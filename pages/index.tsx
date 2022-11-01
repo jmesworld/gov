@@ -1,4 +1,4 @@
-import Head from 'next/head';
+import Head from "next/head";
 import {
   Box,
   Divider,
@@ -12,14 +12,89 @@ import {
   Flex,
   Icon,
   useColorMode,
-  useColorModeValue
-} from '@chakra-ui/react';
-import { BsFillMoonStarsFill, BsFillSunFill } from 'react-icons/bs';
-import { Product, Dependency, WalletSection } from '../components';
-import { dependencies, products } from '../config';
+  useColorModeValue,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  Input,
+  useToast,
+} from "@chakra-ui/react";
+import { BsFillMoonStarsFill, BsFillSunFill } from "react-icons/bs";
+import { Product, Dependency, WalletSection } from "../components";
+import { dependencies, products } from "../config";
+import { useState } from "react";
+import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
+import { IdentityserviceClient } from "../client/Identityservice.client";
+import { useIdentityserviceRegisterUserMutation } from "../client/Identityservice.react-query";
+import { useWallet } from "@cosmos-kit/react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  MsgExecuteContract,
+  CreateTxOptions,
+  Extension,
+  Coin,
+  ExtensionOptions,
+} from "@terra-money/terra.js";
+import { ExecuteMsg } from "../client/Identityservice.types";
 
 export default function Home() {
   const { colorMode, toggleColorMode } = useColorMode();
+  const [isModalOpen, setModalState] = useState(false);
+  const [identityName, setIdentityName] = useState("");
+  const handleIdentityNameChange = (event: any) =>
+    setIdentityName(event.target.value);
+
+  const toast = useToast();
+
+  const walletManager = useWallet();
+  const { walletStatus, address } = walletManager;
+
+  async function registerUser() {
+    const ext = new Extension();
+    const contract =
+      "terra19wzedfegwqjpxp3zjgc4x426u8ylkyuzeeh3hrhzueljsz5wzdzsc2xef8";
+
+    const msg: ExecuteMsg = { register_user: { name: identityName } };
+    const execMsg = new MsgExecuteContract(address as string, contract, msg);
+
+    try {
+      const txMsg = {
+        msgs: [execMsg.toJSON(false)],
+      };
+      const result = await ext.request(
+        "post",
+        JSON.parse(JSON.stringify(txMsg))
+      );
+      const payload = JSON.parse(JSON.stringify(result.payload));
+      if (payload.success) {
+        setIdentityName("");
+        setModalState(false);
+        toast({
+          title: "Identity created.",
+          description: "We've created your identity for you.",
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Identity creation error.",
+          description: payload.error.message,
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+      }
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const identityMutation = useMutation(["userIdentity"], registerUser);
 
   return (
     <Container maxW="5xl" py={10}>
@@ -29,16 +104,25 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Flex justifyContent="end" mb={4}>
-        <Button variant="outline" px={0} onClick={toggleColorMode}>
-          <Icon
-            as={colorMode === 'light' ? BsFillMoonStarsFill : BsFillSunFill}
-          />
+        <Button
+          marginLeft={8}
+          justifyContent="center"
+          alignItems="center"
+          borderRadius="lg"
+          width={200}
+          height={50}
+          color={useColorModeValue("primary.500", "primary.200")}
+          variant="outline"
+          px={0}
+          onClick={() => setModalState(true)}
+        >
+          Create an Identity
         </Button>
       </Flex>
       <Box textAlign="center">
         <Heading
           as="h1"
-          fontSize={{ base: '3xl', sm: '4xl', md: '5xl' }}
+          fontSize={{ base: "3xl", sm: "4xl", md: "5xl" }}
           fontWeight="extrabold"
           mb={3}
         >
@@ -47,21 +131,60 @@ export default function Home() {
         <Heading
           as="h1"
           fontWeight="bold"
-          fontSize={{ base: '2xl', sm: '3xl', md: '4xl' }}
+          fontSize={{ base: "2xl", sm: "3xl", md: "4xl" }}
         >
           <Text
             as="span"
-            color={useColorModeValue('primary.500', 'primary.200')}
+            color={useColorModeValue("primary.500", "primary.200")}
           >
             Let&apos;s Liberate ART together
           </Text>
         </Heading>
       </Box>
       <WalletSection />
-      <Link
-      fontWeight="bold"
-      fontSize={24}
-      >DAOs</Link>
+      <Link href="/DAOs" fontWeight="bold" fontSize={24}>
+        DAOs
+      </Link>
+
+      <Modal isOpen={isModalOpen} onClose={() => setModalState(false)}>
+        <ModalOverlay>
+          <ModalContent>
+            <ModalHeader fontSize={32} fontWeight="bold">
+              Create an Identity
+            </ModalHeader>
+            <ModalCloseButton onClick={() => setModalState(false)} />
+            <ModalBody>
+              <Box>
+                <Text marginBottom={2} fontSize={24}>
+                  NAME
+                </Text>
+                <Input
+                  value={identityName}
+                  onChange={handleIdentityNameChange}
+                  placeholder="Type your name here"
+                  size="lg"
+                  marginBottom={8}
+                ></Input>
+                <Flex justifyContent="center" margin={8}>
+                  <Button
+                    onClick={() => {
+                      identityMutation.mutate();
+                    }}
+                    width={200}
+                    height={50}
+                    variant="outline"
+                    color="white"
+                    bgColor={useColorModeValue("primary.500", "primary.200")}
+                  >
+                    {" "}
+                    Create Identity{" "}
+                  </Button>
+                </Flex>
+              </Box>
+            </ModalBody>
+          </ModalContent>
+        </ModalOverlay>
+      </Modal>
     </Container>
   );
 }

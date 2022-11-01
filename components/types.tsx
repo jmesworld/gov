@@ -79,3 +79,14 @@ export interface FeatureProps {
   text: string;
   href: string;
 }
+
+export interface DAOItemProps {
+  name: string | null | undefined;
+  address: string;
+  // TODO: Add more fields
+}
+
+export interface DAOCosigner {
+  name: string;
+  weight: number;
+}
