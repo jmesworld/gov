@@ -53,9 +53,12 @@ export default function MyDAOs() {
   const identityName: string = router.query.identityName as string;
   const [isModalOpen, setModalState] = useState(false);
   const [cosigners, setCosigners] = useState(new Array());
+  const [cosignersTotalWeight, setCosignersTotalWeight] = useState(new Array());
   const [threshold, setThreshold] = useState(0);
+  const [thresholdPercentage, setThresholdPercentage] = useState(0);
   const [daoName, setDaoName] = useState("");
   const [isDaoNameValid, setDaoNameValidity] = useState(false);
+  console.log(sumArray(cosignersTotalWeight));
   const toast = useToast();
   const walletManager = useWallet();
   const {
@@ -271,6 +274,8 @@ export default function MyDAOs() {
                     name: ownerQueryResult.data?.identity?.name as string,
                     address: address ? address : "",
                   }}
+                  cosignersTotalWeight={cosignersTotalWeight}
+                  setCosignersTotalWeight={setCosignersTotalWeight}
                 />
               </Grid>
               <Grid
@@ -286,6 +291,9 @@ export default function MyDAOs() {
                     placeholder="% to pass"
                     type="number"
                     onChange={(event) => {
+                      setThresholdPercentage(
+                        parseInt(event.target.value.trim())
+                      );
                       setThreshold(
                         Math.ceil(
                           (parseInt(event.target.value.trim()) / 100) *
@@ -298,6 +306,14 @@ export default function MyDAOs() {
               </Grid>
               <Flex justifyContent="center" margin={8}>
                 <Button
+                  disabled={
+                    daoName.length > 1 &&
+                    thresholdPercentage >= 30 &&
+                    thresholdPercentage <= 100 &&
+                    sumArray(cosignersTotalWeight) === 100
+                      ? false
+                      : true
+                  }
                   width={200}
                   height={50}
                   variant="outline"
@@ -322,4 +338,11 @@ export default function MyDAOs() {
       </Flex>
     </Container>
   );
+}
+
+function sumArray(arr: number[]): number {
+  const result = arr.reduce((accumulator, current) => {
+    return accumulator + current;
+  }, 0);
+  return result;
 }

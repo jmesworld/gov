@@ -3,14 +3,18 @@ import { Grid, Text, Input, Flex, Button } from "@chakra-ui/react";
 export const DAOCosignerForm = ({
   cosigners,
   setCosigners,
-  owner
+  owner,
+  cosignersTotalWeight,
+  setCosignersTotalWeight
 }: {
   cosigners: DAOCosigner[];
   setCosigners: any;
   owner: {
     name: string,
     address: string
-  }
+  };
+  cosignersTotalWeight: number[];
+  setCosignersTotalWeight: any;
 }) => {
   let ownerData: DAOCosigner = {
     name: owner.name,
@@ -46,6 +50,8 @@ export const DAOCosignerForm = ({
           width={150}
           onChange={(event) => {
             const value = parseInt(event.target.value.trim());
+            cosignersTotalWeight[i] = value;
+            setCosignersTotalWeight(cosignersTotalWeight);
             cosigners[i].weight = Math.ceil((value / 100) * cosigners.length);
             setCosigners(cosigners);
           }}
@@ -54,6 +60,8 @@ export const DAOCosignerForm = ({
           variant="outline"
           hidden={c.id === 0 ? true : false}
           onClick={() => {
+            cosignersTotalWeight[i] = 0
+            setCosignersTotalWeight(cosignersTotalWeight);
             let newCosigners = cosigners.filter(item => item.id !== c.id);
             setCosigners(newCosigners);
           }}
