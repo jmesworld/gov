@@ -113,13 +113,13 @@ export default function Home() {
           isClosable: true,
         });
       }
-      window.location.reload();
+      // window.location.reload();
       return result;
     } catch (error) {
       console.log(error);
     }
   }
-  console.log(identityMutation.status);
+ 
   return (
     <Container maxW="5xl" py={10}>
       <Head>
