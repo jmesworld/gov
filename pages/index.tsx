@@ -75,7 +75,7 @@ export default function Home() {
     args,
   });
 
-  const identityMutation = useMutation(["userIdentity"], registerUser);
+  const identityMutation = useMutation(["identityMut"], registerUser);
   
   async function registerUser() {
     const ext = new Extension();
@@ -113,13 +113,13 @@ export default function Home() {
           isClosable: true,
         });
       }
-
+      window.location.reload();
       return result;
     } catch (error) {
       console.log(error);
     }
   }
-
+  console.log(identityMutation.status);
   return (
     <Container maxW="5xl" py={10}>
       <Head>
