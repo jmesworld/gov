@@ -44,10 +44,9 @@ export const WalletSection = () => {
     getChainLogo,
     setCurrentChain
   } = walletManager;
-
   const chainOptions = useMemo(
     () =>
-      chains.map((chainRecord) => {
+      [chains[78]].map((chainRecord) => {
         return {
           chainName: chainRecord?.name,
           label: chainRecord?.chain.pretty_name,
@@ -72,7 +71,7 @@ export const WalletSection = () => {
   const onChainChange: handleSelectChainDropdown = async (
     selectedValue: ChainOption | null
   ) => {
-    setCurrentChain(selectedValue?.chainName);
+    setCurrentChain('terra2');
     await connect();
   };
 
@@ -114,7 +113,7 @@ export const WalletSection = () => {
   );
   const chooseChain = (
     <ChooseChain
-      chainName={currentChainName}
+      chainName="terra2"
       chainInfos={chainOptions}
       onChange={onChainChange}
     />
