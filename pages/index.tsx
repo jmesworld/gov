@@ -171,7 +171,7 @@ export default function Home() {
       </Box>
       <WalletSection />
         <NextLink
-          href={{ pathname: "/DAOs", query: { identityName: data?.identity?.name }}}
+          href={{ pathname: "/DAOs"}}
           passHref={true}
         >
           <Link fontWeight="bold" fontSize={24}>

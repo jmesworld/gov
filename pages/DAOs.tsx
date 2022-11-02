@@ -83,9 +83,8 @@ export default function MyDAOs() {
   const { data, error } = useIdentityserviceDaosQuery({ client, args });
   const ownerQueryResult = useIdentityserviceGetIdentityByOwnerQuery({
     client,
-    args: { owner: address ? address : "" },
+    args: { owner: address as string },
   });
-
   async function useMyDaos() {
     let myDaos = [];
     if (data) {
@@ -104,7 +103,6 @@ export default function MyDAOs() {
         }
       }
     }
-    console.log(myDaos);
     return myDaos;
   }
 
@@ -172,7 +170,6 @@ export default function MyDAOs() {
           isClosable: true,
         });
       }
-      console.log(result);
     } catch (error) {
       console.log(error);
     }
@@ -270,7 +267,7 @@ export default function MyDAOs() {
                   cosigners={cosigners}
                   setCosigners={setCosigners}
                   owner={{
-                    name: identityName,
+                    name: ownerQueryResult.data?.identity?.name as string,
                     address: address ? address : "",
                   }}
                 />
