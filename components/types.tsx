@@ -89,4 +89,5 @@ export interface DAOItemProps {
 export interface DAOCosigner {
   name: string;
   weight: number;
+  id: number;
 }

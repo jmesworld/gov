@@ -27,8 +27,14 @@ import { Product, Dependency, WalletSection } from "../components";
 import { dependencies, products } from "../config";
 import { useState } from "react";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
-import { IdentityserviceClient } from "../client/Identityservice.client";
-import { useIdentityserviceRegisterUserMutation } from "../client/Identityservice.react-query";
+import {
+  IdentityserviceClient,
+  IdentityserviceQueryClient,
+} from "../client/Identityservice.client";
+import {
+  useIdentityserviceGetIdentityByOwnerQuery,
+  useIdentityserviceRegisterUserMutation,
+} from "../client/Identityservice.react-query";
 import { useWallet } from "@cosmos-kit/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
@@ -39,6 +45,7 @@ import {
   ExtensionOptions,
 } from "@terra-money/terra.js";
 import { ExecuteMsg } from "../client/Identityservice.types";
+import NextLink from "next/link";
 
 export default function Home() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -52,6 +59,24 @@ export default function Home() {
   const walletManager = useWallet();
   const { walletStatus, address } = walletManager;
 
+  const LCDOptions = {
+    URL: "https://pisco-lcd.terra.dev",
+    chainID: "pisco-1",
+  };
+
+  const lcdClient = new LCDClient(LCDOptions);
+  const args = { owner: address ? address : "" };
+  const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
+    lcdClient,
+    "terra19wzedfegwqjpxp3zjgc4x426u8ylkyuzeeh3hrhzueljsz5wzdzsc2xef8"
+  );
+  const { data, error } = useIdentityserviceGetIdentityByOwnerQuery({
+    client,
+    args,
+  });
+
+  const identityMutation = useMutation(["userIdentity"], registerUser);
+  
   async function registerUser() {
     const ext = new Extension();
     const contract =
@@ -88,14 +113,12 @@ export default function Home() {
           isClosable: true,
         });
       }
-      console.log(result);
+      return result;
     } catch (error) {
       console.log(error);
     }
   }
-
-  const identityMutation = useMutation(["userIdentity"], registerUser);
-
+  console.log(identityMutation);
   return (
     <Container maxW="5xl" py={10}>
       <Head>
@@ -104,20 +127,24 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Flex justifyContent="end" mb={4}>
-        <Button
-          marginLeft={8}
-          justifyContent="center"
-          alignItems="center"
-          borderRadius="lg"
-          width={200}
-          height={50}
-          color={useColorModeValue("primary.500", "primary.200")}
-          variant="outline"
-          px={0}
-          onClick={() => setModalState(true)}
-        >
-          Create an Identity
-        </Button>
+        {data?.identity ? (
+          <Text> Hi, {data.identity.name}</Text>
+        ) : (
+          <Button
+            marginLeft={8}
+            justifyContent="center"
+            alignItems="center"
+            borderRadius="lg"
+            width={200}
+            height={50}
+            color="primary.500"
+            variant="outline"
+            px={0}
+            onClick={() => setModalState(true)}
+          >
+            Create an Identity
+          </Button>
+        )}
       </Flex>
       <Box textAlign="center">
         <Heading
@@ -142,9 +169,14 @@ export default function Home() {
         </Heading>
       </Box>
       <WalletSection />
-      <Link href="/DAOs" fontWeight="bold" fontSize={24}>
-        DAOs
-      </Link>
+        <NextLink
+          href={{ pathname: "/DAOs", query: { identityName: data?.identity?.name }}}
+          passHref={true}
+        >
+          <Link fontWeight="bold" fontSize={24}>
+            My DAOs
+          </Link>
+        </NextLink>
 
       <Modal isOpen={isModalOpen} onClose={() => setModalState(false)}>
         <ModalOverlay>

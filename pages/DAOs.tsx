@@ -28,7 +28,10 @@ import {
   IdentityserviceClient,
   IdentityserviceQueryClient,
 } from "../client/Identityservice.client";
-import { useIdentityserviceDaosQuery } from "../client/Identityservice.react-query";
+import {
+  useIdentityserviceDaosQuery,
+  useIdentityserviceGetIdentityByOwnerQuery,
+} from "../client/Identityservice.react-query";
 import { DaoQueryClient } from "../client/Dao.client";
 import {
   useDaoListVotersQuery,
@@ -37,14 +40,22 @@ import {
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Extension, MsgExecuteContract } from "@terra-money/terra.js";
-import { DaoInstantiateMsg, ExecuteMsg } from "../client/Identityservice.types";
+import {
+  DaoInstantiateMsg,
+  ExecuteMsg,
+  Ordering,
+} from "../client/Identityservice.types";
 import { Voter } from "../client/Dao.types";
+import { useRouter } from "next/router";
 
 export default function MyDAOs() {
+  const router = useRouter();
+  const identityName: string = router.query.identityName as string;
   const [isModalOpen, setModalState] = useState(false);
   const [cosigners, setCosigners] = useState(new Array());
   const [threshold, setThreshold] = useState(0);
   const [daoName, setDaoName] = useState("");
+  const [isDaoNameValid, setDaoNameValidity] = useState(false);
   const toast = useToast();
   const walletManager = useWallet();
   const {
@@ -63,20 +74,24 @@ export default function MyDAOs() {
   };
 
   const lcdClient = new LCDClient(LCDOptions);
-  const args = {};
+  const order: Ordering = "descending";
+  const args = { order: order, limit: 100000 };
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     lcdClient,
     "terra19wzedfegwqjpxp3zjgc4x426u8ylkyuzeeh3hrhzueljsz5wzdzsc2xef8"
   );
   const { data, error } = useIdentityserviceDaosQuery({ client, args });
- 
+  const ownerQueryResult = useIdentityserviceGetIdentityByOwnerQuery({
+    client,
+    args: { owner: address ? address : "" },
+  });
+
   async function useMyDaos() {
     let myDaos = [];
     if (data) {
       for (const i in data?.daos) {
         const daoAddrs = data?.daos[i][1];
         const daoQueryClient = new DaoQueryClient(lcdClient, daoAddrs);
-
         const voter: any = await daoQueryClient.voter({
           address: address ? address : "",
         });
@@ -218,14 +233,21 @@ export default function MyDAOs() {
               <Input
                 placeholder="Type your DAO name here"
                 size="lg"
-                marginBottom={8}
                 onChange={(event) => {
                   setDaoName(event.target.value.trim());
                 }}
               ></Input>
+              {isDaoNameValid && daoName.length > 0 ? (
+                <Text fontSize={16} color="red">
+                  DAO name taken
+                </Text>
+              ) : (
+                ""
+              )}
               <Grid
                 templateColumns="repeat(2, 1fr)"
                 templateRows="repeat(1, 1fr)"
+                marginTop={8}
               >
                 <Text fontSize={24}>COSIGNERS</Text>
                 <Flex justifyContent="end">
@@ -235,7 +257,7 @@ export default function MyDAOs() {
                     onClick={() => {
                       setCosigners((cosigners) => [
                         ...cosigners,
-                        { name: "", weight: 0 },
+                        { name: "", weight: 0, id: cosigners.length + 1 },
                       ]);
                     }}
                   >
@@ -247,6 +269,10 @@ export default function MyDAOs() {
                 <DAOCosignerForm
                   cosigners={cosigners}
                   setCosigners={setCosigners}
+                  owner={{
+                    name: identityName,
+                    address: address ? address : "",
+                  }}
                 />
               </Grid>
               <Grid
@@ -263,9 +289,11 @@ export default function MyDAOs() {
                     type="number"
                     onChange={(event) => {
                       setThreshold(
-                        Math.ceil((parseInt(event.target.value.trim()) / 100) *
-                          cosigners.length
-                      ));
+                        Math.ceil(
+                          (parseInt(event.target.value.trim()) / 100) *
+                            cosigners.length
+                        )
+                      );
                     }}
                   />
                 </Flex>
