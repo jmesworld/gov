@@ -113,12 +113,13 @@ export default function Home() {
           isClosable: true,
         });
       }
+
       return result;
     } catch (error) {
       console.log(error);
     }
   }
-  console.log(identityMutation);
+
   return (
     <Container maxW="5xl" py={10}>
       <Head>
