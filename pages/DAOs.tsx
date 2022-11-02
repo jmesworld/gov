@@ -173,7 +173,7 @@ export default function MyDAOs() {
           isClosable: true,
         });
       }
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       console.log(error);
     }
