@@ -59,6 +59,7 @@ export const WalletSection = () => {
 
   // Events
   const onClickConnect: MouseEventHandler = async (e) => {
+    setCurrentChain('terra2');
     e.preventDefault();
     await connect();
   };
@@ -139,7 +140,7 @@ export const WalletSection = () => {
         alignItems="center"
         justifyContent="center"
       >
-        <GridItem>{chooseChain}</GridItem>
+        {/* <GridItem>{chooseChain}</GridItem> */}
         <GridItem>{connectWalletWarn}</GridItem>
         <GridItem px={6}>
           <Stack
