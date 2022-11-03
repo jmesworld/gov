@@ -32,6 +32,7 @@ import {
   IdentityserviceQueryClient,
 } from "../client/Identityservice.client";
 import {
+  useIdentityserviceGetIdentityByNameQuery,
   useIdentityserviceGetIdentityByOwnerQuery,
   useIdentityserviceRegisterUserMutation,
 } from "../client/Identityservice.react-query";
@@ -51,8 +52,9 @@ export default function Home() {
   const { colorMode, toggleColorMode } = useColorMode();
   const [isModalOpen, setModalState] = useState(false);
   const [identityName, setIdentityName] = useState("");
+
   const handleIdentityNameChange = (event: any) =>
-    setIdentityName(event.target.value);
+    setIdentityName(event.target.value.trim());
 
   const toast = useToast();
 
@@ -75,8 +77,13 @@ export default function Home() {
     args,
   });
 
+  const identityNameQuery = useIdentityserviceGetIdentityByNameQuery({
+    client,
+    args: { name: identityName },
+  });
+
   const identityMutation = useMutation(["identityMut"], registerUser);
-  
+
   async function registerUser() {
     const ext = new Extension();
     const contract =
@@ -119,7 +126,7 @@ export default function Home() {
       console.log(error);
     }
   }
- 
+
   return (
     <Container maxW="5xl" py={10}>
       <Head>
@@ -170,14 +177,11 @@ export default function Home() {
         </Heading>
       </Box>
       <WalletSection />
-        <NextLink
-          href={{ pathname: "/DAOs"}}
-          passHref={true}
-        >
-          <Link fontWeight="bold" fontSize={24}>
-            My DAOs
-          </Link>
-        </NextLink>
+      <NextLink href={{ pathname: "/DAOs" }} passHref={true}>
+        <Link fontWeight="bold" fontSize={24}>
+          My DAOs
+        </Link>
+      </NextLink>
 
       <Modal isOpen={isModalOpen} onClose={() => setModalState(false)}>
         <ModalOverlay>
@@ -196,13 +200,27 @@ export default function Home() {
                   onChange={handleIdentityNameChange}
                   placeholder="Type your name here"
                   size="lg"
-                  marginBottom={8}
+                  marginBottom={2}
                 ></Input>
+                <Text marginBottom={8} fontSize={16}>
+                  {identityNameQuery?.data?.identity?.name.toString() ===
+                  identityName
+                    ? "Name taken!"
+                    : ""}
+                </Text>
                 <Flex justifyContent="center" margin={8}>
                   <Button
                     onClick={() => {
                       identityMutation.mutate();
                     }}
+                    disabled={
+                      !(
+                        identityNameQuery?.data?.identity?.name.toString() ===
+                        identityName
+                      ) && identityName.length > 1
+                        ? false
+                        : true
+                    }
                     width={200}
                     height={50}
                     variant="outline"

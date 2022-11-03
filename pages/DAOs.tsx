@@ -30,13 +30,11 @@ import {
 } from "../client/Identityservice.client";
 import {
   useIdentityserviceDaosQuery,
+  useIdentityserviceGetIdentityByNameQuery,
   useIdentityserviceGetIdentityByOwnerQuery,
 } from "../client/Identityservice.react-query";
 import { DaoQueryClient } from "../client/Dao.client";
-import {
-  useDaoListVotersQuery,
-  useDaoNameQuery,
-} from "../client/Dao.react-query";
+import { useDaoNameQuery } from "../client/Dao.react-query";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Extension, MsgExecuteContract } from "@terra-money/terra.js";
@@ -58,6 +56,7 @@ export default function MyDAOs() {
   const [thresholdPercentage, setThresholdPercentage] = useState(0);
   const [daoName, setDaoName] = useState("");
   const [isDaoNameValid, setDaoNameValidity] = useState(false);
+  const [isIdNamesValid, setIdNamesValid] = useState(false);
   console.log(sumArray(cosignersTotalWeight));
   const toast = useToast();
   const walletManager = useWallet();
@@ -88,6 +87,12 @@ export default function MyDAOs() {
     client,
     args: { owner: address as string },
   });
+
+  const daoNameQuery = useIdentityserviceGetIdentityByNameQuery({
+    client,
+    args: { name: daoName },
+  });
+
   async function useMyDaos() {
     let myDaos = [];
     if (data) {
@@ -232,19 +237,18 @@ export default function MyDAOs() {
                 DAO NAME
               </Text>
               <Input
+              marginBottom={2}
                 placeholder="Type your DAO name here"
                 size="lg"
                 onChange={(event) => {
                   setDaoName(event.target.value.trim());
                 }}
               ></Input>
-              {isDaoNameValid && daoName.length > 0 ? (
-                <Text fontSize={16} color="red">
-                  DAO name taken
-                </Text>
-              ) : (
-                ""
-              )}
+              <Text marginBottom={2} fontSize={16}>
+                {daoNameQuery?.data?.identity?.name.toString() === daoName
+                  ? "Name taken!"
+                  : ""}
+              </Text>
               <Grid
                 templateColumns="repeat(2, 1fr)"
                 templateRows="repeat(1, 1fr)"
@@ -276,6 +280,7 @@ export default function MyDAOs() {
                   }}
                   cosignersTotalWeight={cosignersTotalWeight}
                   setCosignersTotalWeight={setCosignersTotalWeight}
+                  setIdNamesValid={setIdNamesValid}
                 />
               </Grid>
               <Grid
@@ -307,6 +312,8 @@ export default function MyDAOs() {
               <Flex justifyContent="center" margin={8}>
                 <Button
                   disabled={
+                    !(daoNameQuery?.data?.identity?.name.toString() === daoName) &&
+                    isIdNamesValid &&
                     daoName.length > 1 &&
                     thresholdPercentage >= 30 &&
                     thresholdPercentage <= 100 &&
