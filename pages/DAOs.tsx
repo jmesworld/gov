@@ -34,7 +34,6 @@ import {
 } from "../client/Identityservice.react-query";
 import { DaoQueryClient } from "../client/Dao.client";
 import {
-  useDaoListVotersQuery,
   useDaoNameQuery,
 } from "../client/Dao.react-query";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
@@ -58,6 +57,7 @@ export default function MyDAOs() {
   const [thresholdPercentage, setThresholdPercentage] = useState(0);
   const [daoName, setDaoName] = useState("");
   const [isDaoNameValid, setDaoNameValidity] = useState(false);
+  const [isIdNamesValid, setIdNamesValid] = useState(false);
   console.log(sumArray(cosignersTotalWeight));
   const toast = useToast();
   const walletManager = useWallet();
@@ -88,6 +88,18 @@ export default function MyDAOs() {
     client,
     args: { owner: address as string },
   });
+
+  const daoQueryClient: DaoQueryClient = new DaoQueryClient(
+    lcdClient,
+    "terra19wzedfegwqjpxp3zjgc4x426u8ylkyuzeeh3hrhzueljsz5wzdzsc2xef8",
+  );
+  const identityNameQuery = useDaoNameQuery({
+    client: daoQueryClient,
+    options: {  
+    }
+  });
+
+
   async function useMyDaos() {
     let myDaos = [];
     if (data) {
@@ -276,6 +288,7 @@ export default function MyDAOs() {
                   }}
                   cosignersTotalWeight={cosignersTotalWeight}
                   setCosignersTotalWeight={setCosignersTotalWeight}
+                  setIdNamesValid={setIdNamesValid}
                 />
               </Grid>
               <Grid
@@ -307,6 +320,7 @@ export default function MyDAOs() {
               <Flex justifyContent="center" margin={8}>
                 <Button
                   disabled={
+                    isIdNamesValid &&
                     daoName.length > 1 &&
                     thresholdPercentage >= 30 &&
                     thresholdPercentage <= 100 &&
