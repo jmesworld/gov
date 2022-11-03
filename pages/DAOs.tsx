@@ -30,12 +30,11 @@ import {
 } from "../client/Identityservice.client";
 import {
   useIdentityserviceDaosQuery,
+  useIdentityserviceGetIdentityByNameQuery,
   useIdentityserviceGetIdentityByOwnerQuery,
 } from "../client/Identityservice.react-query";
 import { DaoQueryClient } from "../client/Dao.client";
-import {
-  useDaoNameQuery,
-} from "../client/Dao.react-query";
+import { useDaoNameQuery } from "../client/Dao.react-query";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Extension, MsgExecuteContract } from "@terra-money/terra.js";
@@ -89,16 +88,10 @@ export default function MyDAOs() {
     args: { owner: address as string },
   });
 
-  const daoQueryClient: DaoQueryClient = new DaoQueryClient(
-    lcdClient,
-    "terra19wzedfegwqjpxp3zjgc4x426u8ylkyuzeeh3hrhzueljsz5wzdzsc2xef8",
-  );
-  const identityNameQuery = useDaoNameQuery({
-    client: daoQueryClient,
-    options: {  
-    }
+  const daoNameQuery = useIdentityserviceGetIdentityByNameQuery({
+    client,
+    args: { name: daoName },
   });
-
 
   async function useMyDaos() {
     let myDaos = [];
@@ -244,19 +237,18 @@ export default function MyDAOs() {
                 DAO NAME
               </Text>
               <Input
+              marginBottom={2}
                 placeholder="Type your DAO name here"
                 size="lg"
                 onChange={(event) => {
                   setDaoName(event.target.value.trim());
                 }}
               ></Input>
-              {isDaoNameValid && daoName.length > 0 ? (
-                <Text fontSize={16} color="red">
-                  DAO name taken
-                </Text>
-              ) : (
-                ""
-              )}
+              <Text marginBottom={2} fontSize={16}>
+                {daoNameQuery?.data?.identity?.name.toString() === daoName
+                  ? "Name taken!"
+                  : ""}
+              </Text>
               <Grid
                 templateColumns="repeat(2, 1fr)"
                 templateRows="repeat(1, 1fr)"
@@ -320,6 +312,7 @@ export default function MyDAOs() {
               <Flex justifyContent="center" margin={8}>
                 <Button
                   disabled={
+                    !(daoNameQuery?.data?.identity?.name.toString() === daoName) &&
                     isIdNamesValid &&
                     daoName.length > 1 &&
                     thresholdPercentage >= 30 &&
