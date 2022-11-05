@@ -9,6 +9,7 @@ import { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee } from "@cosmjs/amino";
 import { Duration, Threshold, Decimal, InstantiateMsg, Voter, ExecuteMsg, Expiration, Timestamp, Uint64, CosmosMsgForEmpty, BankMsg, Uint128, StakingMsg, DistributionMsg, WasmMsg, Binary, Vote, Coin, Empty, QueryMsg, Status, ThresholdResponse, ProposalListResponse, ProposalResponseForEmpty, VoterListResponse, VoterDetail, VoteListResponse, VoteInfo, NameResponse, VoteResponse, VoterResponse } from "./Dao.types";
 import { DaoQueryClient, DaoClient } from "./Dao.client";
+import { Coins, WaitTxBroadcastResult } from "@terra-money/terra.js";
 export const daoQueryKeys = {
   contract: ([{
     contract: "dao"
@@ -210,8 +211,8 @@ export interface DaoCloseMutation {
     coins?: Coins;
   };
 }
-export function useDaoCloseMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, DaoCloseMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, DaoCloseMutation>(({
+export function useDaoCloseMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, DaoCloseMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, DaoCloseMutation>(({
     client,
     msg,
     args: {
@@ -228,8 +229,8 @@ export interface DaoExecuteMutation {
     coins?: Coins;
   };
 }
-export function useDaoExecuteMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, DaoExecuteMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, DaoExecuteMutation>(({
+export function useDaoExecuteMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, DaoExecuteMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, DaoExecuteMutation>(({
     client,
     msg,
     args: {
@@ -247,8 +248,8 @@ export interface DaoVoteMutation {
     coins?: Coins;
   };
 }
-export function useDaoVoteMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, DaoVoteMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, DaoVoteMutation>(({
+export function useDaoVoteMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, DaoVoteMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, DaoVoteMutation>(({
     client,
     msg,
     args: {
@@ -268,8 +269,8 @@ export interface DaoProposeMutation {
     coins?: Coins;
   };
 }
-export function useDaoProposeMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, DaoProposeMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, DaoProposeMutation>(({
+export function useDaoProposeMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, DaoProposeMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, DaoProposeMutation>(({
     client,
     msg,
     args: {

@@ -44,11 +44,8 @@ import {
   Ordering,
 } from "../client/Identityservice.types";
 import { Voter } from "../client/Dao.types";
-import { useRouter } from "next/router";
 
 export default function MyDAOs() {
-  const router = useRouter();
-  const identityName: string = router.query.identityName as string;
   const [isModalOpen, setModalState] = useState(false);
   const [cosigners, setCosigners] = useState(new Array());
   const [cosignersTotalWeight, setCosignersTotalWeight] = useState(new Array());
@@ -57,7 +54,7 @@ export default function MyDAOs() {
   const [daoName, setDaoName] = useState("");
   const [isDaoNameValid, setDaoNameValidity] = useState(false);
   const [isIdNamesValid, setIdNamesValid] = useState(false);
-  console.log(sumArray(cosignersTotalWeight));
+
   const toast = useToast();
   const walletManager = useWallet();
   const {
