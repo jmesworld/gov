@@ -244,7 +244,7 @@ export default function MyDAOs() {
               <Text marginBottom={2} fontSize={16}>
                 {daoNameQuery?.data?.identity?.name.toString() === daoName
                   ? "Name taken!"
-                  : ""}
+                  : "available"}
               </Text>
               <Grid
                 templateColumns="repeat(2, 1fr)"
@@ -334,7 +334,7 @@ export default function MyDAOs() {
         </ModalContent>
       </Modal>
       <Flex marginTop={24}>
-        {!myDaos?.isLoading ? (
+        {!myDaos?.isFetching || !myDaos.isPaused || !myDaos.isLoading ? (
           <DAOList daos={myDaos?.data} />
         ) : (
           <Text>Loading your DAOs.....</Text>
