@@ -77,8 +77,8 @@ export default function Proposals() {
   } = walletManager;
 
   const LCDOptions = {
-    URL: "https://pisco-lcd.terra.dev",
-    chainID: "pisco-1",
+    URL: process.env.LCD_URL as string,
+    chainID: process.env.CHAIN_ID as string,
   };
 
   const lcdClient = new LCDClient(LCDOptions);
@@ -88,10 +88,15 @@ export default function Proposals() {
     let msgs = [];
 
     for (let recipient of recipients) {
-      const coin: Dao.Coin = { denom: "uluna", amount: recipient.amount.toString() }
-      const bankMsg: Dao.BankMsg = { send: { amount: [coin], to_address: recipient.address } }
+      const coin: Dao.Coin = {
+        denom: "uluna",
+        amount: recipient.amount.toString(),
+      };
+      const bankMsg: Dao.BankMsg = {
+        send: { amount: [coin], to_address: recipient.address },
+      };
       msgs.push({
-        bank: bankMsg
+        bank: bankMsg,
       });
     }
 
@@ -151,10 +156,7 @@ export default function Proposals() {
 
   const proposalMutation = useMutation(["proposalMutation"], createProposal);
 
-  const daoQueryClient = new DaoQueryClient(
-    lcdClient,
-    daoAddress as string
-  );
+  const daoQueryClient = new DaoQueryClient(lcdClient, daoAddress as string);
   const proposalsQuery = useDaoListProposalsQuery({
     client: daoQueryClient,
     args: { limit: 10000 },
@@ -243,7 +245,12 @@ export default function Proposals() {
                     onClick={() => {
                       setRecipients((recipients) => [
                         ...recipients,
-                        { name: "", amount: 0, id: recipients.length + 1, address: "" },
+                        {
+                          name: "",
+                          amount: 0,
+                          id: recipients.length + 1,
+                          address: "",
+                        },
                       ]);
                     }}
                   >
@@ -284,7 +291,10 @@ export default function Proposals() {
       </Modal>
       <Flex marginTop={24}>
         {!proposalsQuery?.isLoading ? (
-          <ProposalList proposals={proposalsQuery?.data?.proposals} daoAddress={daoAddress as string} />
+          <ProposalList
+            proposals={proposalsQuery?.data?.proposals}
+            daoAddress={daoAddress as string}
+          />
         ) : (
           <Text>Loading your proposals.....</Text>
         )}

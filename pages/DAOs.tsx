@@ -45,6 +45,11 @@ import {
 } from "../client/Identityservice.types";
 import { Voter } from "../client/Dao.types";
 
+const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
+const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
+const IDENTITY_SERVICE_CONTRACT = process.env
+  .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
+
 export default function MyDAOs() {
   const [isModalOpen, setModalState] = useState(false);
   const [cosigners, setCosigners] = useState(new Array());
@@ -68,8 +73,8 @@ export default function MyDAOs() {
   } = walletManager;
 
   const LCDOptions = {
-    URL: "https://pisco-lcd.terra.dev",
-    chainID: "pisco-1",
+    URL: LCD_URL,
+    chainID: CHAIN_ID,
   };
 
   const lcdClient = new LCDClient(LCDOptions);
@@ -77,7 +82,7 @@ export default function MyDAOs() {
   const args = { order: order, limit: 100000 };
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     lcdClient,
-    "terra19wzedfegwqjpxp3zjgc4x426u8ylkyuzeeh3hrhzueljsz5wzdzsc2xef8"
+    IDENTITY_SERVICE_CONTRACT
   );
   const { data, error } = useIdentityserviceDaosQuery({ client, args });
   const ownerQueryResult = useIdentityserviceGetIdentityByOwnerQuery({
@@ -141,8 +146,7 @@ export default function MyDAOs() {
       };
 
       const ext = new Extension();
-      const contract =
-        "terra19wzedfegwqjpxp3zjgc4x426u8ylkyuzeeh3hrhzueljsz5wzdzsc2xef8";
+      const contract = IDENTITY_SERVICE_CONTRACT;
 
       const msg: ExecuteMsg = { register_dao: daoData };
       const execMsg = new MsgExecuteContract(address as string, contract, msg);
@@ -221,7 +225,13 @@ export default function MyDAOs() {
           </Flex>
         </GridItem>
       </Grid>
-      <Modal isOpen={isModalOpen} onClose={() => setModalState(false)}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setModalState(false);
+          setDaoName("");
+        }}
+      >
         <ModalOverlay />
         <ModalContent maxW="50%">
           <ModalHeader fontSize={32} fontWeight="bold">
@@ -234,7 +244,7 @@ export default function MyDAOs() {
                 DAO NAME
               </Text>
               <Input
-              marginBottom={2}
+                marginBottom={2}
                 placeholder="Type your DAO name here"
                 size="lg"
                 onChange={(event) => {
@@ -242,9 +252,13 @@ export default function MyDAOs() {
                 }}
               ></Input>
               <Text marginBottom={2} fontSize={16}>
-                {daoNameQuery?.data?.identity?.name.toString() === daoName
-                  ? "Name taken!"
-                  : "available"}
+                {daoName.length > 0
+                  ? daoNameQuery.isFetched
+                    ? daoNameQuery?.data?.identity?.name.toString() === daoName
+                      ? "Name taken!"
+                      : "available"
+                    : ""
+                  : ""}
               </Text>
               <Grid
                 templateColumns="repeat(2, 1fr)"
@@ -309,7 +323,9 @@ export default function MyDAOs() {
               <Flex justifyContent="center" margin={8}>
                 <Button
                   disabled={
-                    !(daoNameQuery?.data?.identity?.name.toString() === daoName) &&
+                    !(
+                      daoNameQuery?.data?.identity?.name.toString() === daoName
+                    ) &&
                     isIdNamesValid &&
                     daoName.length > 1 &&
                     thresholdPercentage >= 30 &&
@@ -334,7 +350,7 @@ export default function MyDAOs() {
         </ModalContent>
       </Modal>
       <Flex marginTop={24}>
-        {!myDaos?.isFetching || !myDaos.isPaused || !myDaos.isLoading ? (
+        {!myDaos.isFetching ? (
           <DAOList daos={myDaos?.data} />
         ) : (
           <Text>Loading your DAOs.....</Text>

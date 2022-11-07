@@ -56,13 +56,16 @@ import * as Dao from "../client/Dao.types";
 import exp from "constants";
 import { VoteOption } from "../client/Governance.types";
 
+const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
+const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
+const IDENTITY_SERVICE_CONTRACT = process.env.NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
+
 export default function ProposalDetail() {
   const router = useRouter();
   const proposalId = router.query.id;
   const daoAddress = router.query.address;
 
   let vote = "";
-
 
   const toast = useToast();
   const walletManager = useWallet();
@@ -77,8 +80,8 @@ export default function ProposalDetail() {
   } = walletManager;
 
   const LCDOptions = {
-    URL: "https://pisco-lcd.terra.dev",
-    chainID: "pisco-1",
+    URL: LCD_URL,
+    chainID: CHAIN_ID,
   };
 
   const lcdClient = new LCDClient(LCDOptions);
@@ -222,24 +225,16 @@ export default function ProposalDetail() {
   // }
   // const recipientsQuery = useQuery(['recipientsQuery'], getRecipients);
 
-
   const proposalThreshold: any = proposalQuery.data?.threshold;
   const proposalThresholdWeight = proposalQuery.data
     ? proposalThreshold["absolute_count"]["weight"]
     : 0;
 
-  async function getProposalExpiryDate() {
-    try {
-    const expires = proposalQuery.data?.expires;
-    const date = await dateFromBlockHeight(JSON.parse(JSON.stringify(expires))['at_height']);
-    return date;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  const proposalExpiryDate = useQuery(['proposalExpiryDate'], getProposalExpiryDate);
-  
-  const proposalMsgs: any[] = proposalQuery.data ? proposalQuery.data?.msgs : [];
+  const proposalExpiryDate: any = proposalQuery.data?.expires;
+
+  const proposalMsgs: any[] = proposalQuery.data
+    ? proposalQuery.data?.msgs
+    : [];
 
   return (
     <Container maxW="5xl" py={10}>
@@ -273,14 +268,13 @@ export default function ProposalDetail() {
         <Text marginBottom={2} fontSize={24} fontWeight="bold">
           RECIPIENTS
         </Text>
-        {
-          proposalMsgs.map((recipient, i) => (
+        {proposalMsgs.map((recipient, i) => (
           <Text key={i} marginBottom={2} fontSize={18}>
-            {recipient['bank']['send']['to_address']} {recipient['bank']['send']['amount'][0]['amount']} {recipient['bank']['send']['amount'][0]['denom']}
+            {recipient["bank"]["send"]["to_address"]}{" "}
+            {recipient["bank"]["send"]["amount"][0]["amount"]}{" "}
+            {recipient["bank"]["send"]["amount"][0]["denom"]}
           </Text>
-          )
-          )
-        }
+        ))}
         <Text marginTop={8} fontSize={24} fontWeight="bold">
           RESULTS
         </Text>
@@ -314,8 +308,10 @@ export default function ProposalDetail() {
             START:
           </Text> */}
           <Text marginBottom={8} fontSize={18}>
-            END: 
-            {/* {proposalExpiryDate.data ? proposalExpiryDate.data : ""}  */}
+            END:{" "}
+            {proposalQuery.data
+              ? proposalExpiryDate["at_height"] + " (block height)"
+              : ""}
           </Text>
         </Grid>
         <Grid templateColumns="repeat(3, 1fr)" templateRows="repeat(1, 1fr)">
@@ -386,37 +382,3 @@ export default function ProposalDetail() {
     </Container>
   );
 }
-
-export const RecipientList = ({}) => {};
-
-export const dateFromBlockHeight = async (blockHeight: number) => {
-  const LCDOptions = {
-    URL: "https://pisco-lcd.terra.dev",
-    chainID: "pisco-1",
-  };
-
-  const lcdClient = new LCDClient(LCDOptions);
-
-  const currentBlockInfo = await lcdClient.tendermint.blockInfo();
-  const currentBlockHeight = currentBlockInfo.block.header.height;
-  const currentBlockTimestamp = currentBlockInfo.block.header.time;
-  const currentBlockDate = new Date(currentBlockTimestamp);
-  const currentBlockEpoch = currentBlockDate.getTime();
-
-  const prevBlockInfo = await lcdClient.tendermint.blockInfo(
-    parseInt(currentBlockHeight) - 10
-  );
-  const prevBlockHeight = prevBlockInfo.block.header.height;
-  const prevBlockTimestamp = prevBlockInfo.block.header.time;
-  const prevBlockDate = new Date(prevBlockTimestamp);
-  const prevBlockEpoch = prevBlockDate.getTime();
-
-  const d1 = currentBlockEpoch - prevBlockEpoch;
-  const d2 = blockHeight - parseInt(prevBlockHeight);
-  const d3 = parseInt(currentBlockHeight) - parseInt(prevBlockHeight);
-  const d4 = d1 * (d2 / d3);
-  const epoch = Math.ceil(d4 + prevBlockEpoch);
-  const targetDate = new Date(epoch);
-
-  return targetDate.toString();
-};
