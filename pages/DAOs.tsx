@@ -357,7 +357,7 @@ export default function MyDAOs() {
         </ModalContent>
       </Modal>
       <Flex marginTop={24}>
-        {!myDaos.isFetching ? (
+        {!myDaos.isFetching && myDaos.data !== undefined ? (
           <DAOList daos={myDaos?.data} />
         ) : (
           <Text>Loading your DAOs.....</Text>

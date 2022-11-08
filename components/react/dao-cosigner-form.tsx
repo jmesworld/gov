@@ -5,6 +5,11 @@ import { LCDClient } from "@terra-money/terra.js";
 import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
 import { useQuery } from "@tanstack/react-query";
 
+const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
+const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
+const IDENTITY_SERVICE_CONTRACT = process.env
+  .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
+
 export const DAOCosignerForm = ({
   cosigners,
   setCosigners,
@@ -31,14 +36,14 @@ export const DAOCosignerForm = ({
   cosigners[0] = ownerData;
 
   const LCDOptions = {
-    URL: process.env.LCD_URL as string,
-    chainID: process.env.CHAIN_ID as string,
+    URL: LCD_URL,
+    chainID: CHAIN_ID,
   };
 
   const lcdClient = new LCDClient(LCDOptions);
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     lcdClient,
-    process.env.IDENTITY_SERVICE_CONTRACT as string
+    IDENTITY_SERVICE_CONTRACT
   );
 
   async function getIdentitiesByNames() {
@@ -116,7 +121,15 @@ export const DAOCosignerForm = ({
           </Button>
         </Grid>
         <Text fontSize={12}>
-          {idsByNamesQuery?.data ? idsByNamesQuery?.data[i] : ""}
+          {
+            // @ts-ignore
+            !idsByNamesQuery.isLoading && idsByNamesQuery.data[i] !== undefined
+              ? // @ts-ignore
+                idsByNamesQuery?.data[i]
+              : cosigners[i].name.length > 1
+              ? "Loading"
+              : ""
+          }
         </Text>
       </>
     );
