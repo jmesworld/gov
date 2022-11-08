@@ -237,7 +237,14 @@ export default function MyDAOs() {
           <ModalHeader fontSize={32} fontWeight="bold">
             Create a DAO
           </ModalHeader>
-          <ModalCloseButton onClick={() => setModalState(false)} />
+          <ModalCloseButton
+            onClick={() => {
+              setCosigners(new Array());
+              setDaoName("");
+              setThreshold(0);
+              setModalState(false);
+            }}
+          />
           <ModalBody>
             <Box>
               <Text marginBottom={2} fontSize={24}>
