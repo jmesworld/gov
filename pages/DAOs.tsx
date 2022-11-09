@@ -19,6 +19,7 @@ import {
   Input,
   Icon,
   useToast,
+  Spinner,
 } from "@chakra-ui/react";
 import { DAOList } from "../components/react/dao-list";
 import { useState } from "react";
@@ -96,8 +97,9 @@ export default function MyDAOs() {
   });
 
   async function useMyDaos() {
-    let myDaos = [];
+    let myDaos: any = 'undefined';
     if (data) {
+      myDaos = [];
       for (const i in data?.daos) {
         const daoAddrs = data?.daos[i][1];
         const daoQueryClient = new DaoQueryClient(lcdClient, daoAddrs);
@@ -356,11 +358,11 @@ export default function MyDAOs() {
           </ModalBody>
         </ModalContent>
       </Modal>
-      <Flex marginTop={24}>
-        {!myDaos.isFetching && myDaos.data !== undefined ? (
+      <Flex marginTop={24} justifyContent='center'>
+        {myDaos.data !== 'undefined' ? (
           <DAOList daos={myDaos?.data} />
         ) : (
-          <Text>Loading your DAOs.....</Text>
+          <Spinner color='red.500' />
         )}
       </Flex>
     </Container>

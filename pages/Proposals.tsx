@@ -20,6 +20,7 @@ import {
   Icon,
   useToast,
   Textarea,
+  Spinner,
 } from "@chakra-ui/react";
 import { ProposalList } from "../components/react/proposal-list";
 import { useState } from "react";
@@ -53,6 +54,11 @@ import * as Governance from "../client/Governance.types";
 import * as BjmesToken from "../client/BjmesToken.types";
 import * as Dao from "../client/Dao.types";
 
+const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
+const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
+const IDENTITY_SERVICE_CONTRACT = process.env
+  .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
+
 export default function Proposals() {
   const router = useRouter();
   const daoName = router.query.name;
@@ -77,8 +83,8 @@ export default function Proposals() {
   } = walletManager;
 
   const LCDOptions = {
-    URL: process.env.LCD_URL as string,
-    chainID: process.env.CHAIN_ID as string,
+    URL: LCD_URL,
+    chainID: CHAIN_ID,
   };
 
   const lcdClient = new LCDClient(LCDOptions);
@@ -289,14 +295,15 @@ export default function Proposals() {
           </ModalBody>
         </ModalContent>
       </Modal>
-      <Flex marginTop={24}>
-        {!proposalsQuery?.isLoading ? (
+      <Flex marginTop={24} justifyContent='center'>
+        {proposalsQuery.data ? (
           <ProposalList
+          // @ts-ignore
             proposals={proposalsQuery?.data?.proposals}
             daoAddress={daoAddress as string}
           />
         ) : (
-          <Text>Loading your proposals.....</Text>
+          <Spinner color='red.500' />
         )}
       </Flex>
     </Container>
