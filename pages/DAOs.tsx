@@ -97,7 +97,7 @@ export default function MyDAOs() {
   });
 
   async function useMyDaos() {
-    let myDaos: any = 'undefined';
+    let myDaos: any = "undefined";
     if (data) {
       myDaos = [];
       for (const i in data?.daos) {
@@ -233,6 +233,7 @@ export default function MyDAOs() {
           setModalState(false);
           setDaoName("");
         }}
+        scrollBehavior={"inside"}
       >
         <ModalOverlay />
         <ModalContent maxW="50%">
@@ -275,22 +276,20 @@ export default function MyDAOs() {
                 marginTop={8}
               >
                 <Text fontSize={24}>COSIGNERS</Text>
-                <Flex justifyContent="end">
-                  <Button
-                    variant="outline"
-                    width={100}
-                    onClick={() => {
-                      setCosigners((cosigners) => [
-                        ...cosigners,
-                        { name: "", weight: 0, id: cosigners.length + 1 },
-                      ]);
-                    }}
-                  >
-                    <Text fontSize={18} fontWeight="bold">
-                      +
-                    </Text>
-                  </Button>
-                </Flex>
+                <Button
+                  variant="outline"
+                  width={100}
+                  onClick={() => {
+                    setCosigners((cosigners) => [
+                      ...cosigners,
+                      { name: "", weight: 0, id: cosigners.length + 1 },
+                    ]);
+                  }}
+                >
+                  <Text fontSize={18} fontWeight="bold">
+                    +
+                  </Text>
+                </Button>
                 <DAOCosignerForm
                   cosigners={cosigners}
                   setCosigners={setCosigners}
@@ -358,11 +357,11 @@ export default function MyDAOs() {
           </ModalBody>
         </ModalContent>
       </Modal>
-      <Flex marginTop={24} justifyContent='center'>
-        {myDaos.data !== 'undefined' ? (
+      <Flex marginTop={24} justifyContent="center">
+        {myDaos.data !== "undefined" ? (
           <DAOList daos={myDaos?.data} />
         ) : (
-          <Spinner color='red.500' />
+          <Spinner color="red.500" />
         )}
       </Flex>
     </Container>

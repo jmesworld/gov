@@ -207,7 +207,7 @@ export default function Proposals() {
           </Flex>
         </GridItem>
       </Grid>
-      <Modal isOpen={isModalOpen} onClose={() => setModalState(false)}>
+      <Modal isOpen={isModalOpen} onClose={() => setModalState(false)}  scrollBehavior={"inside"}>
         <ModalOverlay />
         <ModalContent maxW="50%">
           <ModalHeader fontSize={32} fontWeight="bold">

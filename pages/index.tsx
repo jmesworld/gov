@@ -187,7 +187,7 @@ export default function Home() {
         </Link>
       </NextLink>
 
-      <Modal isOpen={isModalOpen} onClose={() => setModalState(false)}>
+      <Modal isOpen={isModalOpen} onClose={() => setModalState(false)}  scrollBehavior={"inside"}>
         <ModalOverlay>
           <ModalContent>
             <ModalHeader fontSize={32} fontWeight="bold">
