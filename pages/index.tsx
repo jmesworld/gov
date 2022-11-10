@@ -91,7 +91,7 @@ export default function Home() {
 
   async function registerUser() {
     const ext = new Extension();
-    const contract = process.env.IDENTITY_SERVICE_CONTRACT as string;
+    const contract = IDENTITY_SERVICE_CONTRACT;
 
     const msg: ExecuteMsg = { register_user: { name: identityName } };
     const execMsg = new MsgExecuteContract(address as string, contract, msg);
