@@ -1,16 +1,12 @@
 import Head from "next/head";
 import {
   Box,
-  Divider,
-  Grid,
   Heading,
   Text,
-  Stack,
   Container,
   Link,
   Button,
   Flex,
-  Icon,
   useColorMode,
   useColorModeValue,
   Modal,
@@ -22,28 +18,21 @@ import {
   Input,
   useToast,
 } from "@chakra-ui/react";
-import { BsFillMoonStarsFill, BsFillSunFill } from "react-icons/bs";
-import { Product, Dependency, WalletSection } from "../components";
-import { dependencies, products } from "../config";
+import { WalletSection } from "../components";
 import { useState } from "react";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
 import {
-  IdentityserviceClient,
   IdentityserviceQueryClient,
 } from "../client/Identityservice.client";
 import {
   useIdentityserviceGetIdentityByNameQuery,
   useIdentityserviceGetIdentityByOwnerQuery,
-  useIdentityserviceRegisterUserMutation,
 } from "../client/Identityservice.react-query";
 import { useWallet } from "@cosmos-kit/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   MsgExecuteContract,
-  CreateTxOptions,
   Extension,
-  Coin,
-  ExtensionOptions,
 } from "@terra-money/terra.js";
 import { ExecuteMsg } from "../client/Identityservice.types";
 import NextLink from "next/link";

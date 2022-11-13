@@ -6,55 +6,20 @@ import {
   Heading,
   Button,
   Grid,
-  GridItem,
   useColorModeValue,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
   Text,
-  Input,
-  Icon,
   useToast,
-  Textarea,
 } from "@chakra-ui/react";
-import { ProposalList } from "../components/react/proposal-list";
-import { useState } from "react";
 import { useWallet } from "@cosmos-kit/react";
+import { DaoQueryClient } from "../client/Dao.client";
 import {
-  IdentityserviceClient,
-  IdentityserviceQueryClient,
-} from "../client/Identityservice.client";
-import {
-  useIdentityserviceDaosQuery,
-  useIdentityserviceGetIdentityByNameQuery,
-  useIdentityserviceGetIdentityByOwnerQuery,
-} from "../client/Identityservice.react-query";
-import { DaoClient, DaoQueryClient } from "../client/Dao.client";
-import {
-  useDaoListProposalsQuery,
   useDaoListVotesQuery,
-  useDaoNameQuery,
   useDaoProposalQuery,
 } from "../client/Dao.react-query";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Extension, MsgExecuteContract } from "@terra-money/terra.js";
-import {
-  DaoInstantiateMsg,
-  ExecuteMsg,
-  Ordering,
-} from "../client/Identityservice.types";
 import { useRouter } from "next/router";
-import { ProposalRecipientForm } from "../components/react/proposal-recipient-form";
-import * as Governance from "../client/Governance.types";
-import * as BjmesToken from "../client/BjmesToken.types";
-import * as Dao from "../client/Dao.types";
-import exp from "constants";
-import { VoteOption } from "../client/Governance.types";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;

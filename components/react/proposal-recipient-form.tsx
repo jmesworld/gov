@@ -58,6 +58,8 @@ export const ProposalRecipientForm = ({
 
   const idsByNamesQuery = useQuery(["identities"], getIdentitiesByNames);
 
+  const [focusedCosignerIndex, setFocusedCosignerIndex] = useState(Infinity);
+
   let recipientItem = recipients.map((c, i) => {
     if (idsByNamesQuery.data) {
       recipients[i].address = idsByNamesQuery.data[i];
@@ -80,6 +82,9 @@ export const ProposalRecipientForm = ({
               recipients[i].name = event.target.value.trim();
               setRecipients(recipients);
               setRecipientsNamesValid(false);
+            }}
+            onFocus={() => {
+              setFocusedCosignerIndex(i);
             }}
             onBlur={() => idsByNamesQuery.refetch()}
           />
@@ -113,7 +118,9 @@ export const ProposalRecipientForm = ({
           {recipients[i].name.length > 0
             ? !idsByNamesQuery.isFetching
               ? idsByNamesQuery?.data?.at(i)
-              : "Checking..."
+              : (
+                i === focusedCosignerIndex ? "Checking...": idsByNamesQuery?.data?.at(i)
+              )
             : ""}
         </Text>
       </Fragment>

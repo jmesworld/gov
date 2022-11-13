@@ -14,10 +14,8 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter,
   Text,
   Input,
-  Icon,
   useToast,
   Spinner,
 } from "@chakra-ui/react";
@@ -26,7 +24,6 @@ import { useState } from "react";
 import { DAOCosignerForm } from "../components/react/dao-cosigner-form";
 import { useWallet } from "@cosmos-kit/react";
 import {
-  IdentityserviceClient,
   IdentityserviceQueryClient,
 } from "../client/Identityservice.client";
 import {
@@ -35,7 +32,6 @@ import {
   useIdentityserviceGetIdentityByOwnerQuery,
 } from "../client/Identityservice.react-query";
 import { DaoQueryClient } from "../client/Dao.client";
-import { useDaoNameQuery } from "../client/Dao.react-query";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Extension, MsgExecuteContract } from "@terra-money/terra.js";

@@ -69,7 +69,12 @@ export const DAOCosignerForm = ({
   }
 
   const idsByNamesQuery = useQuery(["identities"], getIdentitiesByNames);
+
+  const [focusedCosignerIndex, setFocusedCosignerIndex] = useState(Infinity);
+
+
   let cosignerItem = cosigners.map((c, i) => {
+
     return (
       <Fragment key={c.id}>
         <Grid
@@ -88,6 +93,9 @@ export const DAOCosignerForm = ({
               setCosigners(cosigners);
               setIdNamesValid(false);
               // idsByNamesQuery.refetch();
+            }}
+            onFocus={() => {
+              setFocusedCosignerIndex(i);
             }}
             onBlur={() => idsByNamesQuery.refetch()}
           />
@@ -125,7 +133,9 @@ export const DAOCosignerForm = ({
           {cosigners[i].name.length > 0
             ? !idsByNamesQuery.isFetching
               ? idsByNamesQuery?.data?.at(i)
-              : "Checking..."
+              : (
+                i === focusedCosignerIndex ? "Checking...": idsByNamesQuery?.data?.at(i)
+              )
             : ""}
         </Text>
       </Fragment>
