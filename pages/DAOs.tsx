@@ -14,18 +14,16 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter,
   Text,
   Input,
-  Icon,
   useToast,
+  Spinner,
 } from "@chakra-ui/react";
 import { DAOList } from "../components/react/dao-list";
 import { useState } from "react";
 import { DAOCosignerForm } from "../components/react/dao-cosigner-form";
 import { useWallet } from "@cosmos-kit/react";
 import {
-  IdentityserviceClient,
   IdentityserviceQueryClient,
 } from "../client/Identityservice.client";
 import {
@@ -34,7 +32,6 @@ import {
   useIdentityserviceGetIdentityByOwnerQuery,
 } from "../client/Identityservice.react-query";
 import { DaoQueryClient } from "../client/Dao.client";
-import { useDaoNameQuery } from "../client/Dao.react-query";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Extension, MsgExecuteContract } from "@terra-money/terra.js";
@@ -44,11 +41,13 @@ import {
   Ordering,
 } from "../client/Identityservice.types";
 import { Voter } from "../client/Dao.types";
-import { useRouter } from "next/router";
+
+const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
+const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
+const IDENTITY_SERVICE_CONTRACT = process.env
+  .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 
 export default function MyDAOs() {
-  const router = useRouter();
-  const identityName: string = router.query.identityName as string;
   const [isModalOpen, setModalState] = useState(false);
   const [cosigners, setCosigners] = useState(new Array());
   const [cosignersTotalWeight, setCosignersTotalWeight] = useState(new Array());
@@ -57,7 +56,7 @@ export default function MyDAOs() {
   const [daoName, setDaoName] = useState("");
   const [isDaoNameValid, setDaoNameValidity] = useState(false);
   const [isIdNamesValid, setIdNamesValid] = useState(false);
-  console.log(sumArray(cosignersTotalWeight));
+
   const toast = useToast();
   const walletManager = useWallet();
   const {
@@ -71,8 +70,8 @@ export default function MyDAOs() {
   } = walletManager;
 
   const LCDOptions = {
-    URL: "https://pisco-lcd.terra.dev",
-    chainID: "pisco-1",
+    URL: LCD_URL,
+    chainID: CHAIN_ID,
   };
 
   const lcdClient = new LCDClient(LCDOptions);
@@ -80,7 +79,7 @@ export default function MyDAOs() {
   const args = { order: order, limit: 100000 };
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     lcdClient,
-    "terra19wzedfegwqjpxp3zjgc4x426u8ylkyuzeeh3hrhzueljsz5wzdzsc2xef8"
+    IDENTITY_SERVICE_CONTRACT
   );
   const { data, error } = useIdentityserviceDaosQuery({ client, args });
   const ownerQueryResult = useIdentityserviceGetIdentityByOwnerQuery({
@@ -94,8 +93,9 @@ export default function MyDAOs() {
   });
 
   async function useMyDaos() {
-    let myDaos = [];
+    let myDaos: any = "undefined";
     if (data) {
+      myDaos = [];
       for (const i in data?.daos) {
         const daoAddrs = data?.daos[i][1];
         const daoQueryClient = new DaoQueryClient(lcdClient, daoAddrs);
@@ -144,8 +144,7 @@ export default function MyDAOs() {
       };
 
       const ext = new Extension();
-      const contract =
-        "terra19wzedfegwqjpxp3zjgc4x426u8ylkyuzeeh3hrhzueljsz5wzdzsc2xef8";
+      const contract = IDENTITY_SERVICE_CONTRACT;
 
       const msg: ExecuteMsg = { register_dao: daoData };
       const execMsg = new MsgExecuteContract(address as string, contract, msg);
@@ -224,20 +223,34 @@ export default function MyDAOs() {
           </Flex>
         </GridItem>
       </Grid>
-      <Modal isOpen={isModalOpen} onClose={() => setModalState(false)}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setModalState(false);
+          setDaoName("");
+        }}
+        scrollBehavior={"inside"}
+      >
         <ModalOverlay />
         <ModalContent maxW="50%">
           <ModalHeader fontSize={32} fontWeight="bold">
             Create a DAO
           </ModalHeader>
-          <ModalCloseButton onClick={() => setModalState(false)} />
+          <ModalCloseButton
+            onClick={() => {
+              setCosigners(new Array());
+              setDaoName("");
+              setThreshold(0);
+              setModalState(false);
+            }}
+          />
           <ModalBody>
             <Box>
               <Text marginBottom={2} fontSize={24}>
                 DAO NAME
               </Text>
               <Input
-              marginBottom={2}
+                marginBottom={2}
                 placeholder="Type your DAO name here"
                 size="lg"
                 onChange={(event) => {
@@ -245,8 +258,12 @@ export default function MyDAOs() {
                 }}
               ></Input>
               <Text marginBottom={2} fontSize={16}>
-                {daoNameQuery?.data?.identity?.name.toString() === daoName
-                  ? "Name taken!"
+                {daoName.length > 0
+                  ? daoNameQuery.isFetched
+                    ? daoNameQuery?.data?.identity?.name.toString() === daoName
+                      ? "Name taken!"
+                      : "Available"
+                    : "Checking..."
                   : ""}
               </Text>
               <Grid
@@ -255,22 +272,20 @@ export default function MyDAOs() {
                 marginTop={8}
               >
                 <Text fontSize={24}>COSIGNERS</Text>
-                <Flex justifyContent="end">
-                  <Button
-                    variant="outline"
-                    width={100}
-                    onClick={() => {
-                      setCosigners((cosigners) => [
-                        ...cosigners,
-                        { name: "", weight: 0, id: cosigners.length + 1 },
-                      ]);
-                    }}
-                  >
-                    <Text fontSize={18} fontWeight="bold">
-                      +
-                    </Text>
-                  </Button>
-                </Flex>
+                <Button
+                  variant="outline"
+                  width={100}
+                  onClick={() => {
+                    setCosigners((cosigners) => [
+                      ...cosigners,
+                      { name: "", weight: 0, id: (cosigners.length + 1) },
+                    ]);
+                  }}
+                >
+                  <Text fontSize={18} fontWeight="bold">
+                    +
+                  </Text>
+                </Button>
                 <DAOCosignerForm
                   cosigners={cosigners}
                   setCosigners={setCosigners}
@@ -295,6 +310,9 @@ export default function MyDAOs() {
                     width={250}
                     placeholder="% to pass"
                     type="number"
+                    onBlur={() => {
+                      daoNameQuery.refetch();
+                    }}
                     onChange={(event) => {
                       setThresholdPercentage(
                         parseInt(event.target.value.trim())
@@ -312,7 +330,9 @@ export default function MyDAOs() {
               <Flex justifyContent="center" margin={8}>
                 <Button
                   disabled={
-                    !(daoNameQuery?.data?.identity?.name.toString() === daoName) &&
+                    !(
+                      daoNameQuery?.data?.identity?.name.toString() === daoName
+                    ) &&
                     isIdNamesValid &&
                     daoName.length > 1 &&
                     thresholdPercentage >= 30 &&
@@ -336,11 +356,11 @@ export default function MyDAOs() {
           </ModalBody>
         </ModalContent>
       </Modal>
-      <Flex marginTop={24}>
-        {!myDaos?.isLoading ? (
+      <Flex marginTop={24} justifyContent="center">
+        {myDaos.data !== "undefined" ? (
           <DAOList daos={myDaos?.data} />
         ) : (
-          <Text>Loading your DAOs.....</Text>
+          <Spinner color="red.500" />
         )}
       </Flex>
     </Container>

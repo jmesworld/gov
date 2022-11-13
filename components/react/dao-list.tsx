@@ -1,8 +1,9 @@
 import { DAOItemProps } from "../types";
-import { Box, Divider, Flex, Text } from "@chakra-ui/react";
+import { Box, Divider, Flex, Link, Text } from "@chakra-ui/react";
+import NextLink from "next/link";
 
 export const DAOList = ({ daos }: any) => {
-  console.log(daos)
+
   if (!daos) {
     return (
       <Flex justifyContent="center" width="100%">
@@ -10,16 +11,23 @@ export const DAOList = ({ daos }: any) => {
       </Flex>
     );
   } else {
-    const daoItems = daos.map((dao: {name: any, address: any}) => (
-      <Text
-        fontSize={18}
-        marginLeft={8}
-        marginTop={4}
-        marginBottom={4}
-        key={dao.name.toString()}
+    const daoItems = daos.map((dao: { name: any; address: any }) => (
+      <NextLink
+        key={dao.name}
+        href={{
+          pathname: "/Proposals",
+          query: { name: dao.name, address: dao.address },
+        }}
+        passHref={true}
       >
-        {dao.name}
-      </Text>
+        <Link fontSize={24}>
+          <Box height={54} width={1000} justifyContent='center' alignItems='center'>
+            <Text fontSize={18} marginLeft={8} key={dao.name.toString()}>
+              {dao.name}
+            </Text>
+          </Box>
+        </Link>
+      </NextLink>
     ));
 
     return <ul>{daoItems}</ul>;

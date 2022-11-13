@@ -7,7 +7,7 @@
 import { UseQueryOptions, useQuery, useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee } from "@cosmjs/amino";
-import { Coin } from "@terra-money/terra.js";
+import { Coin, Coins, WaitTxBroadcastResult } from "@terra-money/terra.js";
 import { Addr, Uint128, ConfigResponse, Cw20HookMsg, Feature, ExecuteMsg, Binary, VoteOption, Cw20ReceiveMsg, InstantiateMsg, ProposalPeriod, PeriodInfoResponse, ProposalType, ProposalStatus, ProposalResponse, ProposalsResponse, QueryMsg } from "./Governance.types";
 import { GovernanceQueryClient, GovernanceClient } from "./Governance.client";
 export const governanceQueryKeys = {
@@ -103,8 +103,8 @@ export interface GovernanceSetContractMutation {
     coins?: Coins;
   };
 }
-export function useGovernanceSetContractMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, GovernanceSetContractMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, GovernanceSetContractMutation>(({
+export function useGovernanceSetContractMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceSetContractMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceSetContractMutation>(({
     client,
     msg,
     args: {
@@ -121,8 +121,8 @@ export interface GovernanceConcludeMutation {
     coins?: Coins;
   };
 }
-export function useGovernanceConcludeMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, GovernanceConcludeMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, GovernanceConcludeMutation>(({
+export function useGovernanceConcludeMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceConcludeMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceConcludeMutation>(({
     client,
     msg,
     args: {
@@ -140,8 +140,8 @@ export interface GovernanceVoteMutation {
     coins?: Coins;
   };
 }
-export function useGovernanceVoteMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, GovernanceVoteMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, GovernanceVoteMutation>(({
+export function useGovernanceVoteMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceVoteMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceVoteMutation>(({
     client,
     msg,
     args: {
@@ -156,8 +156,8 @@ export interface GovernanceReceiveMutation {
     coins?: Coins;
   };
 }
-export function useGovernanceReceiveMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, GovernanceReceiveMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, GovernanceReceiveMutation>(({
+export function useGovernanceReceiveMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceReceiveMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceReceiveMutation>(({
     client,
     msg,
     args: {

@@ -1,16 +1,12 @@
 import Head from "next/head";
 import {
   Box,
-  Divider,
-  Grid,
   Heading,
   Text,
-  Stack,
   Container,
   Link,
   Button,
   Flex,
-  Icon,
   useColorMode,
   useColorModeValue,
   Modal,
@@ -22,31 +18,29 @@ import {
   Input,
   useToast,
 } from "@chakra-ui/react";
-import { BsFillMoonStarsFill, BsFillSunFill } from "react-icons/bs";
-import { Product, Dependency, WalletSection } from "../components";
-import { dependencies, products } from "../config";
+import { WalletSection } from "../components";
 import { useState } from "react";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
 import {
-  IdentityserviceClient,
   IdentityserviceQueryClient,
 } from "../client/Identityservice.client";
 import {
   useIdentityserviceGetIdentityByNameQuery,
   useIdentityserviceGetIdentityByOwnerQuery,
-  useIdentityserviceRegisterUserMutation,
 } from "../client/Identityservice.react-query";
 import { useWallet } from "@cosmos-kit/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   MsgExecuteContract,
-  CreateTxOptions,
   Extension,
-  Coin,
-  ExtensionOptions,
 } from "@terra-money/terra.js";
 import { ExecuteMsg } from "../client/Identityservice.types";
 import NextLink from "next/link";
+
+const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
+const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
+const IDENTITY_SERVICE_CONTRACT = process.env
+  .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 
 export default function Home() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -62,15 +56,15 @@ export default function Home() {
   const { walletStatus, address } = walletManager;
 
   const LCDOptions = {
-    URL: "https://pisco-lcd.terra.dev",
-    chainID: "pisco-1",
+    URL: LCD_URL,
+    chainID: CHAIN_ID,
   };
 
   const lcdClient = new LCDClient(LCDOptions);
   const args = { owner: address ? address : "" };
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     lcdClient,
-    "terra19wzedfegwqjpxp3zjgc4x426u8ylkyuzeeh3hrhzueljsz5wzdzsc2xef8"
+    IDENTITY_SERVICE_CONTRACT
   );
   const { data, error } = useIdentityserviceGetIdentityByOwnerQuery({
     client,
@@ -82,12 +76,11 @@ export default function Home() {
     args: { name: identityName },
   });
 
-  const identityMutation = useMutation(["identityMut"], registerUser);
+  const identityMutation = useMutation(["identityMutation"], registerUser);
 
   async function registerUser() {
     const ext = new Extension();
-    const contract =
-      "terra19wzedfegwqjpxp3zjgc4x426u8ylkyuzeeh3hrhzueljsz5wzdzsc2xef8";
+    const contract = IDENTITY_SERVICE_CONTRACT;
 
     const msg: ExecuteMsg = { register_user: { name: identityName } };
     const execMsg = new MsgExecuteContract(address as string, contract, msg);
@@ -177,19 +170,32 @@ export default function Home() {
         </Heading>
       </Box>
       <WalletSection />
-      <NextLink href={{ pathname: "/DAOs" }} passHref={true}>
-        <Link fontWeight="bold" fontSize={24}>
-          My DAOs
-        </Link>
-      </NextLink>
+      {data?.identity ? (
+        <NextLink href={{ pathname: "/DAOs" }} passHref={true}>
+          <Link fontWeight="bold" fontSize={24}>
+            My DAOs
+          </Link>
+        </NextLink>
+      ) : (
+        ""
+      )}
 
-      <Modal isOpen={isModalOpen} onClose={() => setModalState(false)}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setModalState(false)}
+        scrollBehavior={"inside"}
+      >
         <ModalOverlay>
           <ModalContent>
             <ModalHeader fontSize={32} fontWeight="bold">
               Create an Identity
             </ModalHeader>
-            <ModalCloseButton onClick={() => setModalState(false)} />
+            <ModalCloseButton
+              onClick={() => {
+                setModalState(false);
+                setIdentityName("");
+              }}
+            />
             <ModalBody>
               <Box>
                 <Text marginBottom={2} fontSize={24}>
@@ -201,11 +207,18 @@ export default function Home() {
                   placeholder="Type your name here"
                   size="lg"
                   marginBottom={2}
+                  onBlur={() => {
+                    identityNameQuery.refetch();
+                  }}
                 ></Input>
                 <Text marginBottom={8} fontSize={16}>
-                  {identityNameQuery?.data?.identity?.name.toString() ===
-                  identityName
-                    ? "Name taken!"
+                  {identityName.length > 0
+                    ? identityNameQuery.isFetched
+                      ? identityNameQuery?.data?.identity?.name.toString() ===
+                        identityName
+                        ? "Name taken!"
+                        : "Available"
+                      : "Checking..."
                     : ""}
                 </Text>
                 <Flex justifyContent="center" margin={8}>
