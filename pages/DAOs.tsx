@@ -266,8 +266,8 @@ export default function MyDAOs() {
                   ? daoNameQuery.isFetched
                     ? daoNameQuery?.data?.identity?.name.toString() === daoName
                       ? "Name taken!"
-                      : "available"
-                    : ""
+                      : "Available"
+                    : "Checking..."
                   : ""}
               </Text>
               <Grid
@@ -282,7 +282,7 @@ export default function MyDAOs() {
                   onClick={() => {
                     setCosigners((cosigners) => [
                       ...cosigners,
-                      { name: "", weight: 0, id: cosigners.length + 1 },
+                      { name: "", weight: 0, id: (cosigners.length + 1) },
                     ]);
                   }}
                 >
@@ -314,6 +314,9 @@ export default function MyDAOs() {
                     width={250}
                     placeholder="% to pass"
                     type="number"
+                    onBlur={() => {
+                      daoNameQuery.refetch();
+                    }}
                     onChange={(event) => {
                       setThresholdPercentage(
                         parseInt(event.target.value.trim())

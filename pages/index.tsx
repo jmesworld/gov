@@ -181,13 +181,21 @@ export default function Home() {
         </Heading>
       </Box>
       <WalletSection />
-      <NextLink href={{ pathname: "/DAOs" }} passHref={true}>
-        <Link fontWeight="bold" fontSize={24}>
-          My DAOs
-        </Link>
-      </NextLink>
+      {data?.identity ? (
+        <NextLink href={{ pathname: "/DAOs" }} passHref={true}>
+          <Link fontWeight="bold" fontSize={24}>
+            My DAOs
+          </Link>
+        </NextLink>
+      ) : (
+        ""
+      )}
 
-      <Modal isOpen={isModalOpen} onClose={() => setModalState(false)}  scrollBehavior={"inside"}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setModalState(false)}
+        scrollBehavior={"inside"}
+      >
         <ModalOverlay>
           <ModalContent>
             <ModalHeader fontSize={32} fontWeight="bold">
@@ -210,6 +218,9 @@ export default function Home() {
                   placeholder="Type your name here"
                   size="lg"
                   marginBottom={2}
+                  onBlur={() => {
+                    identityNameQuery.refetch();
+                  }}
                 ></Input>
                 <Text marginBottom={8} fontSize={16}>
                   {identityName.length > 0
@@ -217,8 +228,8 @@ export default function Home() {
                       ? identityNameQuery?.data?.identity?.name.toString() ===
                         identityName
                         ? "Name taken!"
-                        : "available"
-                      : ""
+                        : "Available"
+                      : "Checking..."
                     : ""}
                 </Text>
                 <Flex justifyContent="center" margin={8}>

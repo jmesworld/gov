@@ -1,6 +1,6 @@
 import { DAOCosigner } from "../types";
 import { Grid, Text, Input, Flex, Button } from "@chakra-ui/react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { LCDClient } from "@terra-money/terra.js";
 import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
 import { useQuery } from "@tanstack/react-query";
@@ -63,9 +63,9 @@ export const ProposalRecipientForm = ({
       recipients[i].address = idsByNamesQuery.data[i];
     }
     return (
-      <>
+      <Fragment key={c.id}>
         <Grid
-          key={c.id}
+          key={i}
           templateColumns="repeat(3, 1fr)"
           templateRows="repeat(1, 1fr)"
           marginTop={4}
@@ -81,6 +81,7 @@ export const ProposalRecipientForm = ({
               setRecipients(recipients);
               setRecipientsNamesValid(false);
             }}
+            onBlur={() => idsByNamesQuery.refetch()}
           />
           <Input
             placeholder="amount"
@@ -109,17 +110,13 @@ export const ProposalRecipientForm = ({
           </Button>
         </Grid>
         <Text fontSize={12}>
-          {
-            // @ts-ignore
-            !idsByNamesQuery.isLoading && idsByNamesQuery.data[i] !== undefined
-              ? // @ts-ignore
-                idsByNamesQuery?.data[i]
-              : recipients[i].name.length > 1
-              ? "Loading"
-              : ""
-          }
+          {recipients[i].name.length > 0
+            ? !idsByNamesQuery.isFetching
+              ? idsByNamesQuery?.data?.at(i)
+              : "Checking..."
+            : ""}
         </Text>
-      </>
+      </Fragment>
     );
   });
   return <ul>{recipientItem}</ul>;

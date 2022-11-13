@@ -207,7 +207,17 @@ export default function Proposals() {
           </Flex>
         </GridItem>
       </Grid>
-      <Modal isOpen={isModalOpen} onClose={() => setModalState(false)}  scrollBehavior={"inside"}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setModalState(false);
+          setRecipients(new Array());
+          setProposalName("");
+          setProposalDesc("");
+          setRecipientsNamesValid(false);
+        }}
+        scrollBehavior={"inside"}
+      >
         <ModalOverlay />
         <ModalContent maxW="50%">
           <ModalHeader fontSize={32} fontWeight="bold">
@@ -274,11 +284,11 @@ export default function Proposals() {
               <Flex justifyContent="center" margin={8}>
                 <Button
                   disabled={
-                    isRecipientsNamesValid &&
-                    proposalName.length > 2 &&
-                    proposalDesc.length > 2
-                      ? false
-                      : true
+                    !(
+                      isRecipientsNamesValid &&
+                      proposalName.length > 2 &&
+                      proposalDesc.length > 2
+                    )
                   }
                   width={250}
                   height={50}
@@ -295,15 +305,15 @@ export default function Proposals() {
           </ModalBody>
         </ModalContent>
       </Modal>
-      <Flex marginTop={24} justifyContent='center'>
+      <Flex marginTop={24} justifyContent="center">
         {proposalsQuery.data ? (
           <ProposalList
-          // @ts-ignore
+            // @ts-ignore
             proposals={proposalsQuery?.data?.proposals}
             daoAddress={daoAddress as string}
           />
         ) : (
-          <Spinner color='red.500' />
+          <Spinner color="red.500" />
         )}
       </Flex>
     </Container>

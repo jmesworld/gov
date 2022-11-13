@@ -4,6 +4,7 @@ import { useState } from "react";
 import { LCDClient } from "@terra-money/terra.js";
 import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
 import { useQuery } from "@tanstack/react-query";
+import { Fragment } from "react";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -68,12 +69,10 @@ export const DAOCosignerForm = ({
   }
 
   const idsByNamesQuery = useQuery(["identities"], getIdentitiesByNames);
-
   let cosignerItem = cosigners.map((c, i) => {
     return (
-      <>
+      <Fragment key={c.id}>
         <Grid
-          key={c.id}
           templateColumns="repeat(3, 1fr)"
           templateRows="repeat(1, 1fr)"
           marginTop={4}
@@ -88,7 +87,9 @@ export const DAOCosignerForm = ({
               cosigners[i].name = event.target.value.trim();
               setCosigners(cosigners);
               setIdNamesValid(false);
+              // idsByNamesQuery.refetch();
             }}
+            onBlur={() => idsByNamesQuery.refetch()}
           />
           <Input
             placeholder="% vote power"
@@ -121,17 +122,13 @@ export const DAOCosignerForm = ({
           </Button>
         </Grid>
         <Text fontSize={12}>
-          {
-            // @ts-ignore
-            !idsByNamesQuery.isLoading && idsByNamesQuery.data[i] !== undefined
-              ? // @ts-ignore
-                idsByNamesQuery?.data[i]
-              : cosigners[i].name.length > 1
-              ? "Loading"
-              : ""
-          }
+          {cosigners[i].name.length > 0
+            ? !idsByNamesQuery.isFetching
+              ? idsByNamesQuery?.data?.at(i)
+              : "Checking..."
+            : ""}
         </Text>
-      </>
+      </Fragment>
     );
   });
   return <ul>{cosignerItem}</ul>;
