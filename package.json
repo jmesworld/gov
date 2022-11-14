@@ -5,7 +5,7 @@
   "private": false,
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "next export && gh-pages -d out -- -m 'Deploy GH pages'",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
