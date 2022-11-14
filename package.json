@@ -2,7 +2,7 @@
   "name": "@cosmonauts/connect-multi-chain",
   "version": "0.7.2",
   "homepage": "https://mayoreee.github.io/jmes-governance-website",
-  "private": true,
+  "private": false,
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
