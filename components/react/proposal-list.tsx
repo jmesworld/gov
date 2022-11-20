@@ -3,7 +3,7 @@ import { Box, Divider, Flex, Link, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 
 export const ProposalList = ({ proposals, daoAddress }: any) => {
-  if (!proposals) {
+  if (!proposals || Array.from(proposals).length === 0) {
     return (
       <Flex justifyContent="center" width="100%">
         <Text> No proposal has been created yet </Text>

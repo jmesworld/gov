@@ -23,9 +23,7 @@ import { DAOList } from "../components/react/dao-list";
 import { useState } from "react";
 import { DAOCosignerForm } from "../components/react/dao-cosigner-form";
 import { useWallet } from "@cosmos-kit/react";
-import {
-  IdentityserviceQueryClient,
-} from "../client/Identityservice.client";
+import { IdentityserviceQueryClient } from "../client/Identityservice.client";
 import {
   useIdentityserviceDaosQuery,
   useIdentityserviceGetIdentityByNameQuery,
@@ -50,12 +48,15 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 export default function MyDAOs() {
   const [isModalOpen, setModalState] = useState(false);
   const [cosigners, setCosigners] = useState(new Array());
-  const [cosignersTotalWeight, setCosignersTotalWeight] = useState(new Array());
+  const [cosignersTotalWeight, setCosignersTotalWeight] = useState(
+    new Array<number>()
+  );
   const [threshold, setThreshold] = useState(0);
   const [thresholdPercentage, setThresholdPercentage] = useState(0);
   const [daoName, setDaoName] = useState("");
   const [isDaoNameValid, setDaoNameValidity] = useState(false);
   const [isIdNamesValid, setIdNamesValid] = useState(false);
+  const [isNewDataUpdated, setDataUpdated] = useState(false);
 
   const toast = useToast();
   const walletManager = useWallet();
@@ -114,11 +115,38 @@ export default function MyDAOs() {
     return myDaos;
   }
 
-  const myDaos = useQuery(["myDaos"], useMyDaos);
-
+  const myDaos = useQuery(["myDaos"], useMyDaos, {
+    onSuccess: (data) => {
+      if (data !== "undefined") {
+        let storeData = new Map<string, any>();
+        storeData.set(address as string, data);
+        localStorage.setItem(
+          "myDaosData",
+          JSON.stringify(Object.fromEntries(storeData))
+        );
+      }
+      setDataUpdated(true);
+    },
+    refetchInterval: 1000,
+  });
   async function registerDao() {
     let _voters: Voter[] = [];
     try {
+      const minimum = Math.min(...cosignersTotalWeight);
+      const minimumIndex = cosignersTotalWeight.indexOf(minimum);
+      cosigners[minimumIndex].weight = 1;
+
+      for (let i = 0; i < cosignersTotalWeight.length; i++) {
+        if (i !== minimumIndex) {
+          const ratio = Math.ceil(
+            cosignersTotalWeight[i] / cosignersTotalWeight[minimumIndex]
+          );
+          cosigners[i].weight = ratio;
+        }
+      }
+
+      setCosigners(cosigners);
+
       for (let c of cosigners) {
         const _addrResponse = await client.getIdentityByName({ name: c.name });
         _voters.push({
@@ -163,7 +191,8 @@ export default function MyDAOs() {
         setModalState(false);
         toast({
           title: "Dao created.",
-          description: "We've created your Dao for you.",
+          description:
+            "We've created your Dao for you. You'll be able to access it once it's been included in a block.",
           status: "success",
           duration: 9000,
           isClosable: true,
@@ -177,7 +206,7 @@ export default function MyDAOs() {
           isClosable: true,
         });
       }
-      // window.location.reload();
+      myDaos.refetch();
     } catch (error) {
       console.log(error);
     }
@@ -278,7 +307,7 @@ export default function MyDAOs() {
                   onClick={() => {
                     setCosigners((cosigners) => [
                       ...cosigners,
-                      { name: "", weight: 0, id: (cosigners.length + 1) },
+                      { name: "", weight: 0, id: cosigners.length + 1 },
                     ]);
                   }}
                 >
@@ -357,8 +386,12 @@ export default function MyDAOs() {
         </ModalContent>
       </Modal>
       <Flex marginTop={24} justifyContent="center">
-        {myDaos.data !== "undefined" ? (
-          <DAOList daos={myDaos?.data} />
+        {typeof window !== "undefined" &&
+        address !== "undefined" &&
+        !(localStorage.getItem("myDaosData") as string)?.includes(
+          "undefined"
+        ) ? (
+          <DAOList daos={localStorage.getItem("myDaosData") as string} />
         ) : (
           <Spinner color="red.500" />
         )}
