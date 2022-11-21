@@ -76,7 +76,7 @@ export default function MyDAOs() {
   };
 
   const lcdClient = new LCDClient(LCDOptions);
-  const order: Ordering = "descending";
+  const order: Ordering = "ascending";
   const args = { order: order, limit: 100000 };
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     lcdClient,
