@@ -76,12 +76,13 @@ export default function MyDAOs() {
   };
 
   const lcdClient = new LCDClient(LCDOptions);
-  const order: Ordering = "ascending";
+  const order: Ordering = "descending";
   const args = { order: order, limit: 100000 };
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     lcdClient,
     IDENTITY_SERVICE_CONTRACT
   );
+
   const { data, error } = useIdentityserviceDaosQuery({ client, args });
   const ownerQueryResult = useIdentityserviceGetIdentityByOwnerQuery({
     client,
@@ -95,15 +96,33 @@ export default function MyDAOs() {
 
   async function useMyDaos() {
     let myDaos: any = "undefined";
-    if (data) {
+
+    let _data: any[] = [];
+    let _startAfter = 0;
+    let _isDataComplete = false;
+    while (!_isDataComplete) {
+      const _current_batch_data = await client.daos({
+        limit: 30,
+        startAfter: _startAfter,
+        order: "ascending",
+      });
+      if (_current_batch_data.daos.length === 0) {
+        _isDataComplete = true;
+        break;
+      }
+      _data.push(..._current_batch_data.daos);
+      _startAfter += 30;
+    }
+    _data.reverse();
+    if (_data) {
       myDaos = [];
-      for (const i in data?.daos) {
-        const daoAddrs = data?.daos[i][1];
+      for (const i in _data) {
+        const daoAddrs = _data[i][1];
         const daoQueryClient = new DaoQueryClient(lcdClient, daoAddrs);
         const voter: any = await daoQueryClient.voter({
           address: address ? address : "",
         });
-        if (voter.weight > 0) {
+        if (voter.weight >= 0) {
           const nameResult = await daoQueryClient.name();
           myDaos.push({
             name: nameResult.name,
@@ -117,14 +136,13 @@ export default function MyDAOs() {
 
   const myDaos = useQuery(["myDaos"], useMyDaos, {
     onSuccess: (data) => {
-      if (data !== "undefined") {
-        let storeData = new Map<string, any>();
-        storeData.set(address as string, data);
-        localStorage.setItem(
-          "myDaosData",
-          JSON.stringify(Object.fromEntries(storeData))
-        );
-      }
+      console.log("fire onSuccess");
+      let storeData = new Map<string, any>();
+      storeData.set(address as string, data);
+      localStorage.setItem(
+        "myDaosData",
+        JSON.stringify(Object.fromEntries(storeData))
+      );
       setDataUpdated(true);
     },
     refetchInterval: 1000,
@@ -213,7 +231,6 @@ export default function MyDAOs() {
   }
 
   const daoMutation = useMutation(["daoMutation"], registerDao);
-
   return (
     <Container maxW="5xl" py={10}>
       <Head>
