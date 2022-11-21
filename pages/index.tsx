@@ -73,6 +73,7 @@ export default function Home() {
 
   const identityMutation = useMutation(["identityMutation"], registerUser);
 
+
   async function registerUser() {
     const ext = new Extension();
     const contract = IDENTITY_SERVICE_CONTRACT;

@@ -62,6 +62,9 @@ export const WalletSection = () => {
     setCurrentChain('terra2');
     e.preventDefault();
     await connect();
+    if (typeof window !== "undefined") {
+      localStorage.setItem("myDaosData", "undefined");
+    }
   };
 
   const onClickOpenView: MouseEventHandler = (e) => {
@@ -74,6 +77,9 @@ export const WalletSection = () => {
   ) => {
     setCurrentChain('terra2');
     await connect();
+    if (typeof window !== "undefined") {
+      localStorage.setItem("myDaosData", "undefined");
+    }
   };
 
   // Components
