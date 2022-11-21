@@ -169,7 +169,7 @@ export default function Home() {
         </Heading>
       </Box>
       <WalletSection />
-      {data?.identity ? (
+      {!!address ? (
         <NextLink href={{ pathname: "/DAOs" }} passHref={true}>
           <Link fontWeight="bold" fontSize={24}>
             My DAOs
