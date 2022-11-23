@@ -21,19 +21,14 @@ import {
 import { WalletSection } from "../components";
 import { useState } from "react";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
-import {
-  IdentityserviceQueryClient,
-} from "../client/Identityservice.client";
+import { IdentityserviceQueryClient } from "../client/Identityservice.client";
 import {
   useIdentityserviceGetIdentityByNameQuery,
   useIdentityserviceGetIdentityByOwnerQuery,
 } from "../client/Identityservice.react-query";
 import { useWallet } from "@cosmos-kit/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  MsgExecuteContract,
-  Extension,
-} from "@terra-money/terra.js";
+import { MsgExecuteContract, Extension } from "@terra-money/terra.js";
 import { ExecuteMsg } from "../client/Identityservice.types";
 import NextLink from "next/link";
 
@@ -77,6 +72,7 @@ export default function Home() {
   });
 
   const identityMutation = useMutation(["identityMutation"], registerUser);
+
 
   async function registerUser() {
     const ext = new Extension();
@@ -128,23 +124,27 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Flex justifyContent="end" mb={4}>
-        {data?.identity ? (
-          <Text> Hi, {data.identity.name}</Text>
+        {typeof address !== "undefined" ? (
+          data?.identity ? (
+            <Text> Hi, {data.identity.name}</Text>
+          ) : (
+            <Button
+              marginLeft={8}
+              justifyContent="center"
+              alignItems="center"
+              borderRadius="lg"
+              width={200}
+              height={50}
+              color="primary.500"
+              variant="outline"
+              px={0}
+              onClick={() => setModalState(true)}
+            >
+              Create an Identity
+            </Button>
+          )
         ) : (
-          <Button
-            marginLeft={8}
-            justifyContent="center"
-            alignItems="center"
-            borderRadius="lg"
-            width={200}
-            height={50}
-            color="primary.500"
-            variant="outline"
-            px={0}
-            onClick={() => setModalState(true)}
-          >
-            Create an Identity
-          </Button>
+          ""
         )}
       </Flex>
       <Box textAlign="center">
@@ -170,7 +170,7 @@ export default function Home() {
         </Heading>
       </Box>
       <WalletSection />
-      {data?.identity ? (
+      {!!address ? (
         <NextLink href={{ pathname: "/DAOs" }} passHref={true}>
           <Link fontWeight="bold" fontSize={24}>
             My DAOs

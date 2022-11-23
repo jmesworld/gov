@@ -23,9 +23,7 @@ import { DAOList } from "../components/react/dao-list";
 import { useState } from "react";
 import { DAOCosignerForm } from "../components/react/dao-cosigner-form";
 import { useWallet } from "@cosmos-kit/react";
-import {
-  IdentityserviceQueryClient,
-} from "../client/Identityservice.client";
+import { IdentityserviceQueryClient } from "../client/Identityservice.client";
 import {
   useIdentityserviceDaosQuery,
   useIdentityserviceGetIdentityByNameQuery,
@@ -50,12 +48,15 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 export default function MyDAOs() {
   const [isModalOpen, setModalState] = useState(false);
   const [cosigners, setCosigners] = useState(new Array());
-  const [cosignersTotalWeight, setCosignersTotalWeight] = useState(new Array());
+  const [cosignersTotalWeight, setCosignersTotalWeight] = useState(
+    new Array<number>()
+  );
   const [threshold, setThreshold] = useState(0);
   const [thresholdPercentage, setThresholdPercentage] = useState(0);
   const [daoName, setDaoName] = useState("");
   const [isDaoNameValid, setDaoNameValidity] = useState(false);
   const [isIdNamesValid, setIdNamesValid] = useState(false);
+  const [isNewDataUpdated, setDataUpdated] = useState(false);
 
   const toast = useToast();
   const walletManager = useWallet();
@@ -81,6 +82,7 @@ export default function MyDAOs() {
     lcdClient,
     IDENTITY_SERVICE_CONTRACT
   );
+
   const { data, error } = useIdentityserviceDaosQuery({ client, args });
   const ownerQueryResult = useIdentityserviceGetIdentityByOwnerQuery({
     client,
@@ -94,15 +96,33 @@ export default function MyDAOs() {
 
   async function useMyDaos() {
     let myDaos: any = "undefined";
-    if (data) {
+
+    let _data: any[] = [];
+    let _startAfter = 0;
+    let _isDataComplete = false;
+    while (!_isDataComplete) {
+      const _current_batch_data = await client.daos({
+        limit: 30,
+        startAfter: _startAfter,
+        order: "ascending",
+      });
+      if (_current_batch_data.daos.length === 0) {
+        _isDataComplete = true;
+        break;
+      }
+      _data.push(..._current_batch_data.daos);
+      _startAfter += 30;
+    }
+    _data.reverse();
+    if (_data) {
       myDaos = [];
-      for (const i in data?.daos) {
-        const daoAddrs = data?.daos[i][1];
+      for (const i in _data) {
+        const daoAddrs = _data[i][1];
         const daoQueryClient = new DaoQueryClient(lcdClient, daoAddrs);
         const voter: any = await daoQueryClient.voter({
           address: address ? address : "",
         });
-        if (voter.weight > 0) {
+        if (voter.weight >= 0) {
           const nameResult = await daoQueryClient.name();
           myDaos.push({
             name: nameResult.name,
@@ -114,11 +134,37 @@ export default function MyDAOs() {
     return myDaos;
   }
 
-  const myDaos = useQuery(["myDaos"], useMyDaos);
-
+  const myDaos = useQuery(["myDaos"], useMyDaos, {
+    onSuccess: (data) => {
+      console.log("fire onSuccess");
+      let storeData = new Map<string, any>();
+      storeData.set(address as string, data);
+      localStorage.setItem(
+        "myDaosData",
+        JSON.stringify(Object.fromEntries(storeData))
+      );
+      setDataUpdated(true);
+    },
+    refetchInterval: 1000,
+  });
   async function registerDao() {
     let _voters: Voter[] = [];
     try {
+      const minimum = Math.min(...cosignersTotalWeight);
+      const minimumIndex = cosignersTotalWeight.indexOf(minimum);
+      cosigners[minimumIndex].weight = 1;
+
+      for (let i = 0; i < cosignersTotalWeight.length; i++) {
+        if (i !== minimumIndex) {
+          const ratio = Math.ceil(
+            cosignersTotalWeight[i] / cosignersTotalWeight[minimumIndex]
+          );
+          cosigners[i].weight = ratio;
+        }
+      }
+
+      setCosigners(cosigners);
+
       for (let c of cosigners) {
         const _addrResponse = await client.getIdentityByName({ name: c.name });
         _voters.push({
@@ -163,7 +209,8 @@ export default function MyDAOs() {
         setModalState(false);
         toast({
           title: "Dao created.",
-          description: "We've created your Dao for you.",
+          description:
+            "We've created your Dao for you. You'll be able to access it once it's been included in a block.",
           status: "success",
           duration: 9000,
           isClosable: true,
@@ -177,14 +224,13 @@ export default function MyDAOs() {
           isClosable: true,
         });
       }
-      // window.location.reload();
+      myDaos.refetch();
     } catch (error) {
       console.log(error);
     }
   }
 
   const daoMutation = useMutation(["daoMutation"], registerDao);
-
   return (
     <Container maxW="5xl" py={10}>
       <Head>
@@ -278,7 +324,7 @@ export default function MyDAOs() {
                   onClick={() => {
                     setCosigners((cosigners) => [
                       ...cosigners,
-                      { name: "", weight: 0, id: (cosigners.length + 1) },
+                      { name: "", weight: 0, id: cosigners.length + 1 },
                     ]);
                   }}
                 >
@@ -357,8 +403,12 @@ export default function MyDAOs() {
         </ModalContent>
       </Modal>
       <Flex marginTop={24} justifyContent="center">
-        {myDaos.data !== "undefined" ? (
-          <DAOList daos={myDaos?.data} />
+        {typeof window !== "undefined" &&
+        address !== "undefined" &&
+        !(localStorage.getItem("myDaosData") as string)?.includes(
+          "undefined"
+        ) ? (
+          <DAOList daos={localStorage.getItem("myDaosData") as string} />
         ) : (
           <Spinner color="red.500" />
         )}

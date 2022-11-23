@@ -110,8 +110,6 @@ export const DAOCosignerForm = ({
               let value = parseInt(event.target.value.trim());
               cosignersTotalWeight[i] = value;
               setCosignersTotalWeight(cosignersTotalWeight);
-              cosigners[i].weight = Math.ceil((value / 100) * cosigners.length);
-              setCosigners(cosigners);
             }}
           />
           <Button

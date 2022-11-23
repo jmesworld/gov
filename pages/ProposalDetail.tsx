@@ -23,7 +23,8 @@ import { useRouter } from "next/router";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
-const IDENTITY_SERVICE_CONTRACT = process.env.NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
+const IDENTITY_SERVICE_CONTRACT = process.env
+  .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 
 export default function ProposalDetail() {
   const router = useRouter();
@@ -200,7 +201,6 @@ export default function ProposalDetail() {
   const proposalMsgs: any[] = proposalQuery.data
     ? proposalQuery.data?.msgs
     : [];
-
   return (
     <Container maxW="5xl" py={10}>
       <Head>
@@ -326,7 +326,8 @@ export default function ProposalDetail() {
             <Button
               disabled={
                 (votesQuery.data?.votes.filter((vote) => vote.vote === "yes")
-                  ?.length as number) < proposalThresholdWeight
+                  ?.length as number) < proposalThresholdWeight &&
+                proposalQuery.data?.status === "executed"
                   ? true
                   : false
               }
