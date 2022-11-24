@@ -15,38 +15,23 @@ export type ExecuteMsg = {
     [k: string]: unknown;
   };
 } | {
-  register_dao: DaoInstantiateMsg;
+  register_dao: DaoMembersInstantiateMsg;
 };
 export type Duration = {
   height: number;
 } | {
   time: number;
 };
-export type Threshold = {
-  absolute_count: {
-    weight: number;
-  };
-} | {
-  absolute_percentage: {
-    percentage: Decimal;
-  };
-} | {
-  threshold_quorum: {
-    quorum: Decimal;
-    threshold: Decimal;
-  };
-};
 export type Decimal = string;
-export interface DaoInstantiateMsg {
+export interface DaoMembersInstantiateMsg {
   dao_name: string;
   max_voting_period: Duration;
-  threshold: Threshold;
-  voters: Voter[];
+  members: Member[];
+  threshold_percentage: Decimal;
 }
-export interface Voter {
+export interface Member {
   addr: string;
   weight: number;
-  [k: string]: unknown;
 }
 export type IdType = "user" | "dao";
 export interface GetIdentityByNameResponse {
@@ -64,7 +49,8 @@ export interface GetIdentityByOwnerResponse {
   [k: string]: unknown;
 }
 export interface InstantiateMsg {
-  dao_code_id: number;
+  dao_members_code_id: number;
+  dao_multisig_code_id: number;
   owner: Addr;
   [k: string]: unknown;
 }

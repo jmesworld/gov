@@ -7,7 +7,7 @@
 import { LCDClient, Coins, MnemonicKey, MsgExecuteContract, WaitTxBroadcastResult } from "@terra-money/terra.js";
 import { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee } from "@cosmjs/amino";
-import { Addr, DaosResponse, ExecuteMsg, Duration, Threshold, Decimal, DaoInstantiateMsg, Voter, IdType, GetIdentityByNameResponse, Identity, GetIdentityByOwnerResponse, InstantiateMsg, QueryMsg, Ordering } from "./Identityservice.types";
+import { Addr, DaosResponse, ExecuteMsg, Duration, Decimal, DaoMembersInstantiateMsg, Member, IdType, GetIdentityByNameResponse, Identity, GetIdentityByOwnerResponse, InstantiateMsg, QueryMsg, Ordering } from "./Identityservice.types";
 export interface IdentityserviceReadOnlyInterface {
   contractAddress: string;
   getIdentityByOwner: ({
@@ -90,15 +90,15 @@ export interface IdentityserviceInterface extends IdentityserviceReadOnlyInterfa
     name: string;
   }, coins?: Coins) => Promise<WaitTxBroadcastResult>;
   registerDao: ({
-    daoName,
-    maxVotingPeriod,
-    threshold,
-    voters
+    dao_name,
+    max_voting_period,
+    members,
+    threshold_percentage
   }: {
-    daoName: string;
-    maxVotingPeriod: Duration;
-    threshold: Threshold;
-    voters: Voter[];
+    dao_name: string;
+    max_voting_period: Duration;
+    members: Member[];
+    threshold_percentage: Decimal;
   }, coins?: Coins) => Promise<WaitTxBroadcastResult>;
 }
 export class IdentityserviceClient extends IdentityserviceQueryClient implements IdentityserviceInterface {
@@ -132,24 +132,24 @@ export class IdentityserviceClient extends IdentityserviceQueryClient implements
     return await this.client.tx.broadcast(tx);
   };
   registerDao = async ({
-    daoName,
-    maxVotingPeriod,
-    threshold,
-    voters
+    dao_name,
+    max_voting_period,
+    members,
+    threshold_percentage
   }: {
-    daoName: string;
-    maxVotingPeriod: Duration;
-    threshold: Threshold;
-    voters: Voter[];
+    dao_name: string;
+    max_voting_period: Duration;
+    members: Member[];
+    threshold_percentage: Decimal;
   }, coins?: Coins): Promise<WaitTxBroadcastResult> => {
     const key = new MnemonicKey(this.user.mnemonicKeyOptions);
     const wallet = this.client.wallet(key);
     const execMsg = new MsgExecuteContract(this.user.address, this.contractAddress, {
       register_dao: {
-        dao_name: daoName,
-        max_voting_period: maxVotingPeriod,
-        threshold,
-        voters
+        dao_name: dao_name,
+        max_voting_period: max_voting_period,
+        members,
+        threshold_percentage: threshold_percentage
       }
     }, coins);
     const txOptions = { msgs: [execMsg] };

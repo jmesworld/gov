@@ -7,7 +7,7 @@
 import { LCDClient, Coins, MnemonicKey, MsgExecuteContract, WaitTxBroadcastResult } from "@terra-money/terra.js";
 import { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee } from "@cosmjs/amino";
-import { Addr, Uint128, ConfigResponse, Cw20HookMsg, Feature, ExecuteMsg, Binary, VoteOption, Cw20ReceiveMsg, InstantiateMsg, ProposalPeriod, PeriodInfoResponse, ProposalType, ProposalStatus, ProposalResponse, ProposalsResponse, QueryMsg } from "./Governance.types";
+import { Addr, Uint128, ConfigResponse, Decimal, CoreSlotsResponse, SlotVoteResult, ExecuteMsg, ProposalMsg, Feature, CosmosMsgForEmpty, BankMsg, StakingMsg, DistributionMsg, WasmMsg, Binary, CoreSlot, VoteOption, Coin, Empty, RevokeCoreSlot, InstantiateMsg, ProposalPeriod, PeriodInfoResponse, ProposalType, ProposalStatus, ProposalResponse, ProposalsResponse, QueryMsg } from "./Governance.types";
 export interface GovernanceReadOnlyInterface {
   contractAddress: string;
   config: () => Promise<ConfigResponse>;
@@ -24,6 +24,7 @@ export interface GovernanceReadOnlyInterface {
     limit?: number;
     start?: number;
   }) => Promise<ProposalsResponse>;
+  coreSlots: () => Promise<CoreSlotsResponse>;
 }
 export class GovernanceQueryClient implements GovernanceReadOnlyInterface {
   client: LCDClient;
@@ -36,6 +37,7 @@ export class GovernanceQueryClient implements GovernanceReadOnlyInterface {
     this.periodInfo = this.periodInfo.bind(this);
     this.proposal = this.proposal.bind(this);
     this.proposals = this.proposals.bind(this);
+    this.coreSlots = this.coreSlots.bind(this);
   }
 
   config = async (): Promise<ConfigResponse> => {
@@ -73,18 +75,15 @@ export class GovernanceQueryClient implements GovernanceReadOnlyInterface {
       }
     });
   };
+  coreSlots = async (): Promise<CoreSlotsResponse> => {
+    return this.client.wasm.contractQuery(this.contractAddress, {
+      core_slots: {}
+    });
+  };
 }
 export interface GovernanceInterface extends GovernanceReadOnlyInterface {
   contractAddress: string;
-  receive: ({
-    amount,
-    msg,
-    sender
-  }: {
-    amount: Uint128;
-    msg: Binary;
-    sender: string;
-  }, coins?: Coins) => Promise<WaitTxBroadcastResult>;
+  propose: (coins?: Coins) => Promise<WaitTxBroadcastResult>;
   vote: ({
     id,
     vote
@@ -106,6 +105,23 @@ export interface GovernanceInterface extends GovernanceReadOnlyInterface {
     distribution: string;
     identityservice: string;
   }, coins?: Coins) => Promise<WaitTxBroadcastResult>;
+  setCoreSlot: ({
+    proposalId
+  }: {
+    proposalId: number;
+  }, coins?: Coins) => Promise<WaitTxBroadcastResult>;
+  unsetCoreSlot: ({
+    proposalId
+  }: {
+    proposalId: number;
+  }, coins?: Coins) => Promise<WaitTxBroadcastResult>;
+  resignCoreSlot: ({
+    note,
+    slot
+  }: {
+    note: string;
+    slot: CoreSlot;
+  }, coins?: Coins) => Promise<WaitTxBroadcastResult>;
 }
 export class GovernanceClient extends GovernanceQueryClient implements GovernanceInterface {
   client: LCDClient;
@@ -117,29 +133,20 @@ export class GovernanceClient extends GovernanceQueryClient implements Governanc
     this.client = client;
     this.user = user;
     this.contractAddress = contractAddress;
-    this.receive = this.receive.bind(this);
+    this.propose = this.propose.bind(this);
     this.vote = this.vote.bind(this);
     this.conclude = this.conclude.bind(this);
     this.setContract = this.setContract.bind(this);
+    this.setCoreSlot = this.setCoreSlot.bind(this);
+    this.unsetCoreSlot = this.unsetCoreSlot.bind(this);
+    this.resignCoreSlot = this.resignCoreSlot.bind(this);
   }
 
-  receive = async ({
-    amount,
-    msg,
-    sender
-  }: {
-    amount: Uint128;
-    msg: Binary;
-    sender: string;
-  }, coins?: Coins): Promise<WaitTxBroadcastResult> => {
+  propose = async (coins?: Coins): Promise<WaitTxBroadcastResult> => {
     const key = new MnemonicKey(this.user.mnemonicKeyOptions);
     const wallet = this.client.wallet(key);
     const execMsg = new MsgExecuteContract(this.user.address, this.contractAddress, {
-      receive: {
-        amount,
-        msg,
-        sender
-      }
+      propose: {}
     }, coins);
     const txOptions = { msgs: [execMsg] };
     const tx = await wallet.createAndSignTx(txOptions);
@@ -196,6 +203,57 @@ export class GovernanceClient extends GovernanceQueryClient implements Governanc
         artist_curator: artistCurator,
         distribution,
         identityservice
+      }
+    }, coins);
+    const txOptions = { msgs: [execMsg] };
+    const tx = await wallet.createAndSignTx(txOptions);
+    return await this.client.tx.broadcast(tx);
+  };
+  setCoreSlot = async ({
+    proposalId
+  }: {
+    proposalId: number;
+  }, coins?: Coins): Promise<WaitTxBroadcastResult> => {
+    const key = new MnemonicKey(this.user.mnemonicKeyOptions);
+    const wallet = this.client.wallet(key);
+    const execMsg = new MsgExecuteContract(this.user.address, this.contractAddress, {
+      set_core_slot: {
+        proposal_id: proposalId
+      }
+    }, coins);
+    const txOptions = { msgs: [execMsg] };
+    const tx = await wallet.createAndSignTx(txOptions);
+    return await this.client.tx.broadcast(tx);
+  };
+  unsetCoreSlot = async ({
+    proposalId
+  }: {
+    proposalId: number;
+  }, coins?: Coins): Promise<WaitTxBroadcastResult> => {
+    const key = new MnemonicKey(this.user.mnemonicKeyOptions);
+    const wallet = this.client.wallet(key);
+    const execMsg = new MsgExecuteContract(this.user.address, this.contractAddress, {
+      unset_core_slot: {
+        proposal_id: proposalId
+      }
+    }, coins);
+    const txOptions = { msgs: [execMsg] };
+    const tx = await wallet.createAndSignTx(txOptions);
+    return await this.client.tx.broadcast(tx);
+  };
+  resignCoreSlot = async ({
+    note,
+    slot
+  }: {
+    note: string;
+    slot: CoreSlot;
+  }, coins?: Coins): Promise<WaitTxBroadcastResult> => {
+    const key = new MnemonicKey(this.user.mnemonicKeyOptions);
+    const wallet = this.client.wallet(key);
+    const execMsg = new MsgExecuteContract(this.user.address, this.contractAddress, {
+      resign_core_slot: {
+        note,
+        slot
       }
     }, coins);
     const txOptions = { msgs: [execMsg] };

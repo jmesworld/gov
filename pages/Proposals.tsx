@@ -25,18 +25,14 @@ import {
 import { ProposalList } from "../components/react/proposal-list";
 import { useState } from "react";
 import { useWallet } from "@cosmos-kit/react";
-import { DaoQueryClient } from "../client/Dao.client";
-import {
-  useDaoListProposalsQuery,
-  useDaoNameQuery,
-  useDaoProposalQuery,
-} from "../client/Dao.react-query";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Extension, MsgExecuteContract } from "@terra-money/terra.js";
 import { useRouter } from "next/router";
 import { ProposalRecipientForm } from "../components/react/proposal-recipient-form";
-import * as Dao from "../client/Dao.types";
+import { DaoMultisigQueryClient } from "../client/DaoMultisig.client";
+import { useDaoMultisigListProposalsQuery } from "../client/DaoMultisig.react-query";
+import { BankMsg, Coin, ExecuteMsg } from "../client/DaoMultisig.types";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -78,11 +74,11 @@ export default function Proposals() {
     let msgs = [];
 
     for (let recipient of recipients) {
-      const coin: Dao.Coin = {
+      const coin: Coin = {
         denom: "uluna",
         amount: recipient.amount.toString(),
       };
-      const bankMsg: Dao.BankMsg = {
+      const bankMsg: BankMsg = {
         send: { amount: [coin], to_address: recipient.address },
       };
       msgs.push({
@@ -90,7 +86,7 @@ export default function Proposals() {
       });
     }
 
-    const msg: Dao.ExecuteMsg = {
+    const msg: ExecuteMsg = {
       propose: {
         title: proposalName.trim(),
         description: proposalDesc.trim(),
@@ -146,8 +142,11 @@ export default function Proposals() {
 
   const proposalMutation = useMutation(["proposalMutation"], createProposal);
 
-  const daoQueryClient = new DaoQueryClient(lcdClient, daoAddress as string);
-  const proposalsQuery = useDaoListProposalsQuery({
+  const daoQueryClient = new DaoMultisigQueryClient(
+    lcdClient,
+    daoAddress as string
+  );
+  const proposalsQuery = useDaoMultisigListProposalsQuery({
     client: daoQueryClient,
     args: { limit: 10000 },
   });

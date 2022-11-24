@@ -11,15 +11,12 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useWallet } from "@cosmos-kit/react";
-import { DaoQueryClient } from "../client/Dao.client";
-import {
-  useDaoListVotesQuery,
-  useDaoProposalQuery,
-} from "../client/Dao.react-query";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
 import { useMutation } from "@tanstack/react-query";
 import { Extension, MsgExecuteContract } from "@terra-money/terra.js";
 import { useRouter } from "next/router";
+import { DaoMultisigQueryClient } from "../client/DaoMultisig.client";
+import { useDaoMultisigListVotesQuery, useDaoMultisigProposalQuery } from "../client/DaoMultisig.react-query";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -52,13 +49,13 @@ export default function ProposalDetail() {
 
   const lcdClient = new LCDClient(LCDOptions);
 
-  const daoQueryClient = new DaoQueryClient(lcdClient, daoAddress as string);
-  const proposalQuery = useDaoProposalQuery({
+  const daoQueryClient = new DaoMultisigQueryClient(lcdClient, daoAddress as string);
+  const proposalQuery = useDaoMultisigProposalQuery({
     client: daoQueryClient,
     args: { proposalId: proposalId ? parseInt(proposalId as string) : 0 },
   });
 
-  const votesQuery = useDaoListVotesQuery({
+  const votesQuery = useDaoMultisigListVotesQuery({
     client: daoQueryClient,
     args: { proposalId: proposalId ? parseInt(proposalId as string) : 0 },
   });
@@ -165,35 +162,9 @@ export default function ProposalDetail() {
     executeProposal
   );
 
-  // async function getRecipients() {
-  //   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
-  //     lcdClient,
-  //     "terra19wzedfegwqjpxp3zjgc4x426u8ylkyuzeeh3hrhzueljsz5wzdzsc2xef8"
-  //   );
-  //   try {
-  //   let recipients: any[] = [];
-  //   if (proposalQuery.data) {
-  //     const _msgs: any[]  = proposalQuery.data ? proposalQuery.data?.msgs : [];
-  //     for (let _msg of _msgs) {
-  //       const _addrs = _msg['bank']['send']['to_address'];
-  //       const _amount = _msg['bank']['send']['amount'];
-  //       const _nameResponse = await client.getIdentityByOwner({ owner: _addrs });
-  //       recipients.push({
-  //         name: _nameResponse.identity ? _nameResponse.identity.name : "",
-  //         amount: _amount
-  //       });
-  //     }
-  //   }
-  //   return recipients;
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
-  // const recipientsQuery = useQuery(['recipientsQuery'], getRecipients);
-
   const proposalThreshold: any = proposalQuery.data?.threshold;
   const proposalThresholdWeight = proposalQuery.data
-    ? proposalThreshold["absolute_count"]["weight"]
+    ? proposalThreshold["absolute_percentage"]["total_weight"]
     : 0;
 
   const proposalExpiryDate: any = proposalQuery.data?.expires;

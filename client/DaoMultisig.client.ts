@@ -7,10 +7,9 @@
 import { LCDClient, Coins, MnemonicKey, MsgExecuteContract, WaitTxBroadcastResult } from "@terra-money/terra.js";
 import { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee } from "@cosmjs/amino";
-import { Duration, Threshold, Decimal, InstantiateMsg, Voter, ExecuteMsg, Expiration, Timestamp, Uint64, CosmosMsgForEmpty, BankMsg, Uint128, StakingMsg, DistributionMsg, WasmMsg, Binary, Vote, Coin, Empty, QueryMsg, Status, ThresholdResponse, ProposalListResponse, ProposalResponseForEmpty, VoterListResponse, VoterDetail, VoteListResponse, VoteInfo, NameResponse, VoteResponse, VoterResponse } from "./Dao.types";
-export interface DaoReadOnlyInterface {
+import { Executor, Addr, Duration, Threshold, Decimal, InstantiateMsg, ExecuteMsg, Expiration, Timestamp, Uint64, CosmosMsgForEmpty, BankMsg, Uint128, WasmMsg, Binary, Vote, Coin, Empty, MemberChangedHookMsg, MemberDiff, QueryMsg, ConfigResponse, VoteResponse, VoteInfo, Status, ThresholdResponse, ProposalListResponseForEmpty, ProposalResponseForEmpty, VoterListResponse, VoterDetail, VoteListResponse, VoterResponse } from "./DaoMultisig.types";
+export interface DaoMultisigReadOnlyInterface {
   contractAddress: string;
-  name: () => Promise<NameResponse>;
   threshold: () => Promise<ThresholdResponse>;
   proposal: ({
     proposalId
@@ -23,15 +22,15 @@ export interface DaoReadOnlyInterface {
   }: {
     limit?: number;
     startAfter?: number;
-  }) => Promise<ProposalListResponse>;
+  }) => Promise<ProposalListResponseForEmpty>;
   reverseProposals: ({
     limit,
     startBefore
   }: {
     limit?: number;
     startBefore?: number;
-  }) => Promise<ProposalListResponse>;
-  showVote: ({
+  }) => Promise<ProposalListResponseForEmpty>;
+  getVote: ({
     proposalId,
     voter
   }: {
@@ -59,30 +58,26 @@ export interface DaoReadOnlyInterface {
     limit?: number;
     startAfter?: string;
   }) => Promise<VoterListResponse>;
+  config: () => Promise<ConfigResponse>;
 }
-export class DaoQueryClient implements DaoReadOnlyInterface {
+export class DaoMultisigQueryClient implements DaoMultisigReadOnlyInterface {
   client: LCDClient;
   contractAddress: string;
 
   constructor(client: LCDClient, contractAddress: string) {
     this.client = client;
     this.contractAddress = contractAddress;
-    this.name = this.name.bind(this);
     this.threshold = this.threshold.bind(this);
     this.proposal = this.proposal.bind(this);
     this.listProposals = this.listProposals.bind(this);
     this.reverseProposals = this.reverseProposals.bind(this);
-    this.showVote = this.showVote.bind(this);
+    this.getVote = this.getVote.bind(this);
     this.listVotes = this.listVotes.bind(this);
     this.voter = this.voter.bind(this);
     this.listVoters = this.listVoters.bind(this);
+    this.config = this.config.bind(this);
   }
 
-  name = async (): Promise<NameResponse> => {
-    return this.client.wasm.contractQuery(this.contractAddress, {
-      name: {}
-    });
-  };
   threshold = async (): Promise<ThresholdResponse> => {
     return this.client.wasm.contractQuery(this.contractAddress, {
       threshold: {}
@@ -105,7 +100,7 @@ export class DaoQueryClient implements DaoReadOnlyInterface {
   }: {
     limit?: number;
     startAfter?: number;
-  }): Promise<ProposalListResponse> => {
+  }): Promise<ProposalListResponseForEmpty> => {
     return this.client.wasm.contractQuery(this.contractAddress, {
       list_proposals: {
         limit,
@@ -119,7 +114,7 @@ export class DaoQueryClient implements DaoReadOnlyInterface {
   }: {
     limit?: number;
     startBefore?: number;
-  }): Promise<ProposalListResponse> => {
+  }): Promise<ProposalListResponseForEmpty> => {
     return this.client.wasm.contractQuery(this.contractAddress, {
       reverse_proposals: {
         limit,
@@ -127,7 +122,7 @@ export class DaoQueryClient implements DaoReadOnlyInterface {
       }
     });
   };
-  showVote = async ({
+  getVote = async ({
     proposalId,
     voter
   }: {
@@ -135,7 +130,7 @@ export class DaoQueryClient implements DaoReadOnlyInterface {
     voter: string;
   }): Promise<VoteResponse> => {
     return this.client.wasm.contractQuery(this.contractAddress, {
-      show_vote: {
+      get_vote: {
         proposal_id: proposalId,
         voter
       }
@@ -183,8 +178,13 @@ export class DaoQueryClient implements DaoReadOnlyInterface {
       }
     });
   };
+  config = async (): Promise<ConfigResponse> => {
+    return this.client.wasm.contractQuery(this.contractAddress, {
+      config: {}
+    });
+  };
 }
-export interface DaoInterface extends DaoReadOnlyInterface {
+export interface DaoMultisigInterface extends DaoMultisigReadOnlyInterface {
   contractAddress: string;
   propose: ({
     description,
@@ -214,8 +214,13 @@ export interface DaoInterface extends DaoReadOnlyInterface {
   }: {
     proposalId: number;
   }, coins?: Coins) => Promise<WaitTxBroadcastResult>;
+  memberChangedHook: ({
+    diffs
+  }: {
+    diffs: MemberDiff[];
+  }, coins?: Coins) => Promise<WaitTxBroadcastResult>;
 }
-export class DaoClient extends DaoQueryClient implements DaoInterface {
+export class DaoMultisigClient extends DaoMultisigQueryClient implements DaoMultisigInterface {
   client: LCDClient;
   user: any;
   contractAddress: string;
@@ -229,6 +234,7 @@ export class DaoClient extends DaoQueryClient implements DaoInterface {
     this.vote = this.vote.bind(this);
     this.execute = this.execute.bind(this);
     this.close = this.close.bind(this);
+    this.memberChangedHook = this.memberChangedHook.bind(this);
   }
 
   propose = async ({
@@ -301,6 +307,22 @@ export class DaoClient extends DaoQueryClient implements DaoInterface {
     const execMsg = new MsgExecuteContract(this.user.address, this.contractAddress, {
       close: {
         proposal_id: proposalId
+      }
+    }, coins);
+    const txOptions = { msgs: [execMsg] };
+    const tx = await wallet.createAndSignTx(txOptions);
+    return await this.client.tx.broadcast(tx);
+  };
+  memberChangedHook = async ({
+    diffs
+  }: {
+    diffs: MemberDiff[];
+  }, coins?: Coins): Promise<WaitTxBroadcastResult> => {
+    const key = new MnemonicKey(this.user.mnemonicKeyOptions);
+    const wallet = this.client.wallet(key);
+    const execMsg = new MsgExecuteContract(this.user.address, this.contractAddress, {
+      member_changed_hook: {
+        diffs
       }
     }, coins);
     const txOptions = { msgs: [execMsg] };
