@@ -1,11 +1,19 @@
-import { Box, Container, Text } from "@chakra-ui/react";
+import { Box, Container, Grid, GridItem, Text } from "@chakra-ui/react";
 import { useWallet } from "@cosmos-kit/react";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
 import {
   GovernanceClient,
   GovernanceQueryClient,
 } from "../client/Governance.client";
-import { useGovernancePeriodInfoQuery } from "../client/Governance.react-query";
+import {
+  useGovernanceCoreSlotsQuery,
+  useGovernancePeriodInfoQuery,
+} from "../client/Governance.react-query";
+import { IdentityserviceQueryClient } from "../client/Identityservice.client";
+import {
+  useIdentityserviceDaosQuery,
+  useIdentityserviceGetIdentityByOwnerQuery,
+} from "../client/Identityservice.react-query";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -27,6 +35,8 @@ export default function Governance() {
     lcdClient,
     NEXT_PUBLIC_GOVERNANCE_CONTRACT
   );
+  const identityserviceQueryClient: IdentityserviceQueryClient =
+    new IdentityserviceQueryClient(lcdClient, IDENTITY_SERVICE_CONTRACT);
 
   const periodInfoQuery = useGovernancePeriodInfoQuery({
     client: governanceQueryClient,
@@ -35,64 +45,120 @@ export default function Governance() {
     },
   });
 
+  const coreSlotQuery = useGovernanceCoreSlotsQuery({
+    client: governanceQueryClient,
+    options: {
+      refetchInterval: 1000,
+    },
+  });
+
+  const brandCoreSlotIdentityQuery = useIdentityserviceGetIdentityByOwnerQuery({
+    client: identityserviceQueryClient,
+    args: {
+      owner: coreSlotQuery.data?.brand?.dao as string,
+    },
+    options: {
+      refetchInterval: 1000,
+      enabled: !!coreSlotQuery.data?.brand?.dao,
+    },
+  });
+
+  const coreTechCoreSlotIdentityQuery =
+    useIdentityserviceGetIdentityByOwnerQuery({
+      client: identityserviceQueryClient,
+      args: {
+        owner: coreSlotQuery.data?.core_tech?.dao as string,
+      },
+      options: {
+        refetchInterval: 1000,
+        enabled: !!coreSlotQuery.data?.core_tech?.dao,
+      },
+    });
+
+  const creativeCoreSlotIdentityQuery =
+    useIdentityserviceGetIdentityByOwnerQuery({
+      client: identityserviceQueryClient,
+      args: {
+        owner: coreSlotQuery.data?.creative?.dao as string,
+      },
+      options: {
+        refetchInterval: 1000,
+        enabled: !!coreSlotQuery.data?.creative?.dao,
+      },
+    });
+
   return (
-    <Box marginTop={8}>
-      <Text fontWeight="bold"> Period Info </Text>
-      <Text> Current Block: {periodInfoQuery.data?.current_block} </Text>
-      <Text> Current Period: {periodInfoQuery.data?.current_period} </Text>
-      <Text>
-        {" "}
-        Current Posting Start:{" "}
-        {timestampToDate(
-          periodInfoQuery.data?.current_posting_start as number
-        )}{" "}
-      </Text>
-      <Text>
-        {" "}
-        Current Time in Cycle: {
-          periodInfoQuery.data?.current_time_in_cycle
-        }{" "}
-      </Text>
-      <Text>
-        {" "}
-        Current Voting Start:{" "}
-        {timestampToDate(
-          periodInfoQuery.data?.current_voting_start as number
-        )}{" "}
-      </Text>
-      <Text>
-        {" "}
-        Current Voting End:{" "}
-        {timestampToDate(
-          periodInfoQuery.data?.current_voting_end as number
-        )}{" "}
-      </Text>
-      <Text> Cycle Length: {periodInfoQuery.data?.cycle_length} </Text>
-      <Text>
-        {" "}
-        Next Posting Start:{" "}
-        {timestampToDate(
-          periodInfoQuery.data?.next_posting_start as number
-        )}{" "}
-      </Text>
-      <Text>
-        {" "}
-        Next Voting Start:{" "}
-        {timestampToDate(
-          periodInfoQuery.data?.next_voting_start as number
-        )}{" "}
-      </Text>
-      <Text>
-        {" "}
-        Posting Period Length: {
-          periodInfoQuery.data?.posting_period_length
-        }{" "}
-      </Text>
-      <Text>
-        {" "}
-        Voting Period Length: {periodInfoQuery.data?.voting_period_length}{" "}
-      </Text>
-    </Box>
+    <Grid templateColumns="repeat(2, 1fr)" templateRows="repeat(1, 1fr)">
+      <GridItem colSpan={1}>
+        <Box marginTop={8}>
+          <Text fontWeight="bold"> Period Info </Text>
+          <Text> Current Block: {periodInfoQuery.data?.current_block} </Text>
+          <Text> Current Period: {periodInfoQuery.data?.current_period} </Text>
+          <Text>
+            {" "}
+            Current Posting Start:{" "}
+            {timestampToDate(
+              periodInfoQuery.data?.current_posting_start as number
+            )}{" "}
+          </Text>
+          <Text>
+            {" "}
+            Current Time in Cycle: {
+              periodInfoQuery.data?.current_time_in_cycle
+            }{" "}
+          </Text>
+          <Text>
+            {" "}
+            Current Voting Start:{" "}
+            {timestampToDate(
+              periodInfoQuery.data?.current_voting_start as number
+            )}{" "}
+          </Text>
+          <Text>
+            {" "}
+            Current Voting End:{" "}
+            {timestampToDate(
+              periodInfoQuery.data?.current_voting_end as number
+            )}{" "}
+          </Text>
+          <Text> Cycle Length: {periodInfoQuery.data?.cycle_length} </Text>
+          <Text>
+            {" "}
+            Next Posting Start:{" "}
+            {timestampToDate(
+              periodInfoQuery.data?.next_posting_start as number
+            )}{" "}
+          </Text>
+          <Text>
+            {" "}
+            Next Voting Start:{" "}
+            {timestampToDate(
+              periodInfoQuery.data?.next_voting_start as number
+            )}{" "}
+          </Text>
+          <Text>
+            {" "}
+            Posting Period Length: {
+              periodInfoQuery.data?.posting_period_length
+            }{" "}
+          </Text>
+          <Text>
+            {" "}
+            Voting Period Length: {
+              periodInfoQuery.data?.voting_period_length
+            }{" "}
+          </Text>
+        </Box>
+      </GridItem>
+      <GridItem colSpan={1}>
+        <Box marginTop={8}>
+          <Text fontWeight="bold"> Core Slots </Text>
+          <Text> Brand: {brandCoreSlotIdentityQuery.data?.identity?.name} </Text>
+          <Text> Core Tech: {coreTechCoreSlotIdentityQuery.data?.identity?.name} </Text>
+          <Text> Creative: {creativeCoreSlotIdentityQuery.data?.identity?.name} </Text>
+        </Box>
+      </GridItem>
+    </Grid>
   );
 }
 
