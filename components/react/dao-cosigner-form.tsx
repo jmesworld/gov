@@ -49,21 +49,22 @@ export const DAOCosignerForm = ({
 
   async function getIdentitiesByNames() {
     let identityAddrs = new Array();
-
-    for (let j = 0; j < cosigners.length; j++) {
-      const name = cosigners[j].name;
-      const identityRes = await client.getIdentityByName({ name: name });
-      if (identityRes.identity?.name === name) {
-        identityAddrs[j] = identityRes.identity?.owner;
-      } else {
-        identityAddrs[j] = "Invalid identity";
+    if (!!cosigners) {
+      for (let j = 0; j < cosigners.length; j++) {
+        const name = cosigners[j].name;
+        const identityRes = await client.getIdentityByName({ name: name });
+        if (identityRes.identity?.name === name) {
+          identityAddrs[j] = identityRes.identity?.owner;
+        } else {
+          identityAddrs[j] = "Invalid identity";
+        }
       }
-    }
 
-    if (identityAddrs.includes("Invalid identity")) {
-      setIdNamesValid(false);
-    } else {
-      setIdNamesValid(true);
+      if (identityAddrs.includes("Invalid identity")) {
+        setIdNamesValid(false);
+      } else {
+        setIdNamesValid(true);
+      }
     }
     return identityAddrs;
   }
@@ -72,9 +73,7 @@ export const DAOCosignerForm = ({
 
   const [focusedCosignerIndex, setFocusedCosignerIndex] = useState(Infinity);
 
-
   let cosignerItem = cosigners.map((c, i) => {
-
     return (
       <Fragment key={c.id}>
         <Grid
@@ -128,12 +127,12 @@ export const DAOCosignerForm = ({
           </Button>
         </Grid>
         <Text fontSize={12}>
-          {cosigners[i].name.length > 0
+          {cosigners[i].name?.length > 0
             ? !idsByNamesQuery.isFetching
               ? idsByNamesQuery?.data?.at(i)
-              : (
-                i === focusedCosignerIndex ? "Checking...": idsByNamesQuery?.data?.at(i)
-              )
+              : i === focusedCosignerIndex
+              ? "Checking..."
+              : idsByNamesQuery?.data?.at(i)
             : ""}
         </Text>
       </Fragment>
