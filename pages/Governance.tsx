@@ -31,7 +31,7 @@ export default function Governance() {
   const periodInfoQuery = useGovernancePeriodInfoQuery({
     client: governanceQueryClient,
     options: {
-      refetchInterval: 1000,
+      refetchInterval: 100,
     },
   });
 
