@@ -31,6 +31,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { MsgExecuteContract, Extension } from "@terra-money/terra.js";
 import { ExecuteMsg } from "../client/Identityservice.types";
 import NextLink from "next/link";
+import Governance from "./Governance";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -72,7 +73,6 @@ export default function Home() {
   });
 
   const identityMutation = useMutation(["identityMutation"], registerUser);
-
 
   async function registerUser() {
     const ext = new Extension();
@@ -176,6 +176,11 @@ export default function Home() {
             My DAOs
           </Link>
         </NextLink>
+      ) : (
+        ""
+      )}
+      {!!address ? (
+        <Governance/>
       ) : (
         ""
       )}

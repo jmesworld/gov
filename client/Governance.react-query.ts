@@ -9,6 +9,7 @@ import { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee } from "@cosmjs/amino";
 import { Addr, Uint128, ConfigResponse, Decimal, CoreSlotsResponse, SlotVoteResult, ExecuteMsg, ProposalMsg, Feature, CosmosMsgForEmpty, BankMsg, StakingMsg, DistributionMsg, WasmMsg, Binary, CoreSlot, VoteOption, Coin, Empty, RevokeCoreSlot, InstantiateMsg, ProposalPeriod, PeriodInfoResponse, ProposalType, ProposalStatus, ProposalResponse, ProposalsResponse, QueryMsg } from "./Governance.types";
 import { GovernanceQueryClient, GovernanceClient } from "./Governance.client";
+import { Coins, WaitTxBroadcastResult } from "@terra-money/terra.js";
 export const governanceQueryKeys = {
   contract: ([{
     contract: "governance"
@@ -114,8 +115,8 @@ export interface GovernanceResignCoreSlotMutation {
     coins?: Coins;
   };
 }
-export function useGovernanceResignCoreSlotMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, GovernanceResignCoreSlotMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, GovernanceResignCoreSlotMutation>(({
+export function useGovernanceResignCoreSlotMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceResignCoreSlotMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceResignCoreSlotMutation>(({
     client,
     msg,
     args: {
@@ -132,8 +133,8 @@ export interface GovernanceUnsetCoreSlotMutation {
     coins?: Coins;
   };
 }
-export function useGovernanceUnsetCoreSlotMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, GovernanceUnsetCoreSlotMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, GovernanceUnsetCoreSlotMutation>(({
+export function useGovernanceUnsetCoreSlotMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceUnsetCoreSlotMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceUnsetCoreSlotMutation>(({
     client,
     msg,
     args: {
@@ -150,8 +151,8 @@ export interface GovernanceSetCoreSlotMutation {
     coins?: Coins;
   };
 }
-export function useGovernanceSetCoreSlotMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, GovernanceSetCoreSlotMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, GovernanceSetCoreSlotMutation>(({
+export function useGovernanceSetCoreSlotMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceSetCoreSlotMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceSetCoreSlotMutation>(({
     client,
     msg,
     args: {
@@ -170,8 +171,8 @@ export interface GovernanceSetContractMutation {
     coins?: Coins;
   };
 }
-export function useGovernanceSetContractMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, GovernanceSetContractMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, GovernanceSetContractMutation>(({
+export function useGovernanceSetContractMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceSetContractMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceSetContractMutation>(({
     client,
     msg,
     args: {
@@ -188,8 +189,8 @@ export interface GovernanceConcludeMutation {
     coins?: Coins;
   };
 }
-export function useGovernanceConcludeMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, GovernanceConcludeMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, GovernanceConcludeMutation>(({
+export function useGovernanceConcludeMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceConcludeMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceConcludeMutation>(({
     client,
     msg,
     args: {
@@ -207,8 +208,8 @@ export interface GovernanceVoteMutation {
     coins?: Coins;
   };
 }
-export function useGovernanceVoteMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, GovernanceVoteMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, GovernanceVoteMutation>(({
+export function useGovernanceVoteMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceVoteMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceVoteMutation>(({
     client,
     msg,
     args: {
@@ -223,8 +224,8 @@ export interface GovernanceProposeMutation {
     coins?: Coins;
   };
 }
-export function useGovernanceProposeMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, GovernanceProposeMutation>, "mutationFn">) {
-  return useMutation<ExecuteResult, Error, GovernanceProposeMutation>(({
+export function useGovernanceProposeMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceProposeMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceProposeMutation>(({
     client,
     msg,
     args: {
