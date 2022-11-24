@@ -30,27 +30,72 @@ export default function Governance() {
 
   const periodInfoQuery = useGovernancePeriodInfoQuery({
     client: governanceQueryClient,
+    options: {
+      refetchInterval: 1000,
+    },
   });
 
-  
   return (
     <Box marginTop={8}>
       <Text fontWeight="bold"> Period Info </Text>
       <Text> Current Block: {periodInfoQuery.data?.current_block} </Text>
       <Text> Current Period: {periodInfoQuery.data?.current_period} </Text>
-      <Text> Current Posting Start: {timestampToDate(periodInfoQuery.data?.current_posting_start as number)} </Text>
-      <Text> Current Time in Cycle: {periodInfoQuery.data?.current_time_in_cycle} </Text>
-      <Text> Current Voting Start: {timestampToDate(periodInfoQuery.data?.current_voting_start as number)} </Text>
-      <Text> Current Voting End: {timestampToDate(periodInfoQuery.data?.current_voting_end as number)} </Text>
+      <Text>
+        {" "}
+        Current Posting Start:{" "}
+        {timestampToDate(
+          periodInfoQuery.data?.current_posting_start as number
+        )}{" "}
+      </Text>
+      <Text>
+        {" "}
+        Current Time in Cycle: {
+          periodInfoQuery.data?.current_time_in_cycle
+        }{" "}
+      </Text>
+      <Text>
+        {" "}
+        Current Voting Start:{" "}
+        {timestampToDate(
+          periodInfoQuery.data?.current_voting_start as number
+        )}{" "}
+      </Text>
+      <Text>
+        {" "}
+        Current Voting End:{" "}
+        {timestampToDate(
+          periodInfoQuery.data?.current_voting_end as number
+        )}{" "}
+      </Text>
       <Text> Cycle Length: {periodInfoQuery.data?.cycle_length} </Text>
-      <Text> Next Posting Start: {timestampToDate(periodInfoQuery.data?.next_posting_start as number)} </Text>
-      <Text> Next Voting Start: {timestampToDate(periodInfoQuery.data?.next_voting_start as number)} </Text>
-      <Text> Posting Period Length: {periodInfoQuery.data?.posting_period_length} </Text>
-      <Text> Voting Period Length: {periodInfoQuery.data?.voting_period_length} </Text>
+      <Text>
+        {" "}
+        Next Posting Start:{" "}
+        {timestampToDate(
+          periodInfoQuery.data?.next_posting_start as number
+        )}{" "}
+      </Text>
+      <Text>
+        {" "}
+        Next Voting Start:{" "}
+        {timestampToDate(
+          periodInfoQuery.data?.next_voting_start as number
+        )}{" "}
+      </Text>
+      <Text>
+        {" "}
+        Posting Period Length: {
+          periodInfoQuery.data?.posting_period_length
+        }{" "}
+      </Text>
+      <Text>
+        {" "}
+        Voting Period Length: {periodInfoQuery.data?.voting_period_length}{" "}
+      </Text>
     </Box>
   );
 }
 
 const timestampToDate = (timestamp: number) => {
-  return new Date(timestamp * 1000).toDateString()
-}
+  return new Date(timestamp * 1000).toDateString();
+};
