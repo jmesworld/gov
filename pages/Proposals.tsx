@@ -21,6 +21,7 @@ import {
   useToast,
   Textarea,
   Spinner,
+  Link,
 } from "@chakra-ui/react";
 import { ProposalList } from "../components/react/proposal-list";
 import { useState } from "react";
@@ -33,6 +34,11 @@ import { ProposalRecipientForm } from "../components/react/proposal-recipient-fo
 import { DaoMultisigQueryClient } from "../client/DaoMultisig.client";
 import { useDaoMultisigListProposalsQuery } from "../client/DaoMultisig.react-query";
 import { BankMsg, Coin, ExecuteMsg } from "../client/DaoMultisig.types";
+import { FundingProposal } from "../components/react/funding-proposal";
+import { ProposalDaoAddMembers } from "../components/react/proposal-dao-add-members";
+import { UpdateMemberProposal } from "../components/react/update-member-proposal";
+import { CoreSlotProposal } from "../components/react/core-slot-proposal";
+import { RevokeCoreSlotProposal } from "../components/react/revoke-core-slot-proposal";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -47,6 +53,14 @@ export default function Proposals() {
   const [recipients, setRecipients] = useState(new Array());
   const [isRecipientsNamesValid, setRecipientsNamesValid] = useState(false);
   const [isModalOpen, setModalState] = useState(false);
+  const [isSelectProposalType, setSelectProposalType] = useState(true);
+  const [isFundingProposalType, setFundingProposalType] = useState(false);
+  const [isUpdateMemberProposalType, setUpdateMemberProposalType] =
+    useState(false);
+  const [isCoreSlotProposalType, setCoreSlotProposalType] = useState(false);
+  const [isRevokeCoreSlotProposalType, setRevokeCoreSlotProposalType] =
+    useState(false);
+
   const [proposalName, setProposalName] = useState("");
   const [proposalDesc, setProposalDesc] = useState("");
 
@@ -133,7 +147,6 @@ export default function Proposals() {
           isClosable: true,
         });
       }
-      console.log(result);
       return result;
     } catch (e) {
       console.error(e);
@@ -204,87 +217,89 @@ export default function Proposals() {
         <ModalOverlay />
         <ModalContent maxW="50%">
           <ModalHeader fontSize={32} fontWeight="bold">
-            Create a Proposal
+            {isSelectProposalType ? (
+              <Text>Select Proposal Type</Text>
+            ) : (
+              "Create a Proposal"
+            )}
           </ModalHeader>
-          <ModalCloseButton onClick={() => setModalState(false)} />
+          <ModalCloseButton
+            onClick={() => {
+              setModalState(false);
+              setSelectProposalType(true);
+              setFundingProposalType(false);
+              setUpdateMemberProposalType(false);
+            }}
+          />
           <ModalBody>
-            <Box>
-              <Text marginBottom={2} fontSize={24}>
-                PROPOSAL NAME
-              </Text>
-              <Input
-                marginBottom={4}
-                placeholder="Type your Proposal name here"
-                size="lg"
-                onChange={(event) => {
-                  setProposalName(event.target.value.trim());
-                }}
-              ></Input>
-              <Text marginBottom={2} fontSize={24}>
-                DESCRIPTION
-              </Text>
-              <Textarea
-                marginBottom={2}
-                placeholder="Enter your description here"
-                size="lg"
-                onChange={(event) => {
-                  setProposalDesc(event.target.value.trim());
-                }}
-              ></Textarea>
-              <Grid
-                templateColumns="repeat(2, 1fr)"
-                templateRows="repeat(1, 1fr)"
-                marginTop={8}
-              >
-                <Text fontSize={24}>RECIPIENT</Text>
-                <Flex justifyContent="end">
-                  <Button
-                    variant="outline"
-                    width={100}
-                    onClick={() => {
-                      setRecipients((recipients) => [
-                        ...recipients,
-                        {
-                          name: "",
-                          amount: 0,
-                          id: recipients.length + 1,
-                          address: "",
-                        },
-                      ]);
-                    }}
-                  >
-                    <Text fontSize={18} fontWeight="bold">
-                      +
-                    </Text>
-                  </Button>
-                </Flex>
-                <ProposalRecipientForm
-                  recipients={recipients}
-                  setRecipients={setRecipients}
-                  setRecipientsNamesValid={setRecipientsNamesValid}
-                />
-              </Grid>
-              <Flex justifyContent="center" margin={8}>
+            {isSelectProposalType ? (
+              <>
                 <Button
-                  disabled={
-                    !(
-                      isRecipientsNamesValid &&
-                      proposalName.length > 2 &&
-                      proposalDesc.length > 2
-                    )
-                  }
-                  width={250}
-                  height={50}
-                  variant="outline"
-                  color="white"
-                  bgColor={useColorModeValue("primary.500", "primary.200")}
-                  onClick={() => proposalMutation.mutate()}
+                  marginRight={4}
+                  marginBottom={8}
+                  onClick={() => {
+                    setFundingProposalType(true);
+                    setSelectProposalType(false);
+                  }}
                 >
                   {" "}
-                  Create DAO Proposal{" "}
+                  Funding{" "}
                 </Button>
-              </Flex>
-            </Box>
+                <Button
+                  marginRight={4}
+                  marginBottom={8}
+                  onClick={() => {
+                    setUpdateMemberProposalType(true);
+                    setSelectProposalType(false);
+                  }}
+                >
+                  {" "}
+                  Update Member{" "}
+                </Button>
+                <Button
+                  marginRight={4}
+                  marginBottom={8}
+                  onClick={() => {
+                    setCoreSlotProposalType(true);
+                    setSelectProposalType(false);
+                  }}
+                >
+                  {" "}
+                  Core Slot{" "}
+                </Button>
+                <Button
+                  marginRight={4}
+                  marginBottom={8}
+                  onClick={() => {
+                    setRevokeCoreSlotProposalType(true);
+                    setSelectProposalType(false);
+                  }}
+                >
+                  {" "}
+                  Revoke Core Slot{" "}
+                </Button>
+              </>
+            ) : isFundingProposalType ? (
+              <FundingProposal
+                recipients={recipients}
+                setProposalName={setProposalName}
+                setProposalDesc={setProposalDesc}
+                setRecipients={setRecipients}
+                setRecipientsNamesValid={setRecipientsNamesValid}
+                proposalDesc={proposalDesc}
+                proposalName={proposalName}
+                proposalMutation={proposalMutation}
+                isRecipientsNamesValid={isRecipientsNamesValid}
+              />
+            ) : isUpdateMemberProposalType ? (
+              <UpdateMemberProposal />
+            ) : isCoreSlotProposalType ? (
+              <CoreSlotProposal />
+            ) : isRevokeCoreSlotProposalType ? (
+              <RevokeCoreSlotProposal />
+            ) : (
+              ""
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>
