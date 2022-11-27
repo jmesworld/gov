@@ -16,7 +16,10 @@ import { useMutation } from "@tanstack/react-query";
 import { Extension, MsgExecuteContract } from "@terra-money/terra.js";
 import { useRouter } from "next/router";
 import { DaoMultisigQueryClient } from "../client/DaoMultisig.client";
-import { useDaoMultisigListVotesQuery, useDaoMultisigProposalQuery } from "../client/DaoMultisig.react-query";
+import {
+  useDaoMultisigListVotesQuery,
+  useDaoMultisigProposalQuery,
+} from "../client/DaoMultisig.react-query";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -49,7 +52,10 @@ export default function ProposalDetail() {
 
   const lcdClient = new LCDClient(LCDOptions);
 
-  const daoQueryClient = new DaoMultisigQueryClient(lcdClient, daoAddress as string);
+  const daoQueryClient = new DaoMultisigQueryClient(
+    lcdClient,
+    daoAddress as string
+  );
   const proposalQuery = useDaoMultisigProposalQuery({
     client: daoQueryClient,
     args: { proposalId: proposalId ? parseInt(proposalId as string) : 0 },
@@ -172,6 +178,7 @@ export default function ProposalDetail() {
   const proposalMsgs: any[] = proposalQuery.data
     ? proposalQuery.data?.msgs
     : [];
+
   return (
     <Container maxW="5xl" py={10}>
       <Head>
@@ -201,16 +208,22 @@ export default function ProposalDetail() {
         <Text marginBottom={8} fontSize={18}>
           {proposalQuery.data?.description}
         </Text>
-        <Text marginBottom={2} fontSize={24} fontWeight="bold">
-          RECIPIENTS
-        </Text>
-        {proposalMsgs.map((recipient, i) => (
-          <Text key={i} marginBottom={2} fontSize={18}>
-            {recipient["bank"]["send"]["to_address"]}{" "}
-            {recipient["bank"]["send"]["amount"][0]["amount"]}{" "}
-            {recipient["bank"]["send"]["amount"][0]["denom"]}
+        {proposalMsgs.length > 0 && !!proposalMsgs[0].bank ? (
+          <Text marginBottom={2} fontSize={24} fontWeight="bold">
+            RECIPIENTS
           </Text>
-        ))}
+        ) : (
+          ""
+        )}
+        {proposalMsgs.length > 0 && !!proposalMsgs[0].bank
+          ? proposalMsgs.map((recipient, i) => (
+              <Text key={i} marginBottom={2} fontSize={18}>
+                {recipient.bank?.send?.to_address}{" "}
+                {recipient.bank?.send?.amount[0].amount}{" "}
+                {recipient.bank?.send?.amount[0].denom}
+              </Text>
+            ))
+          : ""}
         <Text marginTop={8} fontSize={24} fontWeight="bold">
           RESULTS
         </Text>

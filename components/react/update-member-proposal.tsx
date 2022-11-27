@@ -31,6 +31,8 @@ import { useWallet } from "@cosmos-kit/react";
 import { ExecuteMsg } from "../../client/DaoMembers.types";
 import { VoterDetail } from "../../client/DaoMultisig.types";
 import { useMutation } from "@tanstack/react-query";
+import { WasmMsg } from "../../client/Governance.types";
+import * as DaoMultisig from "../../client/DaoMultisig.types";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -116,13 +118,43 @@ export const UpdateMemberProposal = () => {
         remove: remove,
       };
 
+      const contract_addr = (await daoMembersQueryClient.config())
+        .dao_members_addr as string;
+
+      const updateMembersMsg: ExecuteMsg = {
+        update_members: daoUpdateMembersData,
+      };
+
+      const wasmMsg: WasmMsg = {
+        execute: {
+          contract_addr: contract_addr,
+          funds: [],
+          msg: Buffer.from(JSON.stringify(updateMembersMsg)).toString("base64"),
+        },
+      };
+
       const ext = new Extension();
-      const msg: ExecuteMsg = { update_members: daoUpdateMembersData };
+
+      const msg: DaoMultisig.ExecuteMsg = {
+        propose: {
+          title: proposalTitle,
+          description: proposalDesc,
+          msgs: [
+            {
+              wasm: wasmMsg,
+            },
+          ],
+        },
+      };
+
+      const dao_multisig_contract_addr = daoMembersQueryClient.contractAddress as string; 
+
       const execMsg = new MsgExecuteContract(
         address as string,
-        daoNameUpdateMembersQuery.data?.identity?.owner as string,
+        dao_multisig_contract_addr,
         msg
       );
+
       const txMsg = {
         msgs: [execMsg.toJSON(false)],
       };
@@ -142,8 +174,7 @@ export const UpdateMemberProposal = () => {
         setRemoveMembersNamesValid(false);
         toast({
           title: "Dao created.",
-          description:
-            "We've created your Proposal for you.",
+          description: "We've created your Proposal for you.",
           status: "success",
           duration: 9000,
           isClosable: true,
