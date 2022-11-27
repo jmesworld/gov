@@ -42,7 +42,6 @@ export const ImprovementProposal = ({ daoName }: { daoName: string }) => {
 
   const [proposalTitle, setProposalTitle] = useState("");
   const [proposalDesc, setProposalDesc] = useState("");
-  const [coreSlotOption, setCoreSlotOption] = useState("0");
 
   const LCDOptions = {
     URL: LCD_URL,
@@ -129,8 +128,8 @@ export const ImprovementProposal = ({ daoName }: { daoName: string }) => {
         setProposalDesc("");
         setProposalTitle("");
         toast({
-          title: "Core slot proposal created.",
-          description: "We've created your Core slot Proposal for you.",
+          title: "Improvement proposal created.",
+          description: "We've created your Improvement Proposal for you.",
           status: "success",
           duration: 9000,
           isClosable: true,
@@ -179,13 +178,6 @@ export const ImprovementProposal = ({ daoName }: { daoName: string }) => {
             setProposalDesc(event.target.value.trim());
           }}
         ></Textarea>
-        <RadioGroup onChange={setCoreSlotOption} value={coreSlotOption}>
-          <Stack direction="row">
-            <Radio value="0">Brand</Radio>
-            <Radio value="1">Core Tech</Radio>
-            <Radio value="2">Creative</Radio>
-          </Stack>
-        </RadioGroup>
 
         <Flex justifyContent="center" margin={8}>
           <Button
@@ -198,7 +190,7 @@ export const ImprovementProposal = ({ daoName }: { daoName: string }) => {
             onClick={() => coreSlotProposalMutation.mutate()}
           >
             {" "}
-            Create Core Slot Proposal{" "}
+            Create Improvement Proposal{" "}
           </Button>
         </Flex>
       </Box>

@@ -25,8 +25,8 @@ import {
 } from "../../client/Governance.types";
 import * as DaoMultisig from "../../client/DaoMultisig.types";
 import { useMutation } from "@tanstack/react-query";
-import { useIdentityserviceGetIdentityByNameQuery } from "../../client/Identityservice.react-query";
 import { DaoMultisigQueryClient } from "../../client/DaoMultisig.client";
+import { useIdentityserviceGetIdentityByNameQuery } from "../../client/Identityservice.react-query";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -35,14 +35,13 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
-export const RevokeCoreSlotProposal = ({ daoName }: { daoName: string }) => {
+export const TextProposal = ({ daoName }: { daoName: string }) => {
   const walletManager = useWallet();
   const { walletStatus, address } = walletManager;
   const toast = useToast();
 
   const [proposalTitle, setProposalTitle] = useState("");
   const [proposalDesc, setProposalDesc] = useState("");
-  const [coreSlotOption, setCoreSlotOption] = useState("0");
 
   const LCDOptions = {
     URL: LCD_URL,
@@ -64,32 +63,23 @@ export const RevokeCoreSlotProposal = ({ daoName }: { daoName: string }) => {
     daoNameUpdateMembersQuery.data?.identity?.owner as string
   );
 
-  async function revokeCoreSlotProposal() {
+  async function createTextProposal() {
     try {
-      const slots: CoreSlot[] = [
-        { brand: {} },
-        { core_tech: {} },
-        { creative: {} },
-      ];
-
-      const slot: CoreSlot = slots.at(parseInt(coreSlotOption)) as CoreSlot;
-
       const proposalMsg: ExecuteMsg = {
         propose: {
-          core_slot: {
+          text_proposal: {
             title: proposalTitle,
             description: proposalDesc,
-            slot,
           },
         },
       };
 
-      const deposit: Coin = { denom: "uluna", amount: "1000" };
+      // const deposit: Coin = { denom: "uluna", amount: "1000" };
 
       const wasmMsg: WasmMsg = {
         execute: {
           contract_addr: NEXT_PUBLIC_GOVERNANCE_CONTRACT,
-          funds: [deposit],
+          funds: [],
           msg: Buffer.from(JSON.stringify(proposalMsg)).toString("base64"),
         },
       };
@@ -128,8 +118,8 @@ export const RevokeCoreSlotProposal = ({ daoName }: { daoName: string }) => {
         setProposalDesc("");
         setProposalTitle("");
         toast({
-          title: "Revoke Core Slot proposal created.",
-          description: "We've created your Revoke Core Slot Proposal for you.",
+          title: "Text proposal created.",
+          description: "We've created your Text Proposal for you.",
           status: "success",
           duration: 9000,
           isClosable: true,
@@ -149,8 +139,8 @@ export const RevokeCoreSlotProposal = ({ daoName }: { daoName: string }) => {
   }
 
   const coreSlotProposalMutation = useMutation(
-    ["revokeSlotProposalMutation"],
-    revokeCoreSlotProposal
+    ["coreTextProposalMutation"],
+    createTextProposal
   );
 
   return (
@@ -178,14 +168,6 @@ export const RevokeCoreSlotProposal = ({ daoName }: { daoName: string }) => {
             setProposalDesc(event.target.value.trim());
           }}
         ></Textarea>
-        <RadioGroup onChange={setCoreSlotOption} value={coreSlotOption}>
-          <Stack direction="row">
-            <Radio value="0">Brand</Radio>
-            <Radio value="1">Core Tech</Radio>
-            <Radio value="2">Creative</Radio>
-          </Stack>
-        </RadioGroup>
-
         <Flex justifyContent="center" margin={8}>
           <Button
             disabled={!(proposalTitle.length > 2 && proposalDesc.length > 2)}
@@ -197,7 +179,7 @@ export const RevokeCoreSlotProposal = ({ daoName }: { daoName: string }) => {
             onClick={() => coreSlotProposalMutation.mutate()}
           >
             {" "}
-            Create Revoke Core Slot Proposal{" "}
+            Create Text Proposal{" "}
           </Button>
         </Flex>
       </Box>
