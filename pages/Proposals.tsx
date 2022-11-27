@@ -39,6 +39,7 @@ import { ProposalDaoAddMembers } from "../components/react/proposal-dao-add-memb
 import { UpdateMemberProposal } from "../components/react/update-member-proposal";
 import { CoreSlotProposal } from "../components/react/core-slot-proposal";
 import { RevokeCoreSlotProposal } from "../components/react/revoke-core-slot-proposal";
+import { ImprovementProposal } from "../components/react/improvement-proposal";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -59,6 +60,8 @@ export default function Proposals() {
     useState(false);
   const [isCoreSlotProposalType, setCoreSlotProposalType] = useState(false);
   const [isRevokeCoreSlotProposalType, setRevokeCoreSlotProposalType] =
+    useState(false);
+  const [isImprovementProposalType, setImprovementProposalType] =
     useState(false);
 
   const [proposalName, setProposalName] = useState("");
@@ -278,6 +281,17 @@ export default function Proposals() {
                   {" "}
                   Revoke Core Slot{" "}
                 </Button>
+                <Button
+                  marginRight={4}
+                  marginBottom={8}
+                  onClick={() => {
+                    setImprovementProposalType(true);
+                    setSelectProposalType(false);
+                  }}
+                >
+                  {" "}
+                  Improvement{" "}
+                </Button>
               </>
             ) : isFundingProposalType ? (
               <FundingProposal
@@ -297,6 +311,8 @@ export default function Proposals() {
               <CoreSlotProposal daoName={daoName as string} />
             ) : isRevokeCoreSlotProposalType ? (
               <RevokeCoreSlotProposal daoName={daoName as string} />
+            ) : isImprovementProposalType ? (
+              <ImprovementProposal daoName={daoName as string} />
             ) : (
               ""
             )}
