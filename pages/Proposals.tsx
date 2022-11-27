@@ -292,11 +292,11 @@ export default function Proposals() {
                 isRecipientsNamesValid={isRecipientsNamesValid}
               />
             ) : isUpdateMemberProposalType ? (
-              <UpdateMemberProposal />
+              <UpdateMemberProposal daoName={daoName as string} />
             ) : isCoreSlotProposalType ? (
-              <CoreSlotProposal />
+              <CoreSlotProposal daoName={daoName as string} />
             ) : isRevokeCoreSlotProposalType ? (
-              <RevokeCoreSlotProposal />
+              <RevokeCoreSlotProposal daoName={daoName as string} />
             ) : (
               ""
             )}

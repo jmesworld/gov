@@ -25,6 +25,8 @@ import {
 } from "../../client/Governance.types";
 import * as DaoMultisig from "../../client/DaoMultisig.types";
 import { useMutation } from "@tanstack/react-query";
+import { useIdentityserviceGetIdentityByNameQuery } from "../../client/Identityservice.react-query";
+import { DaoMultisigQueryClient } from "../../client/DaoMultisig.client";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -33,7 +35,7 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
-export const RevokeCoreSlotProposal = () => {
+export const RevokeCoreSlotProposal = ({ daoName }: { daoName: string }) => {
   const walletManager = useWallet();
   const { walletStatus, address } = walletManager;
   const toast = useToast();
@@ -50,6 +52,16 @@ export const RevokeCoreSlotProposal = () => {
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     lcdClient,
     IDENTITY_SERVICE_CONTRACT
+  );
+
+  const daoNameUpdateMembersQuery = useIdentityserviceGetIdentityByNameQuery({
+    client,
+    args: { name: daoName },
+  });
+
+  const daoMembersQueryClient = new DaoMultisigQueryClient(
+    lcdClient,
+    daoNameUpdateMembersQuery.data?.identity?.owner as string
   );
 
   async function revokeCoreSlotProposal() {
@@ -94,10 +106,13 @@ export const RevokeCoreSlotProposal = () => {
         },
       };
 
+      const dao_multisig_contract_addr =
+        daoMembersQueryClient.contractAddress as string;
+
       const ext = new Extension();
       const execMsg = new MsgExecuteContract(
         address as string,
-        NEXT_PUBLIC_GOVERNANCE_CONTRACT,
+        dao_multisig_contract_addr,
         msg
       );
       const txMsg = {
