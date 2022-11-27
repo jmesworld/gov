@@ -39,7 +39,7 @@ const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 
-export const UpdateMemberProposal = () => {
+export const UpdateMemberProposal = ({ daoName }: { daoName: string }) => {
   const walletManager = useWallet();
   const { walletStatus, address } = walletManager;
   const toast = useToast();
@@ -51,7 +51,6 @@ export const UpdateMemberProposal = () => {
   const [removeMembers, setRemoveMembers] = useState(new Array<any>());
   const [isRemoveMembersNamesValid, setRemoveMembersNamesValid] =
     useState(false);
-  const [daoNameUpdateMembers, setDaoNameUpdateMembers] = useState("");
 
   const LCDOptions = {
     URL: LCD_URL,
@@ -65,7 +64,7 @@ export const UpdateMemberProposal = () => {
 
   const daoNameUpdateMembersQuery = useIdentityserviceGetIdentityByNameQuery({
     client,
-    args: { name: daoNameUpdateMembers },
+    args: { name: daoName },
   });
 
   const daoMembersQueryClient = new DaoMultisigQueryClient(
@@ -147,7 +146,8 @@ export const UpdateMemberProposal = () => {
         },
       };
 
-      const dao_multisig_contract_addr = daoMembersQueryClient.contractAddress as string; 
+      const dao_multisig_contract_addr =
+        daoMembersQueryClient.contractAddress as string;
 
       const execMsg = new MsgExecuteContract(
         address as string,
@@ -167,7 +167,6 @@ export const UpdateMemberProposal = () => {
       if (payload.success) {
         setAddMembers(new Array());
         setAddMembersNamesValid(false);
-        setDaoNameUpdateMembers("");
         setProposalDesc("");
         setProposalTitle("");
         setRemoveMembers(new Array());
@@ -223,27 +222,6 @@ export const UpdateMemberProposal = () => {
             setProposalDesc(event.target.value.trim());
           }}
         ></Textarea>
-        <Text marginBottom={2} fontSize={24}>
-          DAO NAME
-        </Text>
-        <Input
-          marginBottom={2}
-          placeholder="Type your DAO name here"
-          size="lg"
-          onChange={(event) => {
-            setDaoNameUpdateMembers(event.target.value.trim());
-          }}
-        ></Input>
-        <Text marginBottom={2} fontSize={14}>
-          {daoNameUpdateMembers.length > 0
-            ? daoNameUpdateMembersQuery.isFetched
-              ? daoNameUpdateMembersQuery?.data?.identity?.name.toString() ===
-                daoNameUpdateMembers
-                ? daoNameUpdateMembersQuery.data.identity.owner
-                : "Dao does not exist!"
-              : "Checking..."
-            : ""}
-        </Text>
         <Grid
           templateColumns="repeat(2, 1fr)"
           templateRows="repeat(1, 1fr)"
@@ -320,7 +298,7 @@ export const UpdateMemberProposal = () => {
             disabled={
               !(
                 daoNameUpdateMembersQuery?.data?.identity?.name.toString() ===
-                  daoNameUpdateMembers &&
+                  daoName &&
                 !!daoMembersListQuery.data &&
                 isAddMembersNamesValid &&
                 isRemoveMembersNamesValid &&
