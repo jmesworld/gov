@@ -32,11 +32,15 @@ import { MsgExecuteContract, Extension } from "@terra-money/terra.js";
 import { ExecuteMsg } from "../client/Identityservice.types";
 import NextLink from "next/link";
 import Governance from "./Governance";
+import { GovernanceQueryClient } from "../client/Governance.client";
+import { useGovernanceProposalQuery, useGovernanceProposalsQuery } from "../client/Governance.react-query";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
+const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
+  .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
 export default function Home() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -115,7 +119,7 @@ export default function Home() {
       console.log(error);
     }
   }
-
+  
   return (
     <Container maxW="5xl" py={10}>
       <Head>

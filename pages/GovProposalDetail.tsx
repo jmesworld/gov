@@ -25,8 +25,15 @@ import {
   useGovernanceProposalQuery,
   useGovernanceProposalsQuery,
 } from "../client/Governance.react-query";
-import { ExecuteMsg } from "../client/Governance.types";
-import * as DaoMultisig from "../client/DaoMultisig.types";
+import { ExecuteMsg, VoteOption } from "../client/Governance.types";
+import { IdentityserviceQueryClient } from "../client/Identityservice.client";
+import { useIdentityserviceGetIdentityByOwnerQuery } from "../client/Identityservice.react-query";
+import { DistributionQueryClient } from "../client/Distribution.client";
+import {
+  useDistributionGrantQuery,
+  useDistributionGrantsQuery,
+} from "../client/Distribution.react-query";
+import * as Distribution from "../client/Distribution.types";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -34,8 +41,10 @@ const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
+const NEXT_PUBLIC_DISTRIBUTION_CONTRACT = process.env
+  .NEXT_PUBLIC_DISTRIBUTION_CONTRACT as string;
 
-export default function ProposalDetail() {
+export default function GovProposalDetail() {
   const router = useRouter();
   const proposalId = router.query.id;
   const daoAddress = router.query.address;
@@ -60,36 +69,37 @@ export default function ProposalDetail() {
   };
 
   const lcdClient = new LCDClient(LCDOptions);
-
-  const daoQueryClient = new DaoMultisigQueryClient(
+  const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     lcdClient,
-    daoAddress as string
+    IDENTITY_SERVICE_CONTRACT
   );
+
   const governanceQueryClient = new GovernanceQueryClient(
     lcdClient,
     NEXT_PUBLIC_GOVERNANCE_CONTRACT
   );
 
-  const proposalQuery = useDaoMultisigProposalQuery({
-    client: daoQueryClient,
-    args: { proposalId: proposalId ? parseInt(proposalId as string) : 0 },
-  });
+  const distributionQueryClient = new DistributionQueryClient(
+    lcdClient,
+    NEXT_PUBLIC_DISTRIBUTION_CONTRACT
+  );
 
-  const votesQuery = useDaoMultisigListVotesQuery({
-    client: daoQueryClient,
-    args: { proposalId: proposalId ? parseInt(proposalId as string) : 0 },
+  const proposalQuery = useGovernanceProposalQuery({
+    client: governanceQueryClient,
+    args: { id: proposalId ? parseInt(proposalId as string) : 0 },
   });
 
   async function voteOnProposal() {
-    const msg = {
+    const voteOption: VoteOption = vote as VoteOption;
+    const msg: ExecuteMsg = {
       vote: {
-        proposal_id: parseInt(proposalId as string),
-        vote: vote,
+        id: parseInt(proposalId as string),
+        vote: voteOption,
       },
     };
     const execMsg = new MsgExecuteContract(
       address as string,
-      daoAddress as string,
+      NEXT_PUBLIC_GOVERNANCE_CONTRACT,
       msg
     );
 
@@ -130,15 +140,15 @@ export default function ProposalDetail() {
 
   const voteMutation = useMutation(["voteMutation"], voteOnProposal);
 
-  async function executeProposal() {
-    const msg: DaoMultisig.ExecuteMsg = {
-      execute: {
-        proposal_id: parseInt(proposalId as string),
+  async function concludeProposal() {
+    const msg: ExecuteMsg = {
+      conclude: {
+        id: parseInt(proposalId as string),
       },
     };
     const execMsg = new MsgExecuteContract(
       address as string,
-      daoAddress as string,
+      NEXT_PUBLIC_GOVERNANCE_CONTRACT,
       msg
     );
 
@@ -176,22 +186,99 @@ export default function ProposalDetail() {
       console.error(e);
     }
   }
-
-  const proposalExecuteMutation = useMutation(
-    ["proposalExecuteMutation"],
-    executeProposal
+  const proposalConcludeMutation = useMutation(
+    ["proposalConcludeMutation"],
+    concludeProposal
   );
 
-  const proposalThreshold: any = proposalQuery.data?.threshold;
-  const proposalThresholdWeight = proposalQuery.data
-    ? proposalThreshold["absolute_percentage"]["total_weight"]
-    : 0;
+  const votingStarts =
+    new Date(
+      (proposalQuery.data?.voting_start as number) * 1000
+    ).toLocaleDateString() +
+    " " +
+    new Date(
+      (proposalQuery.data?.voting_start as number) * 1000
+    ).toLocaleTimeString();
+  const votingEnds =
+    new Date(
+      (proposalQuery.data?.voting_end as number) * 1000
+    ).toLocaleDateString() +
+    "  " +
+    new Date(
+      (proposalQuery.data?.voting_end as number) * 1000
+    ).toLocaleTimeString();
 
-  const proposalExpiryDate: any = proposalQuery.data?.expires;
+  const daoIdentityQuery = useIdentityserviceGetIdentityByOwnerQuery({
+    client,
+    args: {
+      owner: proposalQuery.data?.dao as string,
+    },
+    options: {
+      enabled: !!proposalQuery.data?.dao,
+    },
+  });
 
-  const proposalMsgs: any[] = proposalQuery.data
-    ? proposalQuery.data?.msgs
-    : [];
+  // console.log(proposalQuery.data)
+
+  const grantsQuery = useDistributionGrantsQuery({
+    client: distributionQueryClient,
+    args: {},
+    options: {},
+  });
+
+  // const grant = grantsQuery.data?.grants.filter((grant) => grant.dao === )
+  console.log(grantsQuery.data);
+
+  async function claimProposal() {
+    const msg: Distribution.ExecuteMsg = {
+      claim: {
+        grant_id: 1,
+      },
+    };
+    const execMsg = new MsgExecuteContract(
+      address as string,
+      NEXT_PUBLIC_GOVERNANCE_CONTRACT,
+      msg
+    );
+
+    const txMsg = {
+      msgs: [execMsg.toJSON(false)],
+    };
+
+    try {
+      const ext = new Extension();
+      const result = await ext.request(
+        "post",
+        JSON.parse(JSON.stringify(txMsg))
+      );
+      const payload = JSON.parse(JSON.stringify(result.payload));
+      if (payload.success) {
+        toast({
+          title: "Proposal executed.",
+          description: "We've executed your Proposal for you.",
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Proposal execution error.",
+          description: payload.error.message,
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+      }
+      console.log(result);
+      return result;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  const proposalClaimMutation = useMutation(
+    ["proposalClaimMutation"],
+    claimProposal
+  );
 
   return (
     <Container maxW="5xl" py={10}>
@@ -222,67 +309,44 @@ export default function ProposalDetail() {
         <Text marginBottom={8} fontSize={18}>
           {proposalQuery.data?.description}
         </Text>
-        {proposalMsgs.length > 0 && !!proposalMsgs[0].bank ? (
-          <Text marginBottom={2} fontSize={24} fontWeight="bold">
-            RECIPIENTS
+        <Text marginBottom={2} fontSize={24} fontWeight="bold">
+          DAO PROPOSAL CREATOR
+        </Text>
+        <Flex marginBottom={8}>
+          <Text fontSize={18}>{daoIdentityQuery.data?.identity?.name}</Text>
+          <Text marginLeft={8} fontSize={18}>
+            {`(${daoIdentityQuery.data?.identity?.owner})`}
           </Text>
-        ) : (
-          ""
-        )}
-        {proposalMsgs.length > 0 && !!proposalMsgs[0].bank
-          ? proposalMsgs.map((recipient, i) => (
-              <Text key={i} marginBottom={2} fontSize={18}>
-                {recipient.bank?.send?.to_address}{" "}
-                {recipient.bank?.send?.amount[0].amount}{" "}
-                {recipient.bank?.send?.amount[0].denom}
-              </Text>
-            ))
-          : ""}
+        </Flex>
         <Text marginTop={8} fontSize={24} fontWeight="bold">
           RESULTS
         </Text>
         <Grid templateColumns="repeat(2, 1fr)" templateRows="repeat(1, 1fr)">
           <Text marginBottom={8} fontSize={18}>
-            YES:{" "}
-            {
-              votesQuery.data?.votes.filter(
-                (vote) =>
-                  vote.proposal_id === parseInt(proposalId as string) &&
-                  vote.vote === "yes"
-              )?.length
-            }
+            YES: {proposalQuery.data?.coins_yes}
           </Text>
           <Text marginBottom={8} fontSize={18}>
-            NO:{" "}
-            {
-              votesQuery.data?.votes.filter(
-                (vote) =>
-                  vote.proposal_id === parseInt(proposalId as string) &&
-                  vote.vote === "no"
-              )?.length
-            }
+            NO: {proposalQuery.data?.coins_no}
           </Text>
         </Grid>
         <Text marginBottom={2} fontSize={24} fontWeight="bold">
           DATES
         </Text>
         <Grid templateColumns="repeat(2, 1fr)" templateRows="repeat(1, 1fr)">
-          {/* <Text marginBottom={8} fontSize={18}>
-            START:
-          </Text> */}
           <Text marginBottom={8} fontSize={18}>
-            END:{" "}
-            {proposalQuery.data
-              ? proposalExpiryDate["at_height"] + " (block height)"
-              : ""}
+            START: {proposalQuery.data ? votingStarts : ""}
+          </Text>
+          <Text marginBottom={8} fontSize={18}>
+            END: {proposalQuery.data ? votingEnds : ""}
           </Text>
         </Grid>
-        <Grid templateColumns="repeat(3, 1fr)" templateRows="repeat(1, 1fr)">
+        <Grid templateColumns="repeat(4, 1fr)" templateRows="repeat(1, 1fr)">
           <Flex justifyContent="center" margin={8}>
             <Button
               disabled={
-                votesQuery.data?.votes.filter((vote) => vote.voter === address)
-                  ?.length
+                proposalQuery.data?.yes_voters.filter(
+                  (voter) => voter === address
+                )?.length
                   ? true
                   : false
               }
@@ -302,8 +366,9 @@ export default function ProposalDetail() {
           <Flex justifyContent="center" margin={8}>
             <Button
               disabled={
-                votesQuery.data?.votes.filter((vote) => vote.voter === address)
-                  ?.length
+                proposalQuery.data?.no_voters.filter(
+                  (voter) => voter === address
+                )?.length
                   ? true
                   : false
               }
@@ -320,25 +385,44 @@ export default function ProposalDetail() {
               NO
             </Button>
           </Flex>
+          <Flex justifyContent="center" margin={8}>
+            <Button
+              disabled={
+                proposalQuery.data?.status === "success_concluded" ||
+                proposalQuery.data?.status === "expired_concluded"
+                  ? true
+                  : false
+              }
+              width={150}
+              height={50}
+              variant="outline"
+              color="white"
+              bgColor={"primary.500"}
+              onClick={() => {
+                proposalConcludeMutation.mutate();
+              }}
+            >
+              CONCLUDE
+            </Button>
+          </Flex>
+          {proposalQuery.data?.prop_type.toString().includes("funding") ? (
             <Flex justifyContent="center" margin={8}>
               <Button
-                disabled={
-                  proposalQuery.data?.status === "executed"
-                    ? true
-                    : false
-                }
                 width={150}
                 height={50}
                 variant="outline"
                 color="white"
-                bgColor={"primary.500"}
+                bgColor="grey"
                 onClick={() => {
-                  proposalExecuteMutation.mutate();
+                  proposalConcludeMutation.mutate();
                 }}
               >
-                EXECUTE
+                CLAIM
               </Button>
-            </Flex>   
+            </Flex>
+          ) : (
+            ""
+          )}
         </Grid>
       </Box>
     </Container>

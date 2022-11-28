@@ -5,6 +5,9 @@ import {
   Flex,
   Grid,
   Input,
+  Radio,
+  RadioGroup,
+  Stack,
   Text,
   Textarea,
 } from "@chakra-ui/react";
@@ -20,6 +23,10 @@ export const FundingProposal = ({
   proposalName,
   proposalMutation,
   isRecipientsNamesValid,
+  fundGovProposalType,
+  setFundGovProposalType,
+  fundGovProposalAmount,
+  setFundGovProposalAmount,
 }: {
   recipients: any[];
   setProposalName: any;
@@ -30,6 +37,10 @@ export const FundingProposal = ({
   proposalName: any;
   proposalMutation: any;
   isRecipientsNamesValid: any;
+  fundGovProposalType: string;
+  setFundGovProposalType: any;
+  fundGovProposalAmount: number;
+  setFundGovProposalAmount: any;
 }) => {
   return (
     <Container>
@@ -49,46 +60,71 @@ export const FundingProposal = ({
           DESCRIPTION
         </Text>
         <Textarea
-          marginBottom={2}
+           marginBottom={4}
           placeholder="Enter your description here"
           size="lg"
           onChange={(event) => {
             setProposalDesc(event.target.value.trim());
           }}
         ></Textarea>
-        <Grid
-          templateColumns="repeat(2, 1fr)"
-          templateRows="repeat(1, 1fr)"
-          marginTop={8}
+        <Text marginBottom={2} fontSize={24}>
+          FUNDING PROPOSAL TYPE
+        </Text>
+        <RadioGroup
+          onChange={setFundGovProposalType}
+          value={fundGovProposalType}
         >
-          <Text fontSize={24}>RECIPIENT</Text>
-          <Flex justifyContent="end">
-            <Button
-              variant="outline"
-              width={100}
-              onClick={() => {
-                setRecipients((recipients: string | any[]) => [
-                  ...recipients,
-                  {
-                    name: "",
-                    amount: 0,
-                    id: recipients.length + 1,
-                    address: "",
-                  },
-                ]);
-              }}
-            >
-              <Text fontSize={18} fontWeight="bold">
-                +
-              </Text>
-            </Button>
-          </Flex>
-          <ProposalRecipientForm
-            recipients={recipients}
-            setRecipients={setRecipients}
-            setRecipientsNamesValid={setRecipientsNamesValid}
+          <Stack direction="row">
+            <Radio value="dao">Dao</Radio>
+            <Radio value="gov">Governance</Radio>
+          </Stack>
+        </RadioGroup>
+        {fundGovProposalType === "dao" ? (
+          <Grid
+            templateColumns="repeat(2, 1fr)"
+            templateRows="repeat(1, 1fr)"
+            marginTop={8}
+          >
+            <Text fontSize={24}>RECIPIENT</Text>
+            <Flex justifyContent="end">
+              <Button
+                variant="outline"
+                width={100}
+                onClick={() => {
+                  setRecipients((recipients: string | any[]) => [
+                    ...recipients,
+                    {
+                      name: "",
+                      amount: 0,
+                      id: recipients.length + 1,
+                      address: "",
+                    },
+                  ]);
+                }}
+              >
+                <Text fontSize={18} fontWeight="bold">
+                  +
+                </Text>
+              </Button>
+            </Flex>
+            <ProposalRecipientForm
+              recipients={recipients}
+              setRecipients={setRecipients}
+              setRecipientsNamesValid={setRecipientsNamesValid}
+            />
+          </Grid>
+        ) : (
+          <Input
+            placeholder="Enter funding amount"
+            size="md"
+            marginTop={4}
+            type="number"
+            width={200}
+            onChange={(event) => {
+              setFundGovProposalAmount(parseInt(event.target.value.trim()))
+            }}
           />
-        </Grid>
+        )}
         <Flex justifyContent="center" margin={8}>
           <Button
             disabled={

@@ -41,11 +41,16 @@ import { CoreSlotProposal } from "../components/react/core-slot-proposal";
 import { RevokeCoreSlotProposal } from "../components/react/revoke-core-slot-proposal";
 import { ImprovementProposal } from "../components/react/improvement-proposal";
 import { TextProposal } from "../components/react/text-proposal";
+import * as Governance from "../client/Governance.types";
+import { useIdentityserviceGetIdentityByNameQuery } from "../client/Identityservice.react-query";
+import { IdentityserviceQueryClient } from "../client/Identityservice.client";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
+const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
+  .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
 export default function Proposals() {
   const router = useRouter();
@@ -68,6 +73,8 @@ export default function Proposals() {
 
   const [proposalName, setProposalName] = useState("");
   const [proposalDesc, setProposalDesc] = useState("");
+  const [fundGovProposalType, setFundGovProposalType] = useState("dao");
+  const [fundGovProposalAmount, setFundGovProposalAmount] = useState(0);
 
   const toast = useToast();
   const walletManager = useWallet();
@@ -87,10 +94,25 @@ export default function Proposals() {
   };
 
   const lcdClient = new LCDClient(LCDOptions);
+  const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
+    lcdClient,
+    IDENTITY_SERVICE_CONTRACT
+  );
+
+  const daoNameUpdateMembersQuery = useIdentityserviceGetIdentityByNameQuery({
+    client,
+    args: { name: daoName as string },
+  });
+
+  const daoMembersQueryClient = new DaoMultisigQueryClient(
+    lcdClient,
+    daoNameUpdateMembersQuery.data?.identity?.owner as string
+  );
 
   async function createProposal() {
     const contractAddress = daoAddress as string;
-    let msgs = [];
+    let daoMsgs: any = [];
+    let govMsg: any;
 
     for (let recipient of recipients) {
       const coin: Coin = {
@@ -100,22 +122,63 @@ export default function Proposals() {
       const bankMsg: BankMsg = {
         send: { amount: [coin], to_address: recipient.address },
       };
-      msgs.push({
+      daoMsgs.push({
         bank: bankMsg,
       });
     }
 
-    const msg: ExecuteMsg = {
-      propose: {
-        title: proposalName.trim(),
-        description: proposalDesc.trim(),
-        msgs: msgs,
-      },
-    };
+    if (fundGovProposalType === "gov") {
+      const proposalMsg: Governance.ExecuteMsg = {
+        propose: {
+          funding: {
+            title: proposalName.trim(),
+            description: proposalDesc.trim(),
+            duration: 300,
+            amount: fundGovProposalAmount.toString(),
+          },
+        },
+      };
+
+      const deposit: Governance.Coin = { denom: "uluna", amount: "1000" };
+
+      const wasmMsg: Governance.WasmMsg = {
+        execute: {
+          contract_addr: NEXT_PUBLIC_GOVERNANCE_CONTRACT,
+          funds: [deposit],
+          msg: toBase64(proposalMsg),
+        },
+      };
+      const _msg: ExecuteMsg = {
+        propose: {
+          title: proposalName.trim(),
+          description: proposalDesc.trim(),
+          msgs: [
+            {
+              wasm: wasmMsg,
+            },
+          ],
+        },
+      };
+      govMsg = _msg;
+    }
+
+    let msg: any =
+      fundGovProposalType === "gov"
+        ? govMsg
+        : {
+            propose: {
+              title: proposalName.trim(),
+              description: proposalDesc.trim(),
+              msgs: daoMsgs,
+            },
+          };
+
+    const dao_multisig_contract_addr =
+      daoMembersQueryClient.contractAddress as string;
 
     const execMsg = new MsgExecuteContract(
       address as string,
-      contractAddress,
+      dao_multisig_contract_addr,
       msg
     );
 
@@ -152,6 +215,7 @@ export default function Proposals() {
           isClosable: true,
         });
       }
+      proposalsQuery.refetch();
       return result;
     } catch (e) {
       console.error(e);
@@ -317,6 +381,10 @@ export default function Proposals() {
                 proposalName={proposalName}
                 proposalMutation={proposalMutation}
                 isRecipientsNamesValid={isRecipientsNamesValid}
+                fundGovProposalType={fundGovProposalType}
+                setFundGovProposalType={setFundGovProposalType}
+                fundGovProposalAmount={fundGovProposalAmount}
+                setFundGovProposalAmount={setFundGovProposalAmount}
               />
             ) : isUpdateMemberProposalType ? (
               <UpdateMemberProposal daoName={daoName as string} />
@@ -337,7 +405,6 @@ export default function Proposals() {
       <Flex marginTop={24} justifyContent="center">
         {proposalsQuery.data ? (
           <ProposalList
-            // @ts-ignore
             proposals={proposalsQuery?.data?.proposals}
             daoAddress={daoAddress as string}
           />
