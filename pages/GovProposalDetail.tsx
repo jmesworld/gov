@@ -227,7 +227,6 @@ export default function GovProposalDetail() {
   });
 
   // const grant = grantsQuery.data?.grants.filter((grant) => grant.dao === )
-  console.log(grantsQuery.data);
 
   async function claimProposal() {
     const msg: Distribution.ExecuteMsg = {
@@ -279,6 +278,20 @@ export default function GovProposalDetail() {
     ["proposalClaimMutation"],
     claimProposal
   );
+
+  const prop_type = proposalQuery.data
+    ? Object.keys(proposalQuery.data?.prop_type)[0]
+    : "";
+
+  const prop_type_info = proposalQuery.data
+    ? Object.keys(
+        JSON.parse(JSON.stringify(proposalQuery.data?.prop_type))[prop_type]
+      )[0]
+    : "";
+
+  const prop_status = proposalQuery.data?.status;
+
+  console.log(prop_status);
   return (
     <Container maxW="5xl" py={10}>
       <Head>
@@ -316,6 +329,21 @@ export default function GovProposalDetail() {
           <Text marginLeft={8} fontSize={18}>
             {`(${daoIdentityQuery.data?.identity?.owner})`}
           </Text>
+        </Flex>
+        <Text marginBottom={2} fontSize={24} fontWeight="bold">
+          PROPOSAL TYPE
+        </Text>
+        <Flex marginBottom={8}>
+          <Text fontSize={18}>{prop_type + ` :`}</Text>
+          <Text marginLeft={8} fontSize={18}>
+            {prop_type_info}
+          </Text>
+        </Flex>
+        <Text marginBottom={2} fontSize={24} fontWeight="bold">
+          PROPOSAL STATUS
+        </Text>
+        <Flex marginBottom={8}>
+          <Text fontSize={18}>{prop_status}</Text>
         </Flex>
         <Text marginTop={8} fontSize={24} fontWeight="bold">
           RESULTS
