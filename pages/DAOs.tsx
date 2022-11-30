@@ -156,7 +156,7 @@ export default function MyDAOs() {
       );
       setDataUpdated(true);
     },
-    refetchInterval: 1000,
+    refetchInterval: 10,
   });
   async function registerDao() {
     let _members: Member[] = [];
