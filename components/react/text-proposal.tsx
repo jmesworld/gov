@@ -35,7 +35,13 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
-export const TextProposal = ({ daoName }: { daoName: string }) => {
+export const TextProposal = ({
+  daoName,
+  isGovProposal,
+}: {
+  daoName: string;
+  isGovProposal: boolean;
+}) => {
   const walletManager = useWallet();
   const { walletStatus, address } = walletManager;
   const toast = useToast();
@@ -65,36 +71,48 @@ export const TextProposal = ({ daoName }: { daoName: string }) => {
 
   async function createTextProposal() {
     try {
-      const proposalMsg: ExecuteMsg = {
-        propose: {
-          text_proposal: {
-            title: proposalTitle,
-            description: proposalDesc,
-          },
-        },
-      };
-
-      // const deposit: Coin = { denom: "uluna", amount: "1000" };
-
-      const wasmMsg: WasmMsg = {
-        execute: {
-          contract_addr: NEXT_PUBLIC_GOVERNANCE_CONTRACT,
-          funds: [],
-          msg: Buffer.from(JSON.stringify(proposalMsg)).toString("base64"),
-        },
-      };
-
-      const msg: DaoMultisig.ExecuteMsg = {
+      const daoMsg: DaoMultisig.ExecuteMsg = {
         propose: {
           title: proposalTitle,
           description: proposalDesc,
-          msgs: [
-            {
-              wasm: wasmMsg,
-            },
-          ],
+          msgs: [],
         },
       };
+      let govMsg: any;
+
+      if (isGovProposal) {
+        const proposalMsg: ExecuteMsg = {
+          propose: {
+            text_proposal: {
+              title: proposalTitle,
+              description: proposalDesc,
+            },
+          },
+        };
+
+        const wasmMsg: WasmMsg = {
+          execute: {
+            contract_addr: NEXT_PUBLIC_GOVERNANCE_CONTRACT,
+            funds: [],
+            msg: Buffer.from(JSON.stringify(proposalMsg)).toString("base64"),
+          },
+        };
+
+        const _msg: DaoMultisig.ExecuteMsg = {
+          propose: {
+            title: proposalTitle,
+            description: proposalDesc,
+            msgs: [
+              {
+                wasm: wasmMsg,
+              },
+            ],
+          },
+        };
+        govMsg = _msg;
+      }
+
+      let msg: any = isGovProposal ? govMsg : daoMsg;
 
       const dao_multisig_contract_addr =
         daoMembersQueryClient.contractAddress as string;

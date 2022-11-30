@@ -42,6 +42,7 @@ export const ImprovementProposal = ({ daoName }: { daoName: string }) => {
 
   const [proposalTitle, setProposalTitle] = useState("");
   const [proposalDesc, setProposalDesc] = useState("");
+  const [proposalCode, setProposalCode] = useState("");
 
   const LCDOptions = {
     URL: LCD_URL,
@@ -65,24 +66,15 @@ export const ImprovementProposal = ({ daoName }: { daoName: string }) => {
 
   async function createImprovementProposal() {
     try {
-      const proposalMsg: ExecuteMsg = {
-        propose: {
-          improvement: {
-            title: proposalTitle,
-            description: proposalDesc,
-            msgs: [
-              {
-                bank: {
-                  send: {
-                    amount: [{ denom: "uluna", amount: "1000" }],
-                    to_address: address as string,
-                  },
-                },
-              },
-            ],
-          },
-        },
-      };
+      // const proposalMsg: ExecuteMsg = {
+      //   propose: {
+      //     improvement: {
+      //       title: proposalTitle,
+      //       description: proposalDesc,
+      //       msgs: proposalCode,
+      //     },
+      //   },
+      // };
 
       const deposit: Coin = { denom: "uluna", amount: "1000" };
 
@@ -90,7 +82,7 @@ export const ImprovementProposal = ({ daoName }: { daoName: string }) => {
         execute: {
           contract_addr: NEXT_PUBLIC_GOVERNANCE_CONTRACT,
           funds: [deposit],
-          msg: Buffer.from(JSON.stringify(proposalMsg)).toString("base64"),
+          msg: Buffer.from(JSON.stringify(proposalCode)).toString("base64"),
         },
       };
 
@@ -178,10 +170,21 @@ export const ImprovementProposal = ({ daoName }: { daoName: string }) => {
             setProposalDesc(event.target.value.trim());
           }}
         ></Textarea>
+          <Text marginBottom={2} fontSize={24}>
+          CODE
+        </Text>
+        <Textarea
+          marginBottom={2}
+          placeholder="Enter code here"
+          size="lg"
+          onChange={(event) => {
+            setProposalCode(event.target.value.trim());
+          }}
+        ></Textarea>
 
         <Flex justifyContent="center" margin={8}>
           <Button
-            disabled={!(proposalTitle.length > 2 && proposalDesc.length > 2)}
+            disabled={!(proposalTitle.length > 2 && proposalDesc.length > 2 && proposalCode.length > 2)}
             width={250}
             height={50}
             variant="outline"

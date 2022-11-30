@@ -73,8 +73,9 @@ export default function Proposals() {
 
   const [proposalName, setProposalName] = useState("");
   const [proposalDesc, setProposalDesc] = useState("");
-  const [fundGovProposalType, setFundGovProposalType] = useState("dao");
   const [fundGovProposalAmount, setFundGovProposalAmount] = useState(0);
+  const [isDaoProposal, setIsDaoProposal] = useState(false);
+  const [isGovProposal, setIsGovProposal] = useState(false);
 
   const toast = useToast();
   const walletManager = useWallet();
@@ -127,7 +128,7 @@ export default function Proposals() {
       });
     }
 
-    if (fundGovProposalType === "gov") {
+    if (isGovProposal) {
       const proposalMsg: Governance.ExecuteMsg = {
         propose: {
           funding: {
@@ -162,16 +163,15 @@ export default function Proposals() {
       govMsg = _msg;
     }
 
-    let msg: any =
-      fundGovProposalType === "gov"
-        ? govMsg
-        : {
-            propose: {
-              title: proposalName.trim(),
-              description: proposalDesc.trim(),
-              msgs: daoMsgs,
-            },
-          };
+    let msg: any = isGovProposal
+      ? govMsg
+      : {
+          propose: {
+            title: proposalName.trim(),
+            description: proposalDesc.trim(),
+            msgs: daoMsgs,
+          },
+        };
 
     const dao_multisig_contract_addr =
       daoMembersQueryClient.contractAddress as string;
@@ -231,6 +231,9 @@ export default function Proposals() {
   const proposalsQuery = useDaoMultisigListProposalsQuery({
     client: daoQueryClient,
     args: { limit: 10000 },
+    options: {
+      refetchInterval: 10
+    }
   });
 
   return (
@@ -241,7 +244,7 @@ export default function Proposals() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Grid templateColumns="repeat(3, 1fr)" templateRows="repeat(1, 1fr)">
-        <GridItem colSpan={1} />
+        {/* <GridItem colSpan={1} /> */}
         <GridItem colSpan={1}>
           <Box textAlign="center">
             <Heading
@@ -249,10 +252,31 @@ export default function Proposals() {
               fontWeight="bold"
               fontSize={{ base: "2xl", sm: "3xl", md: "4xl" }}
             >
-              Proposals
+              Proposals {daoName}
             </Heading>
-            <Heading as="h2">{daoName}</Heading>
           </Box>
+        </GridItem>
+        <GridItem>
+          <Flex justifyContent="end" mb={4}>
+            {" "}
+            <Button
+              justifyContent="center"
+              alignItems="center"
+              borderRadius="lg"
+              width={250}
+              height={50}
+              color={useColorModeValue("primary.500", "primary.200")}
+              variant="outline"
+              px={0}
+              onClick={() => {
+                setModalState(true);
+                setIsGovProposal(true);
+              }}
+              fontSize={14}
+            >
+              Create Governance Proposal
+            </Button>
+          </Flex>
         </GridItem>
         <GridItem colSpan={1}>
           <Flex justifyContent="end" mb={4}>
@@ -260,14 +284,18 @@ export default function Proposals() {
               justifyContent="center"
               alignItems="center"
               borderRadius="lg"
-              width={150}
+              width={250}
               height={50}
               color={useColorModeValue("primary.500", "primary.200")}
               variant="outline"
               px={0}
-              onClick={() => setModalState(true)}
+              onClick={() => {
+                setModalState(true);
+                setIsDaoProposal(true);
+              }}
+              fontSize={14}
             >
-              Create Proposal
+              Create Dao Proposal
             </Button>
           </Flex>
         </GridItem>
@@ -280,6 +308,8 @@ export default function Proposals() {
           setProposalName("");
           setProposalDesc("");
           setRecipientsNamesValid(false);
+          setIsDaoProposal(false);
+          setIsGovProposal(false);
         }}
         scrollBehavior={"inside"}
       >
@@ -297,6 +327,10 @@ export default function Proposals() {
               setModalState(false);
               setSelectProposalType(true);
               setFundingProposalType(false);
+              setCoreSlotProposalType(false);
+              setImprovementProposalType(false);
+              setRevokeCoreSlotProposalType(false);
+              setTextProposalType(false);
               setUpdateMemberProposalType(false);
             }}
           />
@@ -314,50 +348,66 @@ export default function Proposals() {
                   {" "}
                   Funding{" "}
                 </Button>
-                <Button
-                  marginRight={4}
-                  marginBottom={8}
-                  onClick={() => {
-                    setUpdateMemberProposalType(true);
-                    setSelectProposalType(false);
-                  }}
-                >
-                  {" "}
-                  Update Member{" "}
-                </Button>
-                <Button
-                  marginRight={4}
-                  marginBottom={8}
-                  onClick={() => {
-                    setCoreSlotProposalType(true);
-                    setSelectProposalType(false);
-                  }}
-                >
-                  {" "}
-                  Core Slot{" "}
-                </Button>
-                <Button
-                  marginRight={4}
-                  marginBottom={8}
-                  onClick={() => {
-                    setRevokeCoreSlotProposalType(true);
-                    setSelectProposalType(false);
-                  }}
-                >
-                  {" "}
-                  Revoke Core Slot{" "}
-                </Button>
-                <Button
-                  marginRight={4}
-                  marginBottom={8}
-                  onClick={() => {
-                    setImprovementProposalType(true);
-                    setSelectProposalType(false);
-                  }}
-                >
-                  {" "}
-                  Improvement{" "}
-                </Button>
+                {isDaoProposal ? (
+                  <Button
+                    marginRight={4}
+                    marginBottom={8}
+                    onClick={() => {
+                      setUpdateMemberProposalType(true);
+                      setSelectProposalType(false);
+                    }}
+                  >
+                    {" "}
+                    Update Member{" "}
+                  </Button>
+                ) : (
+                  ""
+                )}
+                {isGovProposal ? (
+                  <Button
+                    marginRight={4}
+                    marginBottom={8}
+                    onClick={() => {
+                      setCoreSlotProposalType(true);
+                      setSelectProposalType(false);
+                    }}
+                  >
+                    {" "}
+                    Core Slot{" "}
+                  </Button>
+                ) : (
+                  ""
+                )}
+                {isGovProposal ? (
+                  <Button
+                    marginRight={4}
+                    marginBottom={8}
+                    onClick={() => {
+                      setRevokeCoreSlotProposalType(true);
+                      setSelectProposalType(false);
+                    }}
+                  >
+                    {" "}
+                    Revoke Core Slot{" "}
+                  </Button>
+                ) : (
+                  ""
+                )}
+                {isGovProposal ? (
+                  <Button
+                    marginRight={4}
+                    marginBottom={8}
+                    onClick={() => {
+                      setImprovementProposalType(true);
+                      setSelectProposalType(false);
+                    }}
+                  >
+                    {" "}
+                    Improvement{" "}
+                  </Button>
+                ) : (
+                  ""
+                )}
                 <Button
                   marginRight={4}
                   marginBottom={8}
@@ -381,8 +431,7 @@ export default function Proposals() {
                 proposalName={proposalName}
                 proposalMutation={proposalMutation}
                 isRecipientsNamesValid={isRecipientsNamesValid}
-                fundGovProposalType={fundGovProposalType}
-                setFundGovProposalType={setFundGovProposalType}
+                isGovProposal={isGovProposal}
                 fundGovProposalAmount={fundGovProposalAmount}
                 setFundGovProposalAmount={setFundGovProposalAmount}
               />
@@ -395,7 +444,7 @@ export default function Proposals() {
             ) : isImprovementProposalType ? (
               <ImprovementProposal daoName={daoName as string} />
             ) : isTextProposalType ? (
-              <TextProposal daoName={daoName as string} />
+              <TextProposal daoName={daoName as string} isGovProposal={isGovProposal}/>
             ) : (
               ""
             )}

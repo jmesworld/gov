@@ -23,8 +23,7 @@ export const FundingProposal = ({
   proposalName,
   proposalMutation,
   isRecipientsNamesValid,
-  fundGovProposalType,
-  setFundGovProposalType,
+  isGovProposal,
   fundGovProposalAmount,
   setFundGovProposalAmount,
 }: {
@@ -36,9 +35,8 @@ export const FundingProposal = ({
   proposalDesc: any;
   proposalName: any;
   proposalMutation: any;
-  isRecipientsNamesValid: any;
-  fundGovProposalType: string;
-  setFundGovProposalType: any;
+  isRecipientsNamesValid: boolean;
+  isGovProposal: boolean;
   fundGovProposalAmount: number;
   setFundGovProposalAmount: any;
 }) => {
@@ -60,26 +58,14 @@ export const FundingProposal = ({
           DESCRIPTION
         </Text>
         <Textarea
-           marginBottom={4}
+          marginBottom={4}
           placeholder="Enter your description here"
           size="lg"
           onChange={(event) => {
             setProposalDesc(event.target.value.trim());
           }}
         ></Textarea>
-        <Text marginBottom={2} fontSize={24}>
-          FUNDING PROPOSAL TYPE
-        </Text>
-        <RadioGroup
-          onChange={setFundGovProposalType}
-          value={fundGovProposalType}
-        >
-          <Stack direction="row">
-            <Radio value="dao">Dao</Radio>
-            <Radio value="gov">Governance</Radio>
-          </Stack>
-        </RadioGroup>
-        {fundGovProposalType === "dao" ? (
+        {!isGovProposal ? (
           <Grid
             templateColumns="repeat(2, 1fr)"
             templateRows="repeat(1, 1fr)"
@@ -114,22 +100,51 @@ export const FundingProposal = ({
             />
           </Grid>
         ) : (
-          <Input
-            placeholder="Enter funding amount"
-            size="md"
-            marginTop={4}
-            type="number"
-            width={200}
-            onChange={(event) => {
-              setFundGovProposalAmount(parseInt(event.target.value.trim()))
-            }}
-          />
+          <>
+            <Text marginBottom={2} fontSize={24}>
+              START DATE{" "}
+            </Text>
+            <Input
+              placeholder="Enter funding amount"
+              size="md"
+              type="date"
+              width={200}
+              marginBottom={4}
+              onChange={(event) => {
+                setFundGovProposalAmount(parseInt(event.target.value.trim()));
+              }}
+            />
+            <Text marginBottom={2} fontSize={24}>
+              END DATE
+            </Text>
+            <Input
+              placeholder="Enter funding amount"
+              size="md"
+              type="date"
+              width={200}
+              marginBottom={4}
+              onChange={(event) => {
+                setFundGovProposalAmount(parseInt(event.target.value.trim()));
+              }}
+            />
+            <Text marginBottom={2} fontSize={24}>AMOUNT</Text>
+            <Input
+              placeholder="Enter funding amount"
+              size="md"
+              type="number"
+              width={200}
+              marginBottom={4}
+              onChange={(event) => {
+                setFundGovProposalAmount(parseInt(event.target.value.trim()));
+              }}
+            />
+          </>
         )}
         <Flex justifyContent="center" margin={8}>
           <Button
             disabled={
               !(
-                isRecipientsNamesValid &&
+                (isRecipientsNamesValid || fundGovProposalAmount > 0) &&
                 proposalName.length > 2 &&
                 proposalDesc.length > 2
               )

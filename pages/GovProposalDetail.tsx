@@ -279,7 +279,6 @@ export default function GovProposalDetail() {
     ["proposalClaimMutation"],
     claimProposal
   );
-
   return (
     <Container maxW="5xl" py={10}>
       <Head>
