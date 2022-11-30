@@ -192,11 +192,11 @@ export default function Governance() {
           </Box>
         </GridItem>
       </Grid>
-      <Text fontWeight="bold" fontSize={24} marginTop={12}>
+      <Text fontWeight="bold" fontSize={24} marginTop={12} marginBottom={4}>
         {" "}
         Governance Proposals{" "}
       </Text>
-      <Flex marginTop={4} justifyContent="left">
+      <ul>
         {governanceProposalQuery.data ? (
           governanceProposalQuery.data?.proposal_count > 0 ? (
             governanceProposalQuery?.data?.proposals?.map((proposal: any) => (
@@ -237,7 +237,7 @@ export default function Governance() {
         ) : (
           <Spinner color="red.500" />
         )}
-      </Flex>
+      </ul>
     </Fragment>
   );
 }
