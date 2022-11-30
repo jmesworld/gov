@@ -53,14 +53,14 @@ export default function Governance() {
   const periodInfoQuery = useGovernancePeriodInfoQuery({
     client: governanceQueryClient,
     options: {
-      refetchInterval: 100,
+      refetchInterval: 10,
     },
   });
 
   const coreSlotQuery = useGovernanceCoreSlotsQuery({
     client: governanceQueryClient,
     options: {
-      refetchInterval: 1000,
+      refetchInterval: 10,
     },
   });
 
@@ -70,7 +70,7 @@ export default function Governance() {
       owner: coreSlotQuery.data?.brand?.dao as string,
     },
     options: {
-      refetchInterval: 1000,
+      refetchInterval: 10,
       enabled: !!coreSlotQuery.data?.brand?.dao,
     },
   });
@@ -82,7 +82,7 @@ export default function Governance() {
         owner: coreSlotQuery.data?.core_tech?.dao as string,
       },
       options: {
-        refetchInterval: 1000,
+        refetchInterval: 10,
         enabled: !!coreSlotQuery.data?.core_tech?.dao,
       },
     });
@@ -94,7 +94,7 @@ export default function Governance() {
         owner: coreSlotQuery.data?.creative?.dao as string,
       },
       options: {
-        refetchInterval: 1000,
+        refetchInterval: 10,
         enabled: !!coreSlotQuery.data?.creative?.dao,
       },
     });
