@@ -26,6 +26,8 @@ export const FundingProposal = ({
   isGovProposal,
   fundGovProposalAmount,
   setFundGovProposalAmount,
+  fundGovProposalDuration,
+  setFundGovProposalDuration,
 }: {
   recipients: any[];
   setProposalName: any;
@@ -39,6 +41,8 @@ export const FundingProposal = ({
   isGovProposal: boolean;
   fundGovProposalAmount: number;
   setFundGovProposalAmount: any;
+  fundGovProposalDuration: number;
+  setFundGovProposalDuration: any;
 }) => {
   return (
     <Container>
@@ -102,29 +106,16 @@ export const FundingProposal = ({
         ) : (
           <>
             <Text marginBottom={2} fontSize={24}>
-              START DATE{" "}
+              DURATION{" "}
             </Text>
             <Input
-              placeholder="Enter funding amount"
+              placeholder="Duration in months"
               size="md"
-              type="date"
+              type="number"
               width={200}
               marginBottom={4}
               onChange={(event) => {
-                setFundGovProposalAmount(parseInt(event.target.value.trim()));
-              }}
-            />
-            <Text marginBottom={2} fontSize={24}>
-              END DATE
-            </Text>
-            <Input
-              placeholder="Enter funding amount"
-              size="md"
-              type="date"
-              width={200}
-              marginBottom={4}
-              onChange={(event) => {
-                setFundGovProposalAmount(parseInt(event.target.value.trim()));
+                setFundGovProposalDuration(event.target.value.trim())
               }}
             />
             <Text marginBottom={2} fontSize={24}>AMOUNT</Text>

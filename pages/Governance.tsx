@@ -243,5 +243,9 @@ export default function Governance() {
 }
 
 const timestampToDate = (timestamp: number) => {
-  return new Date(timestamp * 1000).toDateString();
+  return (
+    new Date(timestamp * 1000).toLocaleDateString() +
+    " " +
+    new Date(timestamp * 1000).toLocaleTimeString()
+  );
 };

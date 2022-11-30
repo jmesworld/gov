@@ -291,7 +291,6 @@ export default function GovProposalDetail() {
 
   const prop_status = proposalQuery.data?.status;
 
-  console.log(prop_status);
   return (
     <Container maxW="5xl" py={10}>
       <Head>
@@ -325,9 +324,13 @@ export default function GovProposalDetail() {
           DAO PROPOSAL CREATOR
         </Text>
         <Flex marginBottom={8}>
-          <Text fontSize={18}>{daoIdentityQuery.data?.identity?.name}</Text>
+          <Text fontSize={18}>
+            {daoIdentityQuery.data ? daoIdentityQuery.data?.identity?.name : ""}
+          </Text>
           <Text marginLeft={8} fontSize={18}>
-            {`(${daoIdentityQuery.data?.identity?.owner})`}
+            {daoIdentityQuery.data
+              ? `(${daoIdentityQuery.data?.identity?.owner})`
+              : ""}
           </Text>
         </Flex>
         <Text marginBottom={2} fontSize={24} fontWeight="bold">

@@ -76,6 +76,7 @@ export default function Proposals() {
   const [fundGovProposalAmount, setFundGovProposalAmount] = useState(0);
   const [isDaoProposal, setIsDaoProposal] = useState(false);
   const [isGovProposal, setIsGovProposal] = useState(false);
+  const [fundGovProposalDuration, setFundGovProposalDuration] = useState(0);
 
   const toast = useToast();
   const walletManager = useWallet();
@@ -134,7 +135,7 @@ export default function Proposals() {
           funding: {
             title: proposalName.trim(),
             description: proposalDesc.trim(),
-            duration: 300,
+            duration: fundGovProposalDuration * 30 * 24 * 60 * 60, // months to seconds
             amount: fundGovProposalAmount.toString(),
           },
         },
@@ -232,8 +233,8 @@ export default function Proposals() {
     client: daoQueryClient,
     args: { limit: 10000 },
     options: {
-      refetchInterval: 10
-    }
+      refetchInterval: 10,
+    },
   });
 
   return (
@@ -434,6 +435,8 @@ export default function Proposals() {
                 isGovProposal={isGovProposal}
                 fundGovProposalAmount={fundGovProposalAmount}
                 setFundGovProposalAmount={setFundGovProposalAmount}
+                fundGovProposalDuration={fundGovProposalDuration}
+                setFundGovProposalDuration={setFundGovProposalDuration}
               />
             ) : isUpdateMemberProposalType ? (
               <UpdateMemberProposal daoName={daoName as string} />
@@ -444,7 +447,10 @@ export default function Proposals() {
             ) : isImprovementProposalType ? (
               <ImprovementProposal daoName={daoName as string} />
             ) : isTextProposalType ? (
-              <TextProposal daoName={daoName as string} isGovProposal={isGovProposal}/>
+              <TextProposal
+                daoName={daoName as string}
+                isGovProposal={isGovProposal}
+              />
             ) : (
               ""
             )}
