@@ -33,7 +33,10 @@ import { ExecuteMsg } from "../client/Identityservice.types";
 import NextLink from "next/link";
 import Governance from "./Governance";
 import { GovernanceQueryClient } from "../client/Governance.client";
-import { useGovernanceProposalQuery, useGovernanceProposalsQuery } from "../client/Governance.react-query";
+import {
+  useGovernanceProposalQuery,
+  useGovernanceProposalsQuery,
+} from "../client/Governance.react-query";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -119,7 +122,7 @@ export default function Home() {
       console.log(error);
     }
   }
-  
+
   return (
     <Container maxW="5xl" py={10}>
       <Head>
@@ -169,7 +172,7 @@ export default function Home() {
             as="span"
             color={useColorModeValue("primary.500", "primary.200")}
           >
-            Let&apos;s Liberate ART together
+            Liberate ART together
           </Text>
         </Heading>
       </Box>
@@ -183,11 +186,7 @@ export default function Home() {
       ) : (
         ""
       )}
-      {!!address ? (
-        <Governance/>
-      ) : (
-        ""
-      )}
+      <Governance />
 
       <Modal
         isOpen={isModalOpen}
@@ -197,7 +196,7 @@ export default function Home() {
         <ModalOverlay>
           <ModalContent>
             <ModalHeader fontSize={32} fontWeight="bold">
-              Create an Identity
+              Create Identity
             </ModalHeader>
             <ModalCloseButton
               onClick={() => {
