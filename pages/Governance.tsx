@@ -268,7 +268,7 @@ export default function Governance() {
 
 const timestampToDate = (timestamp: number) => {
   return (
-    new Date(timestamp * 1000).toLocaleDateString() +
+    new Date(timestamp * 1000).toLocaleDateString('default', {day: '2-digit', month: 'short', year: 'numeric'}) +
     " " +
     new Date(timestamp * 1000).toLocaleTimeString()
   );
