@@ -22,6 +22,7 @@ import {
 } from "../client/DaoMultisig.react-query";
 import { GovernanceQueryClient } from "../client/Governance.client";
 import {
+  useGovernancePeriodInfoQuery,
   useGovernanceProposalQuery,
   useGovernanceProposalsQuery,
 } from "../client/Governance.react-query";
@@ -291,6 +292,13 @@ export default function GovProposalDetail() {
 
   const prop_status = proposalQuery.data?.status;
 
+  const periodInfoQuery = useGovernancePeriodInfoQuery({
+    client: governanceQueryClient,
+    options: {
+      refetchInterval: 10,
+    },
+  });
+
   return (
     <Container maxW="5xl" py={10}>
       <Head>
@@ -376,7 +384,7 @@ export default function GovProposalDetail() {
               disabled={
                 proposalQuery.data?.yes_voters.filter(
                   (voter) => voter === address
-                )?.length
+                )?.length || periodInfoQuery.data?.current_period === "posting"
                   ? true
                   : false
               }
@@ -398,7 +406,7 @@ export default function GovProposalDetail() {
               disabled={
                 proposalQuery.data?.no_voters.filter(
                   (voter) => voter === address
-                )?.length
+                )?.length || periodInfoQuery.data?.current_period === "posting"
                   ? true
                   : false
               }
@@ -419,7 +427,8 @@ export default function GovProposalDetail() {
             <Button
               disabled={
                 proposalQuery.data?.status === "success_concluded" ||
-                proposalQuery.data?.status === "expired_concluded"
+                proposalQuery.data?.status === "expired_concluded" ||
+                periodInfoQuery.data?.current_period === "voting"
                   ? true
                   : false
               }
