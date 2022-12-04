@@ -146,9 +146,10 @@ export const FundingProposal = ({
             color="white"
             bgColor="primary.500"
             onClick={() => proposalMutation.mutate()}
+            _hover={{bg:"primary.500"}}
           >
             {" "}
-            Create DAO Proposal{" "}
+            Create Funding Proposal{" "}
           </Button>
         </Flex>
       </Box>

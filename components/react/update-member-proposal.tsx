@@ -306,15 +306,16 @@ export const UpdateMemberProposal = ({ daoName }: { daoName: string }) => {
                 proposalDesc.length > 2
               )
             }
-            width={250}
+            width={350}
             height={50}
             variant="outline"
             color="white"
             bgColor="primary.500"
             onClick={() => updateMembersMutation.mutate()}
+            _hover={{bg:"primary.500"}}
           >
             {" "}
-            Create DAO Proposal{" "}
+            Create Update Member Proposal{" "}
           </Button>
         </Flex>
       </Box>

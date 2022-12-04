@@ -189,12 +189,13 @@ export const RevokeCoreSlotProposal = ({ daoName }: { daoName: string }) => {
         <Flex justifyContent="center" margin={8}>
           <Button
             disabled={!(proposalTitle.length > 2 && proposalDesc.length > 2)}
-            width={250}
+            width={350}
             height={50}
             variant="outline"
             color="white"
             bgColor="primary.500"
             onClick={() => coreSlotProposalMutation.mutate()}
+            _hover={{bg:"primary.500"}}
           >
             {" "}
             Create Revoke Core Slot Proposal{" "}

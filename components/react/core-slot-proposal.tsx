@@ -195,6 +195,7 @@ export const CoreSlotProposal = ({ daoName }: { daoName: string }) => {
             color="white"
             bgColor="primary.500"
             onClick={() => coreSlotProposalMutation.mutate()}
+            _hover={{bg:"primary.500"}}
           >
             {" "}
             Create Core Slot Proposal{" "}

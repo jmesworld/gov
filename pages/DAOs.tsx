@@ -396,6 +396,7 @@ export default function MyDAOs() {
                   color="white"
                   bgColor={useColorModeValue("primary.500", "primary.200")}
                   onClick={() => daoMutation.mutate()}
+                  _hover={{bg:"primary.500"}}
                 >
                   {" "}
                   Create DAO{" "}
