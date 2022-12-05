@@ -41,6 +41,12 @@ import {
   useGovernanceProposalsQuery,
 } from "../client/Governance.react-query";
 import { CheckIcon } from "@chakra-ui/icons";
+import * as BjmesToken from "../client/BjmesToken.types";
+import {
+  bjmesTokenQueryKeys,
+  useBjmesTokenBalanceQuery,
+} from "../client/BjmesToken.react-query";
+import { BjmesTokenQueryClient } from "../client/BjmesToken.client";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -48,6 +54,8 @@ const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
+const NEXT_PUBLIC_BJMES_TOKEN_CONTRACT = process.env
+  .NEXT_PUBLIC_BJMES_TOKEN_CONTRACT as string;
 
 export default function Home() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -76,6 +84,11 @@ export default function Home() {
     lcdClient,
     IDENTITY_SERVICE_CONTRACT
   );
+  const bjmesTokenClient: BjmesTokenQueryClient = new BjmesTokenQueryClient(
+    lcdClient,
+    NEXT_PUBLIC_BJMES_TOKEN_CONTRACT
+  );
+
   const { data, error } = useIdentityserviceGetIdentityByOwnerQuery({
     client,
     args,
@@ -138,6 +151,58 @@ export default function Home() {
     }
   }
 
+  const votingTokenMutation = useMutation(
+    ["votingTokenMutation"],
+    getVotingToken
+  );
+
+  async function getVotingToken() {
+    const ext = new Extension();
+    const contract = NEXT_PUBLIC_BJMES_TOKEN_CONTRACT;
+
+    const msg: BjmesToken.ExecuteMsg = {
+      mint: { amount: "10000", recipient: address as string },
+    };
+    const execMsg = new MsgExecuteContract(address as string, contract, msg);
+
+    try {
+      const txMsg = {
+        msgs: [execMsg.toJSON(false)],
+      };
+      const result = await ext.request(
+        "post",
+        JSON.parse(JSON.stringify(txMsg))
+      );
+      const payload = JSON.parse(JSON.stringify(result.payload));
+      if (payload.success) {
+        toast({
+          title: "Tokens minted.",
+          description: "We've minted your tokens for you.",
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Token minting error.",
+          description: payload.error.message,
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+      }
+      return result;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const votingTokenQuery = useBjmesTokenBalanceQuery({
+    client: bjmesTokenClient,
+    args: { address: address as string },
+    options: { refetchInterval: 10 },
+  });
+
   return (
     <Container maxW="7xl" py={10}>
       <Head>
@@ -171,6 +236,30 @@ export default function Home() {
           ""
         )}
       </Flex>
+      {data?.identity ? (
+        <Flex justifyContent="end" mb={4} alignItems="center" marginTop={8}>
+          <Text
+            marginLeft={8}
+          >{`Balance: ${votingTokenQuery?.data?.balance.toString()} Bjmes`}</Text>
+
+          <Button
+            marginLeft={8}
+            justifyContent="center"
+            alignItems="center"
+            borderRadius="lg"
+            width={200}
+            height={50}
+            color="primary.500"
+            variant="outline"
+            px={0}
+            onClick={() => votingTokenMutation.mutate()}
+          >
+            Get Voting Token
+          </Button>
+        </Flex>
+      ) : (
+        ""
+      )}
 
       <Box textAlign="center" marginBottom={24} marginTop={24}>
         <Heading
