@@ -105,6 +105,8 @@ export default function Governance() {
     options: {},
   });
 
+  const current_period: string = periodInfoQuery.data?.current_period.toString() as string;
+
   return (
     <Fragment>
       <Grid templateColumns="repeat(2, 1fr)" templateRows="repeat(1, 1fr)">
@@ -122,7 +124,7 @@ export default function Governance() {
               {" "}
               Current Period:{" "}
               {!!periodInfoQuery.data
-                ? periodInfoQuery.data?.current_period
+                ? current_period[0].toLocaleUpperCase() + current_period.slice(1)
                 : ""}{" "}
             </Text>
             <Text>
@@ -268,7 +270,7 @@ export default function Governance() {
 
 const timestampToDate = (timestamp: number) => {
   return (
-    new Date(timestamp * 1000).toLocaleDateString('default', {day: '2-digit', month: 'short', year: 'numeric'}) +
+    new Date(timestamp * 1000).toLocaleDateString('default', {day: '2-digit', month: 'short', year: 'numeric'}).toUpperCase() +
     " " +
     new Date(timestamp * 1000).toLocaleTimeString()
   );
