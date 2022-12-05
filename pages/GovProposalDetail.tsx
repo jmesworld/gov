@@ -88,6 +88,7 @@ export default function GovProposalDetail() {
   const proposalQuery = useGovernanceProposalQuery({
     client: governanceQueryClient,
     args: { id: proposalId ? parseInt(proposalId as string) : 0 },
+    options: { refetchInterval: 10 },
   });
 
   async function voteOnProposal() {
@@ -215,6 +216,7 @@ export default function GovProposalDetail() {
       owner: proposalQuery.data?.dao as string,
     },
     options: {
+      refetchInterval: 10,
       enabled: !!proposalQuery.data?.dao,
     },
   });
@@ -224,7 +226,7 @@ export default function GovProposalDetail() {
   const grantsQuery = useDistributionGrantsQuery({
     client: distributionQueryClient,
     args: {},
-    options: {},
+    options: { refetchInterval: 10 },
   });
 
   // const grant = grantsQuery.data?.grants.filter((grant) => grant.dao === )

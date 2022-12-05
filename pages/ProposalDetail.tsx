@@ -73,11 +73,13 @@ export default function ProposalDetail() {
   const proposalQuery = useDaoMultisigProposalQuery({
     client: daoQueryClient,
     args: { proposalId: proposalId ? parseInt(proposalId as string) : 0 },
+    options: { refetchInterval: 10 },
   });
 
   const votesQuery = useDaoMultisigListVotesQuery({
     client: daoQueryClient,
     args: { proposalId: proposalId ? parseInt(proposalId as string) : 0 },
+    options: { refetchInterval: 10 },
   });
 
   async function voteOnProposal() {
@@ -320,25 +322,23 @@ export default function ProposalDetail() {
               NO
             </Button>
           </Flex>
-            <Flex justifyContent="center" margin={8}>
-              <Button
-                disabled={
-                  proposalQuery.data?.status === "executed"
-                    ? true
-                    : false
-                }
-                width={150}
-                height={50}
-                variant="outline"
-                color="white"
-                bgColor={"primary.500"}
-                onClick={() => {
-                  proposalExecuteMutation.mutate();
-                }}
-              >
-                EXECUTE
-              </Button>
-            </Flex>   
+          <Flex justifyContent="center" margin={8}>
+            <Button
+              disabled={
+                proposalQuery.data?.status === "executed" ? true : false
+              }
+              width={150}
+              height={50}
+              variant="outline"
+              color="white"
+              bgColor={"primary.500"}
+              onClick={() => {
+                proposalExecuteMutation.mutate();
+              }}
+            >
+              EXECUTE
+            </Button>
+          </Flex>
         </Grid>
       </Box>
     </Container>
