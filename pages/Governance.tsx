@@ -105,7 +105,8 @@ export default function Governance() {
     options: {},
   });
 
-  const current_period: string = periodInfoQuery.data?.current_period.toString() as string;
+  const current_period: string =
+    periodInfoQuery.data?.current_period.toString() as string;
 
   return (
     <Fragment>
@@ -124,7 +125,8 @@ export default function Governance() {
               {" "}
               Current Period:{" "}
               {!!periodInfoQuery.data
-                ? current_period[0].toLocaleUpperCase() + current_period.slice(1)
+                ? current_period[0].toLocaleUpperCase() +
+                  current_period.slice(1)
                 : ""}{" "}
             </Text>
             <Text>
@@ -161,7 +163,11 @@ export default function Governance() {
                   )
                 : ""}{" "}
             </Text>
-            <Text> Cycle Length: {periodInfoQuery.data?.cycle_length} </Text>
+            <Text>
+              {" "}
+              Cycle Length:{" "}
+              {secondsToDays(periodInfoQuery.data?.cycle_length as number)}{" "}
+            </Text>
             <Text>
               {" "}
               Next Posting Start:{" "}
@@ -184,14 +190,18 @@ export default function Governance() {
               {" "}
               Posting Period Length:{" "}
               {!!periodInfoQuery.data
-                ? periodInfoQuery.data?.posting_period_length
+                ? secondsToDays(
+                    periodInfoQuery.data?.posting_period_length as number
+                  )
                 : ""}{" "}
             </Text>
             <Text>
               {" "}
               Voting Period Length:{" "}
               {!!periodInfoQuery.data
-                ? periodInfoQuery.data?.voting_period_length
+                ? secondsToDays(
+                    periodInfoQuery.data?.voting_period_length as number
+                  )
                 : ""}
             </Text>
           </Box>
@@ -270,8 +280,19 @@ export default function Governance() {
 
 const timestampToDate = (timestamp: number) => {
   return (
-    new Date(timestamp * 1000).toLocaleDateString('default', {day: '2-digit', month: 'short', year: 'numeric'}).toUpperCase() +
+    new Date(timestamp * 1000)
+      .toLocaleDateString("default", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+      .toUpperCase() +
     " " +
     new Date(timestamp * 1000).toLocaleTimeString()
   );
+};
+
+const secondsToDays = (seconds: number) => {
+  const day_count = Math.ceil(seconds / 86400);
+  return `${Math.ceil(seconds / 86400).toString()} ${day_count === 1 ? "day" : "days"}`;
 };
