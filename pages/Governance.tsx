@@ -102,7 +102,9 @@ export default function Governance() {
   const governanceProposalQuery = useGovernanceProposalsQuery({
     client: governanceQueryClient,
     args: {},
-    options: {},
+    options: {
+      refetchInterval: 10
+    },
   });
 
   const current_period: string =
