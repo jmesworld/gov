@@ -21,27 +21,36 @@ import {
   useToast,
   Textarea,
   Spinner,
+  Link,
 } from "@chakra-ui/react";
 import { ProposalList } from "../components/react/proposal-list";
 import { useState } from "react";
 import { useWallet } from "@cosmos-kit/react";
-import { DaoQueryClient } from "../client/Dao.client";
-import {
-  useDaoListProposalsQuery,
-  useDaoNameQuery,
-  useDaoProposalQuery,
-} from "../client/Dao.react-query";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Extension, MsgExecuteContract } from "@terra-money/terra.js";
 import { useRouter } from "next/router";
 import { ProposalRecipientForm } from "../components/react/proposal-recipient-form";
-import * as Dao from "../client/Dao.types";
+import { DaoMultisigQueryClient } from "../client/DaoMultisig.client";
+import { useDaoMultisigListProposalsQuery } from "../client/DaoMultisig.react-query";
+import { BankMsg, Coin, ExecuteMsg } from "../client/DaoMultisig.types";
+import { FundingProposal } from "../components/react/funding-proposal";
+import { ProposalDaoAddMembers } from "../components/react/proposal-dao-add-members";
+import { UpdateMemberProposal } from "../components/react/update-member-proposal";
+import { CoreSlotProposal } from "../components/react/core-slot-proposal";
+import { RevokeCoreSlotProposal } from "../components/react/revoke-core-slot-proposal";
+import { ImprovementProposal } from "../components/react/improvement-proposal";
+import { TextProposal } from "../components/react/text-proposal";
+import * as Governance from "../client/Governance.types";
+import { useIdentityserviceGetIdentityByNameQuery } from "../client/Identityservice.react-query";
+import { IdentityserviceQueryClient } from "../client/Identityservice.client";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
+const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
+  .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
 export default function Proposals() {
   const router = useRouter();
@@ -51,8 +60,23 @@ export default function Proposals() {
   const [recipients, setRecipients] = useState(new Array());
   const [isRecipientsNamesValid, setRecipientsNamesValid] = useState(false);
   const [isModalOpen, setModalState] = useState(false);
+  const [isSelectProposalType, setSelectProposalType] = useState(true);
+  const [isFundingProposalType, setFundingProposalType] = useState(false);
+  const [isUpdateMemberProposalType, setUpdateMemberProposalType] =
+    useState(false);
+  const [isCoreSlotProposalType, setCoreSlotProposalType] = useState(false);
+  const [isRevokeCoreSlotProposalType, setRevokeCoreSlotProposalType] =
+    useState(false);
+  const [isImprovementProposalType, setImprovementProposalType] =
+    useState(false);
+  const [isTextProposalType, setTextProposalType] = useState(false);
+
   const [proposalName, setProposalName] = useState("");
   const [proposalDesc, setProposalDesc] = useState("");
+  const [fundGovProposalAmount, setFundGovProposalAmount] = useState(0);
+  const [isDaoProposal, setIsDaoProposal] = useState(false);
+  const [isGovProposal, setIsGovProposal] = useState(false);
+  const [fundGovProposalDuration, setFundGovProposalDuration] = useState(0);
 
   const toast = useToast();
   const walletManager = useWallet();
@@ -72,35 +96,90 @@ export default function Proposals() {
   };
 
   const lcdClient = new LCDClient(LCDOptions);
+  const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
+    lcdClient,
+    IDENTITY_SERVICE_CONTRACT
+  );
+
+  const daoNameUpdateMembersQuery = useIdentityserviceGetIdentityByNameQuery({
+    client,
+    args: { name: daoName as string },
+  });
+
+  const daoMembersQueryClient = new DaoMultisigQueryClient(
+    lcdClient,
+    daoNameUpdateMembersQuery.data?.identity?.owner as string
+  );
 
   async function createProposal() {
     const contractAddress = daoAddress as string;
-    let msgs = [];
+    let daoMsgs: any = [];
+    let govMsg: any;
 
     for (let recipient of recipients) {
-      const coin: Dao.Coin = {
+      const coin: Coin = {
         denom: "uluna",
         amount: recipient.amount.toString(),
       };
-      const bankMsg: Dao.BankMsg = {
+      const bankMsg: BankMsg = {
         send: { amount: [coin], to_address: recipient.address },
       };
-      msgs.push({
+      daoMsgs.push({
         bank: bankMsg,
       });
     }
 
-    const msg: Dao.ExecuteMsg = {
-      propose: {
-        title: proposalName.trim(),
-        description: proposalDesc.trim(),
-        msgs: msgs,
-      },
-    };
+    if (isGovProposal) {
+      const proposalMsg: Governance.ExecuteMsg = {
+        propose: {
+          funding: {
+            title: proposalName.trim(),
+            description: proposalDesc.trim(),
+            duration: fundGovProposalDuration * 30 * 24 * 60 * 60, // months to seconds
+            amount: fundGovProposalAmount.toString(),
+          },
+        },
+      };
+
+      const deposit: Governance.Coin = { denom: "uluna", amount: "1000" };
+
+      const wasmMsg: Governance.WasmMsg = {
+        execute: {
+          contract_addr: NEXT_PUBLIC_GOVERNANCE_CONTRACT,
+          funds: [deposit],
+          msg: toBase64(proposalMsg),
+        },
+      };
+      const _msg: ExecuteMsg = {
+        propose: {
+          title: proposalName.trim(),
+          description: proposalDesc.trim(),
+          msgs: [
+            {
+              wasm: wasmMsg,
+            },
+          ],
+        },
+      };
+      govMsg = _msg;
+    }
+
+    let msg: any = isGovProposal
+      ? govMsg
+      : {
+          propose: {
+            title: proposalName.trim(),
+            description: proposalDesc.trim(),
+            msgs: daoMsgs,
+          },
+        };
+
+    const dao_multisig_contract_addr =
+      daoMembersQueryClient.contractAddress as string;
 
     const execMsg = new MsgExecuteContract(
       address as string,
-      contractAddress,
+      dao_multisig_contract_addr,
       msg
     );
 
@@ -137,7 +216,7 @@ export default function Proposals() {
           isClosable: true,
         });
       }
-      console.log(result);
+      proposalsQuery.refetch();
       return result;
     } catch (e) {
       console.error(e);
@@ -146,10 +225,16 @@ export default function Proposals() {
 
   const proposalMutation = useMutation(["proposalMutation"], createProposal);
 
-  const daoQueryClient = new DaoQueryClient(lcdClient, daoAddress as string);
-  const proposalsQuery = useDaoListProposalsQuery({
+  const daoQueryClient = new DaoMultisigQueryClient(
+    lcdClient,
+    daoAddress as string
+  );
+  const proposalsQuery = useDaoMultisigListProposalsQuery({
     client: daoQueryClient,
     args: { limit: 10000 },
+    options: {
+      refetchInterval: 10,
+    },
   });
 
   return (
@@ -160,7 +245,7 @@ export default function Proposals() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Grid templateColumns="repeat(3, 1fr)" templateRows="repeat(1, 1fr)">
-        <GridItem colSpan={1} />
+        {/* <GridItem colSpan={1} /> */}
         <GridItem colSpan={1}>
           <Box textAlign="center">
             <Heading
@@ -168,10 +253,31 @@ export default function Proposals() {
               fontWeight="bold"
               fontSize={{ base: "2xl", sm: "3xl", md: "4xl" }}
             >
-              Proposals
+              Proposals {daoName}
             </Heading>
-            <Heading as="h2">{daoName}</Heading>
           </Box>
+        </GridItem>
+        <GridItem>
+          <Flex justifyContent="end" mb={4}>
+            {" "}
+            <Button
+              justifyContent="center"
+              alignItems="center"
+              borderRadius="lg"
+              width={250}
+              height={50}
+              color={useColorModeValue("primary.500", "primary.200")}
+              variant="outline"
+              px={0}
+              onClick={() => {
+                setModalState(true);
+                setIsGovProposal(true);
+              }}
+              fontSize={14}
+            >
+              Create Governance Proposal
+            </Button>
+          </Flex>
         </GridItem>
         <GridItem colSpan={1}>
           <Flex justifyContent="end" mb={4}>
@@ -179,14 +285,18 @@ export default function Proposals() {
               justifyContent="center"
               alignItems="center"
               borderRadius="lg"
-              width={150}
+              width={250}
               height={50}
               color={useColorModeValue("primary.500", "primary.200")}
               variant="outline"
               px={0}
-              onClick={() => setModalState(true)}
+              onClick={() => {
+                setModalState(true);
+                setIsDaoProposal(true);
+              }}
+              fontSize={14}
             >
-              Create Proposal
+              Create Dao Proposal
             </Button>
           </Flex>
         </GridItem>
@@ -199,100 +309,157 @@ export default function Proposals() {
           setProposalName("");
           setProposalDesc("");
           setRecipientsNamesValid(false);
+          setIsDaoProposal(false);
+          setIsGovProposal(false);
         }}
         scrollBehavior={"inside"}
       >
         <ModalOverlay />
         <ModalContent maxW="50%">
           <ModalHeader fontSize={32} fontWeight="bold">
-            Create a Proposal
+            {isSelectProposalType ? (
+              <Text>Select Proposal Type</Text>
+            ) : (
+              "Create a Proposal"
+            )}
           </ModalHeader>
-          <ModalCloseButton onClick={() => setModalState(false)} />
+          <ModalCloseButton
+            onClick={() => {
+              setModalState(false);
+              setSelectProposalType(true);
+              setFundingProposalType(false);
+              setCoreSlotProposalType(false);
+              setImprovementProposalType(false);
+              setRevokeCoreSlotProposalType(false);
+              setTextProposalType(false);
+              setUpdateMemberProposalType(false);
+            }}
+          />
           <ModalBody>
-            <Box>
-              <Text marginBottom={2} fontSize={24}>
-                PROPOSAL NAME
-              </Text>
-              <Input
-                marginBottom={4}
-                placeholder="Type your Proposal name here"
-                size="lg"
-                onChange={(event) => {
-                  setProposalName(event.target.value.trim());
-                }}
-              ></Input>
-              <Text marginBottom={2} fontSize={24}>
-                DESCRIPTION
-              </Text>
-              <Textarea
-                marginBottom={2}
-                placeholder="Enter your description here"
-                size="lg"
-                onChange={(event) => {
-                  setProposalDesc(event.target.value.trim());
-                }}
-              ></Textarea>
-              <Grid
-                templateColumns="repeat(2, 1fr)"
-                templateRows="repeat(1, 1fr)"
-                marginTop={8}
-              >
-                <Text fontSize={24}>RECIPIENT</Text>
-                <Flex justifyContent="end">
-                  <Button
-                    variant="outline"
-                    width={100}
-                    onClick={() => {
-                      setRecipients((recipients) => [
-                        ...recipients,
-                        {
-                          name: "",
-                          amount: 0,
-                          id: recipients.length + 1,
-                          address: "",
-                        },
-                      ]);
-                    }}
-                  >
-                    <Text fontSize={18} fontWeight="bold">
-                      +
-                    </Text>
-                  </Button>
-                </Flex>
-                <ProposalRecipientForm
-                  recipients={recipients}
-                  setRecipients={setRecipients}
-                  setRecipientsNamesValid={setRecipientsNamesValid}
-                />
-              </Grid>
-              <Flex justifyContent="center" margin={8}>
+            {isSelectProposalType ? (
+              <>
                 <Button
-                  disabled={
-                    !(
-                      isRecipientsNamesValid &&
-                      proposalName.length > 2 &&
-                      proposalDesc.length > 2
-                    )
-                  }
-                  width={250}
-                  height={50}
-                  variant="outline"
-                  color="white"
-                  bgColor={useColorModeValue("primary.500", "primary.200")}
-                  onClick={() => proposalMutation.mutate()}
+                  marginRight={4}
+                  marginBottom={8}
+                  onClick={() => {
+                    setFundingProposalType(true);
+                    setSelectProposalType(false);
+                  }}
                 >
                   {" "}
-                  Create DAO Proposal{" "}
+                  Funding{" "}
                 </Button>
-              </Flex>
-            </Box>
+                {isDaoProposal ? (
+                  <Button
+                    marginRight={4}
+                    marginBottom={8}
+                    onClick={() => {
+                      setUpdateMemberProposalType(true);
+                      setSelectProposalType(false);
+                    }}
+                  >
+                    {" "}
+                    Update Member{" "}
+                  </Button>
+                ) : (
+                  ""
+                )}
+                {isGovProposal ? (
+                  <Button
+                    marginRight={4}
+                    marginBottom={8}
+                    onClick={() => {
+                      setCoreSlotProposalType(true);
+                      setSelectProposalType(false);
+                    }}
+                  >
+                    {" "}
+                    Core Slot{" "}
+                  </Button>
+                ) : (
+                  ""
+                )}
+                {isGovProposal ? (
+                  <Button
+                    marginRight={4}
+                    marginBottom={8}
+                    onClick={() => {
+                      setRevokeCoreSlotProposalType(true);
+                      setSelectProposalType(false);
+                    }}
+                  >
+                    {" "}
+                    Revoke Core Slot{" "}
+                  </Button>
+                ) : (
+                  ""
+                )}
+                {isGovProposal ? (
+                  <Button
+                    marginRight={4}
+                    marginBottom={8}
+                    onClick={() => {
+                      setImprovementProposalType(true);
+                      setSelectProposalType(false);
+                    }}
+                  >
+                    {" "}
+                    Improvement{" "}
+                  </Button>
+                ) : (
+                  ""
+                )}
+                <Button
+                  marginRight={4}
+                  marginBottom={8}
+                  onClick={() => {
+                    setTextProposalType(true);
+                    setSelectProposalType(false);
+                  }}
+                >
+                  {" "}
+                  Text{" "}
+                </Button>
+              </>
+            ) : isFundingProposalType ? (
+              <FundingProposal
+                recipients={recipients}
+                setProposalName={setProposalName}
+                setProposalDesc={setProposalDesc}
+                setRecipients={setRecipients}
+                setRecipientsNamesValid={setRecipientsNamesValid}
+                proposalDesc={proposalDesc}
+                proposalName={proposalName}
+                proposalMutation={proposalMutation}
+                isRecipientsNamesValid={isRecipientsNamesValid}
+                isGovProposal={isGovProposal}
+                fundGovProposalAmount={fundGovProposalAmount}
+                setFundGovProposalAmount={setFundGovProposalAmount}
+                fundGovProposalDuration={fundGovProposalDuration}
+                setFundGovProposalDuration={setFundGovProposalDuration}
+              />
+            ) : isUpdateMemberProposalType ? (
+              <UpdateMemberProposal daoName={daoName as string} />
+            ) : isCoreSlotProposalType ? (
+              <CoreSlotProposal daoName={daoName as string} />
+            ) : isRevokeCoreSlotProposalType ? (
+              <RevokeCoreSlotProposal daoName={daoName as string} />
+            ) : isImprovementProposalType ? (
+              <ImprovementProposal daoName={daoName as string} />
+            ) : isTextProposalType ? (
+              <TextProposal
+                daoName={daoName as string}
+                isGovProposal={isGovProposal}
+              />
+            ) : (
+              ""
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>
       <Flex marginTop={24} justifyContent="center">
         {proposalsQuery.data ? (
           <ProposalList
-            // @ts-ignore
             proposals={proposalsQuery?.data?.proposals}
             daoAddress={daoAddress as string}
           />

@@ -4,6 +4,10 @@
 * and run the @jmes-cosmwasm/ts-codegen generate command to regenerate this file.
 */
 
+export type Executor = "member" | {
+  only: Addr;
+};
+export type Addr = string;
 export type Duration = {
   height: number;
 } | {
@@ -26,14 +30,10 @@ export type Threshold = {
 export type Decimal = string;
 export interface InstantiateMsg {
   dao_name: string;
+  executor?: Executor | null;
+  group_addr: string;
   max_voting_period: Duration;
   threshold: Threshold;
-  voters: Voter[];
-}
-export interface Voter {
-  addr: string;
-  weight: number;
-  [k: string]: unknown;
 }
 export type ExecuteMsg = {
   propose: {
@@ -55,6 +55,8 @@ export type ExecuteMsg = {
   close: {
     proposal_id: number;
   };
+} | {
+  member_changed_hook: MemberChangedHookMsg;
 };
 export type Expiration = {
   at_height: number;
@@ -69,10 +71,6 @@ export type CosmosMsgForEmpty = {
   bank: BankMsg;
 } | {
   custom: Empty;
-} | {
-  staking: StakingMsg;
-} | {
-  distribution: DistributionMsg;
 } | {
   wasm: WasmMsg;
 };
@@ -89,37 +87,6 @@ export type BankMsg = {
   };
 };
 export type Uint128 = string;
-export type StakingMsg = {
-  delegate: {
-    amount: Coin;
-    validator: string;
-    [k: string]: unknown;
-  };
-} | {
-  undelegate: {
-    amount: Coin;
-    validator: string;
-    [k: string]: unknown;
-  };
-} | {
-  redelegate: {
-    amount: Coin;
-    dst_validator: string;
-    src_validator: string;
-    [k: string]: unknown;
-  };
-};
-export type DistributionMsg = {
-  set_withdraw_address: {
-    address: string;
-    [k: string]: unknown;
-  };
-} | {
-  withdraw_delegator_reward: {
-    validator: string;
-    [k: string]: unknown;
-  };
-};
 export type WasmMsg = {
   execute: {
     contract_addr: string;
@@ -165,9 +132,15 @@ export interface Coin {
 export interface Empty {
   [k: string]: unknown;
 }
+export interface MemberChangedHookMsg {
+  diffs: MemberDiff[];
+}
+export interface MemberDiff {
+  key: string;
+  new?: number | null;
+  old?: number | null;
+}
 export type QueryMsg = {
-  name: {};
-} | {
   threshold: {};
 } | {
   proposal: {
@@ -184,7 +157,7 @@ export type QueryMsg = {
     start_before?: number | null;
   };
 } | {
-  show_vote: {
+  get_vote: {
     proposal_id: number;
     voter: string;
   };
@@ -203,7 +176,24 @@ export type QueryMsg = {
     limit?: number | null;
     start_after?: string | null;
   };
+} | {
+  config: {};
 };
+export interface ConfigResponse {
+  dao_members_addr: Addr;
+  dao_name: string;
+  max_voting_period: Duration;
+  threshold: Threshold;
+}
+export interface VoteResponse {
+  vote?: VoteInfo | null;
+}
+export interface VoteInfo {
+  proposal_id: number;
+  vote: Vote;
+  voter: string;
+  weight: number;
+}
 export type Status = "pending" | "open" | "rejected" | "passed" | "executed";
 export type ThresholdResponse = {
   absolute_count: {
@@ -222,7 +212,7 @@ export type ThresholdResponse = {
     total_weight: number;
   };
 };
-export interface ProposalListResponse {
+export interface ProposalListResponseForEmpty {
   proposals: ProposalResponseForEmpty[];
 }
 export interface ProposalResponseForEmpty {
@@ -243,18 +233,6 @@ export interface VoterDetail {
 }
 export interface VoteListResponse {
   votes: VoteInfo[];
-}
-export interface VoteInfo {
-  proposal_id: number;
-  vote: Vote;
-  voter: string;
-  weight: number;
-}
-export interface NameResponse {
-  name?: string | null;
-}
-export interface VoteResponse {
-  vote?: VoteInfo | null;
 }
 export interface VoterResponse {
   weight?: number | null;

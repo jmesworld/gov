@@ -7,9 +7,9 @@
 import { UseQueryOptions, useQuery, useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee } from "@cosmjs/amino";
-import { Coin, Coins, WaitTxBroadcastResult } from "@terra-money/terra.js";
-import { Addr, Uint128, ConfigResponse, Cw20HookMsg, Feature, ExecuteMsg, Binary, VoteOption, Cw20ReceiveMsg, InstantiateMsg, ProposalPeriod, PeriodInfoResponse, ProposalType, ProposalStatus, ProposalResponse, ProposalsResponse, QueryMsg } from "./Governance.types";
+import { Addr, Uint128, ConfigResponse, Decimal, CoreSlotsResponse, SlotVoteResult, ExecuteMsg, ProposalMsg, Feature, CosmosMsgForEmpty, BankMsg, StakingMsg, DistributionMsg, WasmMsg, Binary, CoreSlot, VoteOption, Coin, Empty, RevokeCoreSlot, InstantiateMsg, ProposalPeriod, PeriodInfoResponse, ProposalType, ProposalStatus, ProposalResponse, ProposalsResponse, QueryMsg } from "./Governance.types";
 import { GovernanceQueryClient, GovernanceClient } from "./Governance.client";
+import { Coins, WaitTxBroadcastResult } from "@terra-money/terra.js";
 export const governanceQueryKeys = {
   contract: ([{
     contract: "governance"
@@ -32,6 +32,10 @@ export const governanceQueryKeys = {
   proposals: (contractAddress: string | undefined, args?: Record<string, unknown>) => ([{ ...governanceQueryKeys.address(contractAddress)[0],
     method: "proposals",
     args
+  }] as const),
+  coreSlots: (contractAddress: string | undefined, args?: Record<string, unknown>) => ([{ ...governanceQueryKeys.address(contractAddress)[0],
+    method: "core_slots",
+    args
   }] as const)
 };
 export interface GovernanceReactQuery<TResponse, TData = TResponse> {
@@ -39,6 +43,15 @@ export interface GovernanceReactQuery<TResponse, TData = TResponse> {
   options?: Omit<UseQueryOptions<TResponse, Error, TData>, "'queryKey' | 'queryFn' | 'initialData'"> & {
     initialData?: undefined;
   };
+}
+export interface GovernanceCoreSlotsQuery<TData> extends GovernanceReactQuery<CoreSlotsResponse, TData> {}
+export function useGovernanceCoreSlotsQuery<TData = CoreSlotsResponse>({
+  client,
+  options
+}: GovernanceCoreSlotsQuery<TData>) {
+  return useQuery<CoreSlotsResponse, Error, TData>(governanceQueryKeys.coreSlots(client?.contractAddress), () => client ? client.coreSlots() : Promise.reject(new Error("Invalid client")), { ...options,
+    enabled: !!client && (options?.enabled != undefined ? options.enabled : true)
+  });
 }
 export interface GovernanceProposalsQuery<TData> extends GovernanceReactQuery<ProposalsResponse, TData> {
   args: {
@@ -91,6 +104,61 @@ export function useGovernanceConfigQuery<TData = ConfigResponse>({
   return useQuery<ConfigResponse, Error, TData>(governanceQueryKeys.config(client?.contractAddress), () => client ? client.config() : Promise.reject(new Error("Invalid client")), { ...options,
     enabled: !!client && (options?.enabled != undefined ? options.enabled : true)
   });
+}
+export interface GovernanceResignCoreSlotMutation {
+  client: GovernanceClient;
+  msg: {
+    note: string;
+    slot: CoreSlot;
+  };
+  args?: {
+    coins?: Coins;
+  };
+}
+export function useGovernanceResignCoreSlotMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceResignCoreSlotMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceResignCoreSlotMutation>(({
+    client,
+    msg,
+    args: {
+      coins
+    } = {}
+  }) => client.resignCoreSlot(msg, coins), options);
+}
+export interface GovernanceUnsetCoreSlotMutation {
+  client: GovernanceClient;
+  msg: {
+    proposalId: number;
+  };
+  args?: {
+    coins?: Coins;
+  };
+}
+export function useGovernanceUnsetCoreSlotMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceUnsetCoreSlotMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceUnsetCoreSlotMutation>(({
+    client,
+    msg,
+    args: {
+      coins
+    } = {}
+  }) => client.unsetCoreSlot(msg, coins), options);
+}
+export interface GovernanceSetCoreSlotMutation {
+  client: GovernanceClient;
+  msg: {
+    proposalId: number;
+  };
+  args?: {
+    coins?: Coins;
+  };
+}
+export function useGovernanceSetCoreSlotMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceSetCoreSlotMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceSetCoreSlotMutation>(({
+    client,
+    msg,
+    args: {
+      coins
+    } = {}
+  }) => client.setCoreSlot(msg, coins), options);
 }
 export interface GovernanceSetContractMutation {
   client: GovernanceClient;
@@ -149,19 +217,19 @@ export function useGovernanceVoteMutation(options?: Omit<UseMutationOptions<Wait
     } = {}
   }) => client.vote(msg, coins), options);
 }
-export interface GovernanceReceiveMutation {
+export interface GovernanceProposeMutation {
   client: GovernanceClient;
-  msg: Cw20ReceiveMsg;
+  msg: ProposalMsg;
   args?: {
     coins?: Coins;
   };
 }
-export function useGovernanceReceiveMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceReceiveMutation>, "mutationFn">) {
-  return useMutation<WaitTxBroadcastResult, Error, GovernanceReceiveMutation>(({
+export function useGovernanceProposeMutation(options?: Omit<UseMutationOptions<WaitTxBroadcastResult, Error, GovernanceProposeMutation>, "mutationFn">) {
+  return useMutation<WaitTxBroadcastResult, Error, GovernanceProposeMutation>(({
     client,
     msg,
     args: {
       coins
     } = {}
-  }) => client.receive(msg, coins), options);
+  }) => client.propose(msg, coins), options);
 }

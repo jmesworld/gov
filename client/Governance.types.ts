@@ -16,7 +16,57 @@ export interface ConfigResponse {
   voting_period_length: number;
   [k: string]: unknown;
 }
-export type Cw20HookMsg = {
+export type Decimal = string;
+export interface CoreSlotsResponse {
+  brand?: SlotVoteResult | null;
+  core_tech?: SlotVoteResult | null;
+  creative?: SlotVoteResult | null;
+  [k: string]: unknown;
+}
+export interface SlotVoteResult {
+  dao: Addr;
+  proposal_voting_end: number;
+  yes_ratio: Decimal;
+  [k: string]: unknown;
+}
+export type ExecuteMsg = {
+  propose: ProposalMsg;
+} | {
+  vote: {
+    id: number;
+    vote: VoteOption;
+    [k: string]: unknown;
+  };
+} | {
+  conclude: {
+    id: number;
+    [k: string]: unknown;
+  };
+} | {
+  set_contract: {
+    artist_curator: string;
+    distribution: string;
+    identityservice: string;
+    [k: string]: unknown;
+  };
+} | {
+  set_core_slot: {
+    proposal_id: number;
+    [k: string]: unknown;
+  };
+} | {
+  unset_core_slot: {
+    proposal_id: number;
+    [k: string]: unknown;
+  };
+} | {
+  resign_core_slot: {
+    note: string;
+    slot: CoreSlot;
+    [k: string]: unknown;
+  };
+};
+export type ProposalMsg = {
   text_proposal: {
     description: string;
     title: string;
@@ -37,6 +87,27 @@ export type Cw20HookMsg = {
     title: string;
     [k: string]: unknown;
   };
+} | {
+  improvement: {
+    description: string;
+    msgs: CosmosMsgForEmpty[];
+    title: string;
+    [k: string]: unknown;
+  };
+} | {
+  core_slot: {
+    description: string;
+    slot: CoreSlot;
+    title: string;
+    [k: string]: unknown;
+  };
+} | {
+  revoke_core_slot: {
+    description: string;
+    revoke_slot: RevokeCoreSlot;
+    title: string;
+    [k: string]: unknown;
+  };
 };
 export type Feature = {
   artist_curator: {
@@ -45,33 +116,122 @@ export type Feature = {
     [k: string]: unknown;
   };
 };
-export type ExecuteMsg = {
-  receive: Cw20ReceiveMsg;
+export type CosmosMsgForEmpty = {
+  bank: BankMsg;
 } | {
-  vote: {
-    id: number;
-    vote: VoteOption;
+  custom: Empty;
+} | {
+  staking: StakingMsg;
+} | {
+  distribution: DistributionMsg;
+} | {
+  wasm: WasmMsg;
+};
+export type BankMsg = {
+  send: {
+    amount: Coin[];
+    to_address: string;
     [k: string]: unknown;
   };
 } | {
-  conclude: {
-    id: number;
+  burn: {
+    amount: Coin[];
+    [k: string]: unknown;
+  };
+};
+export type StakingMsg = {
+  delegate: {
+    amount: Coin;
+    validator: string;
     [k: string]: unknown;
   };
 } | {
-  set_contract: {
-    artist_curator: string;
-    distribution: string;
-    identityservice: string;
+  undelegate: {
+    amount: Coin;
+    validator: string;
+    [k: string]: unknown;
+  };
+} | {
+  redelegate: {
+    amount: Coin;
+    dst_validator: string;
+    src_validator: string;
+    [k: string]: unknown;
+  };
+};
+export type DistributionMsg = {
+  set_withdraw_address: {
+    address: string;
+    [k: string]: unknown;
+  };
+} | {
+  withdraw_delegator_reward: {
+    validator: string;
+    [k: string]: unknown;
+  };
+};
+export type WasmMsg = {
+  execute: {
+    contract_addr: string;
+    funds: Coin[];
+    msg: Binary;
+    [k: string]: unknown;
+  };
+} | {
+  instantiate: {
+    admin?: string | null;
+    code_id: number;
+    funds: Coin[];
+    label: string;
+    msg: Binary;
+    [k: string]: unknown;
+  };
+} | {
+  migrate: {
+    contract_addr: string;
+    msg: Binary;
+    new_code_id: number;
+    [k: string]: unknown;
+  };
+} | {
+  update_admin: {
+    admin: string;
+    contract_addr: string;
+    [k: string]: unknown;
+  };
+} | {
+  clear_admin: {
+    contract_addr: string;
     [k: string]: unknown;
   };
 };
 export type Binary = string;
+export type CoreSlot = {
+  brand: {
+    [k: string]: unknown;
+  };
+} | {
+  creative: {
+    [k: string]: unknown;
+  };
+} | {
+  core_tech: {
+    [k: string]: unknown;
+  };
+};
 export type VoteOption = "yes" | "no";
-export interface Cw20ReceiveMsg {
+export interface Coin {
   amount: Uint128;
-  msg: Binary;
-  sender: string;
+  denom: string;
+  [k: string]: unknown;
+}
+export interface Empty {
+  [k: string]: unknown;
+}
+export interface RevokeCoreSlot {
+  dao: string;
+  slot: CoreSlot;
+  [k: string]: unknown;
 }
 export interface InstantiateMsg {
   artist_curator_addr?: string | null;
@@ -109,6 +269,14 @@ export type ProposalType = {
   funding: {
     [k: string]: unknown;
   };
+} | {
+  improvement: {
+    [k: string]: unknown;
+  };
+} | {
+  core_slot: CoreSlot;
+} | {
+  revoke_core_slot: RevokeCoreSlot;
 };
 export type ProposalStatus = "posted" | "voting" | "success" | "expired" | "success_concluded" | "expired_concluded";
 export interface ProposalResponse {
@@ -152,6 +320,10 @@ export type QueryMsg = {
   proposals: {
     limit?: number | null;
     start?: number | null;
+    [k: string]: unknown;
+  };
+} | {
+  core_slots: {
     [k: string]: unknown;
   };
 };

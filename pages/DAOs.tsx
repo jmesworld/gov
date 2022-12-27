@@ -29,16 +29,18 @@ import {
   useIdentityserviceGetIdentityByNameQuery,
   useIdentityserviceGetIdentityByOwnerQuery,
 } from "../client/Identityservice.react-query";
-import { DaoQueryClient } from "../client/Dao.client";
 import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Extension, MsgExecuteContract } from "@terra-money/terra.js";
 import {
-  DaoInstantiateMsg,
+  DaoMembersInstantiateMsg,
   ExecuteMsg,
   Ordering,
 } from "../client/Identityservice.types";
-import { Voter } from "../client/Dao.types";
+import { DaoMultisigQueryClient } from "../client/DaoMultisig.client";
+import { InstantiateMsg } from "../client/DaoMultisig.types";
+import { Member } from "../client/DaoMembers.types";
+import { DaoMembersQueryClient } from "../client/DaoMembers.client";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -94,7 +96,7 @@ export default function MyDAOs() {
     args: { name: daoName },
   });
 
-  async function useMyDaos() {
+  async function getMyDaos() {
     let myDaos: any = "undefined";
 
     let _data: any[] = [];
@@ -118,14 +120,24 @@ export default function MyDAOs() {
       myDaos = [];
       for (const i in _data) {
         const daoAddrs = _data[i][1];
-        const daoQueryClient = new DaoQueryClient(lcdClient, daoAddrs);
-        const voter: any = await daoQueryClient.voter({
-          address: address ? address : "",
+
+        const daoMultisigQueryClient = new DaoMultisigQueryClient(
+          lcdClient,
+          daoAddrs
+        );
+        const daoMembersQueryClient = new DaoMembersQueryClient(
+          lcdClient,
+          daoAddrs
+        );
+
+        const voter: any = await daoMultisigQueryClient.voter({
+          address: address as string
         });
+
         if (voter.weight >= 0) {
-          const nameResult = await daoQueryClient.name();
+          const config = await daoMultisigQueryClient.config();
           myDaos.push({
-            name: nameResult.name,
+            name: config.dao_name,
             address: daoAddrs,
           });
         }
@@ -134,9 +146,8 @@ export default function MyDAOs() {
     return myDaos;
   }
 
-  const myDaos = useQuery(["myDaos"], useMyDaos, {
+  const myDaos = useQuery(["myDaos"], getMyDaos, {
     onSuccess: (data) => {
-      console.log("fire onSuccess");
       let storeData = new Map<string, any>();
       storeData.set(address as string, data);
       localStorage.setItem(
@@ -145,10 +156,10 @@ export default function MyDAOs() {
       );
       setDataUpdated(true);
     },
-    refetchInterval: 1000,
+    refetchInterval: 10,
   });
   async function registerDao() {
-    let _voters: Voter[] = [];
+    let _members: Member[] = [];
     try {
       const minimum = Math.min(...cosignersTotalWeight);
       const minimumIndex = cosignersTotalWeight.indexOf(minimum);
@@ -167,26 +178,21 @@ export default function MyDAOs() {
 
       for (let c of cosigners) {
         const _addrResponse = await client.getIdentityByName({ name: c.name });
-        _voters.push({
+        _members.push({
           addr: _addrResponse.identity ? _addrResponse.identity?.owner : "",
           weight: c.weight,
         });
       }
-      const _threshold = {
-        absolute_count: {
-          weight: threshold,
-        },
-      };
 
       const _maxVotingPeriod = {
         height: 1180000,
       };
 
-      const daoData: DaoInstantiateMsg = {
+      const daoData: DaoMembersInstantiateMsg = {
         dao_name: daoName,
         max_voting_period: _maxVotingPeriod,
-        threshold: _threshold,
-        voters: _voters,
+        threshold_percentage: threshold.toString(),
+        members: _members,
       };
 
       const ext = new Extension();
@@ -364,10 +370,7 @@ export default function MyDAOs() {
                         parseInt(event.target.value.trim())
                       );
                       setThreshold(
-                        Math.ceil(
-                          (parseInt(event.target.value.trim()) / 100) *
-                            cosigners.length
-                        )
+                        parseInt(event.target.value.trim()) / 100
                       );
                     }}
                   />
@@ -393,6 +396,7 @@ export default function MyDAOs() {
                   color="white"
                   bgColor={useColorModeValue("primary.500", "primary.200")}
                   onClick={() => daoMutation.mutate()}
+                  _hover={{bg:"primary.500"}}
                 >
                   {" "}
                   Create DAO{" "}

@@ -7,101 +7,89 @@
 import { LCDClient, Coins, MnemonicKey, MsgExecuteContract, WaitTxBroadcastResult } from "@terra-money/terra.js";
 import { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee } from "@cosmjs/amino";
-import { Addr, DaosResponse, ExecuteMsg, Duration, Decimal, DaoMembersInstantiateMsg, Member, IdType, GetIdentityByNameResponse, Identity, GetIdentityByOwnerResponse, InstantiateMsg, QueryMsg, Ordering } from "./Identityservice.types";
-export interface IdentityserviceReadOnlyInterface {
+import { Addr, ConfigResponse, ExecuteMsg, Uint128, Timestamp, Uint64, GrantResponse, GrantsResponse, Grant, InstantiateMsg, QueryMsg } from "./Distribution.types";
+export interface DistributionReadOnlyInterface {
   contractAddress: string;
-  getIdentityByOwner: ({
-    owner
+  config: () => Promise<ConfigResponse>;
+  grant: ({
+    grantId
   }: {
-    owner: string;
-  }) => Promise<GetIdentityByOwnerResponse>;
-  getIdentityByName: ({
-    name
-  }: {
-    name: string;
-  }) => Promise<GetIdentityByNameResponse>;
-  daos: ({
+    grantId: number;
+  }) => Promise<GrantResponse>;
+  grants: ({
+    dao,
     limit,
-    order,
     startAfter
   }: {
+    dao?: Addr;
     limit?: number;
-    order?: Ordering;
-    startAfter?: number;
-  }) => Promise<DaosResponse>;
+    startAfter?: string;
+  }) => Promise<GrantsResponse>;
 }
-export class IdentityserviceQueryClient implements IdentityserviceReadOnlyInterface {
+export class DistributionQueryClient implements DistributionReadOnlyInterface {
   client: LCDClient;
   contractAddress: string;
 
   constructor(client: LCDClient, contractAddress: string) {
     this.client = client;
     this.contractAddress = contractAddress;
-    this.getIdentityByOwner = this.getIdentityByOwner.bind(this);
-    this.getIdentityByName = this.getIdentityByName.bind(this);
-    this.daos = this.daos.bind(this);
+    this.config = this.config.bind(this);
+    this.grant = this.grant.bind(this);
+    this.grants = this.grants.bind(this);
   }
 
-  getIdentityByOwner = async ({
-    owner
-  }: {
-    owner: string;
-  }): Promise<GetIdentityByOwnerResponse> => {
+  config = async (): Promise<ConfigResponse> => {
     return this.client.wasm.contractQuery(this.contractAddress, {
-      get_identity_by_owner: {
-        owner
+      config: {}
+    });
+  };
+  grant = async ({
+    grantId
+  }: {
+    grantId: number;
+  }): Promise<GrantResponse> => {
+    return this.client.wasm.contractQuery(this.contractAddress, {
+      grant: {
+        grant_id: grantId
       }
     });
   };
-  getIdentityByName = async ({
-    name
-  }: {
-    name: string;
-  }): Promise<GetIdentityByNameResponse> => {
-    return this.client.wasm.contractQuery(this.contractAddress, {
-      get_identity_by_name: {
-        name
-      }
-    });
-  };
-  daos = async ({
+  grants = async ({
+    dao,
     limit,
-    order,
     startAfter
   }: {
+    dao?: Addr;
     limit?: number;
-    order?: Ordering;
-    startAfter?: number;
-  }): Promise<DaosResponse> => {
+    startAfter?: string;
+  }): Promise<GrantsResponse> => {
     return this.client.wasm.contractQuery(this.contractAddress, {
-      daos: {
+      grants: {
+        dao,
         limit,
-        order,
         start_after: startAfter
       }
     });
   };
 }
-export interface IdentityserviceInterface extends IdentityserviceReadOnlyInterface {
+export interface DistributionInterface extends DistributionReadOnlyInterface {
   contractAddress: string;
-  registerUser: ({
-    name
+  addGrant: ({
+    amount,
+    dao,
+    duration
   }: {
-    name: string;
+    amount: Uint128;
+    dao: Addr;
+    duration: number;
   }, coins?: Coins) => Promise<WaitTxBroadcastResult>;
-  registerDao: ({
-    dao_name,
-    max_voting_period,
-    members,
-    threshold_percentage
+  claim: ({
+    grantId
   }: {
-    dao_name: string;
-    max_voting_period: Duration;
-    members: Member[];
-    threshold_percentage: Decimal;
+    grantId: number;
   }, coins?: Coins) => Promise<WaitTxBroadcastResult>;
 }
-export class IdentityserviceClient extends IdentityserviceQueryClient implements IdentityserviceInterface {
+export class DistributionClient extends DistributionQueryClient implements DistributionInterface {
   client: LCDClient;
   user: any;
   contractAddress: string;
@@ -111,45 +99,42 @@ export class IdentityserviceClient extends IdentityserviceQueryClient implements
     this.client = client;
     this.user = user;
     this.contractAddress = contractAddress;
-    this.registerUser = this.registerUser.bind(this);
-    this.registerDao = this.registerDao.bind(this);
+    this.addGrant = this.addGrant.bind(this);
+    this.claim = this.claim.bind(this);
   }
 
-  registerUser = async ({
-    name
+  addGrant = async ({
+    amount,
+    dao,
+    duration
   }: {
-    name: string;
+    amount: Uint128;
+    dao: Addr;
+    duration: number;
   }, coins?: Coins): Promise<WaitTxBroadcastResult> => {
     const key = new MnemonicKey(this.user.mnemonicKeyOptions);
     const wallet = this.client.wallet(key);
     const execMsg = new MsgExecuteContract(this.user.address, this.contractAddress, {
-      register_user: {
-        name
+      add_grant: {
+        amount,
+        dao,
+        duration
       }
     }, coins);
     const txOptions = { msgs: [execMsg] };
     const tx = await wallet.createAndSignTx(txOptions);
     return await this.client.tx.broadcast(tx);
   };
-  registerDao = async ({
-    dao_name,
-    max_voting_period,
-    members,
-    threshold_percentage
+  claim = async ({
+    grantId
   }: {
-    dao_name: string;
-    max_voting_period: Duration;
-    members: Member[];
-    threshold_percentage: Decimal;
+    grantId: number;
   }, coins?: Coins): Promise<WaitTxBroadcastResult> => {
     const key = new MnemonicKey(this.user.mnemonicKeyOptions);
     const wallet = this.client.wallet(key);
     const execMsg = new MsgExecuteContract(this.user.address, this.contractAddress, {
-      register_dao: {
-        dao_name: dao_name,
-        max_voting_period: max_voting_period,
-        members,
-        threshold_percentage: threshold_percentage
+      claim: {
+        grant_id: grantId
       }
     }, coins);
     const txOptions = { msgs: [execMsg] };

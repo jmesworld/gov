@@ -1,7 +1,6 @@
 {
   "name": "@jmes/jmes-governance-website",
   "version": "0.1.0",
-  "homepage": "https://mayoreee.github.io/jmes-governance-website",
   "private": true,
   "scripts": {
     "predeploy": "npm run build",
@@ -31,7 +30,6 @@
     "cosmjs-utils": "^0.1.0",
     "fast-fuzzy": "1.11.2",
     "framer-motion": "7.3.6",
-    "gh-pages": "^4.0.0",
     "jmes-contracts": "git+https://github.com/blockheist/jmes-contracts.git",
     "next": "12.2.5",
     "react": "18.2.0",

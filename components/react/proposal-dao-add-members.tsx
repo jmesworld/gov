@@ -1,41 +1,31 @@
 import { DAOCosigner } from "../types";
 import { Grid, Text, Input, Flex, Button } from "@chakra-ui/react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { LCDClient } from "@terra-money/terra.js";
 import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
 import { useQuery } from "@tanstack/react-query";
-import { Fragment } from "react";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 
-export const DAOCosignerForm = ({
-  cosigners,
-  setCosigners,
-  owner,
-  cosignersTotalWeight,
-  setCosignersTotalWeight,
-  setIdNamesValid,
+export const ProposalDaoAddMembers = ({
+  addMembers,
+  setAddMembers,
+  setAddMembersNamesValid,
+  daoAddress,
 }: {
-  cosigners: DAOCosigner[];
-  setCosigners: any;
-  owner: {
+  addMembers: {
     name: string;
+    id: number;
     address: string;
-  };
-  cosignersTotalWeight: number[];
-  setCosignersTotalWeight: any;
-  setIdNamesValid: any;
+    percentage: number;
+  }[];
+  setAddMembers: any;
+  setAddMembersNamesValid: any;
+  daoAddress: string;
 }) => {
-  let ownerData: DAOCosigner = {
-    name: owner.name,
-    id: 0,
-    weight: 0,
-  };
-  cosigners[0] = ownerData;
-
   const LCDOptions = {
     URL: LCD_URL,
     chainID: CHAIN_ID,
@@ -49,34 +39,41 @@ export const DAOCosignerForm = ({
 
   async function getIdentitiesByNames() {
     let identityAddrs = new Array();
-    if (!!cosigners) {
-      for (let j = 0; j < cosigners.length; j++) {
-        const name = cosigners[j].name;
-        const identityRes = await client.getIdentityByName({ name: name });
-        if (identityRes.identity?.name === name) {
-          identityAddrs[j] = identityRes.identity?.owner;
-        } else {
-          identityAddrs[j] = "Invalid identity";
-        }
-      }
 
-      if (identityAddrs.includes("Invalid identity")) {
-        setIdNamesValid(false);
+    for (let j = 0; j < addMembers.length; j++) {
+      const name = addMembers[j].name;
+      const identityRes = await client.getIdentityByName({ name: name });
+      if (identityRes.identity?.name === name) {
+        identityAddrs[j] = identityRes.identity?.owner;
       } else {
-        setIdNamesValid(true);
+        identityAddrs[j] = "Invalid identity";
       }
+    }
+
+    if (identityAddrs.includes("Invalid identity")) {
+      setAddMembersNamesValid(false);
+    } else {
+      setAddMembersNamesValid(true);
     }
     return identityAddrs;
   }
 
-  const idsByNamesQuery = useQuery(["identities"], getIdentitiesByNames);
+  const idsByNamesQuery = useQuery(
+    ["identitiesAddMembers"],
+    getIdentitiesByNames
+  );
 
-  const [focusedCosignerIndex, setFocusedCosignerIndex] = useState(Infinity);
+  const [addMembersFocusedCosignerIndex, setAddMembersFocusedCosignerIndex] =
+    useState(Infinity);
 
-  let cosignerItem = cosigners.map((c, i) => {
+  let addMembersItem = addMembers.map((c, i) => {
+    if (idsByNamesQuery.data) {
+      addMembers[i].address = idsByNamesQuery.data[i];
+    }
     return (
       <Fragment key={c.id}>
         <Grid
+          key={i}
           templateColumns="repeat(3, 1fr)"
           templateRows="repeat(1, 1fr)"
           marginTop={4}
@@ -88,13 +85,12 @@ export const DAOCosignerForm = ({
             width={300}
             disabled={c.id === 0 ? true : false}
             onChange={(event) => {
-              cosigners[i].name = event.target.value.trim();
-              setCosigners(cosigners);
-              setIdNamesValid(false);
-              // idsByNamesQuery.refetch();
+              addMembers[i].name = event.target.value.trim();
+              setAddMembers(addMembers);
+              setAddMembersNamesValid(false);
             }}
             onFocus={() => {
-              setFocusedCosignerIndex(i);
+              setAddMembersFocusedCosignerIndex(i);
             }}
             onBlur={() => idsByNamesQuery.refetch()}
           />
@@ -104,21 +100,23 @@ export const DAOCosignerForm = ({
             marginLeft={8}
             marginRight={8}
             type="number"
-            width={150}
+            width={120}
+            max={99}
             onChange={(event) => {
               let value = parseInt(event.target.value.trim());
-              cosignersTotalWeight[i] = value;
-              setCosignersTotalWeight(cosignersTotalWeight);
+              if (value >= 100) {
+                event.target.value = "100";
+              }
+              addMembers[i].percentage = value;
+              setAddMembers(addMembers);
             }}
           />
           <Button
             variant="outline"
             hidden={c.id === 0 ? true : false}
             onClick={() => {
-              cosignersTotalWeight[i] = 0;
-              setCosignersTotalWeight(cosignersTotalWeight);
-              let newCosigners = cosigners.filter((item) => item.id !== c.id);
-              setCosigners(newCosigners);
+              let newAddMembers = addMembers.filter((item) => item.id !== c.id);
+              setAddMembers(newAddMembers);
             }}
           >
             <Text fontSize={18} fontWeight="bold">
@@ -127,10 +125,10 @@ export const DAOCosignerForm = ({
           </Button>
         </Grid>
         <Text fontSize={12}>
-          {cosigners[i].name?.length > 0
+          {addMembers[i].name.length > 0
             ? !idsByNamesQuery.isFetching
               ? idsByNamesQuery?.data?.at(i)
-              : i === focusedCosignerIndex
+              : i === addMembersFocusedCosignerIndex
               ? "Checking..."
               : idsByNamesQuery?.data?.at(i)
             : ""}
@@ -138,5 +136,5 @@ export const DAOCosignerForm = ({
       </Fragment>
     );
   });
-  return <ul>{cosignerItem}</ul>;
+  return <ul>{addMembersItem}</ul>;
 };
