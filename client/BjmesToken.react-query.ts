@@ -244,7 +244,7 @@ export function useBjmesTokenUploadLogoMutation(options?: Omit<UseMutationOption
     args: {
       coins
     } = {}
-  }) => client.uploadLogo(msg, coins), options);
+  }) => client.uploadLogo(coins), options);
 }
 export interface BjmesTokenUpdateMarketingMutation {
   client: BjmesTokenClient;
