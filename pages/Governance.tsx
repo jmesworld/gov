@@ -1,31 +1,27 @@
 import {
   Box,
-  Container,
   Flex,
-  Grid,
-  GridItem,
-  Link,
-  Spinner,
+  Spacer,
   Text,
+  VStack,
 } from "@chakra-ui/react";
-import { useWallet } from "@cosmos-kit/react";
-import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
-import { Fragment } from "react";
-import {
-  GovernanceClient,
-  GovernanceQueryClient,
-} from "../client/Governance.client";
-import {
-  useGovernanceCoreSlotsQuery,
-  useGovernancePeriodInfoQuery,
-  useGovernanceProposalsQuery,
-} from "../client/Governance.react-query";
+import { useEffect, useState } from "react";
 import { IdentityserviceQueryClient } from "../client/Identityservice.client";
 import {
   useIdentityserviceDaosQuery,
-  useIdentityserviceGetIdentityByOwnerQuery,
 } from "../client/Identityservice.react-query";
-import NextLink from "next/link";
+import { JMESLogo } from "../components";
+import { NavBarItem } from "../components/react/navigation-item";
+import GovernanceProposal from "./GovernanceProposal";
+import { Ordering } from "../client/Identityservice.types";
+import { DaoMultisigQueryClient } from "../client/DaoMultisig.client";
+import { DaoMembersQueryClient } from "../client/DaoMembers.client";
+import { useQuery } from "@tanstack/react-query";
+import { DaoProposal } from "../components/DaoProposal";
+import { NavBarButton } from "../components/react/navbar-button";
+import { useChain } from "@cosmos-kit/react";
+import { chainName } from "../config/defaults";
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -34,267 +30,258 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
-export default function Governance() {
-  const walletManager = useWallet();
-  const { walletStatus, address } = walletManager;
+let cosmWasmClient: CosmWasmClient;
 
+export default function Governance() {
+  const chainContext = useChain(chainName);
+  const { address, getCosmWasmClient } = chainContext;
+
+  const [isGovProposalSelected, setIsGovProposalSelected] = useState(true);
+  const [selectedDao, setSelectedDao] = useState("");
+  const [selectedDaoName, setSelectedDaoName] = useState("");
+  const [isNewDataUpdated, setDataUpdated] = useState(false);
+
+  const [viewDimension, setViewDimension] = useState(Array());
   const LCDOptions = {
     URL: LCD_URL,
     chainID: CHAIN_ID,
   };
-  const lcdClient = new LCDClient(LCDOptions);
-  const governanceQueryClient = new GovernanceQueryClient(
-    lcdClient,
-    NEXT_PUBLIC_GOVERNANCE_CONTRACT
+
+  useEffect(() => {
+    const init = async () => {
+      cosmWasmClient = await getCosmWasmClient();
+    };
+    init().catch(console.error);
+  });
+
+  const order: Ordering = "descending";
+  const args = { order: order, limit: 100000 };
+  const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
+    cosmWasmClient,
+    IDENTITY_SERVICE_CONTRACT
   );
-  const identityserviceQueryClient: IdentityserviceQueryClient =
-    new IdentityserviceQueryClient(lcdClient, IDENTITY_SERVICE_CONTRACT);
 
-  const periodInfoQuery = useGovernancePeriodInfoQuery({
-    client: governanceQueryClient,
-    options: {
-      refetchInterval: 10,
+  useEffect(() => {
+    const { innerHeight, innerWidth } = window;
+    setViewDimension([innerWidth, innerHeight]);
+  }, []);
+
+  const daosQuery = useIdentityserviceDaosQuery({ client, args });
+
+  async function getMyDaos() {
+    let myDaos: any = "undefined";
+
+    let _data: any[] = [];
+    let _startAfter = 0;
+    let _isDataComplete = false;
+    while (!_isDataComplete) {
+      const _current_batch_data = await client.daos({
+        limit: 30,
+        startAfter: _startAfter,
+        order: "ascending",
+      });
+      if (_current_batch_data.daos.length === 0) {
+        _isDataComplete = true;
+        break;
+      }
+      _data.push(..._current_batch_data.daos);
+      _startAfter += 30;
+    }
+    _data.reverse();
+    if (_data) {
+      myDaos = [];
+      for (const i in _data) {
+        const daoAddrs = _data[i][1];
+
+        const daoMultisigQueryClient = new DaoMultisigQueryClient(
+          cosmWasmClient,
+          daoAddrs
+        );
+        const daoMembersQueryClient = new DaoMembersQueryClient(
+          cosmWasmClient,
+          daoAddrs
+        );
+
+        const voter: any = await daoMultisigQueryClient.voter({
+          address: address as string,
+        });
+
+        if (voter.weight >= 0) {
+          const config = await daoMultisigQueryClient.config();
+          myDaos.push({
+            name: config.dao_name,
+            address: daoAddrs,
+          });
+        }
+      }
+    }
+    return myDaos;
+  }
+
+  const myDaos = useQuery(["myDaos"], getMyDaos, {
+    onSuccess: (data) => {
+      let storeData = new Map<string, any>();
+      storeData.set(address as string, data);
+      localStorage.setItem(
+        "myDaosData",
+        JSON.stringify(Object.fromEntries(storeData))
+      );
+      setDataUpdated(true);
     },
+    refetchInterval: 10,
   });
-
-  const coreSlotQuery = useGovernanceCoreSlotsQuery({
-    client: governanceQueryClient,
-    options: {
-      refetchInterval: 10,
-    },
-  });
-
-  const brandCoreSlotIdentityQuery = useIdentityserviceGetIdentityByOwnerQuery({
-    client: identityserviceQueryClient,
-    args: {
-      owner: coreSlotQuery.data?.brand?.dao as string,
-    },
-    options: {
-      refetchInterval: 10,
-      enabled: !!coreSlotQuery.data?.brand?.dao,
-    },
-  });
-
-  const coreTechCoreSlotIdentityQuery =
-    useIdentityserviceGetIdentityByOwnerQuery({
-      client: identityserviceQueryClient,
-      args: {
-        owner: coreSlotQuery.data?.core_tech?.dao as string,
-      },
-      options: {
-        refetchInterval: 10,
-        enabled: !!coreSlotQuery.data?.core_tech?.dao,
-      },
-    });
-
-  const creativeCoreSlotIdentityQuery =
-    useIdentityserviceGetIdentityByOwnerQuery({
-      client: identityserviceQueryClient,
-      args: {
-        owner: coreSlotQuery.data?.creative?.dao as string,
-      },
-      options: {
-        refetchInterval: 10,
-        enabled: !!coreSlotQuery.data?.creative?.dao,
-      },
-    });
-
-  const governanceProposalQuery = useGovernanceProposalsQuery({
-    client: governanceQueryClient,
-    args: {},
-    options: {
-      refetchInterval: 10
-    },
-  });
-
-  const current_period: string =
-    periodInfoQuery.data?.current_period.toString() as string;
 
   return (
-    <Fragment>
-      <Grid templateColumns="repeat(2, 1fr)" templateRows="repeat(1, 1fr)">
-        <GridItem colSpan={1}>
-          <Box marginTop={8}>
-            <Text fontWeight="bold"> Period Info </Text>
-            <Text>
-              {" "}
-              Current Block:{" "}
-              {!!periodInfoQuery.data
-                ? periodInfoQuery.data?.current_block
-                : ""}{" "}
-            </Text>
-            <Text>
-              {" "}
-              Current Period:{" "}
-              {!!periodInfoQuery.data
-                ? current_period[0].toLocaleUpperCase() +
-                  current_period.slice(1)
-                : ""}{" "}
-            </Text>
-            <Text>
-              {" "}
-              Current Posting Start:{" "}
-              {!!periodInfoQuery.data
-                ? timestampToDate(
-                    periodInfoQuery.data?.current_posting_start as number
-                  )
-                : ""}{" "}
-            </Text>
-            <Text>
-              {" "}
-              Current Time in Cycle:{" "}
-              {!!periodInfoQuery.data
-                ? periodInfoQuery.data?.current_time_in_cycle
-                : ""}{" "}
-            </Text>
-            <Text>
-              {" "}
-              Current Voting Start:{" "}
-              {!!periodInfoQuery.data
-                ? timestampToDate(
-                    periodInfoQuery.data?.current_voting_start as number
-                  )
-                : ""}{" "}
-            </Text>
-            <Text>
-              {" "}
-              Current Voting End:{" "}
-              {!!periodInfoQuery.data
-                ? timestampToDate(
-                    periodInfoQuery.data?.current_voting_end as number
-                  )
-                : ""}{" "}
-            </Text>
-            <Text>
-              {" "}
-              Cycle Length:{" "}
-              {secondsToDays(periodInfoQuery.data?.cycle_length as number)}{" "}
-            </Text>
-            <Text>
-              {" "}
-              Next Posting Start:{" "}
-              {!!periodInfoQuery.data
-                ? timestampToDate(
-                    periodInfoQuery.data?.next_posting_start as number
-                  )
-                : ""}{" "}
-            </Text>
-            <Text>
-              {" "}
-              Next Voting Start:{" "}
-              {!!periodInfoQuery.data
-                ? timestampToDate(
-                    periodInfoQuery.data?.next_voting_start as number
-                  )
-                : ""}{" "}
-            </Text>
-            <Text>
-              {" "}
-              Posting Period Length:{" "}
-              {!!periodInfoQuery.data
-                ? secondsToDays(
-                    periodInfoQuery.data?.posting_period_length as number
-                  )
-                : ""}{" "}
-            </Text>
-            <Text>
-              {" "}
-              Voting Period Length:{" "}
-              {!!periodInfoQuery.data
-                ? secondsToDays(
-                    periodInfoQuery.data?.voting_period_length as number
-                  )
-                : ""}
-            </Text>
-          </Box>
-        </GridItem>
-        <GridItem colSpan={1}>
-          <Box marginTop={8}>
-            <Text fontWeight="bold"> Core Slots </Text>
-            <Text>
-              {" "}
-              Brand: {brandCoreSlotIdentityQuery.data?.identity?.name}{" "}
-            </Text>
-            <Text>
-              {" "}
-              Core Tech: {
-                coreTechCoreSlotIdentityQuery.data?.identity?.name
-              }{" "}
-            </Text>
-            <Text>
-              {" "}
-              Creative: {
-                creativeCoreSlotIdentityQuery.data?.identity?.name
-              }{" "}
-            </Text>
-          </Box>
-        </GridItem>
-      </Grid>
-      <Text fontWeight="bold" fontSize={24} marginTop={12} marginBottom={4}>
-        {" "}
-        Governance Proposals{" "}
-      </Text>
-      <ul>
-        {governanceProposalQuery.data ? (
-          governanceProposalQuery.data?.proposal_count > 0 ? (
-            governanceProposalQuery?.data?.proposals?.map((proposal: any) => (
-              <NextLink
-                key={proposal.id}
-                href={{
-                  pathname: "/GovProposalDetail",
-                  query: { id: proposal.id, address: proposal.dao as string },
-                }}
-                passHref={true}
-              >
-                <Link fontSize={24}>
-                  <Flex>
-                    <Text
-                      marginRight={4}
-                      fontSize={18}
-                      fontWeight="medium"
-                    >{`#${proposal.id}`}</Text>
-                    <Box
-                      height={54}
-                      width={1000}
-                      justifyContent="center"
-                      alignItems="center"
-                    >
-                      <Text fontSize={18} key={proposal.id}>
-                        {proposal.title}
-                      </Text>
-                    </Box>
-                  </Flex>
-                </Link>
-              </NextLink>
-            ))
-          ) : (
-            <Flex justifyContent="center" width="100%">
-              <Text> No proposal has been created yet </Text>
-            </Flex>
-          )
+    <Flex padding={0} width={viewDimension[0]} height={viewDimension[1]}>
+      <VStack
+        width={"200px"}
+        height={"100%"}
+        backgroundColor={"#7453FD"}
+        paddingTop={"30px"}
+        paddingLeft={"0px"}
+        // overflowY="scroll"
+      >
+        <JMESLogo />
+        <Box height={"30px"} />
+        <Flex
+          width={"200px"}
+          height={"42px"}
+          // marginTop={"30px"}
+          paddingLeft={"26px"}
+          backgroundColor={"#7453FD"}
+        >
+          {" "}
+          <Text
+            color="#A1F0C4"
+            fontFamily={"DM Sans"}
+            fontWeight="bold"
+            fontSize={12}
+            alignSelf="center"
+          >
+            GOVERNANCE
+          </Text>
+        </Flex>
+        <NavBarItem
+          text="Proposals"
+          isSelected={isGovProposalSelected}
+          onClick={() => {
+            setIsGovProposalSelected(true);
+            setSelectedDao("");
+            setSelectedDaoName("");
+          }}
+        />
+        <Box height={"42px"} />
+        <Flex
+          width={"200px"}
+          height={"42px"}
+          paddingLeft={"26px"}
+          backgroundColor={"#7453FD"}
+        >
+          {" "}
+          <Text
+            color="#A1F0C4"
+            fontFamily={"DM Sans"}
+            fontWeight="bold"
+            fontSize={12}
+            alignSelf="center"
+          >
+            MY DAOS
+          </Text>
+        </Flex>
+        {typeof window !== "undefined" &&
+        address !== "undefined" &&
+        !(localStorage.getItem("myDaosData") as string)?.includes(
+          "undefined"
+        ) ? (
+          <MyDaosList
+            daos={localStorage.getItem("myDaosData") as string}
+            selectedDao={selectedDao}
+            setSelectedDao={setSelectedDao}
+            setIsGovProposalSelected={setIsGovProposalSelected}
+            selectedDaoName={selectedDaoName}
+            setSelectedDaoName={setSelectedDaoName}
+          />
         ) : (
-          <Spinner color="red.500" />
+          <></>
         )}
-      </ul>
-    </Fragment>
+        <Flex height={"10px"} />
+        <NavBarButton
+          width="180px"
+          height="42px"
+          text={isGovProposalSelected ? "Create DAO" : "New DAO"}
+          marginLeft="10px"
+          marginRight="10px"
+          disabled={false}
+          onClick={() => {}}
+        />
+        <Spacer />
+        <NavBarButton
+          width="180px"
+          height="42px"
+          text="DAO Proposal"
+          marginLeft="10px"
+          marginRight="10px"
+          disabled={false}
+          onClick={() => {}}
+        />
+        <NavBarButton
+          width="180px"
+          height="42px"
+          text="GOV Proposal"
+          marginLeft="10px"
+          marginRight="10px"
+          disabled={false}
+          onClick={() => {}}
+        />
+        <Flex height={"10px"} />
+      </VStack>
+      {isGovProposalSelected ? (
+        <GovernanceProposal />
+      ) : (
+        <DaoProposal daoAddress={selectedDao} daoName={selectedDaoName} />
+      )}
+    </Flex>
   );
 }
 
-const timestampToDate = (timestamp: number) => {
-  return (
-    new Date(timestamp * 1000)
-      .toLocaleDateString("default", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      })
-      .toUpperCase() +
-    " " +
-    new Date(timestamp * 1000).toLocaleTimeString()
-  );
-};
+export const MyDaosList = ({
+  daos,
+  setIsGovProposalSelected,
+  selectedDao,
+  setSelectedDao,
+  selectedDaoName,
+  setSelectedDaoName,
+}: {
+  daos: any;
+  setIsGovProposalSelected: Function;
+  selectedDao: string;
+  setSelectedDao: Function;
+  selectedDaoName: string;
+  setSelectedDaoName: Function;
+}) => {
+  const chainContext = useChain(chainName);
+  const { address } = chainContext;
+  const daosJSON = JSON.parse(daos);
 
-const secondsToDays = (seconds: number) => {
-  const day_count = Math.ceil(seconds / 86400);
-  return `${Math.ceil(seconds / 86400).toString()} ${day_count === 1 ? "day" : "days"}`;
+  if (!daosJSON[address as string]) {
+    return <></>;
+  } else if (Array.from(daosJSON[address as string]).length === 0) {
+    return <></>;
+  } else {
+    const daoItems = daosJSON[address as string].map(
+      (dao: { name: any; address: any }) => (
+        <NavBarItem
+          key={dao.name}
+          text={dao.name}
+          isSelected={selectedDao === dao.address ? true : false}
+          onClick={() => {
+            setIsGovProposalSelected(false);
+            setSelectedDao(dao.address);
+            setSelectedDaoName(dao.name);
+          }}
+        />
+      )
+    );
+    return <ul>{daoItems}</ul>;
+  }
 };

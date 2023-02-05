@@ -5,3 +5,6 @@ export * from './wallet-connect';
 export * from './warn-block';
 export * from './user-card';
 export * from './address-card';
+export * from './gov-header';
+export * from './jmes-logo';
+export * from './chain-card';
