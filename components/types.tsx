@@ -80,6 +80,11 @@ export interface FeatureProps {
   href: string;
 }
 
+export interface ChainCardProps {
+  prettyName: string;
+  icon?: string;
+}
+
 export interface DAOItemProps {
   name: string | null | undefined;
   address: string;

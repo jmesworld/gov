@@ -1,13 +1,16 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-import { WalletProvider } from "@cosmos-kit/react";
+import { ChainProvider } from "@cosmos-kit/react";
 import { ChakraProvider, useQuery } from "@chakra-ui/react";
 import { defaultTheme } from "../config";
-import { wallets } from "@cosmos-kit/keplr";
+import { wallets as keplrWallets } from '@cosmos-kit/keplr';
 import { SignerOptions } from "@cosmos-kit/core";
-import { chains, assets } from "chain-registry";
+import { assets } from "chain-registry";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { Chain } from '@chain-registry/types';
+import jmesTestnet888 from '../config/chains/jmes-testnet-888/chain.json';
+
+const chains: Chain[] = [ jmesTestnet888 ]
 
 function CreateCosmosApp({ Component, pageProps }: AppProps) {
   const signerOptions: SignerOptions = {
@@ -20,14 +23,14 @@ function CreateCosmosApp({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <ChakraProvider theme={defaultTheme}>
-        <WalletProvider
+        <ChainProvider
           chains={chains}
           assetLists={assets}
-          wallets={wallets}
+          wallets={[...keplrWallets]}
           signerOptions={signerOptions}
         >
           <Component {...pageProps} />
-        </WalletProvider>
+        </ChainProvider>
       </ChakraProvider>
     </QueryClientProvider>
   );

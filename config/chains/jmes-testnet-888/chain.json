@@ -1,0 +1,83 @@
+{
+  "$schema": "../chain.schema.json",
+  "chain_name": "JMES Testnet 888",
+  "status": "live",
+  "network_type": "testnet",
+  "website": "https://www.jmes.cloud/",
+  "pretty_name": "JMES Testnet 888",
+  "chain_id": "jmes-888",
+  "daemon_name": "jmesd",
+  "node_home": "$HOME/.jmes",
+  "bech32_prefix": "jmes",
+  "slip44": 6280,
+  "fees": {
+    "fee_tokens": [
+      {
+        "denom": "ujmes",
+        "fixed_min_gas_price": 0.0125,
+        "low_gas_price": 0.0125,
+        "average_gas_price": 0.015,
+        "high_gas_price": 0.15
+      }
+    ]
+  },
+  "staking": {
+    "staking_tokens": [
+      {
+        "denom": "ujmes"
+      }
+    ]
+  },
+  "codebase": {
+    "git_repo": "https://github.com/jmesworld/core/",
+    "recommended_version": "v2.2.0",
+    "compatible_versions": ["v2.2.0"],
+    "binaries": {
+      "linux/amd64": "https://github.com/terra-money/core/releases/download/v2.2.0/terra_2.2.0_Linux_x86_64.tar.gz",
+      "darwin/amd64": "https://github.com/terra-money/core/releases/download/v2.2.0/terra_2.2.0_Darwin_x86_64.tar.gz"
+    },
+    "genesis": {
+      "genesis_url": "http://http://51.38.52.37:1889/genesis.json"
+    }
+  },
+  "peers": {
+    "seeds": [],
+    "persistent_peers": [
+      {
+        "id": "24ef20ecc3fc8c34755fad4af92c67eaf6a7b795",
+        "address": "164.90.208.140:26656"
+      },
+      {
+        "id": "c3fa45f72c551a115dce166b77efb297e7d0a864",
+        "address": "http://51.38.52.37:26656"
+      }
+    ]
+  },
+  "apis": {
+    "rpc": [
+      {
+        "address": "http://51.38.52.37:1889",
+        "provider": "devnode"
+      }
+    ],
+    "rest": [
+      {
+        "address": "http://51.38.52.37:1889",
+        "provider": "devnode"
+      }
+    ],
+    "grpc": [
+      {
+        "address": "http://51.38.52.37:9090",
+        "provider": "devnode"
+      }
+    ]
+  },
+  "explorers": [
+    {
+      "kind": "finder",
+      "url": "http://explorer.jmes.cloud/",
+      "tx_page": "http://explorer.jmes.cloud/transactions/${txHash}"
+    }
+  ]
+}
