@@ -1,10 +1,11 @@
 import { DAOItemProps } from "../types";
 import { Box, Divider, Flex, Link, Spinner, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useWallet } from "@cosmos-kit/react";
+import { useChain } from "@cosmos-kit/react";
+import { chainName } from "../../config/defaults";
 
 export const DAOList = ({ daos }: any) => {
-  const walletManager = useWallet();
+  const walletManager = useChain(chainName);
   const { address } = walletManager;
   const daosJSON = JSON.parse(daos);
 

@@ -251,11 +251,10 @@ export interface GovernanceProposeMutation {
 export function useGovernanceProposeMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, GovernanceProposeMutation>, "mutationFn">) {
   return useMutation<ExecuteResult, Error, GovernanceProposeMutation>(({
     client,
-    msg,
     args: {
       fee,
       memo,
       funds
     } = {}
-  }) => client.propose(msg, fee, memo, funds), options);
+  }) => client.propose(fee, memo, funds), options);
 }
