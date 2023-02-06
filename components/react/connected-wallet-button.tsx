@@ -13,11 +13,12 @@ import {
   MenuList,
   Spacer,
 } from "@chakra-ui/react";
-import { useWallet } from "@cosmos-kit/react";
+import { useChain } from "@cosmos-kit/react";
+import { chainName } from "../../config/defaults";
 
 export const ConnectedWalletButton = ({identityName}: {identityName: string}) => {
-  const walletManager = useWallet();
-  const { address, disconnect } = walletManager;
+  const chainContext = useChain(chainName);
+  const { address, disconnect } = chainContext;
   return (
     <Menu>
       {({ isOpen }) => (

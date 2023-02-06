@@ -240,13 +240,12 @@ export interface BjmesTokenUploadLogoMutation {
 export function useBjmesTokenUploadLogoMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, BjmesTokenUploadLogoMutation>, "mutationFn">) {
   return useMutation<ExecuteResult, Error, BjmesTokenUploadLogoMutation>(({
     client,
-    msg,
     args: {
       fee,
       memo,
       funds
     } = {}
-  }) => client.uploadLogo(msg, fee, memo, funds), options);
+  }) => client.uploadLogo(fee, memo, funds), options);
 }
 export interface BjmesTokenUpdateMarketingMutation {
   client: BjmesTokenClient;

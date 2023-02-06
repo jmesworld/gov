@@ -4,15 +4,15 @@
 * and run the @cosmwasm/ts-codegen generate command to regenerate this file.
 */
 
-import * as _0 from "./ArtNft.types";
-import * as _1 from "./ArtNft.client";
-import * as _2 from "./ArtNft.react-query";
-import * as _3 from "./ArtistCurator.types";
-import * as _4 from "./ArtistCurator.client";
-import * as _5 from "./ArtistCurator.react-query";
-import * as _6 from "./ArtistNft.types";
-import * as _7 from "./ArtistNft.client";
-import * as _8 from "./ArtistNft.react-query";
+// import * as _0 from "./ArtNft.types";
+// import * as _1 from "./ArtNft.client";
+// import * as _2 from "./ArtNft.react-query";
+// import * as _3 from "./ArtistCurator.types";
+// import * as _4 from "./ArtistCurator.client";
+// import * as _5 from "./ArtistCurator.react-query";
+// import * as _6 from "./ArtistNft.types";
+// import * as _7 from "./ArtistNft.client";
+// import * as _8 from "./ArtistNft.react-query";
 import * as _9 from "./BjmesToken.types";
 import * as _10 from "./BjmesToken.client";
 import * as _11 from "./BjmesToken.react-query";
@@ -32,18 +32,18 @@ import * as _24 from "./Identityservice.types";
 import * as _25 from "./Identityservice.client";
 import * as _26 from "./Identityservice.react-query";
 export namespace contracts {
-  export const ArtNft = { ..._0,
-    ..._1,
-    ..._2
-  };
-  export const ArtistCurator = { ..._3,
-    ..._4,
-    ..._5
-  };
-  export const ArtistNft = { ..._6,
-    ..._7,
-    ..._8
-  };
+  // export const ArtNft = { ..._0,
+  //   ..._1,
+  //   ..._2
+  // };
+  // export const ArtistCurator = { ..._3,
+  //   ..._4,
+  //   ..._5
+  // };
+  // export const ArtistNft = { ..._6,
+  //   ..._7,
+  //   ..._8
+  // };
   export const BjmesToken = { ..._9,
     ..._10,
     ..._11

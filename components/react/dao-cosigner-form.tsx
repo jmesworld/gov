@@ -1,15 +1,19 @@
 import { DAOCosigner } from "../types";
 import { Grid, Text, Input, Flex, Button } from "@chakra-ui/react";
-import { useState } from "react";
-import { LCDClient } from "@terra-money/terra.js";
+import { useEffect, useState } from "react";
 import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
 import { useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { useChain } from "@cosmos-kit/react";
+import { chainName } from "../../config/defaults";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
+
+let cosmWasmClient: CosmWasmClient;
 
 export const DAOCosignerForm = ({
   cosigners,
@@ -29,6 +33,10 @@ export const DAOCosignerForm = ({
   setCosignersTotalWeight: any;
   setIdNamesValid: any;
 }) => {
+  const chainContext = useChain(chainName);
+  const { status, address, getCosmWasmClient, getSigningCosmWasmClient } =
+    chainContext;
+
   let ownerData: DAOCosigner = {
     name: owner.name,
     id: 0,
@@ -41,9 +49,14 @@ export const DAOCosignerForm = ({
     chainID: CHAIN_ID,
   };
 
-  const lcdClient = new LCDClient(LCDOptions);
+  useEffect(() => {
+    const init = async () => {
+      cosmWasmClient = await getCosmWasmClient();
+    };
+    init().catch(console.error);
+  });
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
-    lcdClient,
+    cosmWasmClient,
     IDENTITY_SERVICE_CONTRACT
   );
 

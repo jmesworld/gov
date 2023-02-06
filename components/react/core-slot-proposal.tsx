@@ -12,11 +12,9 @@ import {
   Textarea,
   useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
-import { LCDClient } from "@terra-money/terra.js/dist/client/lcd/LCDClient";
+import { useEffect, useState } from "react";
 import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
-import { Extension, MsgExecuteContract } from "@terra-money/terra.js";
-import { useWallet } from "@cosmos-kit/react";
+import { useChain } from "@cosmos-kit/react";
 import {
   Coin,
   CoreSlot,
@@ -27,6 +25,13 @@ import * as DaoMultisig from "../../client/DaoMultisig.types";
 import { useMutation } from "@tanstack/react-query";
 import { DaoMultisigQueryClient } from "../../client/DaoMultisig.client";
 import { useIdentityserviceGetIdentityByNameQuery } from "../../client/Identityservice.react-query";
+import { chainName } from "../../config/defaults";
+import {
+  CosmWasmClient,
+  MsgExecuteContractEncodeObject,
+} from "@cosmjs/cosmwasm-stargate";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
+import { toHex, toUtf8 } from "@cosmjs/encoding";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -35,9 +40,12 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
+let cosmWasmClient: CosmWasmClient;
+
 export const CoreSlotProposal = ({ daoName }: { daoName: string }) => {
-  const walletManager = useWallet();
-  const { walletStatus, address } = walletManager;
+  const chainContext = useChain(chainName);
+  const { status, address, getCosmWasmClient, getSigningCosmWasmClient } =
+    chainContext;
   const toast = useToast();
 
   const [proposalTitle, setProposalTitle] = useState("");
@@ -48,9 +56,14 @@ export const CoreSlotProposal = ({ daoName }: { daoName: string }) => {
     URL: LCD_URL,
     chainID: CHAIN_ID,
   };
-  const lcdClient = new LCDClient(LCDOptions);
+  useEffect(() => {
+    const init = async () => {
+      cosmWasmClient = await getCosmWasmClient();
+    };
+    init().catch(console.error);
+  });
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
-    lcdClient,
+    cosmWasmClient,
     IDENTITY_SERVICE_CONTRACT
   );
 
@@ -60,7 +73,7 @@ export const CoreSlotProposal = ({ daoName }: { daoName: string }) => {
   });
 
   const daoMembersQueryClient = new DaoMultisigQueryClient(
-    lcdClient,
+    cosmWasmClient,
     daoNameUpdateMembersQuery.data?.identity?.owner as string
   );
 
@@ -106,25 +119,27 @@ export const CoreSlotProposal = ({ daoName }: { daoName: string }) => {
         },
       };
 
+      const signingCosmWasmClient = await getSigningCosmWasmClient();
+
       const dao_multisig_contract_addr =
         daoMembersQueryClient.contractAddress as string;
 
-      const ext = new Extension();
-      const execMsg = new MsgExecuteContract(
-        address as string,
-        dao_multisig_contract_addr,
-        msg
-      );
-      const txMsg = {
-        msgs: [execMsg.toJSON(false)],
+      const execMsg: MsgExecuteContractEncodeObject = {
+        typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
+        value: MsgExecuteContract.fromPartial({
+          sender: address,
+          contract: IDENTITY_SERVICE_CONTRACT,
+          msg: toUtf8(JSON.stringify(msg)),
+        }),
       };
 
-      const result = await ext.request(
-        "post",
-        JSON.parse(JSON.stringify(txMsg))
+      const result = await signingCosmWasmClient.signAndBroadcast(
+        address as string,
+        [execMsg],
+        "auto"
       );
-      const payload = JSON.parse(JSON.stringify(result.payload));
-      if (payload.success) {
+
+      if (result.code === 0) {
         setProposalDesc("");
         setProposalTitle("");
         toast({
@@ -137,7 +152,7 @@ export const CoreSlotProposal = ({ daoName }: { daoName: string }) => {
       } else {
         toast({
           title: "Proposal creation error.",
-          description: payload.error.message,
+          description: result.code,
           status: "error",
           duration: 9000,
           isClosable: true,
@@ -195,7 +210,7 @@ export const CoreSlotProposal = ({ daoName }: { daoName: string }) => {
             color="white"
             bgColor="primary.500"
             onClick={() => coreSlotProposalMutation.mutate()}
-            _hover={{bg:"primary.500"}}
+            _hover={{ bg: "primary.500" }}
           >
             {" "}
             Create Core Slot Proposal{" "}
