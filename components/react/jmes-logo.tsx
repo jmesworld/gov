@@ -7,7 +7,7 @@ export const JMESLogo = () => {
         alt="JMES"
         width={"83.37px"}
         height={"24px"}
-        padding={"0px"}
-      ></Image>
+        marginLeft={"26px"}
+      />
   );
 };

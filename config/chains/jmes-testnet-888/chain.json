@@ -68,7 +68,7 @@
     ],
     "grpc": [
       {
-        "address": "http://51.38.52.37:9090",
+        "address": "http://51.38.52.37:1889",
         "provider": "devnode"
       }
     ]

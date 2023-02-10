@@ -24,6 +24,7 @@ import { ExecuteMsg } from "../../client/Identityservice.types";
 import { chainName } from "../../config/defaults";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { toHex, toUtf8 } from "@cosmjs/encoding";
+import { StdFee } from "@cosmjs/stargate";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -104,7 +105,7 @@ export default function IdentityInputSection() {
     };
     init().catch(console.error);
   });
-
+  // console.log(cosmWasmClient)
   const args = { owner: address ? address : "" };
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     cosmWasmClient,
@@ -118,6 +119,16 @@ export default function IdentityInputSection() {
     const contract = IDENTITY_SERVICE_CONTRACT;
 
     const msg: ExecuteMsg = { register_user: { name: identityName } };
+    const fee: StdFee = {
+      amount: [
+        {
+          denom: 'ujmes',
+          amount: '2000',
+        },
+      ],
+      gas: '1000000',
+    };
+
     const execMsg: MsgExecuteContractEncodeObject = {
       typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
       value: MsgExecuteContract.fromPartial({
@@ -131,8 +142,9 @@ export default function IdentityInputSection() {
       const result = await signingCosmWasmClient.signAndBroadcast(
         address as string,
         [execMsg],
-        "auto"
+        fee
       );
+
       if (result.code === 0) {
         toast({
           title: "Identity created.",

@@ -1,6 +1,7 @@
 import { DAOItemProps } from "../types";
 import {
   Box,
+  Button,
   Container,
   Divider,
   Flex,
@@ -8,6 +9,7 @@ import {
   Progress,
   ProgressLabel,
   Text,
+  Tooltip,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useEffect, useState } from "react";
@@ -59,9 +61,12 @@ export const ProposalList = ({
       const noVoters = proposal?.no_voters?.length;
       const totalVoters = isGov ? yesVoters + noVoters : 0;
 
-      const type = isGov
+      const propType = isGov
         ? JSON.stringify(proposal.prop_type).split(":")[0].slice(2)
         : "";
+      const type = isGov
+        ? propType.slice(0, propType.length - 1)
+        : proposal.description;
 
       return (
         <ProposalListItem
@@ -73,10 +78,7 @@ export const ProposalList = ({
           threshold={proposal.threshold?.absolute_percentage?.percentage}
           type={type}
           pass={
-            proposal.status === "success" ||
-            proposal.status === "success_concluded"
-              ? "Yes"
-              : "No"
+            'Yes'
           }
           isGov={isGov}
           daoAddress={daoAddress}
@@ -93,16 +95,15 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
   return (
     <Flex>
       <Text
-        color="#7453FD"
-        fontFamily={"DM Sans"}
+        color="rgba(15,0,86,0.8)"
         fontWeight="medium"
         fontSize={12}
         width={"151px"}
       >
-        {isGov ? "PROPOSALS" : "DAO PROPOSALS"}
+        {isGov ? "GOVERNANCE PROPOSALS" : "DAO PROPOSALS"}
       </Text>
       <Text
-        color="#7453FD"
+        color="rgba(15,0,86,0.8)"
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
@@ -112,7 +113,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         YES
       </Text>
       <Text
-        color="#7453FD"
+        color="rgba(15,0,86,0.8)"
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
@@ -122,7 +123,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         NO
       </Text>
       <Text
-        color="#7453FD"
+        color="rgba(15,0,86,0.8)"
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
@@ -132,14 +133,14 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         % TO PASS
       </Text>
       <Text
-        color="#7453FD"
+        color="rgba(15,0,86,0.8)"
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
         marginLeft={isGov ? "185px" : "158px"}
         width={"94px"}
       >
-        PASS
+        PASSING
       </Text>
     </Flex>
   );
@@ -231,8 +232,10 @@ export const ProposalListItem = ({
     ? votersQuery.data?.voters?.length
     : 0;
 
-  const yesPercent =
-    totalCount === 0 ? 0 : Math.ceil((yesCount / totalCount) * 100);
+  const yesPercentActual = yesCount !== 0 ? yesCount / totalCount : 0;
+  const noPercentActual = noCount !== 0 ? noCount / totalCount : 0;
+
+  const yesPercent = totalCount === 0 ? 0 : Math.floor(yesPercentActual * 100);
 
   const yes = totalCount === 0 ? "0%" : yesPercent.toString() + "%";
 
@@ -242,120 +245,144 @@ export const ProposalListItem = ({
 
   return (
     <>
-      <Box
+      <Flex
         height={"64px"}
         width={isGov ? "1137px" : "836px"}
-        backgroundColor="#704FF7"
+        backgroundColor="purple"
         borderRadius={12}
+        alignItems={"center"}
       >
-        <Flex paddingTop={"9px"}>
-          <Text
-            width={isGov ? "281px" : "268px"}
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={18}
-            marginLeft={"14px"}
-          >
-            {title}
-          </Text>
-          <Text
-            width={"60px"}
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={18}
-            marginLeft={isGov ? "137px" : "0px"}
-          >
-            {yes}
-          </Text>
-          <Text
-            width={"60px"}
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={18}
-            marginLeft={isGov ? "93px" : "62px"}
-          >
-            {no}
-          </Text>
-          <Text
-            width={"87px"}
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={18}
-            marginLeft={isGov ? "103px" : "57px"}
-          >
-            {threshold?.toString() + "%"}
-          </Text>
-          <Text
-            width={"44px"}
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={18}
-            marginLeft={isGov ? "192px" : "164px"}
-          >
+        <Box>
+          <Flex width={"100%"}>
+            <Text
+              width={isGov ? "281px" : "268px"}
+              color="white"
+              fontFamily={"DM Sans"}
+              fontWeight="normal"
+              fontSize={18}
+              marginLeft={"14px"}
+            >
+              {title.length > 20 ? title.substring(0, 20) + "..." : title}
+            </Text>
+            <Tooltip
+              hasArrow={true}
+              label={`${roundNumber(yesPercentActual * 100)}%`}
+              bg={"midnight"}
+              color={"white"}
+              direction={"rtl"}
+            >
+              <Text
+                width={"60px"}
+                color="white"
+                fontFamily={"DM Sans"}
+                fontWeight="normal"
+                fontSize={18}
+                marginLeft={isGov ? "137px" : "0px"}
+              >
+                {yes}
+              </Text>
+            </Tooltip>
+            <Tooltip
+              hasArrow={true}
+              label={`${roundNumber(noPercentActual * 100)}%`}
+              bg={"midnight"}
+              color={"white"}
+              direction={"rtl"}
+            >
+              <Text
+                width={"60px"}
+                color="white"
+                fontFamily={"DM Sans"}
+                fontWeight="normal"
+                fontSize={18}
+                marginLeft={isGov ? "93px" : "62px"}
+              >
+                {no}
+              </Text>
+            </Tooltip>
+            <Text
+              width={"87px"}
+              color="white"
+              fontFamily={"DM Sans"}
+              fontWeight="normal"
+              fontSize={18}
+              marginLeft={isGov ? "103px" : "57px"}
+            >
+              {threshold?.toString() + "%"}
+            </Text>
+          </Flex>
+
+          <Flex alignItems={"center"}>
+            <Text
+              width={isGov ? "281px" : "268px"}
+              color="white"
+              fontFamily={"DM Sans"}
+              fontWeight="normal"
+              fontSize={14}
+              marginLeft={"14px"}
+              opacity={"70%"}
+            >
+              {type.length > 26 ? title.substring(0, 26) + "..." : type}
+            </Text>
+
+            <Box
+              width={"9px"}
+              height={"9px"}
+              backgroundColor="#68FFF1"
+              marginLeft={isGov ? "137px" : "0px"}
+              borderRadius={90}
+            />
+            <Text
+              color="white"
+              fontFamily={"DM Sans"}
+              fontWeight="normal"
+              fontSize={14}
+              marginLeft={"6px"}
+              opacity={"70%"}
+              width={"65px"}
+            >
+              {yesCount < 99 ? `${yesCount} votes` : `99+ votes`}
+            </Text>
+
+            <Box
+              alignSelf={"center"}
+              width={"9px"}
+              height={"9px"}
+              backgroundColor="#FF5876"
+              marginLeft={isGov ? "73px" : "42px"}
+              borderRadius={90}
+            />
+            <Text
+              color="white"
+              fontFamily={"DM Sans"}
+              fontWeight="normal"
+              fontSize={14}
+              marginLeft={"6px"}
+              opacity={"70%"}
+              width={"65px"}
+              marginRight={isGov ? "82px" : "36px"}
+            >
+              {noCount < 99 ? `${noCount} votes` : `99+ votes`}
+            </Text>
+            <ProgressBar yesPercent={yesPercent} threshold={threshold} />
+          </Flex>
+        </Box>
+        <Button
+          variant={"outline"}
+          width={"64px"}
+          height={"24px"}
+          marginLeft={isGov ? "82px" : "45px"}
+          borderRadius={"90px"}
+          borderColor={pass === "Yes" ? "green" : "red"}
+          backgroundColor={"transparent"}
+          _hover={{ bg: "transparent" }}
+          _focus={{ bg: "transparent" }}
+        >
+          <Text color="white" fontWeight="normal" fontSize={14}>
             {pass}
           </Text>
-        </Flex>
-
-        <Flex alignItems={"center"}>
-          <Text
-            width={isGov ? "281px" : "268px"}
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={14}
-            marginLeft={"14px"}
-            opacity={"70%"}
-          >
-            {type.slice(0, type.length - 1)}
-          </Text>
-
-          <Box
-            width={"9px"}
-            height={"9px"}
-            backgroundColor="#68FFF1"
-            marginLeft={isGov ? "137px" : "0px"}
-            borderRadius={90}
-          />
-          <Text
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={14}
-            marginLeft={"6px"}
-            opacity={"70%"}
-            width={"60px"}
-          >
-            {`${yesCount} votes`}
-          </Text>
-
-          <Box
-            alignSelf={"center"}
-            width={"9px"}
-            height={"9px"}
-            backgroundColor="#FF5876"
-            marginLeft={isGov ? "78px" : "47px"}
-            borderRadius={90}
-          />
-          <Text
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={14}
-            marginLeft={"6px"}
-            opacity={"70%"}
-            width={"60px"}
-            marginRight={isGov ? "87px" : "41px"}
-          >
-            {`${noCount} votes`}
-          </Text>
-          <ProgressBar yesPercent={yesPercent} threshold={threshold} />
-        </Flex>
-      </Box>
+        </Button>
+      </Flex>
       <Box height={"7px"} />
     </>
   );
@@ -368,6 +395,7 @@ export const ProgressBar = ({
   yesPercent: number;
   threshold: number;
 }) => {
+  console.log(yesPercent)
   return (
     <Progress
       value={yesPercent}
@@ -375,7 +403,7 @@ export const ProgressBar = ({
       width={"191px"}
       height={"6px"}
       borderRadius={"10px"}
-      variant={yesPercent <= threshold ? "red" : "teal"}
+      variant={yesPercent <= threshold ? "red" : "green"}
     >
       <ProgressLabel marginLeft={threshold?.toString() + "%"} height={"8px"}>
         <Flex
@@ -392,3 +420,6 @@ export const ProgressBar = ({
     </Progress>
   );
 };
+
+export const roundNumber = (num: number) =>
+  Math.round((num + Number.EPSILON) * 100) / 100;
