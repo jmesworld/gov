@@ -78,7 +78,10 @@ export const ProposalList = ({
           threshold={proposal.threshold?.absolute_percentage?.percentage}
           type={type}
           pass={
-            'Yes'
+            proposal.status === "success" ||
+            proposal.status === "success_concluded"
+              ? "Yes"
+              : "No"
           }
           isGov={isGov}
           daoAddress={daoAddress}
@@ -395,7 +398,7 @@ export const ProgressBar = ({
   yesPercent: number;
   threshold: number;
 }) => {
-  console.log(yesPercent)
+  console.log(yesPercent);
   return (
     <Progress
       value={yesPercent}

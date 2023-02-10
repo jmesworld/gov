@@ -75,7 +75,7 @@ export function ConnectedWalletButton() {
     client: bjmesTokenQueryClient,
     args: { address: address as string },
     options: {
-      refetchInterval: 60000,
+      refetchInterval: 10,
     },
   });
 
