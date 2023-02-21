@@ -21,7 +21,7 @@
     "@cosmos-kit/cosmostation": "0.14.18",
     "@cosmos-kit/keplr": "0.32.18",
     "@cosmos-kit/leap": "0.13.18",
-    "@cosmos-kit/react": "1.0.1",
+    "@cosmos-kit/react": "^1.0.13",
     "@emotion/react": "11.10.5",
     "@emotion/styled": "11.10.5",
     "@tanstack/react-query": "^4.13.0",
