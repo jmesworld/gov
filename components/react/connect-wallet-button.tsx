@@ -13,11 +13,14 @@ import { useChain } from "@cosmos-kit/react";
 import { MouseEventHandler } from "react";
 import { chainName } from "../../config/defaults";
 
-export const ConnectButton = () => {
-  const { connect } = useChain(chainName);
+export const ConnectButton = ({
+  connectWallet,
+}: {
+  connectWallet: Function;
+}) => {
   return (
     <Button
-      onClick={() => connect()}
+      onClick={() => connectWallet()}
       backgroundColor={"green"}
       borderRadius={90}
       alignContent="end"

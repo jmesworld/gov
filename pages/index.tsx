@@ -11,30 +11,33 @@ import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { useEffect, useState } from "react";
 import { Ordering } from "../client/Identityservice.types";
 import { useMyDaosList } from "../hooks/useMyDaosList";
-import { NavBarItem } from "../components/react/navigation-item";
 import { DaoProposal } from "../components/DaoProposal";
 import GovernanceProposal from "./GovernanceProposal";
-import { NavBarButton } from "../components/react/navbar-button";
-import { JMESLogo } from "../components";
 import { WalletStatus } from "@cosmos-kit/core";
+import { JMESLogo } from "../components/react";
+import { NavBarItem } from "../components/react/navigation-item";
+import { NavBarButton } from "../components/react/navbar-button";
+import { BjmesTokenQueryClient } from "../client/BjmesToken.client";
+import { useBjmesTokenBalanceQuery } from "../client/BjmesToken.react-query";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
-const NEXT_PUBLIC_BJMES_TOKEN_CONTRACT = process.env
+const BJMES_TOKEN_CONTRACT = process.env
   .NEXT_PUBLIC_BJMES_TOKEN_CONTRACT as string;
 
 export default function Home() {
-  const { address, status, isWalletConnected, getCosmWasmClient } =
-    useChain(chainName);
+  const { address, status, getCosmWasmClient } = useChain(chainName);
 
   const [isGovProposalSelected, setIsGovProposalSelected] = useState(true);
   const [selectedDao, setSelectedDao] = useState("");
   const [selectedDaoName, setSelectedDaoName] = useState("");
   const [isNewDataUpdated, setDataUpdated] = useState(false);
-
   const [viewDimension, setViewDimension] = useState(Array());
+  const [identityBalance, setIdentityBalance] = useState("");
+  const [identityName, setIdentityName] = useState("");
+
   useEffect(() => {
     const { innerHeight, innerWidth } = window;
     setViewDimension([innerWidth, innerHeight]);
@@ -59,6 +62,39 @@ export default function Home() {
     cosmWasmClient as CosmWasmClient,
     setDataUpdated
   );
+
+  const identityserviceQueryClient: IdentityserviceQueryClient =
+    new IdentityserviceQueryClient(
+      cosmWasmClient as CosmWasmClient,
+      IDENTITY_SERVICE_CONTRACT
+    );
+  const bjmesTokenQueryClient: BjmesTokenQueryClient =
+    new BjmesTokenQueryClient(
+      cosmWasmClient as CosmWasmClient,
+      BJMES_TOKEN_CONTRACT
+    );
+
+  const identityOwnerQuery = useIdentityserviceGetIdentityByOwnerQuery({
+    client: identityserviceQueryClient,
+    args: { owner: address ? address : "" },
+    options: {
+      refetchInterval: 10,
+      onSuccess: (data) => {
+        setIdentityName(data?.identity?.name as string);
+      },
+    },
+  });
+
+  const identityOwnerBalanceQuery = useBjmesTokenBalanceQuery({
+    client: bjmesTokenQueryClient,
+    args: { address: address as string },
+    options: {
+      //  refetchInterval: 10,
+      onSuccess: (data) => {
+        setIdentityBalance(data?.balance as string);
+      },
+    },
+  });
 
   return (
     <Container
@@ -170,9 +206,17 @@ export default function Home() {
           <Flex height={"10px"} />
         </VStack>
         {isGovProposalSelected ? (
-          <GovernanceProposal />
+          <GovernanceProposal
+            identityName={identityName}
+            identityBalance={identityBalance}
+          />
         ) : (
-          <DaoProposal daoAddress={selectedDao} daoName={selectedDaoName} />
+          <DaoProposal
+            daoAddress={selectedDao}
+            daoName={selectedDaoName}
+            identityName={identityName}
+            identityBalance={identityBalance}
+          />
         )}
       </Flex>
     </Container>

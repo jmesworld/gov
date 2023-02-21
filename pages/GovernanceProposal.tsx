@@ -20,7 +20,13 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
-export default function GovernanceProposal() {
+export default function GovernanceProposal({
+  identityName,
+  identityBalance,
+}: {
+  identityName: string;
+  identityBalance: string;
+}) {
   const { address, status, getCosmWasmClient } = useChain(chainName);
 
   const [viewDimension, setViewDimension] = useState(Array());
@@ -85,7 +91,10 @@ export default function GovernanceProposal() {
       <Flex width={"100%"}>
         <PeriodInfo />
         <Spacer />
-        <ConnectWalletSection />
+        <ConnectWalletSection
+          identityName={identityName}
+          identityBalance={identityBalance}
+        />
       </Flex>
       <Flex height={"35px"} />
       <GovHeader />

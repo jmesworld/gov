@@ -3,10 +3,7 @@ import {
   Flex,
   Text,
   Image,
-  Box,
-  background,
   Button,
-  VStack,
   Menu,
   MenuButton,
   MenuItem,
@@ -14,74 +11,18 @@ import {
   Spacer,
   Divider,
 } from "@chakra-ui/react";
-import {
-  CosmWasmClient,
-  SigningCosmWasmClient,
-} from "@cosmjs/cosmwasm-stargate";
-import { StdFee } from "@cosmjs/stargate";
 import { useChain } from "@cosmos-kit/react";
-import { useEffect, useState } from "react";
-import { BjmesTokenQueryClient } from "../../client/BjmesToken.client";
-import { useBjmesTokenBalanceQuery } from "../../client/BjmesToken.react-query";
-import { DaoMultisigClient } from "../../client/DaoMultisig.client";
-import { GovernanceClient } from "../../client/Governance.client";
-import {
-  IdentityserviceClient,
-  IdentityserviceQueryClient,
-} from "../../client/Identityservice.client";
-import { useIdentityserviceGetIdentityByOwnerQuery } from "../../client/Identityservice.react-query";
 import { chainName } from "../../config/defaults";
 
-const IDENTITY_SERVICE_CONTRACT = process.env
-  .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
-const BJMES_TOKEN_CONTRACT = process.env
-  .NEXT_PUBLIC_BJMES_TOKEN_CONTRACT as string;
-
-export function ConnectedWalletButton() {
+export const ConnectedWalletButton = ({
+  identityName,
+  identityBalance,
+}: {
+  identityName: string;
+  identityBalance: string;
+}) => {
   const { address, disconnect, getCosmWasmClient, getSigningCosmWasmClient } =
     useChain(chainName);
-
-  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-    null
-  );
-  useEffect(() => {
-    getCosmWasmClient()
-      .then((cosmWasmClient) => {
-        if (!cosmWasmClient || !address) {
-          return;
-        }
-        setCosmWasmClient(cosmWasmClient);
-      })
-      .catch((error) => console.log(error));
-  }, [address, getCosmWasmClient]);
-
-  const identityserviceQueryClient: IdentityserviceQueryClient =
-    new IdentityserviceQueryClient(
-      cosmWasmClient as CosmWasmClient,
-      IDENTITY_SERVICE_CONTRACT
-    );
-  const bjmesTokenQueryClient: BjmesTokenQueryClient =
-    new BjmesTokenQueryClient(
-      cosmWasmClient as CosmWasmClient,
-      BJMES_TOKEN_CONTRACT
-    );
-
-  const identityOwnerQuery = useIdentityserviceGetIdentityByOwnerQuery({
-    client: identityserviceQueryClient,
-    args: { owner: address ? address : "" },
-  });
-
-  const identityOwnerBalanceQuery = useBjmesTokenBalanceQuery({
-    client: bjmesTokenQueryClient,
-    args: { address: address as string },
-    options: {
-      refetchInterval: 10,
-    },
-  });
-
-  const identityName = identityOwnerQuery?.data?.identity?.name as string;
-  const identityBalance = identityOwnerBalanceQuery?.data?.balance as string;
-
   return (
     <Menu>
       {({ isOpen }) => (
@@ -136,13 +77,14 @@ export function ConnectedWalletButton() {
                 alt="JMES Icon"
                 width={"9px"}
                 height={"10.98px"}
-              ></Image>
+              />
               <Text
                 color="midnight"
                 fontWeight="medium"
                 fontSize={14}
                 marginLeft={"6px"}
                 marginRight={"6px"}
+                noOfLines={1}
               >{`${!!identityBalance ? identityBalance : ""}`}</Text>
             </Flex>
           </MenuButton>
@@ -191,4 +133,4 @@ export function ConnectedWalletButton() {
       )}
     </Menu>
   );
-}
+};

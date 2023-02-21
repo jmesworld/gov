@@ -1,4 +1,14 @@
-import { Box, Divider, Text } from "@chakra-ui/react";
+import { QuestionOutlineIcon } from "@chakra-ui/icons";
+import {
+  Box,
+  Center,
+  CircularProgress,
+  CircularProgressLabel,
+  Divider,
+  Flex,
+  Text,
+  Tooltip,
+} from "@chakra-ui/react";
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { useChain } from "@cosmos-kit/react";
 import { useEffect } from "react";
@@ -7,6 +17,9 @@ import { useDaoMultisigListVotersQuery } from "../../client/DaoMultisig.react-qu
 import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
 import { useIdentityserviceGetIdentityByOwnerQuery } from "../../client/Identityservice.react-query";
 import { chainName } from "../../config/defaults";
+
+const tooltip_text =
+  "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -24,10 +37,7 @@ const LCDOptions = {
 
 export const DaoMembersList = ({ daoAddress }: { daoAddress: string }) => {
   const chainContext = useChain(chainName);
-  const {
-    getCosmWasmClient,
-    getSigningCosmWasmClient,
-  } = chainContext;
+  const { getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
 
   useEffect(() => {
     const init = async () => {
@@ -47,15 +57,35 @@ export const DaoMembersList = ({ daoAddress }: { daoAddress: string }) => {
   });
 
   return (
-    <Box>
-      <Text
-        color="#7453FD"
-        fontFamily={"DM Sans"}
-        fontWeight="medium"
-        fontSize={12}
-      >
-        DAO MEMBERS
-      </Text>
+    <Box width={"265px"}>
+      <Flex>
+        <Text
+          color="rgba(15,0,86,0.8)"
+          fontWeight="medium"
+          fontSize={12}
+          marginRight={"6px"}
+          marginBottom={"12px"}
+        >
+          DAO MEMBERS
+        </Text>
+        <Tooltip
+          hasArrow={true}
+          label={tooltip_text}
+          bg={"midnight"}
+          color={"white"}
+          direction={"rtl"}
+          placement={"top"}
+          borderRadius={"10px"}
+          width={"173px"}
+          height={"86px"}
+        >
+          <QuestionOutlineIcon
+            width={"16px"}
+            height={"16px"}
+            color={"rgba(0,0,0,0.4)"}
+          />
+        </Tooltip>
+      </Flex>
       <MembersList
         members={
           !!daoMembersListQuery.data ? daoMembersListQuery.data?.voters : []
@@ -66,17 +96,33 @@ export const DaoMembersList = ({ daoAddress }: { daoAddress: string }) => {
 };
 
 export const MembersList = ({ members }: { members: any }) => {
+  const totalWeight = members?.reduce(
+    (acc: any, o: any) => acc + parseInt(o.weight),
+    0
+  );
   const membersList = members?.map((member: any) => {
-    return <DaoMembersListItem key={member.addr} address={member.addr} />;
+    const weight = member.weight;
+    return (
+      <DaoMembersListItem
+        key={member.addr}
+        address={member.addr}
+        weightPercent={(weight / totalWeight) * 100}
+      />
+    );
   });
 
   return <ul>{membersList}</ul>;
 };
 
-export const DaoMembersListItem = ({ address }: { address: string }) => {
+export const DaoMembersListItem = ({
+  address,
+  weightPercent,
+}: {
+  address: string;
+  weightPercent: any;
+}) => {
   const chainContext = useChain(chainName);
-  const { getCosmWasmClient, getSigningCosmWasmClient } =
-    chainContext;
+  const { getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
 
   useEffect(() => {
     const init = async () => {
@@ -96,28 +142,60 @@ export const DaoMembersListItem = ({ address }: { address: string }) => {
   });
 
   return (
-    <Box width={"230px"} paddingTop={"14px"}>
-      <Text
-        color="#0F0056"
-        fontFamily={"DM Sans"}
-        fontWeight="medium"
-        fontSize={12}
+    <Flex
+      width={"265px"}
+      height={"54px"}
+      marginBottom={"6px"}
+      alignItems={"center"}
+    >
+      <Flex
+        width={"100%"}
+        height={"48px"}
+        borderColor={"rgba(116,83,256,0.3)"}
+        borderWidth={"1px"}
+        borderRadius={"90px"}
+        backgroundColor={"white"}
+        alignItems={"center"}
+        paddingLeft={"20px"}
       >
-        {identityQuery.data?.identity?.name}
-      </Text>
-      <Text
-        color="#0F0056"
-        fontFamily={"DM Sans"}
-        fontWeight="medium"
-        fontSize={12}
-        marginBottom={"14px"}
+        <Text color="purple" fontWeight="medium" fontSize={14}>
+          {identityQuery.data?.identity?.name}
+        </Text>
+      </Flex>
+      <span
+        style={{
+          zIndex: 99999,
+          position: "fixed",
+        }}
       >
-        {`${address.slice(0, 2)}...${address.slice(
-          address.length - 4,
-          address.length
-        )}`}
-      </Text>
-      <Divider borderColor={"grey"} orientation="horizontal" />
-    </Box>
+        <Flex
+          width={"54px"}
+          height={"54px"}
+          borderColor={"rgba(116,83,256,0.3)"}
+          borderWidth={"1px"}
+          borderRadius={"360px"}
+          backgroundColor={"white"}
+          marginLeft={"211px"}
+          justifyContent={"center"}
+        >
+          <Center>
+            <CircularProgress
+              value={weightPercent}
+              size={"44px"}
+              thickness={"8px"}
+              color={"#4FD1C5"}
+            >
+              <CircularProgressLabel
+                color="rgba(0,0,0,0.7)"
+                fontWeight="medium"
+                fontSize={14}
+              >
+                {weightPercent}%
+              </CircularProgressLabel>
+            </CircularProgress>
+          </Center>
+        </Flex>
+      </span>
+    </Flex>
   );
 };

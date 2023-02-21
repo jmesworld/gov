@@ -140,7 +140,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
-        marginLeft={isGov ? "185px" : "158px"}
+        marginLeft={isGov ? "185px" : "142px"}
         width={"94px"}
       >
         PASSING
@@ -175,7 +175,6 @@ export const ProposalListItem = ({
   const chainContext = useChain(chainName);
   const {
     address,
-    isWalletConnected,
     getCosmWasmClient,
     getSigningCosmWasmClient,
   } = chainContext;
@@ -273,6 +272,7 @@ export const ProposalListItem = ({
               bg={"midnight"}
               color={"white"}
               direction={"rtl"}
+              placement={'top'}
             >
               <Text
                 width={"60px"}
@@ -291,6 +291,7 @@ export const ProposalListItem = ({
               bg={"midnight"}
               color={"white"}
               direction={"rtl"}
+              placement={'top'}
             >
               <Text
                 width={"60px"}
@@ -398,7 +399,6 @@ export const ProgressBar = ({
   yesPercent: number;
   threshold: number;
 }) => {
-  console.log(yesPercent);
   return (
     <Progress
       value={yesPercent}

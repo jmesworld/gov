@@ -206,7 +206,7 @@ export default function IdentityInputSection() {
           onBlur={() => {
             identityNameQuery.refetch();
           }}
-        ></Input>
+        />
         <Spacer />
         <CreateIdentityButton onClick={() => identityMutation.mutate()} />
       </Flex>

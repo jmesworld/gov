@@ -37,6 +37,7 @@ import { useChain } from "@cosmos-kit/react";
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { ConnectButton } from "./react/connect-wallet-button";
 import PeriodInfo from "./react/period-info";
+import { ConnectWalletSection } from "./react/connect-wallet-section";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -50,9 +51,13 @@ let cosmWasmClient: CosmWasmClient;
 export const DaoProposal = ({
   daoAddress,
   daoName,
+  identityName,
+  identityBalance,
 }: {
   daoAddress: string;
   daoName: string;
+  identityName: string;
+  identityBalance: string;
 }) => {
   const chainContext = useChain(chainName);
   const { address, getCosmWasmClient } = chainContext;
@@ -120,15 +125,17 @@ export const DaoProposal = ({
       overflowY="scroll"
     >
       <Flex width={"100%"}>
-        <PeriodInfo/>
+        <PeriodInfo />
         <Spacer />
-        <ConnectButton />
+        <ConnectWalletSection
+          identityName={identityName}
+          identityBalance={identityBalance}
+        />
       </Flex>
       <Flex height={"47px"} />
       <Text
-        color={"#7453FD"}
+        color={"darkPurple"}
         fontWeight="bold"
-        fontFamily="DM Sans"
         fontSize={24}
       >
         {daoName}
