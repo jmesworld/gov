@@ -101,7 +101,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         color="rgba(15,0,86,0.8)"
         fontWeight="medium"
         fontSize={12}
-        width={"151px"}
+        width={isGov ? "227px" : "151px"}
       >
         {isGov ? "GOVERNANCE PROPOSALS" : "DAO PROPOSALS"}
       </Text>
@@ -110,7 +110,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
-        marginLeft={isGov ? "280px" : "131"}
+        marginLeft={isGov ? "204px" : "131"}
         width={"32px"}
       >
         YES
