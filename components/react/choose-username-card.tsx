@@ -124,6 +124,7 @@ export const ChooseUsernameCard = ({
           duration: 9000,
           isClosable: true,
         });
+        handleUpdateCard();
       } else {
         toast({
           title: "Identity creation error.",
@@ -245,7 +246,6 @@ export const ChooseUsernameCard = ({
           disabled={!identityName}
           onClick={() => {
             identityMutation.mutate();
-            handleUpdateCard();
           }}
           backgroundColor={"green"}
           borderRadius={90}
