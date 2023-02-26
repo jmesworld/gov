@@ -185,7 +185,7 @@ export default function Home() {
             width="180px"
             height="48px"
             text={"New DAO"}
-            disabled={false}
+            disabled={status !== WalletStatus.Connected}
             onClick={() => {}}
           />
           <Spacer />
