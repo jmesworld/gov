@@ -271,7 +271,8 @@ export const ProposalListItem = ({
               bg={"midnight"}
               color={"white"}
               direction={"rtl"}
-              placement={"top"}
+              placement={"right"}
+              borderRadius={"8px"}
             >
               <Text
                 width={"60px"}
