@@ -7,7 +7,7 @@ export const GovHeader = () => {
         color={"midnight"}
         fontWeight="bold"
         fontFamily="DM Sans"
-        fontSize={16}
+        fontSize={20}
       >
         Welcome to
       </Text>
@@ -15,7 +15,7 @@ export const GovHeader = () => {
         color={"purple"}
         fontWeight="normal"
         fontFamily="DM Sans"
-        fontSize={48}
+        fontSize={38}
       >
         JMES Governance
       </Text>

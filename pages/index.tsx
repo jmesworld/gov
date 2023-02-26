@@ -146,7 +146,7 @@ export default function Home() {
               setSelectedDaoName("");
             }}
           />
-          <Box height={"42px"} />
+          <Box height={"27px"} />
           <Flex
             width={"200px"}
             height={"42px"}
@@ -180,7 +180,7 @@ export default function Home() {
           ) : (
             <></>
           )}
-          <Flex height={"10px"} />
+          <Flex height={"20px"} />
           <NavBarButton
             width="180px"
             height="48px"

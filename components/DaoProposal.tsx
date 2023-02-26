@@ -133,11 +133,7 @@ export const DaoProposal = ({
         />
       </Flex>
       <Flex height={"47px"} />
-      <Text
-        color={"darkPurple"}
-        fontWeight="bold"
-        fontSize={24}
-      >
+      <Text color={"darkPurple"} fontWeight="bold" fontSize={28}>
         {daoName}
       </Text>
       <Flex height={"46px"} />
