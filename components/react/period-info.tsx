@@ -126,6 +126,7 @@ export default function PeriodInfo() {
                 <Text
                   fontWeight={"bold"}
                   fontSize={"14"}
+                  fontFamily="DM Sans"
                   color={current_period === "posting" ? "darkPurple" : "green"}
                   paddingRight={"10px"}
                 >
@@ -146,6 +147,7 @@ export default function PeriodInfo() {
                 <Text
                   fontWeight={"normal"}
                   fontSize={"14"}
+                  fontFamily="DM Sans"
                   color={current_period === "posting" ? "midnight" : "lilac"}
                   paddingLeft={"10px"}
                 >
@@ -170,7 +172,8 @@ export default function PeriodInfo() {
             <Flex width={"100%"} py={"5.3px"}>
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 Current Block
@@ -178,7 +181,8 @@ export default function PeriodInfo() {
               <Spacer />
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 {current_block}
@@ -194,7 +198,8 @@ export default function PeriodInfo() {
             <Flex width={"100%"} py={"5.3px"}>
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 Current Period
@@ -202,7 +207,8 @@ export default function PeriodInfo() {
               <Spacer />
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 {
@@ -221,7 +227,8 @@ export default function PeriodInfo() {
             <Flex width={"100%"} py={"5.3px"}>
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 Current Posting Start
@@ -229,7 +236,8 @@ export default function PeriodInfo() {
               <Spacer />
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 {timestampToDateTime(current_posting_start as number)}
@@ -245,7 +253,8 @@ export default function PeriodInfo() {
             <Flex width={"100%"} py={"5.3px"}>
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 Current Time in Cycle
@@ -253,7 +262,8 @@ export default function PeriodInfo() {
               <Spacer />
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 {current_time_in_cycle}
@@ -269,7 +279,8 @@ export default function PeriodInfo() {
             <Flex width={"100%"} py={"5.3px"}>
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 Current Voting Start
@@ -277,7 +288,8 @@ export default function PeriodInfo() {
               <Spacer />
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 {timestampToDateTime(current_voting_start as number)}
@@ -293,7 +305,8 @@ export default function PeriodInfo() {
             <Flex width={"100%"} py={"5.3px"}>
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 Current Voting End
@@ -301,7 +314,8 @@ export default function PeriodInfo() {
               <Spacer />
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 {timestampToDateTime(current_voting_end as number)}
@@ -317,7 +331,8 @@ export default function PeriodInfo() {
             <Flex width={"100%"} py={"5.3px"}>
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 Cycle Length
@@ -325,7 +340,8 @@ export default function PeriodInfo() {
               <Spacer />
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 {cycle_length}
@@ -341,7 +357,8 @@ export default function PeriodInfo() {
             <Flex width={"100%"} py={"5.3px"}>
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 Next Posting Start
@@ -349,7 +366,8 @@ export default function PeriodInfo() {
               <Spacer />
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 {timestampToDateTime(next_posting_start as number)}
@@ -365,7 +383,8 @@ export default function PeriodInfo() {
             <Flex width={"100%"} py={"5.3px"}>
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 Next Voting Start
@@ -373,7 +392,8 @@ export default function PeriodInfo() {
               <Spacer />
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 {timestampToDateTime(next_voting_start as number)}
@@ -389,7 +409,8 @@ export default function PeriodInfo() {
             <Flex width={"100%"} py={"5.3px"}>
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 Posting Period Length
@@ -397,7 +418,8 @@ export default function PeriodInfo() {
               <Spacer />
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 {posting_period_length}
@@ -413,7 +435,8 @@ export default function PeriodInfo() {
             <Flex width={"100%"} py={"5.3px"}>
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 Voting Posting Length
@@ -421,7 +444,8 @@ export default function PeriodInfo() {
               <Spacer />
               <Text
                 color={current_period === "posting" ? "darkPurple" : "white"}
-                fontWeight="medium"
+                fontWeight="normal"
+                fontFamily="DM Sans"
                 fontSize={12}
               >
                 {voting_period_length}
