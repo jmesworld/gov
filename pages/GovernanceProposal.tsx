@@ -100,7 +100,7 @@ export default function GovernanceProposal({
       <GovHeader />
       <Flex height={"46px"} />
       <ProposalHeader isGov={true} />
-      <Flex height={"17px"} />
+      <Flex height={"10px"} />
       {!!governanceProposalQuery.data ? (
         <ProposalList
           proposals={governanceProposalQuery?.data?.proposals}
