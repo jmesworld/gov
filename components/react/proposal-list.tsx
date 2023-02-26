@@ -371,16 +371,15 @@ export const ProposalListItem = ({
             <ProgressBar yesPercent={yesPercent} threshold={threshold} />
           </Flex>
         </Box>
-        <Button
-          variant={"outline"}
+        <Flex
           width={"64px"}
           height={"24px"}
           marginLeft={isGov ? "82px" : "45px"}
           borderRadius={"90px"}
+          borderWidth={"1px"}
           borderColor={pass === "Yes" ? "green" : "red"}
           backgroundColor={"transparent"}
-          _hover={{ bg: "transparent" }}
-          _focus={{ bg: "transparent" }}
+          justifyContent={"center"}
         >
           <Text
             color="white"
@@ -390,7 +389,7 @@ export const ProposalListItem = ({
           >
             {pass}
           </Text>
-        </Button>
+        </Flex>
       </Flex>
       <Box height={"7px"} />
     </>
