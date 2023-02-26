@@ -63,6 +63,7 @@ export const ConnectedWalletButton = ({
                 fontWeight="medium"
                 fontSize={14}
                 marginLeft={"6px"}
+                fontFamily="DM Sans"
               >{`${!!identityName ? identityName : ""}`}</Text>
               <Spacer />
               <Divider
@@ -85,6 +86,7 @@ export const ConnectedWalletButton = ({
                 marginLeft={"6px"}
                 marginRight={"6px"}
                 noOfLines={1}
+                fontFamily="DM Sans"
               >{`${!!identityBalance ? identityBalance : ""}`}</Text>
             </Flex>
           </MenuButton>
@@ -123,6 +125,7 @@ export const ConnectedWalletButton = ({
                   fontWeight="medium"
                   fontSize={14}
                   marginLeft={"6px"}
+                  fontFamily="DM Sans"
                 >
                   Disconnect
                 </Text>

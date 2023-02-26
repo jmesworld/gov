@@ -36,6 +36,7 @@ export const NavBarButton = ({
             fontWeight="medium"
             fontSize={14}
             marginLeft={"10px"}
+            fontFamily="DM Sans"
           >
             {text}
           </Text>

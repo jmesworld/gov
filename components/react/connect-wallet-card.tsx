@@ -61,6 +61,7 @@ export const ConnectWalletCard = ({
           fontSize={28}
           paddingBottom={"6px"}
           paddingTop={"29px"}
+          fontFamily="DM Sans"
         >
           Connect your JMES wallet
         </Text>
@@ -68,14 +69,24 @@ export const ConnectWalletCard = ({
       </Flex>
       <Flex>
         <Spacer />
-        <Text color={"white"} fontWeight={"normal"} fontSize={16}>
+        <Text
+          color={"white"}
+          fontWeight={"normal"}
+          fontSize={16}
+          fontFamily="DM Sans"
+        >
           Once you connect your wallet make sure you have
         </Text>
         <Spacer />
       </Flex>
       <Flex>
         <Spacer />
-        <Text color={"white"} fontWeight={"normal"} fontSize={16}>
+        <Text
+          color={"white"}
+          fontWeight={"normal"}
+          fontSize={16}
+          fontFamily="DM Sans"
+        >
           JMES tokens so you can create a JMES identity
         </Text>
         <Spacer />
@@ -87,6 +98,7 @@ export const ConnectWalletCard = ({
           fontWeight={"normal"}
           fontSize={16}
           paddingBottom={"6px"}
+          fontFamily="DM Sans"
         >
           and vote on Proposals.
         </Text>
@@ -104,7 +116,7 @@ export const ConnectWalletCard = ({
           width={"200px"}
           height={"48px"}
           _hover={{ bg: "green" }}
-          _active={{bg: 'green'}}
+          _active={{ bg: "green" }}
           variant={"outline"}
           borderWidth={"1px"}
           borderColor={"rgba(0,0,0,0.1)"}

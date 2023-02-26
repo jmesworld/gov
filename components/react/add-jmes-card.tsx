@@ -53,21 +53,37 @@ export const AddJMESCard = ({
       </Flex>
       <Flex>
         <Spacer />
-        <Text color={"white"} fontWeight={"bold"} fontSize={28} py={"6px"}>
+        <Text
+          color={"white"}
+          fontFamily="DM Sans"
+          fontWeight={"bold"}
+          fontSize={28}
+          py={"6px"}
+        >
           Add JMES to Keplr Wallet
         </Text>
         <Spacer />
       </Flex>
       <Flex>
         <Spacer />
-        <Text color={"white"} fontWeight={"normal"} fontSize={16}>
+        <Text
+          color={"white"}
+          fontFamily="DM Sans"
+          fontWeight={"normal"}
+          fontSize={16}
+        >
           Once you connect your wallet make sure you have
         </Text>
         <Spacer />
       </Flex>
       <Flex>
         <Spacer />
-        <Text color={"white"} fontWeight={"normal"} fontSize={16}>
+        <Text
+          color={"white"}
+          fontFamily="DM Sans"
+          fontWeight={"normal"}
+          fontSize={16}
+        >
           JMES tokens so you can create a JMES identity
         </Text>
         <Spacer />
@@ -77,6 +93,7 @@ export const AddJMESCard = ({
         <Text
           color={"white"}
           fontWeight={"normal"}
+          fontFamily="DM Sans"
           fontSize={16}
           paddingBottom={"6px"}
         >
@@ -94,7 +111,7 @@ export const AddJMESCard = ({
           width={"200px"}
           height={"48px"}
           _hover={{ bg: "green" }}
-          _active={{bg: 'green'}}
+          _active={{ bg: "green" }}
           variant={"outline"}
           borderWidth={"1px"}
           borderColor={"rgba(0,0,0,0.1)"}

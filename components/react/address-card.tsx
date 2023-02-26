@@ -37,6 +37,7 @@ export const ConnectedShowAddress = ({
         position="relative"
         fontSize={{ base: 'xs', md: 'sm' }}
         fontWeight="normal"
+        fontFamily="DM Sans"
         letterSpacing="0.4px"
         title={address}
         height="1.25em"

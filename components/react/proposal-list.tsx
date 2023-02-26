@@ -102,6 +102,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
       <Text
         color="rgba(15,0,86,0.8)"
         fontWeight="medium"
+        fontFamily="DM Sans"
         fontSize={12}
         width={isGov ? "227px" : "151px"}
       >
@@ -380,7 +381,12 @@ export const ProposalListItem = ({
           _hover={{ bg: "transparent" }}
           _focus={{ bg: "transparent" }}
         >
-          <Text color="white" fontWeight="normal" fontSize={14}>
+          <Text
+            color="white"
+            fontWeight="normal"
+            fontSize={14}
+            fontFamily="DM Sans"
+          >
             {pass}
           </Text>
         </Button>

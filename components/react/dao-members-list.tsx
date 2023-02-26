@@ -65,6 +65,7 @@ export const DaoMembersList = ({ daoAddress }: { daoAddress: string }) => {
           fontSize={12}
           marginRight={"6px"}
           marginBottom={"12px"}
+          fontFamily="DM Sans"
         >
           DAO MEMBERS
         </Text>
@@ -158,7 +159,12 @@ export const DaoMembersListItem = ({
         alignItems={"center"}
         paddingLeft={"20px"}
       >
-        <Text color="purple" fontWeight="medium" fontSize={14}>
+        <Text
+          color="purple"
+          fontWeight="medium"
+          fontSize={14}
+          fontFamily="DM Sans"
+        >
           {identityQuery.data?.identity?.name}
         </Text>
       </Flex>

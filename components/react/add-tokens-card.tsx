@@ -35,7 +35,7 @@ export const AddTokensCard = ({
   setCurrentCard: Function;
   setIsInitalizing: Function;
 }) => {
-  const toast = useToast()
+  const toast = useToast();
   const { address, disconnect, getCosmWasmClient } = useChain(chainName);
 
   const handleUpdateCard = () => {
@@ -114,6 +114,7 @@ export const AddTokensCard = ({
           color={"white"}
           fontWeight={"bold"}
           fontSize={28}
+          fontFamily="DM Sans"
           paddingBottom={"4px"}
           marginTop={"34px"}
         >
@@ -124,7 +125,12 @@ export const AddTokensCard = ({
       <Flex>
         <Spacer />
         <Box width={"151px"} paddingRight={"11px"}>
-          <Text color={"white"} fontWeight={"normal"} fontSize={12}>
+          <Text
+            color={"white"}
+            fontWeight={"normal"}
+            fontSize={12}
+            fontFamily="DM Sans"
+          >
             Balance
           </Text>
           <Flex
@@ -150,13 +156,19 @@ export const AddTokensCard = ({
               fontSize={18}
               marginLeft={"10.6px"}
               noOfLines={1}
+              fontFamily="DM Sans"
             >
               {`${!!identityBalance ? identityBalance : "loading..."}`}
             </Text>
           </Flex>
         </Box>
         <Box width={"279px"}>
-          <Text color={"white"} fontWeight={"normal"} fontSize={12}>
+          <Text
+            color={"white"}
+            fontWeight={"normal"}
+            fontSize={12}
+            fontFamily="DM Sans"
+          >
             Address
           </Text>
           <Flex
@@ -175,6 +187,7 @@ export const AddTokensCard = ({
               fontSize={18}
               marginLeft={"14px"}
               noOfLines={1}
+              fontFamily="DM Sans"
             >
               {`${address?.slice(0, 13)}...${address?.slice(
                 address.length - 4,
@@ -185,18 +198,18 @@ export const AddTokensCard = ({
               width={"24px"}
               height={"24px"}
               marginLeft={"14px"}
-              aria-label={''}
+              aria-label={""}
               backgroundColor={"transparent"}
               _hover={{ bg: "transparent" }}
               _active={{ bg: "transparent" }}
               onClick={() => {
                 navigator.clipboard.writeText(address as string);
                 toast({
-                  title: 'Copied to clipboard',
+                  title: "Copied to clipboard",
                   description: "",
-                  status: 'success',
+                  status: "success",
                   duration: 1000,
-                })
+                });
               }}
             >
               <CopyIcon
@@ -216,7 +229,7 @@ export const AddTokensCard = ({
           disabled={!identityOwnerBalanceQuery?.data}
           onClick={() => {
             disconnect();
-            setCurrentCard(null)
+            setCurrentCard(null);
           }}
           backgroundColor={"green"}
           borderRadius={90}

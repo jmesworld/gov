@@ -178,6 +178,7 @@ export const ChooseUsernameCard = ({
           fontWeight={"bold"}
           fontSize={28}
           marginTop={"4px"}
+          fontFamily="DM Sans"
         >
           Choose a username
         </Text>
