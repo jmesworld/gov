@@ -21,5 +21,5 @@ export const timestampToDateTime = (timestamp: number) => {
   const epoch = timestamp * 1000;
   const date = new Date(epoch).toLocaleDateString("us", formatDateOptions);
   const time = new Date(epoch).toLocaleTimeString("us", formatTimeOptions);
-  return `${date} ${time}`;
+  return `${date.toUpperCase()} ${time}`;
 };
