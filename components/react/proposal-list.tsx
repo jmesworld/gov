@@ -44,14 +44,16 @@ export const ProposalList = ({
     return (
       <Flex justifyContent="center" width="100%">
         <Text
-          color="#000000"
+          color="rgba(15,0,86,0.8)"
           fontFamily={"DM Sans"}
           fontWeight="normal"
+          fontStyle={"italic"}
           fontSize={14}
           marginTop={"24px"}
         >
-          {" "}
-          No proposal has been created yet{" "}
+          {`There are currently no ${
+            isGov ? "Governance" : "Dao"
+          } Proposals available to view`}
         </Text>
       </Flex>
     );
@@ -173,11 +175,7 @@ export const ProposalListItem = ({
   proposalId?: string;
 }) => {
   const chainContext = useChain(chainName);
-  const {
-    address,
-    getCosmWasmClient,
-    getSigningCosmWasmClient,
-  } = chainContext;
+  const { address, getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
 
   const LCDOptions = {
     URL: LCD_URL,
@@ -272,7 +270,7 @@ export const ProposalListItem = ({
               bg={"midnight"}
               color={"white"}
               direction={"rtl"}
-              placement={'top'}
+              placement={"top"}
             >
               <Text
                 width={"60px"}
@@ -291,7 +289,7 @@ export const ProposalListItem = ({
               bg={"midnight"}
               color={"white"}
               direction={"rtl"}
-              placement={'top'}
+              placement={"top"}
             >
               <Text
                 width={"60px"}
