@@ -19,6 +19,8 @@ import { NavBarItem } from "../components/react/navigation-item";
 import { NavBarButton } from "../components/react/navbar-button";
 import { BjmesTokenQueryClient } from "../client/BjmesToken.client";
 import { useBjmesTokenBalanceQuery } from "../client/BjmesToken.react-query";
+import { addJMEStoKeplr, checkJMESInKeplr } from "../actions/keplr";
+import { OnboardingModal } from "../components/react/onboarding-modal";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -30,6 +32,8 @@ const BJMES_TOKEN_CONTRACT = process.env
 export default function Home() {
   const { address, status, getCosmWasmClient } = useChain(chainName);
 
+  const [isJMESInKeplr, setJMESInKeplr] = useState(false);
+  const [isConnectButtonClicked, setConnectButtonClicked] = useState(false);
   const [isGovProposalSelected, setIsGovProposalSelected] = useState(true);
   const [selectedDao, setSelectedDao] = useState("");
   const [selectedDaoName, setSelectedDaoName] = useState("");
@@ -56,6 +60,12 @@ export default function Home() {
       })
       .catch((error) => console.log(error));
   }, [getCosmWasmClient]);
+
+  // useEffect(() => {
+  //   checkJMESInKeplr()
+  //     .then((val) => setJMESInKeplr(val))
+  //     .catch((error) => console.log(error));
+  // });
 
   const myDaos = useMyDaosList(
     address as string,
@@ -185,8 +195,10 @@ export default function Home() {
             width="180px"
             height="48px"
             text={"New DAO"}
-            disabled={status !== WalletStatus.Connected}
-            onClick={() => {}}
+            disabled={false}
+            onClick={() => {
+              setConnectButtonClicked(true);
+            }}
           />
           <Spacer />
           <NavBarButton
@@ -218,6 +230,14 @@ export default function Home() {
             identityBalance={identityBalance}
           />
         )}
+        <OnboardingModal
+          isConnectButtonClicked={isConnectButtonClicked}
+          setConnectButtonClicked={setConnectButtonClicked}
+          isJMESInKeplr={isJMESInKeplr}
+          identityBalance={identityBalance}
+          identityName={identityName}
+          walletStatus={status}
+        />
       </Flex>
     </Container>
   );
