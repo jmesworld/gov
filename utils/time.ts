@@ -21,5 +21,6 @@ export const timestampToDateTime = (timestamp: number) => {
   const epoch = timestamp * 1000;
   const date = new Date(epoch).toLocaleDateString("us", formatDateOptions);
   const time = new Date(epoch).toLocaleTimeString("us", formatTimeOptions);
-  return `${date.toUpperCase()} ${time}`;
+  const period = parseInt(time.substring(0,2)) >= 12 ? 'PM' : 'AM';
+  return `${date.toUpperCase()} ${time} ${period}`;
 };

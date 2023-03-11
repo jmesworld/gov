@@ -266,7 +266,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                {current_time_in_cycle}
+                {current_time_in_cycle} Days
               </Text>
             </Flex>
             <Divider
@@ -344,7 +344,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                {cycle_length}
+                {cycle_length} Days
               </Text>
             </Flex>
             <Divider
@@ -422,7 +422,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                {posting_period_length}
+                {posting_period_length} Days
               </Text>
             </Flex>
             <Divider
@@ -448,7 +448,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                {voting_period_length}
+                {voting_period_length} Days
               </Text>
             </Flex>
           </MenuList>
