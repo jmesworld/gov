@@ -11,7 +11,7 @@ export const NavBarItem = ({
   onClick: MouseEventHandler<HTMLDivElement>;
 }) => {
   return (
-    <Flex width={"200px"} height={"42px"} onClick={onClick}>
+    <Flex width={"200px"} height={"42px"} onClick={onClick} cursor={'pointer'}>
       <Flex
         width={"100%"}
         height={"100%"}
