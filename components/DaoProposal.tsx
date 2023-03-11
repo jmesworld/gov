@@ -53,11 +53,15 @@ export const DaoProposal = ({
   daoName,
   identityName,
   identityBalance,
+  isConnectButtonClicked,
+  setConnectButtonClicked,
 }: {
   daoAddress: string;
   daoName: string;
   identityName: string;
   identityBalance: string;
+  isConnectButtonClicked: boolean;
+  setConnectButtonClicked: Function;
 }) => {
   const chainContext = useChain(chainName);
   const { address, getCosmWasmClient } = chainContext;
@@ -130,6 +134,8 @@ export const DaoProposal = ({
         <ConnectWalletSection
           identityName={identityName}
           identityBalance={identityBalance}
+          isConnectButtonClicked={isConnectButtonClicked}
+          setConnectButtonClicked={setConnectButtonClicked}
         />
       </Flex>
       <Flex height={"47px"} />

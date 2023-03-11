@@ -223,6 +223,8 @@ export default function Home() {
           <GovernanceProposal
             identityName={identityName}
             identityBalance={identityBalance}
+            isConnectButtonClicked={isConnectButtonClicked}
+            setConnectButtonClicked={setConnectButtonClicked}
           />
         ) : (
           <DaoProposal
@@ -230,6 +232,8 @@ export default function Home() {
             daoName={selectedDaoName}
             identityName={identityName}
             identityBalance={identityBalance}
+            isConnectButtonClicked={isConnectButtonClicked}
+            setConnectButtonClicked={setConnectButtonClicked}
           />
         )}
         <OnboardingModal

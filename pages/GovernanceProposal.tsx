@@ -23,9 +23,13 @@ const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
 export default function GovernanceProposal({
   identityName,
   identityBalance,
+  isConnectButtonClicked,
+  setConnectButtonClicked,
 }: {
   identityName: string;
   identityBalance: string;
+  isConnectButtonClicked: boolean;
+  setConnectButtonClicked: Function;
 }) {
   const { address, status, getCosmWasmClient } = useChain(chainName);
 
@@ -94,6 +98,8 @@ export default function GovernanceProposal({
         <ConnectWalletSection
           identityName={identityName}
           identityBalance={identityBalance}
+          isConnectButtonClicked={isConnectButtonClicked}
+          setConnectButtonClicked={setConnectButtonClicked}
         />
       </Flex>
       <Flex height={"35px"} />

@@ -15,35 +15,21 @@ import { OnboardingModal } from "./onboarding-modal";
 export function ConnectWalletSection({
   identityName,
   identityBalance,
+  isConnectButtonClicked,
+  setConnectButtonClicked,
 }: {
   identityName: string;
   identityBalance: string;
+  isConnectButtonClicked: boolean;
+  setConnectButtonClicked: Function;
 }) {
   const { address, status, connect, getCosmWasmClient } = useChain(chainName);
   const [isJMESInKeplr, setJMESInKeplr] = useState(false);
-  const [isConnectButtonClicked, setConnectButtonClicked] = useState(false);
 
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
   );
-  useEffect(() => {
-    getCosmWasmClient()
-      .then((cosmWasmClient) => {
-        if (!cosmWasmClient || !address) {
-          return;
-        }
-        setCosmWasmClient(cosmWasmClient);
-      })
-      .catch((error) => console.log(error));
-  }, [address, getCosmWasmClient]);
-
-  useEffect(() => {
-    checkJMESInKeplr()
-      .then((val) => setJMESInKeplr(val))
-      .catch((error) => console.log(error));
-  });
-
-  async function connectWallet() {
+  function connectWallet() {
     setConnectButtonClicked(true);
   }
 
@@ -57,14 +43,6 @@ export function ConnectWalletSection({
       ) : (
         <ConnectButton connectWallet={connectWallet} />
       )}
-      <OnboardingModal
-        isConnectButtonClicked={isConnectButtonClicked}
-        setConnectButtonClicked={setConnectButtonClicked}
-        isJMESInKeplr={isJMESInKeplr}
-        identityBalance={identityBalance}
-        identityName={identityName}
-        walletStatus={status}
-      />
     </>
   );
 }
