@@ -87,11 +87,26 @@ export const DaoMembersList = ({ daoAddress }: { daoAddress: string }) => {
           />
         </Tooltip>
       </Flex>
-      <MembersList
-        members={
-          !!daoMembersListQuery.data ? daoMembersListQuery.data?.voters : []
-        }
-      />
+      {!!daoMembersListQuery.data ? (
+        <MembersList
+          members={
+            !!daoMembersListQuery.data ? daoMembersListQuery.data?.voters : []
+          }
+        />
+      ) : (
+        <Flex justifyContent="center" width="100%">
+          <Text
+            color="rgba(15,0,86,0.8)"
+            fontFamily={"DM Sans"}
+            fontWeight="normal"
+            fontStyle={"italic"}
+            fontSize={14}
+            marginTop={"24px"}
+          >
+            Loading members...
+          </Text>
+        </Flex>
+      )}
     </Box>
   );
 };
@@ -165,7 +180,9 @@ export const DaoMembersListItem = ({
           fontSize={14}
           fontFamily="DM Sans"
         >
-          {identityQuery.data?.identity?.name}
+          {!!identityQuery.data
+            ? identityQuery.data?.identity?.name
+            : `${address?.substring(0, 10)}...`}
         </Text>
       </Flex>
       <span

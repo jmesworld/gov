@@ -153,7 +153,18 @@ export const DaoProposal = ({
               daoAddress={daoAddress}
             />
           ) : (
-            ""
+            <Flex justifyContent="center" width="100%">
+              <Text
+                color="rgba(15,0,86,0.8)"
+                fontFamily={"DM Sans"}
+                fontWeight="normal"
+                fontStyle={"italic"}
+                fontSize={14}
+                marginTop={"24px"}
+              >
+                Loading DAO proposals...
+              </Text>
+            </Flex>
           )}
         </Box>
         <Spacer />

@@ -197,7 +197,9 @@ export default function Home() {
             text={"New DAO"}
             disabled={false}
             onClick={() => {
-              setConnectButtonClicked(true);
+              if (status !== WalletStatus.Connected) {
+                setConnectButtonClicked(true);
+              }
             }}
           />
           <Spacer />

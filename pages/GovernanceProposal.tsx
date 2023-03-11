@@ -107,7 +107,18 @@ export default function GovernanceProposal({
           isGov={true}
         />
       ) : (
-        ""
+        <Flex justifyContent="center" width="100%">
+          <Text
+            color="rgba(15,0,86,0.8)"
+            fontFamily={"DM Sans"}
+            fontWeight="normal"
+            fontStyle={"italic"}
+            fontSize={14}
+            marginTop={"24px"}
+          >
+            Loading Governance proposals...
+          </Text>
+        </Flex>
       )}
     </Box>
   );

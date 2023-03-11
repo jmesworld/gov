@@ -64,7 +64,7 @@ export const ConnectedWalletButton = ({
                 fontSize={14}
                 marginLeft={"6px"}
                 fontFamily="DM Sans"
-              >{`${!!identityName ? identityName : ""}`}</Text>
+              >{`${!!identityName ? identityName : address?.substring(0,10)}...`}</Text>
               <Spacer />
               <Divider
                 orientation="vertical"
