@@ -83,6 +83,7 @@ export default function GovernanceProposal({
     },
   });
 
+
   return (
     <Box
       width={"100%"}

@@ -18,11 +18,7 @@ export const ConnectWalletCard = ({
 
   const handleUpdateCard = () => {
     const index = radioGroup.indexOf(currentCard);
-    if (index < radioGroup.length - 1) {
-      setCurrentCard(radioGroup[index + 1]);
-    } else {
-      setCurrentCard(radioGroup[0]);
-    }
+    setCurrentCard(radioGroup[index + 1]);
     setIsInitalizing(false);
   };
 

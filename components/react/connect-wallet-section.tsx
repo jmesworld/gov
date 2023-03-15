@@ -10,7 +10,6 @@ import { useIdentityserviceGetIdentityByOwnerQuery } from "../../client/Identity
 import { chainName } from "../../config/defaults";
 import { ConnectButton } from "./connect-wallet-button";
 import { ConnectedWalletButton } from "./connected-wallet-button";
-import { OnboardingModal } from "./onboarding-modal";
 
 export function ConnectWalletSection({
   identityName,
@@ -39,6 +38,7 @@ export function ConnectWalletSection({
         <ConnectedWalletButton
           identityName={identityName}
           identityBalance={identityBalance}
+          setConnectButtonClicked={setConnectButtonClicked}
         />
       ) : (
         <ConnectButton connectWallet={connectWallet} />

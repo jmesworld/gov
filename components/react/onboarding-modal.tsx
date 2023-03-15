@@ -1,5 +1,6 @@
 import {
   Box,
+  CircularProgress,
   Modal,
   ModalBody,
   ModalContent,
@@ -14,70 +15,103 @@ import { AddTokensCard } from "./add-tokens-card";
 import { ChooseUsernameCard } from "./choose-username-card";
 import { ConnectWalletCard } from "./connect-wallet-card";
 import { OnboardingProgressIndicator } from "./onboarding-progress-indicator";
+import { useChain } from "@cosmos-kit/react";
+import { chainName } from "../../config/defaults";
+import { checkJMESInKeplr } from "../../actions/keplr";
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
+import { BjmesTokenQueryClient } from "../../client/BjmesToken.client";
+import { useIdentityserviceGetIdentityByOwnerQuery } from "../../client/Identityservice.react-query";
+import { useBjmesTokenBalanceQuery } from "../../client/BjmesToken.react-query";
 
-export const OnboardingModal = ({
-  walletStatus,
-  isJMESInKeplr,
-  identityBalance,
-  identityName,
-  isConnectButtonClicked,
-  setConnectButtonClicked,
-}: {
-  walletStatus: WalletStatus;
-  isJMESInKeplr: boolean;
-  identityBalance: string;
-  identityName: string;
-  isConnectButtonClicked: boolean;
-  setConnectButtonClicked: Function;
-}) => {
-  const isOpen =
-    (isConnectButtonClicked || walletStatus === WalletStatus.Connecting) &&
-    (!isJMESInKeplr ||
-    identityName?.length < 1 ||
-    parseInt(identityBalance) === 0
-      ? true
-      : false);
+const IDENTITY_SERVICE_CONTRACT = process.env
+  .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
+const BJMES_TOKEN_CONTRACT = process.env
+  .NEXT_PUBLIC_BJMES_TOKEN_CONTRACT as string;
+
+export default function OnboardingModal () {
+  const { address, status, getCosmWasmClient } = useChain(chainName);
 
   const [radioGroup, setRadioGroup] = useState(new Array());
   const [currentCard, setCurrentCard] = useState(null || String);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [identityBalance, setIdentityBalance] = useState("");
+  const [identityName, setIdentityName] = useState("");
+
+  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
+    null
+  );
+  useEffect(() => {
+    getCosmWasmClient()
+      .then((cosmWasmClient) => {
+        if (!cosmWasmClient) {
+          return;
+        }
+        setCosmWasmClient(cosmWasmClient);
+      })
+      .catch((error) => console.log(error));
+  }, [getCosmWasmClient]);
+
+  const identityserviceQueryClient: IdentityserviceQueryClient =
+    new IdentityserviceQueryClient(
+      cosmWasmClient as CosmWasmClient,
+      IDENTITY_SERVICE_CONTRACT
+    );
+  const bjmesTokenQueryClient: BjmesTokenQueryClient =
+    new BjmesTokenQueryClient(
+      cosmWasmClient as CosmWasmClient,
+      BJMES_TOKEN_CONTRACT
+    );
+
+  const identityOwnerQuery = useIdentityserviceGetIdentityByOwnerQuery({
+    client: identityserviceQueryClient,
+    args: { owner: address ? address : "" },
+    options: {
+      refetchInterval: 10,
+      onSuccess: (data) => {
+        setIdentityName(data?.identity?.name as string);
+      },
+    },
+  });
+
+  const identityOwnerBalanceQuery = useBjmesTokenBalanceQuery({
+    client: bjmesTokenQueryClient,
+    args: { address: address as string },
+    options: {
+      //  refetchInterval: 10,
+      onSuccess: (data) => {
+        setIdentityBalance(data?.balance as string);
+      },
+    },
+  });
 
   useEffect(() => {
-    let cards = new Array(4);
-    if (!isJMESInKeplr) {
-      cards[0] = "add-jmes-card";
-      setCurrentCard("add-jmes-card");
-    }
-    if (walletStatus !== WalletStatus.Connected) {
-      cards[1] = "connect-wallet-card";
-      if (!!isJMESInKeplr) {
-        setCurrentCard("connect-wallet-card");
-      }
-    }
-    if (parseInt(identityBalance) === 0 || !parseInt(identityBalance)) {
-      cards[2] = "add-tokens-card";
-      if (walletStatus === WalletStatus.Connected) {
-        setCurrentCard("add-tokens-card");
-      }
-    }
-    if (identityName?.length < 1) {
-      cards[3] = "choose-username-card";
-      if (parseInt(identityBalance) > 0 || !!parseInt(identityBalance)) {
-        setCurrentCard("choose-username-card");
-      }
-    }
-    const values = cards.filter((card) => !!card);
-    setRadioGroup(values);
+    let cards = new Array();
+    checkJMESInKeplr()
+      .then((val) => {
+        if (!val) {
+          cards.push("add-jmes-card");
+        }
+        if (status !== WalletStatus.Connected) {
+          cards.push("connect-wallet-card");
+        }
+        cards.push("add-tokens-card");
+        cards.push("choose-username-card");
+      })
+      .then(() => {
+        setRadioGroup([...cards]);
+        setCurrentCard(cards[0]);
+        setIsInitializing(false);
+      });
   }, [isInitializing]);
 
   const handleClose = () => {
-    setConnectButtonClicked(false);
     setCurrentCard(radioGroup[0]);
   };
 
   return (
     <Modal
-      isOpen={isOpen && !!currentCard}
+      isOpen={!!currentCard}
       onClose={handleClose}
       isCentered
       closeOnOverlayClick={false}
@@ -103,13 +137,17 @@ export const OnboardingModal = ({
                   position: "fixed",
                 }}
               >
-                <OnboardingComponent
-                  currentCard={currentCard}
-                  radioGroup={radioGroup}
-                  setCurrentCard={setCurrentCard}
-                  setIsInitializing={setIsInitializing}
-                  identityName={identityName}
-                />
+                {!isInitializing ? (
+                  <OnboardingComponent
+                    currentCard={currentCard}
+                    radioGroup={radioGroup}
+                    setCurrentCard={setCurrentCard}
+                    setIsInitializing={setIsInitializing}
+                    identityName={identityName}
+                  />
+                ) : (
+                  <CircularProgress />
+                )}
               </span>
             </Box>
           </ModalBody>
@@ -117,7 +155,7 @@ export const OnboardingModal = ({
       </ModalOverlay>
     </Modal>
   );
-};
+}
 
 const OnboardingComponent = ({
   currentCard,
@@ -161,15 +199,21 @@ const OnboardingComponent = ({
         />
       );
     case "choose-username-card":
-      return (
-        <ChooseUsernameCard
-          radioGroup={radioGroup}
-          currentCard={currentCard}
-          setCurrentCard={setCurrentCard}
-          setIsInitalizing={setIsInitializing}
-          identityName={identityName}
-        />
-      );
+      if (!identityName) {
+        return (
+          <ChooseUsernameCard
+            radioGroup={radioGroup}
+            currentCard={currentCard}
+            setCurrentCard={setCurrentCard}
+            setIsInitalizing={setIsInitializing}
+            identityName={identityName}
+          />
+        );
+      } else {
+        setCurrentCard(null);
+        return <></>;
+      }
+
     default:
       return <></>;
   }

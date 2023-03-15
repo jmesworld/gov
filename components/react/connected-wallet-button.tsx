@@ -17,9 +17,11 @@ import { chainName } from "../../config/defaults";
 export const ConnectedWalletButton = ({
   identityName,
   identityBalance,
+  setConnectButtonClicked,
 }: {
   identityName: string;
   identityBalance: string;
+   setConnectButtonClicked: Function;
 }) => {
   const { address, disconnect, getCosmWasmClient, getSigningCosmWasmClient } =
     useChain(chainName);
@@ -109,6 +111,7 @@ export const ConnectedWalletButton = ({
               borderRadius={"20px"}
               onClick={() => {
                 disconnect();
+                setConnectButtonClicked(false);
               }}
             >
               {" "}

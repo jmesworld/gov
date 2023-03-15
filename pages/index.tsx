@@ -14,13 +14,13 @@ import { useMyDaosList } from "../hooks/useMyDaosList";
 import { DaoProposal } from "../components/DaoProposal";
 import GovernanceProposal from "./GovernanceProposal";
 import { WalletStatus } from "@cosmos-kit/core";
-import { JMESLogo } from "../components/react";
+import { Disconnected, JMESLogo } from "../components/react";
 import { NavBarItem } from "../components/react/navigation-item";
 import { NavBarButton } from "../components/react/navbar-button";
 import { BjmesTokenQueryClient } from "../client/BjmesToken.client";
 import { useBjmesTokenBalanceQuery } from "../client/BjmesToken.react-query";
 import { addJMEStoKeplr, checkJMESInKeplr } from "../actions/keplr";
-import { OnboardingModal } from "../components/react/onboarding-modal";
+import OnboardingModal from "../components/react/onboarding-modal";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -61,11 +61,11 @@ export default function Home() {
       .catch((error) => console.log(error));
   }, [getCosmWasmClient]);
 
-  // useEffect(() => {
-  //   checkJMESInKeplr()
-  //     .then((val) => setJMESInKeplr(val))
-  //     .catch((error) => console.log(error));
-  // });
+  useEffect(() => {
+    checkJMESInKeplr()
+      .then((val) => setJMESInKeplr(val))
+      .catch((error) => console.log(error));
+  }, [!isJMESInKeplr]);
 
   const myDaos = useMyDaosList(
     address as string,
@@ -236,14 +236,11 @@ export default function Home() {
             setConnectButtonClicked={setConnectButtonClicked}
           />
         )}
-        <OnboardingModal
-          isConnectButtonClicked={isConnectButtonClicked}
-          setConnectButtonClicked={setConnectButtonClicked}
-          isJMESInKeplr={isJMESInKeplr}
-          identityBalance={identityBalance}
-          identityName={identityName}
-          walletStatus={status}
-        />
+        {isConnectButtonClicked || status === WalletStatus.Connecting ? (
+          <OnboardingModal/>
+        ) : (
+          ""
+        )}
       </Flex>
     </Container>
   );

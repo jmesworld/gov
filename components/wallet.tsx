@@ -137,8 +137,8 @@ export const WalletSection = () => {
             px={4}
             py={{ base: 6, md: 12 }}
           >
-            {userInfo}
-            {addressBtn}
+            {/* {userInfo}
+            {addressBtn} */}
             <Box w="full" maxW={{ base: 52, md: 64 }}>
               {connectWalletButton}
             </Box>
