@@ -32,7 +32,7 @@ const BJMES_TOKEN_CONTRACT = process.env
 export default function Home() {
   const { address, status, getCosmWasmClient } = useChain(chainName);
 
-  const [isJMESInKeplr, setJMESInKeplr] = useState(false);
+  const [isJMESInKeplr, setJMESInKeplr] = useState(null || Boolean);
   const [isConnectButtonClicked, setConnectButtonClicked] = useState(false);
   const [isGovProposalSelected, setIsGovProposalSelected] = useState(true);
   const [selectedDao, setSelectedDao] = useState("");
@@ -50,6 +50,7 @@ export default function Home() {
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
   );
+  
   useEffect(() => {
     getCosmWasmClient()
       .then((cosmWasmClient) => {
@@ -62,10 +63,12 @@ export default function Home() {
   }, [getCosmWasmClient]);
 
   useEffect(() => {
-    checkJMESInKeplr()
-      .then((val) => setJMESInKeplr(val))
-      .catch((error) => console.log(error));
-  }, [!isJMESInKeplr]);
+    if (!isJMESInKeplr && isConnectButtonClicked) {
+      checkJMESInKeplr()
+        .then((val) => setJMESInKeplr(val))
+        .catch((error) => console.log(error));
+    }
+  }, [isJMESInKeplr, isConnectButtonClicked]);
 
   const myDaos = useMyDaosList(
     address as string,
@@ -237,7 +240,7 @@ export default function Home() {
           />
         )}
         {isConnectButtonClicked || status === WalletStatus.Connecting ? (
-          <OnboardingModal/>
+          <OnboardingModal />
         ) : (
           ""
         )}
