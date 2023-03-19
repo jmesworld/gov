@@ -50,7 +50,7 @@ export default function Home() {
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
   );
-  
+
   useEffect(() => {
     getCosmWasmClient()
       .then((cosmWasmClient) => {
@@ -81,6 +81,7 @@ export default function Home() {
       cosmWasmClient as CosmWasmClient,
       IDENTITY_SERVICE_CONTRACT
     );
+    
   const bjmesTokenQueryClient: BjmesTokenQueryClient =
     new BjmesTokenQueryClient(
       cosmWasmClient as CosmWasmClient,
