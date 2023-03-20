@@ -45,7 +45,7 @@ export const addJMEStoKeplr = async () => {
   });
 };
 
-export const checkJMESInKeplr = async () => { 
+export const checkJMESInKeplr = async () => {
   let key: any = undefined;
   try {
     // @ts-ignore
@@ -54,4 +54,9 @@ export const checkJMESInKeplr = async () => {
     console.log(error);
   }
   return !!key;
+};
+
+export const connectKeplrWallet = async (walletRepo: any) => {
+  const keplrWalletExtension = walletRepo.wallets[0];
+  await keplrWalletExtension?.connect();
 };

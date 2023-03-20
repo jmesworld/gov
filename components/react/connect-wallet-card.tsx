@@ -2,6 +2,7 @@ import { Box, Flex, Spacer, Image, Text, Button } from "@chakra-ui/react";
 import { OnboardingProgressIndicator } from "./onboarding-progress-indicator";
 import { useChain } from "@cosmos-kit/react";
 import { chainName } from "../../config/defaults";
+import { connectKeplrWallet } from "../../actions/keplr";
 
 export const ConnectWalletCard = ({
   radioGroup,
@@ -14,7 +15,7 @@ export const ConnectWalletCard = ({
   setCurrentCard: Function;
   setIsInitalizing: Function;
 }) => {
-  const { connect } = useChain(chainName);
+  const { connect, walletRepo } = useChain(chainName);
 
   const handleUpdateCard = () => {
     const index = radioGroup.indexOf(currentCard);
@@ -23,7 +24,7 @@ export const ConnectWalletCard = ({
   };
 
   const handleConnectWallet = () => {
-    connect()
+    connectKeplrWallet(walletRepo)
       .then((res) => {
         console.log("success");
       })
