@@ -81,7 +81,7 @@ export default function Home() {
       cosmWasmClient as CosmWasmClient,
       IDENTITY_SERVICE_CONTRACT
     );
-    
+
   const bjmesTokenQueryClient: BjmesTokenQueryClient =
     new BjmesTokenQueryClient(
       cosmWasmClient as CosmWasmClient,
@@ -194,7 +194,6 @@ export default function Home() {
           ) : (
             <></>
           )}
-          <Flex height={"20px"} />
           <NavBarButton
             width="180px"
             height="48px"
@@ -292,6 +291,11 @@ export const MyDaosList = ({
         />
       )
     );
-    return <ul>{daoItems}</ul>;
+    return (
+      <>
+        <ul>{daoItems}</ul>
+        <Flex height={"20px"} />
+      </>
+    );
   }
 };
