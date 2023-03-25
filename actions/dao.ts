@@ -66,6 +66,5 @@ export async function getMyDaos(
       }
     }
   }
-  console.log(myDaos)
   return myDaos;
 }
