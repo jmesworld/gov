@@ -113,7 +113,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
-        marginLeft={isGov ? "204px" : "131"}
+        marginLeft={isGov ? "17.942%" : "15.67%"}
         width={"32px"}
       >
         YES
@@ -123,7 +123,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
-        marginLeft={isGov ? "121px" : "90px"}
+        marginLeft={isGov ? "10.642%" : "10.766%"}
         width={"32px"}
       >
         NO
@@ -133,7 +133,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
-        marginLeft={isGov ? "131px" : "85px"}
+        marginLeft={isGov ? "11.522%" : "10.1675%"}
         width={"94px"}
       >
         % TO PASS
@@ -143,7 +143,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
-        marginLeft={isGov ? "185px" : "142px"}
+        marginLeft={isGov ? "16.271%" : "16.986%"}
         width={"94px"}
       >
         PASSING
@@ -280,7 +280,7 @@ export const ProposalListItem = ({
                 fontFamily={"DM Sans"}
                 fontWeight="normal"
                 fontSize={18}
-                marginLeft={isGov ? "137px" : "0px"}
+                marginLeft={isGov ? "11.8734%" : "0%"}
               >
                 {yes}
               </Text>
@@ -299,7 +299,7 @@ export const ProposalListItem = ({
                 fontFamily={"DM Sans"}
                 fontWeight="normal"
                 fontSize={18}
-                marginLeft={isGov ? "93px" : "62px"}
+                marginLeft={isGov ? "8.1794%" : "7.416%"}
               >
                 {no}
               </Text>
@@ -310,7 +310,7 @@ export const ProposalListItem = ({
               fontFamily={"DM Sans"}
               fontWeight="normal"
               fontSize={18}
-              marginLeft={isGov ? "103px" : "57px"}
+              marginLeft={isGov ? "9.059%" : "6.8182%"}
             >
               {threshold?.toString() + "%"}
             </Text>
@@ -333,7 +333,7 @@ export const ProposalListItem = ({
               width={"9px"}
               height={"9px"}
               backgroundColor="#68FFF1"
-              marginLeft={isGov ? "137px" : "0px"}
+              marginLeft={isGov ? "11.8734%" : "0%"}
               borderRadius={90}
             />
             <Text
@@ -353,7 +353,7 @@ export const ProposalListItem = ({
               width={"9px"}
               height={"9px"}
               backgroundColor="#FF5876"
-              marginLeft={isGov ? "73px" : "42px"}
+              marginLeft={isGov ? "6.42%" : "5.024%"}
               borderRadius={90}
             />
             <Text
@@ -364,7 +364,7 @@ export const ProposalListItem = ({
               marginLeft={"6px"}
               opacity={"70%"}
               width={"65px"}
-              marginRight={isGov ? "82px" : "36px"}
+              marginRight={isGov ? "7.212%" : "4.306%"}
             >
               {noCount < 99 ? `${noCount} votes` : `99+ votes`}
             </Text>
@@ -374,7 +374,7 @@ export const ProposalListItem = ({
         <Flex
           width={"64px"}
           height={"24px"}
-          marginLeft={isGov ? "82px" : "45px"}
+          marginLeft={isGov ? "7.212%" : "5.383%"}
           borderRadius={"90px"}
           borderWidth={"1px"}
           borderColor={pass === "Yes" ? "green" : "red"}
