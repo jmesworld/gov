@@ -11,7 +11,7 @@ export function useAccountBalance(address: string) {
     },
     {
       onSuccess: (data) => {
-        console.log(data);
+        //console.log(data);
       },
       refetchInterval: 10,
     }

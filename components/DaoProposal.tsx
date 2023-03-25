@@ -66,13 +66,6 @@ export const DaoProposal = ({
   const chainContext = useChain(chainName);
   const { address, getCosmWasmClient } = chainContext;
 
-  const [viewDimension, setViewDimension] = useState(Array());
-
-  useEffect(() => {
-    const { innerHeight, innerWidth } = window;
-    setViewDimension([innerWidth, innerHeight]);
-  }, []);
-
   useEffect(() => {
     const init = async () => {
       cosmWasmClient = await getCosmWasmClient();

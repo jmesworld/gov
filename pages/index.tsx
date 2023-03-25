@@ -39,15 +39,10 @@ export default function Home() {
   const [selectedDao, setSelectedDao] = useState("");
   const [selectedDaoName, setSelectedDaoName] = useState("");
   const [isNewDataUpdated, setDataUpdated] = useState(false);
-  const [viewDimension, setViewDimension] = useState(Array());
   const [identityBalance, setIdentityBalance] = useState("");
   const [identityName, setIdentityName] = useState("");
 
-  const data = useAccountBalance(address as string)
-  useEffect(() => {
-    const { innerHeight, innerWidth } = window;
-    setViewDimension([innerWidth, innerHeight]);
-  }, []);
+  //const data = useAccountBalance(address as string)
 
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
@@ -115,7 +110,7 @@ export default function Home() {
   return (
     <Container
       maxW="100%"
-      maxH="100%"
+      //maxH="100%"
       padding={0}
       backgroundColor={"rgba(198, 180, 252, 0.3)"}
     >
@@ -123,7 +118,7 @@ export default function Home() {
         <title>JMES Governance</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Flex padding={0} width={viewDimension[0]} height={viewDimension[1]}>
+      <Flex padding={0} width={"100vw"} height={'100vh'}>
         <VStack
           width={"200px"}
           height={"100%"}
