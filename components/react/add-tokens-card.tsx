@@ -1,4 +1,4 @@
-import { CopyIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, CloseIcon, CopyIcon } from "@chakra-ui/icons";
 import {
   Box,
   Flex,
@@ -18,6 +18,8 @@ import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
 import { BjmesTokenQueryClient } from "../../client/BjmesToken.client";
 import { useBjmesTokenBalanceQuery } from "../../client/BjmesToken.react-query";
+import { useAccountBalance } from "../../hooks/useAccountBalance";
+import { useIdentityserviceGetIdentityByOwnerQuery } from "../../client/Identityservice.react-query";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -29,17 +31,20 @@ export const AddTokensCard = ({
   currentCard,
   setCurrentCard,
   setIsInitalizing,
+  setIdentityName,
 }: {
   radioGroup: Array<String>;
   currentCard: String;
   setCurrentCard: Function;
   setIsInitalizing: Function;
+  setIdentityName: Function;
 }) => {
   const toast = useToast();
-  const { address, disconnect, getCosmWasmClient } = useChain(chainName);
+  const { address, disconnect, getCosmWasmClient, wallet } =
+    useChain(chainName);
 
-  const handleUpdateCard = () => {
-    const index = radioGroup.indexOf(currentCard);
+  const handleUpdateCard = (index: number) => {
+    // const index = radioGroup.indexOf(currentCard);
     setCurrentCard(radioGroup[index + 1]);
     setIsInitalizing(false);
   };
@@ -64,25 +69,31 @@ export const AddTokensCard = ({
       cosmWasmClient as CosmWasmClient,
       IDENTITY_SERVICE_CONTRACT
     );
-  const bjmesTokenQueryClient: BjmesTokenQueryClient =
-    new BjmesTokenQueryClient(
-      cosmWasmClient as CosmWasmClient,
-      BJMES_TOKEN_CONTRACT
-    );
-  const identityOwnerBalanceQuery = useBjmesTokenBalanceQuery({
-    client: bjmesTokenQueryClient,
-    args: { address: address as string },
+
+  const identityNameQuery = useIdentityserviceGetIdentityByOwnerQuery({
+    client: identityserviceQueryClient,
+    args: { owner: address as string },
     options: {
-      refetchInterval: 10,
       onSuccess: (data) => {
-        setIdentityBalance(identityOwnerBalanceQuery?.data?.balance as string);
+        if (!!data?.identity?.name.toString()) {
+          setIdentityName(data?.identity?.name.toString());
+        }
       },
     },
   });
 
+  const identityBalanceQuery = useAccountBalance(address as string);
+  const balance: any = identityBalanceQuery.data ?? 0;
   useEffect(() => {
-    if (parseInt(identityBalance) > 0) {
-      handleUpdateCard();
+    setIdentityBalance(balance);
+    if (
+      balance > 0 &&
+      identityBalanceQuery.isSuccess &&
+      identityNameQuery.isSuccess
+    ) {
+      setTimeout(() => {
+        handleUpdateCard(radioGroup.indexOf(currentCard));
+      }, 2000);
     }
   });
 
@@ -94,14 +105,35 @@ export const AddTokensCard = ({
       marginTop={"-41px"}
     >
       <Flex>
-        <Spacer />
-        <Image
-          src="/Barcode.svg"
-          alt="icon"
-          width={"232px"}
-          height={"234px"}
-          justifySelf={"center"}
-        />
+        <Flex width={"100%"} justifyContent={"space-between"}>
+          <IconButton
+            aria-label=""
+            background={"transparent"}
+            color={"transparent"}
+            icon={<ArrowBackIcon width={"24px"} height={"24px"} />}
+            _hover={{backgroundColor: 'transparent'}}
+            marginTop={"51px"}
+            marginLeft={"8px"}
+            onClick={() => handleUpdateCard(radioGroup.indexOf(currentCard) - 2)}
+          />
+          <Image
+            src="/Barcode.svg"
+            alt="icon"
+            width={"232px"}
+            height={"234px"}
+            justifySelf={"center"}
+          />
+          <IconButton
+            aria-label=""
+            background={"transparent"}
+            color={"white"}
+            icon={<CloseIcon height={"24px"} />}
+            marginTop={"51px"}
+            marginRight={"8px"}
+            _hover={{backgroundColor: 'transparent'}}
+            onClick={() => handleUpdateCard(Infinity)}
+          />
+        </Flex>
         <Spacer />
       </Flex>
       <Flex>
@@ -154,7 +186,7 @@ export const AddTokensCard = ({
               noOfLines={1}
               fontFamily="DM Sans"
             >
-              {`${!!identityBalance ? identityBalance : "loading..."}`}
+              {`${identityBalanceQuery.isSuccess ? balance : "loading..."}`}
             </Text>
           </Flex>
         </Box>
@@ -222,7 +254,7 @@ export const AddTokensCard = ({
       <Flex marginBottom={"25px"} marginTop={"38px"}>
         <Spacer />
         <Button
-          disabled={!identityOwnerBalanceQuery?.data}
+          disabled={!identityBalanceQuery.isSuccess}
           onClick={() => {
             disconnect();
             setCurrentCard(null);

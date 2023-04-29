@@ -29,7 +29,7 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 const BJMES_TOKEN_CONTRACT = process.env
   .NEXT_PUBLIC_BJMES_TOKEN_CONTRACT as string;
 
-export default function OnboardingModal () {
+export default function OnboardingModal() {
   const { address, status, getCosmWasmClient } = useChain(chainName);
 
   const [radioGroup, setRadioGroup] = useState(new Array());
@@ -86,6 +86,12 @@ export default function OnboardingModal () {
   });
 
   useEffect(() => {
+    if (status === WalletStatus.Connecting) {
+      setIsInitializing(true)
+    }
+  })
+
+  useEffect(() => {
     let cards = new Array();
     checkJMESInKeplr()
       .then((val) => {
@@ -103,7 +109,7 @@ export default function OnboardingModal () {
         setCurrentCard(cards[0]);
         setIsInitializing(false);
       });
-  }, [isInitializing]);
+  }, [isInitializing === true]);
 
   const handleClose = () => {
     setCurrentCard(radioGroup[0]);
@@ -144,6 +150,7 @@ export default function OnboardingModal () {
                     setCurrentCard={setCurrentCard}
                     setIsInitializing={setIsInitializing}
                     identityName={identityName}
+                    setIdentityName={setIdentityName}
                   />
                 ) : (
                   <CircularProgress />
@@ -163,12 +170,14 @@ const OnboardingComponent = ({
   setCurrentCard,
   setIsInitializing,
   identityName,
+  setIdentityName,
 }: {
   currentCard: String;
   radioGroup: Array<String>;
   setCurrentCard: Function;
   setIsInitializing: Function;
   identityName: String;
+  setIdentityName: Function;
 }) => {
   switch (currentCard) {
     case "add-jmes-card":
@@ -196,24 +205,19 @@ const OnboardingComponent = ({
           currentCard={currentCard}
           setCurrentCard={setCurrentCard}
           setIsInitalizing={setIsInitializing}
+          setIdentityName={setIdentityName}
         />
       );
     case "choose-username-card":
-      if (!identityName) {
-        return (
-          <ChooseUsernameCard
-            radioGroup={radioGroup}
-            currentCard={currentCard}
-            setCurrentCard={setCurrentCard}
-            setIsInitalizing={setIsInitializing}
-            identityName={identityName}
-          />
-        );
-      } else {
-        setCurrentCard(null);
-        return <></>;
-      }
-
+      return (
+        <ChooseUsernameCard
+          radioGroup={radioGroup}
+          currentCard={currentCard}
+          setCurrentCard={setCurrentCard}
+          setIsInitalizing={setIsInitializing}
+          identityName={identityName}
+        />
+      );
     default:
       return <></>;
   }

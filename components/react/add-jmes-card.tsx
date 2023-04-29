@@ -1,4 +1,14 @@
-import { Box, Flex, Spacer, Image, Text, Button } from "@chakra-ui/react";
+import { ArrowBackIcon, CloseIcon } from "@chakra-ui/icons";
+import {
+  Box,
+  Flex,
+  Spacer,
+  Image,
+  Text,
+  Button,
+  IconButton,
+  CloseButton,
+} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { addJMEStoKeplr } from "../../actions/keplr";
 import { OnboardingProgressIndicator } from "./onboarding-progress-indicator";
@@ -14,8 +24,8 @@ export const AddJMESCard = ({
   setCurrentCard: Function;
   setIsInitalizing: Function;
 }) => {
-  const handleUpdateCard = () => {
-    const index = radioGroup.indexOf(currentCard);
+  const handleUpdateCard = (index: number) => {
+    // const index = radioGroup.indexOf(currentCard);
     setCurrentCard(radioGroup[index + 1]);
     setIsInitalizing(false);
   };
@@ -26,7 +36,7 @@ export const AddJMESCard = ({
         console.log("success");
       })
       .catch((error) => console.log(error));
-    handleUpdateCard();
+    handleUpdateCard(radioGroup.indexOf(currentCard));
   };
 
   return (
@@ -37,14 +47,34 @@ export const AddJMESCard = ({
       marginTop={"-90px"}
     >
       <Flex>
-        <Spacer />
-        <Image
-          src="/JMES_Add.svg"
-          alt="icon"
-          width={"255px"}
-          height={"311px"}
-          justifySelf={"center"}
-        />
+        <Flex width={'100%'} justifyContent={'space-between'}>
+          <IconButton
+            aria-label=""
+            background={"transparent"}
+            color = {'transparent'}
+            icon={<ArrowBackIcon width={'24px'} height={'24px'} />}
+            marginTop={'100px'}
+            marginLeft={'8px'}
+            _hover={{backgroundColor: 'transparent'}}
+          />
+          <Image
+            src="/JMES_Add.svg"
+            alt="icon"
+            width={"255px"}
+            height={"311px"}
+            justifySelf={"center"}
+          />
+          <IconButton
+            aria-label=""
+            background={"transparent"}
+            color = {'white'}
+            icon={<CloseIcon height={'24px'} />}
+            marginTop={'100px'}
+            marginRight={'8px'}
+            _hover={{backgroundColor: 'transparent'}}
+            onClick={() => handleUpdateCard(Infinity)}
+          />
+        </Flex>
         <Spacer />
       </Flex>
       <Flex>

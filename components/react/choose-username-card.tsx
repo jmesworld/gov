@@ -1,4 +1,4 @@
-import { CheckIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
   Box,
   Flex,
@@ -10,6 +10,7 @@ import {
   InputGroup,
   InputRightElement,
   useToast,
+  IconButton,
 } from "@chakra-ui/react";
 import { useChain } from "@cosmos-kit/react";
 import { OnboardingProgressIndicator } from "./onboarding-progress-indicator";
@@ -47,8 +48,8 @@ export const ChooseUsernameCard = ({
   setIsInitalizing: Function;
   identityName: String;
 }) => {
-  const handleUpdateCard = () => {
-    const index = radioGroup.indexOf(currentCard);
+  const handleUpdateCard = (index: number) => {
+    // const index = radioGroup.indexOf(currentCard);
     setCurrentCard(radioGroup[index + 1]);
     setIsInitalizing(false);
   };
@@ -64,6 +65,16 @@ export const ChooseUsernameCard = ({
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
   );
+
+  useEffect(() => {
+    if (identityName?.length > 0) {
+      setIdentityNameInput(identityName as string);
+      setTimeout(() => {
+        handleUpdateCard(radioGroup.indexOf(currentCard));
+      }, 2000);
+    }
+  }, [identityName]);
+
   useEffect(() => {
     getCosmWasmClient()
       .then((cosmWasmClient) => {
@@ -120,7 +131,7 @@ export const ChooseUsernameCard = ({
           duration: 9000,
           isClosable: true,
         });
-        handleUpdateCard();
+        handleUpdateCard(radioGroup.indexOf(currentCard));
       } else {
         toast({
           title: "Identity creation error.",
@@ -145,7 +156,7 @@ export const ChooseUsernameCard = ({
           setIsIdentityNameAvailable(true);
         }
       },
-      enabled: identityName.length > 2,
+      enabled: identityNameInput?.length > 2,
     },
   });
 
@@ -157,14 +168,36 @@ export const ChooseUsernameCard = ({
       marginTop={"-52.75px"}
     >
       <Flex>
-        <Spacer />
-        <Image
-          src="/Computer.svg"
-          alt="icon"
-          width={"288px"}
-          height={"275.8px"}
-          justifySelf={"center"}
-        />
+        <Flex width={"100%"} justifyContent={"space-between"}>
+          <IconButton
+            aria-label=""
+            background={"transparent"}
+            color={"white"}
+            icon={<ArrowBackIcon width={"24px"} height={"24px"} />}
+            marginTop={"62.75px"}
+            marginLeft={"8px"}
+            _hover={{ backgroundColor: "transparent" }}
+            onClick={() => handleUpdateCard(radioGroup.indexOf(currentCard) - 2)}
+          />
+          <Image
+            src="/Computer.svg"
+            alt="icon"
+            width={"288px"}
+            height={"275.8px"}
+            justifySelf={"center"}
+          />
+          <IconButton
+            aria-label=""
+            background={"transparent"}
+            color={"white"}
+            icon={<CloseIcon height={"24px"} />}
+            marginTop={"62.75px"}
+            marginRight={"8px"}
+            _hover={{ backgroundColor: "transparent" }}
+            onClick={() => handleUpdateCard(Infinity)}
+          />
+        </Flex>
+
         <Spacer />
       </Flex>
       <Flex>
@@ -225,10 +258,9 @@ export const ChooseUsernameCard = ({
             marginLeft={"18px"}
             marginTop={"8px"}
           >
-            {identityName.length > 0
+            {identityNameInput.length > 0 && identityName?.length === 0
               ? identityNameQuery.isFetched
-                ? identityNameQuery?.data?.identity?.name.toString() ===
-                  identityName
+                ? !isIdentityNameAvailable
                   ? "Name taken!"
                   : "Available"
                 : "Checking..."
@@ -240,7 +272,7 @@ export const ChooseUsernameCard = ({
       <Flex marginTop={"11px"} marginBottom={"25px"}>
         <Spacer />
         <Button
-          disabled={!identityName}
+          disabled={!isIdentityNameAvailable}
           onClick={() => {
             identityMutation.mutate();
           }}

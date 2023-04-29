@@ -14,14 +14,13 @@ import { useMyDaosList } from "../hooks/useMyDaosList";
 import { DaoProposal } from "../components/DaoProposal";
 import GovernanceProposal from "./GovernanceProposal";
 import { WalletStatus } from "@cosmos-kit/core";
-import { Disconnected, JMESLogo } from "../components/react";
+import { JMESLogo } from "../components/react";
 import { NavBarItem } from "../components/react/navigation-item";
 import { NavBarButton } from "../components/react/navbar-button";
 import { BjmesTokenQueryClient } from "../client/BjmesToken.client";
 import { useBjmesTokenBalanceQuery } from "../client/BjmesToken.react-query";
 import { addJMEStoKeplr, checkJMESInKeplr } from "../actions/keplr";
 import OnboardingModal from "../components/react/onboarding-modal";
-import { useAccountBalance } from "../hooks/useAccountBalance";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -42,7 +41,6 @@ export default function Home() {
   const [identityBalance, setIdentityBalance] = useState("");
   const [identityName, setIdentityName] = useState("");
 
-  //const data = useAccountBalance(address as string)
 
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
