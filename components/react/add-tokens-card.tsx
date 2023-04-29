@@ -96,7 +96,7 @@ export const AddTokensCard = ({
           handleUpdateCard(radioGroup.indexOf(currentCard));
         }, 2000);
       } catch (error) {
-        console.log('An error occurred:', error);
+        console.log("An error occurred:", error);
       }
     }
   });
@@ -115,10 +115,12 @@ export const AddTokensCard = ({
             background={"transparent"}
             color={"transparent"}
             icon={<ArrowBackIcon width={"24px"} height={"24px"} />}
-            _hover={{backgroundColor: 'transparent'}}
+            _hover={{ backgroundColor: "transparent" }}
             marginTop={"51px"}
             marginLeft={"8px"}
-            onClick={() => handleUpdateCard(radioGroup.indexOf(currentCard) - 2)}
+            onClick={() =>
+              handleUpdateCard(radioGroup.indexOf(currentCard) - 2)
+            }
           />
           <Image
             src="/Barcode.svg"
@@ -134,7 +136,7 @@ export const AddTokensCard = ({
             icon={<CloseIcon height={"24px"} />}
             marginTop={"51px"}
             marginRight={"8px"}
-            _hover={{backgroundColor: 'transparent'}}
+            _hover={{ backgroundColor: "transparent" }}
             onClick={() => handleUpdateCard(Infinity)}
           />
         </Flex>
