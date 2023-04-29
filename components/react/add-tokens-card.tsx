@@ -98,6 +98,10 @@ export const AddTokensCard = ({
       } catch (error) {
         console.log("An error occurred:", error);
       }
+    }else{
+      console.log('balance: ', balance);
+      console.log('identityBalanceQuery: ', identityBalanceQuery.status);
+      console.log('identityNameQuery: ', identityNameQuery.status);
     }
   });
 
