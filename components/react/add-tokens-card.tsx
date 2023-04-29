@@ -91,17 +91,9 @@ export const AddTokensCard = ({
       identityBalanceQuery.isSuccess &&
       identityNameQuery.isSuccess
     ) {
-      try {
-        setTimeout(() => {
-          handleUpdateCard(radioGroup.indexOf(currentCard));
-        }, 2000);
-      } catch (error) {
-        console.log("An error occurred:", error);
-      }
-    }else{
-      console.log('balance: ', balance);
-      console.log('identityBalanceQuery: ', identityBalanceQuery.status);
-      console.log('identityNameQuery: ', identityNameQuery.status);
+      setTimeout(() => {
+        handleUpdateCard(radioGroup.indexOf(currentCard));
+      }, 2000);
     }
   });
 
