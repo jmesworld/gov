@@ -23,7 +23,7 @@ export function useAccountBalance(address: string) {
       onError: (error) => {
         console.log(error);
       },
-      refetchInterval: 100000,
+      refetchInterval: 10,
     }
   );
 }
