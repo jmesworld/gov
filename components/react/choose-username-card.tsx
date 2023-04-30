@@ -281,7 +281,7 @@ export const ChooseUsernameCard = ({
       <Flex marginTop={"11px"} marginBottom={"25px"}>
         <Spacer />
         <Button
-          disabled={!isIdentityNameAvailable}
+          disabled={!isIdentityNameAvailable || !isIdentityNameValid}
           onClick={() => {
             identityMutation.mutate();
           }}
