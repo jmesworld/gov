@@ -37,7 +37,7 @@
       "darwin/amd64": "https://github.com/terra-money/core/releases/download/v2.2.0/terra_2.2.0_Darwin_x86_64.tar.gz"
     },
     "genesis": {
-      "genesis_url": "http://http://51.38.52.37:1889/genesis.json"
+      "genesis_url": "http://51.38.52.37:1889/genesis.json"
     }
   },
   "peers": {
@@ -56,13 +56,13 @@
   "apis": {
     "rpc": [
       {
-        "address": "http://51.38.52.37:1889",
+        "address": "https://validator-proxy-service-o6lht.ondigitalocean.app/rpc",
         "provider": "devnode"
       }
     ],
     "rest": [
       {
-        "address": "http://51.38.52.37:1889",
+        "address": "https://walrus-app-7otc3.ondigitalocean.app",
         "provider": "devnode"
       }
     ],
