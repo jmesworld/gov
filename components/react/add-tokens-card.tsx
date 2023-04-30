@@ -87,7 +87,7 @@ export const AddTokensCard = ({
   useEffect(() => {
     setIdentityBalance(balance);
     if (
-      parseInt(balance) > 0 &&
+      balance > 0 &&
       identityBalanceQuery.isSuccess &&
       identityNameQuery.isSuccess
     ) {
