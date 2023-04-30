@@ -62,7 +62,7 @@
     ],
     "rest": [
       {
-        "address": "https://walrus-app-7otc3.ondigitalocean.app",
+        "address": "https://validator-proxy-service-o6lht.ondigitalocean.app/rpc",
         "provider": "devnode"
       }
     ],
