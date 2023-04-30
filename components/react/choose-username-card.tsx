@@ -31,6 +31,7 @@ import {
   useIdentityserviceGetIdentityByOwnerQuery,
 } from "../../client/Identityservice.react-query";
 import { WalletStatus } from "@cosmos-kit/core";
+import { IdentityError, validateName } from "../../utils/identity";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -65,6 +66,10 @@ export const ChooseUsernameCard = ({
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
   );
+
+  const validationResult: void | IdentityError =
+    validateName(identityNameInput);
+  const isIdentityNameValid = !validationResult?.name;
 
   useEffect(() => {
     if (identityName?.length > 0) {
@@ -177,7 +182,9 @@ export const ChooseUsernameCard = ({
             marginTop={"62.75px"}
             marginLeft={"8px"}
             _hover={{ backgroundColor: "transparent" }}
-            onClick={() => handleUpdateCard(radioGroup.indexOf(currentCard) - 2)}
+            onClick={() =>
+              handleUpdateCard(radioGroup.indexOf(currentCard) - 2)
+            }
           />
           <Image
             src="/Computer.svg"
@@ -258,12 +265,14 @@ export const ChooseUsernameCard = ({
             marginLeft={"18px"}
             marginTop={"8px"}
           >
-            {identityNameInput.length > 0 && identityName?.length === 0
-              ? identityNameQuery.isFetched
-                ? !isIdentityNameAvailable
-                  ? "Name taken!"
-                  : "Available"
-                : "Checking..."
+            {identityNameInput.length > 0
+              ? isIdentityNameValid
+                ? identityNameQuery.isFetched
+                  ? !isIdentityNameAvailable
+                    ? "Name taken!"
+                    : "Available"
+                  : "Checking..."
+                : validationResult.message
               : ""}
           </Text>
         </Box>
