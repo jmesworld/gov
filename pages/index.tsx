@@ -21,6 +21,7 @@ import { BjmesTokenQueryClient } from "../client/BjmesToken.client";
 import { useBjmesTokenBalanceQuery } from "../client/BjmesToken.react-query";
 import { addJMEStoKeplr, checkJMESInKeplr } from "../actions/keplr";
 import OnboardingModal from "../components/react/onboarding-modal";
+import { useAccountBalance } from "../hooks/useAccountBalance";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -94,15 +95,21 @@ export default function Home() {
     },
   });
 
-  const identityOwnerBalanceQuery = useBjmesTokenBalanceQuery({
-    client: bjmesTokenQueryClient,
-    args: { address: address as string },
-    options: {
-      //  refetchInterval: 10,
-      onSuccess: (data) => {
-        setIdentityBalance(data?.balance as string);
-      },
-    },
+  // const identityOwnerBalanceQuery = useBjmesTokenBalanceQuery({
+  //   client: bjmesTokenQueryClient,
+  //   args: { address: address as string },
+  //   options: {
+  //     //  refetchInterval: 10,
+  //     onSuccess: (data) => {
+  //       setIdentityBalance(data?.balance as string);
+  //     },
+  //   },
+  // });
+
+  const identityBalanceQuery = useAccountBalance(address as string);
+  const balance: any = identityBalanceQuery.data ?? 0;
+  useEffect(() => {
+    setIdentityBalance(balance);
   });
 
   return (
