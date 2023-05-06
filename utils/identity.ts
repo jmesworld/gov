@@ -27,6 +27,13 @@ export function validateName(name: string): void | IdentityError {
       length,
       max_length: MAX_NAME_LENGTH,
     };
+  } else if (/[A-Z]/.test(name)) {
+    return {
+      message: "Name contains uppercase letter",
+      name: "NameHasUpperCase",
+      length,
+      max_length: MAX_NAME_LENGTH,
+    };
   } else {
     const bytepos_invalid_char_start = name.search(invalid_char);
     if (bytepos_invalid_char_start === -1) {
