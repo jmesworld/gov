@@ -1,11 +1,11 @@
 {
   "$schema": "../chain.schema.json",
-  "chain_name": "JMES Testnet 888",
+  "chain_name": "JMES Testnet",
   "status": "live",
   "network_type": "testnet",
   "website": "https://www.jmes.cloud/",
-  "pretty_name": "JMES Testnet 888",
-  "chain_id": "jmes-888",
+  "pretty_name": "JMES Testnet",
+  "chain_id": "jmes-testnet-1",
   "daemon_name": "jmesd",
   "node_home": "$HOME/.jmes",
   "bech32_prefix": "jmes",
@@ -44,12 +44,12 @@
     "seeds": [],
     "persistent_peers": [
       {
-        "id": "24ef20ecc3fc8c34755fad4af92c67eaf6a7b795",
-        "address": "164.90.208.140:26656"
+        "id": "2a39d42bb299b913e5dbbaf9a5e458fb3ff7536b",
+        "address": "164.92.191.45:2665"
       },
       {
-        "id": "c3fa45f72c551a115dce166b77efb297e7d0a864",
-        "address": "http://51.38.52.37:26656"
+        "id": "eb490967a016bbcb361ab2ba1f6d2a2ca1eb8593",
+        "address": "46.101.197.51:26656"
       }
     ]
   },
@@ -57,19 +57,19 @@
     "rpc": [
       {
         "address": "https://validator-proxy-service-o6lht.ondigitalocean.app/rpc",
-        "provider": "devnode"
+        "provider": "jmesworld"
       }
     ],
     "rest": [
       {
         "address": "https://validator-proxy-service-o6lht.ondigitalocean.app/rpc",
-        "provider": "devnode"
+        "provider": "jmesworld"
       }
     ],
     "grpc": [
       {
-        "address": "http://51.38.52.37:1889",
-        "provider": "devnode"
+        "address": "http://164.92.191.45:1889",
+        "provider": "zeus"
       }
     ]
   },

@@ -141,8 +141,8 @@ export const DaoProposal = ({
         {daoName}
       </Text>
       <Flex height={"46px"} />
-      <Flex>
-        <Box>
+      <Flex >
+        <Box width={"100%"}>
           <ProposalHeader isGov={false} />
           <Flex height={"10px"} />
           {!!proposalsQuery.data ? (

@@ -8,11 +8,11 @@ import { SignerOptions } from "@cosmos-kit/core";
 import { assets } from "chain-registry";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Chain } from "@chain-registry/types";
-import jmesTestnet888 from "../config/chains/jmes-testnet-888/chain.json";
+import jmesTestnet from "../config/chains/jmes-testnet-1/chain.json";
 import { chainName } from "../config/defaults";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
-const chains: Chain[] = [jmesTestnet888];
+const chains: Chain[] = [jmesTestnet];
 
 function CreateCosmosApp({ Component, pageProps }: AppProps) {
   const signerOptions: SignerOptions = {
