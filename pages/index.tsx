@@ -22,6 +22,7 @@ import { useBjmesTokenBalanceQuery } from "../client/BjmesToken.react-query";
 import { addJMEStoKeplr, checkJMESInKeplr } from "../actions/keplr";
 import OnboardingModal from "../components/react/onboarding-modal";
 import { useAccountBalance } from "../hooks/useAccountBalance";
+import CreateDao from "./CreateDao";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -36,12 +37,12 @@ export default function Home() {
   const [isJMESInKeplr, setJMESInKeplr] = useState(null || Boolean);
   const [isConnectButtonClicked, setConnectButtonClicked] = useState(false);
   const [isGovProposalSelected, setIsGovProposalSelected] = useState(true);
+  const [isCreateDaoSelected, setCreateDaoSelected] = useState(false);
   const [selectedDao, setSelectedDao] = useState("");
   const [selectedDaoName, setSelectedDaoName] = useState("");
   const [isNewDataUpdated, setDataUpdated] = useState(false);
   const [identityBalance, setIdentityBalance] = useState("");
   const [identityName, setIdentityName] = useState("");
-
 
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
@@ -123,7 +124,7 @@ export default function Home() {
         <title>JMES Governance</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Flex padding={0} width={"100vw"} height={'100vh'}>
+      <Flex padding={0} width={"100vw"} height={"100vh"}>
         <VStack
           width={"200px"}
           height={"100%"}
@@ -158,6 +159,7 @@ export default function Home() {
             isSelected={isGovProposalSelected}
             onClick={() => {
               setIsGovProposalSelected(true);
+              setCreateDaoSelected(false);
               setSelectedDao("");
               setSelectedDaoName("");
             }}
@@ -192,6 +194,7 @@ export default function Home() {
               setIsGovProposalSelected={setIsGovProposalSelected}
               selectedDaoName={selectedDaoName}
               setSelectedDaoName={setSelectedDaoName}
+              setCreateDaoSelected={setCreateDaoSelected}
             />
           ) : (
             <></>
@@ -204,6 +207,8 @@ export default function Home() {
             onClick={() => {
               if (status !== WalletStatus.Connected) {
                 setConnectButtonClicked(true);
+              } else {
+                setCreateDaoSelected(true);
               }
             }}
           />
@@ -224,7 +229,15 @@ export default function Home() {
           />
           <Flex height={"10px"} />
         </VStack>
-        {isGovProposalSelected ? (
+        {isCreateDaoSelected ? (
+          <CreateDao
+            identityName={identityName}
+            identityBalance={identityBalance}
+            isConnectButtonClicked={isConnectButtonClicked}
+            setConnectButtonClicked={setConnectButtonClicked}
+            setCreateDaoSelected={setCreateDaoSelected}
+          />
+        ) : isGovProposalSelected ? (
           <GovernanceProposal
             identityName={identityName}
             identityBalance={identityBalance}
@@ -258,6 +271,7 @@ export const MyDaosList = ({
   setSelectedDao,
   selectedDaoName,
   setSelectedDaoName,
+  setCreateDaoSelected,
 }: {
   daos: any;
   setIsGovProposalSelected: Function;
@@ -265,6 +279,7 @@ export const MyDaosList = ({
   setSelectedDao: Function;
   selectedDaoName: string;
   setSelectedDaoName: Function;
+  setCreateDaoSelected: Function;
 }) => {
   const chainContext = useChain(chainName);
   const { address } = chainContext;
@@ -289,6 +304,7 @@ export const MyDaosList = ({
             setIsGovProposalSelected(false);
             setSelectedDao(dao.address);
             setSelectedDaoName(dao.name);
+            setCreateDaoSelected(false);
           }}
         />
       )
