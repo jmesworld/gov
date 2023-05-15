@@ -28,7 +28,10 @@ import NextLink from "next/link";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { NavBarItem } from "../components/react/navigation-item";
 import { ConnectedWalletButton } from "../components/react/connected-wallet-button";
-import { ProposalHeader, ProposalList } from "../components/react/proposal-list";
+import {
+  ProposalHeader,
+  ProposalList,
+} from "../components/react/proposal-list";
 import { useDaoMultisigListProposalsQuery } from "../client/DaoMultisig.react-query";
 import { DaoMultisigQueryClient } from "../client/DaoMultisig.client";
 import { DaoMembersList } from "../components/react/dao-members-list";
@@ -46,7 +49,7 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
-export const DaoProposal = ({
+export default function DaoProposal({
   daoAddress,
   daoName,
   identityName,
@@ -60,7 +63,7 @@ export const DaoProposal = ({
   identityBalance: string;
   isConnectButtonClicked: boolean;
   setConnectButtonClicked: Function;
-}) => {
+}) {
   const chainContext = useChain(chainName);
   const { address, getCosmWasmClient } = chainContext;
 
@@ -178,4 +181,4 @@ export const DaoProposal = ({
       </Flex>
     </Box>
   );
-};
+}

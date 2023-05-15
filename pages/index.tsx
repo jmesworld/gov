@@ -11,7 +11,6 @@ import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { useEffect, useState } from "react";
 import { Ordering } from "../client/Identityservice.types";
 import { useMyDaosList } from "../hooks/useMyDaosList";
-import { DaoProposal } from "./DaoProposal";
 import GovernanceProposal from "./GovernanceProposal";
 import { WalletStatus } from "@cosmos-kit/core";
 import { JMESLogo } from "../components/react";
@@ -23,6 +22,7 @@ import { addJMEStoKeplr, checkJMESInKeplr } from "../actions/keplr";
 import OnboardingModal from "../components/react/onboarding-modal";
 import { useAccountBalance } from "../hooks/useAccountBalance";
 import CreateDao from "./CreateDao";
+import DaoProposal from "./DaoProposal";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
