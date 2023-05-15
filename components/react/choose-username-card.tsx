@@ -11,6 +11,7 @@ import {
   InputRightElement,
   useToast,
   IconButton,
+  CircularProgress,
 } from "@chakra-ui/react";
 import { useChain } from "@cosmos-kit/react";
 import { OnboardingProgressIndicator } from "./onboarding-progress-indicator";
@@ -19,8 +20,12 @@ import { useEffect, useState } from "react";
 import {
   CosmWasmClient,
   MsgExecuteContractEncodeObject,
+  SigningCosmWasmClient,
 } from "@cosmjs/cosmwasm-stargate";
-import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
+import {
+  IdentityserviceClient,
+  IdentityserviceQueryClient,
+} from "../../client/Identityservice.client";
 import { useMutation } from "@tanstack/react-query";
 import { ExecuteMsg } from "../../client/Identityservice.types";
 import { StdFee } from "@cosmjs/stargate";
@@ -29,12 +34,23 @@ import { toHex, toUtf8 } from "@cosmjs/encoding";
 import {
   useIdentityserviceGetIdentityByNameQuery,
   useIdentityserviceGetIdentityByOwnerQuery,
+  useIdentityserviceRegisterUserMutation,
 } from "../../client/Identityservice.react-query";
 import { WalletStatus } from "@cosmos-kit/core";
 import { IdentityError, validateName } from "../../utils/identity";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
+
+const fee: StdFee = {
+  amount: [
+    {
+      denom: "ujmes",
+      amount: "2",
+    },
+  ],
+  gas: "1000000",
+};
 
 export const ChooseUsernameCard = ({
   radioGroup,
@@ -62,10 +78,13 @@ export const ChooseUsernameCard = ({
 
   const [identityNameInput, setIdentityNameInput] = useState("");
   const [isIdentityNameAvailable, setIsIdentityNameAvailable] = useState(false);
+  const [isCreatingIdentity, setIsCreatingIdentity] = useState(false);
 
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
   );
+  const [signingClient, setSigningClient] =
+    useState<SigningCosmWasmClient | null>(null);
 
   const validationResult: void | IdentityError =
     validateName(identityNameInput);
@@ -81,6 +100,7 @@ export const ChooseUsernameCard = ({
   }, [identityName]);
 
   useEffect(() => {
+    if(address) {
     getCosmWasmClient()
       .then((cosmWasmClient) => {
         if (!cosmWasmClient || !address) {
@@ -89,68 +109,30 @@ export const ChooseUsernameCard = ({
         setCosmWasmClient(cosmWasmClient);
       })
       .catch((error) => console.log(error));
-  }, [address, getCosmWasmClient]);
+
+    getSigningCosmWasmClient()
+      .then((signingClient) => {
+        if (!signingClient) {
+          return;
+        }
+        setSigningClient(signingClient);
+      })
+      .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient, getSigningCosmWasmClient]);
 
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     cosmWasmClient as CosmWasmClient,
     IDENTITY_SERVICE_CONTRACT
   );
 
-  const identityMutation = useMutation(["identityMutation"], registerUser);
+  const idClient: IdentityserviceClient = new IdentityserviceClient(
+    signingClient as SigningCosmWasmClient,
+    address as string,
+    IDENTITY_SERVICE_CONTRACT
+  );
 
-  async function registerUser() {
-    const signingCosmWasmClient = await getSigningCosmWasmClient();
-    const contract = IDENTITY_SERVICE_CONTRACT;
-
-    const msg: ExecuteMsg = { register_user: { name: identityNameInput } };
-    const fee: StdFee = {
-      amount: [
-        {
-          denom: "ujmes",
-          amount: "2000",
-        },
-      ],
-      gas: "1000000",
-    };
-
-    const execMsg: MsgExecuteContractEncodeObject = {
-      typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
-      value: MsgExecuteContract.fromPartial({
-        sender: address,
-        contract: IDENTITY_SERVICE_CONTRACT,
-        msg: toUtf8(JSON.stringify(msg)),
-      }),
-    };
-
-    try {
-      const result = await signingCosmWasmClient.signAndBroadcast(
-        address as string,
-        [execMsg],
-        fee
-      );
-      if (result.code === 0) {
-        toast({
-          title: "Identity created.",
-          description: "We've created your identity for you.",
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-        });
-        handleUpdateCard(radioGroup.indexOf(currentCard));
-      } else {
-        toast({
-          title: "Identity creation error.",
-          description: result.code,
-          status: "error",
-          duration: 9000,
-          isClosable: true,
-        });
-      }
-      return result;
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  const identityMutation = useIdentityserviceRegisterUserMutation();
 
   const identityNameQuery = useIdentityserviceGetIdentityByNameQuery({
     client,
@@ -283,7 +265,42 @@ export const ChooseUsernameCard = ({
         <Button
           disabled={!isIdentityNameAvailable || !isIdentityNameValid}
           onClick={() => {
-            identityMutation.mutate();
+            setIsCreatingIdentity(true);
+            identityMutation
+              .mutateAsync({
+                client: idClient,
+                msg: {
+                  name: identityNameInput,
+                },
+                args: { fee },
+              })
+              .then((result) => {
+                toast({
+                  title: "Identity created.",
+                  description: "We've created your Identity for you.",
+                  status: "success",
+                  duration: 9000,
+                  isClosable: true,
+                  containerStyle: {
+                    backgroundColor: "darkPurple",
+                    borderRadius: 12,
+                  },
+                });
+              })
+              .catch((error) => {
+                toast({
+                  title: "Identity creation error",
+                  description: error.toString(),
+                  status: "error",
+                  duration: 9000,
+                  isClosable: true,
+                  containerStyle: {
+                    backgroundColor: "red",
+                    borderRadius: 12,
+                  },
+                });
+              })
+              .finally(() => setIsCreatingIdentity(false));
           }}
           backgroundColor={"green"}
           borderRadius={90}
@@ -296,14 +313,18 @@ export const ChooseUsernameCard = ({
           borderWidth={"1px"}
           borderColor={"rgba(0,0,0,0.1)"}
         >
-          <Text
-            color="midnight"
-            fontFamily={"DM Sans"}
-            fontWeight="medium"
-            fontSize={14}
-          >
-            Create identity
-          </Text>
+          {!isCreatingIdentity ? (
+            <Text
+              color="midnight"
+              fontFamily={"DM Sans"}
+              fontWeight="medium"
+              fontSize={14}
+            >
+              Create Identity
+            </Text>
+          ) : (
+            <CircularProgress isIndeterminate size={"24px"} color="midnight" />
+          )}
         </Button>
         <Spacer />
       </Flex>

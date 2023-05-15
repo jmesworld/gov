@@ -68,24 +68,26 @@ export const CreateDaoForm = ({
     useState<SigningCosmWasmClient | null>(null);
 
   useEffect(() => {
-    getCosmWasmClient()
-      .then((cosmWasmClient) => {
-        if (!cosmWasmClient) {
-          return;
-        }
-        setCosmWasmClient(cosmWasmClient);
-      })
-      .catch((error) => console.log(error));
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
 
-    getSigningCosmWasmClient()
-      .then((signingClient) => {
-        if (!signingClient) {
-          return;
-        }
-        setSigningClient(signingClient);
-      })
-      .catch((error) => console.log(error));
-  }, [getCosmWasmClient, getSigningCosmWasmClient]);
+      getSigningCosmWasmClient()
+        .then((signingClient) => {
+          if (!signingClient) {
+            return;
+          }
+          setSigningClient(signingClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient, getSigningCosmWasmClient]);
 
   const totalVotingPower = daoMembers.reduce(
     (sum, member) => sum + (!!member?.votingPower ? member?.votingPower : 0),
@@ -128,7 +130,7 @@ export const CreateDaoForm = ({
     totalVotingPower === 100 &&
     isDaoNameValid &&
     threshold > 0 &&
-    isIdentityNamesValid;
+    (isIdentityNamesValid || daoMembers.length === 1);
 
   const idClient: IdentityserviceClient = new IdentityserviceClient(
     signingClient as SigningCosmWasmClient,
@@ -497,7 +499,7 @@ export const CreateDaoForm = ({
                   duration: 9000,
                   isClosable: true,
                   containerStyle: {
-                    backgroundColor: "darkPurple",
+                    backgroundColor: "red",
                     borderRadius: 12,
                   },
                 });
@@ -525,11 +527,7 @@ export const CreateDaoForm = ({
               Create
             </Text>
           ) : (
-            <CircularProgress
-              isIndeterminate
-              size={"24px"}
-              color="midnight"
-            />
+            <CircularProgress isIndeterminate size={"24px"} color="midnight" />
           )}
         </Button>
       </Flex>

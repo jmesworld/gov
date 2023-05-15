@@ -35,8 +35,6 @@ const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
 const NEXT_PUBLIC_BJMES_TOKEN_CONTRACT = process.env
   .NEXT_PUBLIC_BJMES_TOKEN_CONTRACT as string;
 
-let cosmWasmClient: CosmWasmClient;
-
 export const CreateIdentitySection = () => {
   const chainContext = useChain(chainName);
   const { status } = chainContext;
@@ -82,12 +80,8 @@ export const CreateIdentitySection = () => {
 
 export default function IdentityInputSection() {
   const chainContext = useChain(chainName);
-  const {
-    address,
-    status,
-    getCosmWasmClient,
-    getSigningCosmWasmClient,
-  } = chainContext;
+  const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
+    chainContext;
 
   const toast = useToast();
 
@@ -99,16 +93,25 @@ export default function IdentityInputSection() {
     chainID: CHAIN_ID,
   };
 
+  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
+    null
+  );
   useEffect(() => {
-    const init = async () => {
-      cosmWasmClient = await getCosmWasmClient();
-    };
-    init().catch(console.error);
-  });
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient]);
   // console.log(cosmWasmClient)
   const args = { owner: address ? address : "" };
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
-    cosmWasmClient,
+    cosmWasmClient as CosmWasmClient,
     IDENTITY_SERVICE_CONTRACT
   );
 
@@ -122,11 +125,11 @@ export default function IdentityInputSection() {
     const fee: StdFee = {
       amount: [
         {
-          denom: 'ujmes',
-          amount: '2000',
+          denom: "ujmes",
+          amount: "2000",
         },
       ],
-      gas: '1000000',
+      gas: "1000000",
     };
 
     const execMsg: MsgExecuteContractEncodeObject = {

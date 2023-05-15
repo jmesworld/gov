@@ -29,8 +29,6 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
-let cosmWasmClient: CosmWasmClient;
-
 export const ProposalList = ({
   proposals,
   isGov,
@@ -183,15 +181,24 @@ export const ProposalListItem = ({
     chainID: CHAIN_ID,
   };
 
+  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
+    null
+  );
   useEffect(() => {
-    const init = async () => {
-      cosmWasmClient = await getCosmWasmClient();
-    };
-    init().catch(console.error);
-  });
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient]);
 
   const daoQueryClient = new DaoMultisigQueryClient(
-    cosmWasmClient,
+    cosmWasmClient as CosmWasmClient,
     daoAddress as string
   );
 

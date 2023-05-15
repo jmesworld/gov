@@ -42,15 +42,17 @@ export default function OnboardingModal() {
     null
   );
   useEffect(() => {
-    getCosmWasmClient()
-      .then((cosmWasmClient) => {
-        if (!cosmWasmClient) {
-          return;
-        }
-        setCosmWasmClient(cosmWasmClient);
-      })
-      .catch((error) => console.log(error));
-  }, [getCosmWasmClient]);
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient]);
 
   const identityserviceQueryClient: IdentityserviceQueryClient =
     new IdentityserviceQueryClient(
@@ -87,9 +89,9 @@ export default function OnboardingModal() {
 
   useEffect(() => {
     if (status === WalletStatus.Connecting) {
-      setIsInitializing(true)
+      setIsInitializing(true);
     }
-  })
+  });
 
   useEffect(() => {
     let cards = new Array();

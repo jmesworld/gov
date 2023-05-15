@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { useChain } from "@cosmos-kit/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { DaoMultisigQueryClient } from "../../client/DaoMultisig.client";
 import { useDaoMultisigListVotersQuery } from "../../client/DaoMultisig.react-query";
 import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
@@ -28,7 +28,6 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
-let cosmWasmClient: CosmWasmClient;
 
 const LCDOptions = {
   URL: LCD_URL,
@@ -37,17 +36,26 @@ const LCDOptions = {
 
 export const DaoMembersList = ({ daoAddress }: { daoAddress: string }) => {
   const chainContext = useChain(chainName);
-  const { getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
+  const { address, getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
 
+  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
+    null
+  );
   useEffect(() => {
-    const init = async () => {
-      cosmWasmClient = await getCosmWasmClient();
-    };
-    init().catch(console.error);
-  });
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient]);
 
   const daoMultisigQueryClient = new DaoMultisigQueryClient(
-    cosmWasmClient,
+    cosmWasmClient as CosmWasmClient,
     daoAddress
   );
 
@@ -140,15 +148,24 @@ export const DaoMembersListItem = ({
   const chainContext = useChain(chainName);
   const { getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
 
+  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
+    null
+  );
   useEffect(() => {
-    const init = async () => {
-      cosmWasmClient = await getCosmWasmClient();
-    };
-    init().catch(console.error);
-  });
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient]);
 
   const identityserviceQueryClient = new IdentityserviceQueryClient(
-    cosmWasmClient,
+    cosmWasmClient as CosmWasmClient,
     IDENTITY_SERVICE_CONTRACT
   );
 

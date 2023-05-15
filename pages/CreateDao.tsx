@@ -48,15 +48,17 @@ export default function CreateDao({
     null
   );
   useEffect(() => {
-    getCosmWasmClient()
-      .then((cosmWasmClient) => {
-        if (!cosmWasmClient) {
-          return;
-        }
-        setCosmWasmClient(cosmWasmClient);
-      })
-      .catch((error) => console.log(error));
-  }, [getCosmWasmClient]);
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient]);
 
   const governanceQueryClient = new GovernanceQueryClient(
     cosmWasmClient as CosmWasmClient,
@@ -117,7 +119,11 @@ export default function CreateDao({
       </Text>
       <Flex height={"75px"} />
       <CreateDaoForm
-        daoOwner={{ name: identityName, address: address as string, votingPower: 0 }}
+        daoOwner={{
+          name: identityName,
+          address: address as string,
+          votingPower: 0,
+        }}
         setCreateDaoSelected={setCreateDaoSelected}
       />
     </Box>

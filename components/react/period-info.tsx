@@ -25,20 +25,22 @@ const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
 export default function PeriodInfo() {
-  const { getCosmWasmClient } = useChain(chainName);
+  const { address, getCosmWasmClient } = useChain(chainName);
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
   );
   useEffect(() => {
-    getCosmWasmClient()
-      .then((cosmWasmClient) => {
-        if (!cosmWasmClient) {
-          return;
-        }
-        setCosmWasmClient(cosmWasmClient);
-      })
-      .catch((error) => console.log(error));
-  }, [getCosmWasmClient]);
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient]);
 
   const governanceQueryClient = new GovernanceQueryClient(
     cosmWasmClient as CosmWasmClient,
@@ -133,7 +135,7 @@ export default function PeriodInfo() {
                   Current cycle:{" "}
                   {!!periodInfoQuery?.data
                     ? (((current_period?.charAt(0).toUpperCase() as string) +
-                        current_period?.slice(1)) as string)
+                      current_period?.slice(1)) as string)
                     : ""}
                 </Text>
                 <Divider

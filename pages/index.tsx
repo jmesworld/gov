@@ -11,7 +11,7 @@ import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { useEffect, useState } from "react";
 import { Ordering } from "../client/Identityservice.types";
 import { useMyDaosList } from "../hooks/useMyDaosList";
-import { DaoProposal } from "../components/DaoProposal";
+import { DaoProposal } from "./DaoProposal";
 import GovernanceProposal from "./GovernanceProposal";
 import { WalletStatus } from "@cosmos-kit/core";
 import { JMESLogo } from "../components/react";
@@ -49,15 +49,24 @@ export default function Home() {
   );
 
   useEffect(() => {
-    getCosmWasmClient()
-      .then((cosmWasmClient) => {
-        if (!cosmWasmClient) {
-          return;
-        }
-        setCosmWasmClient(cosmWasmClient);
-      })
-      .catch((error) => console.log(error));
-  }, [getCosmWasmClient]);
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient]);
+
+  useEffect(() => {
+    if (status == WalletStatus.Disconnected) {
+      setCreateDaoSelected(false);
+      setIsGovProposalSelected(true);
+    }
+  }, [status]);
 
   useEffect(() => {
     if (!isJMESInKeplr && isConnectButtonClicked) {

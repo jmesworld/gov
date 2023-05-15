@@ -25,7 +25,9 @@ export const ConnectedWalletButton = ({
 }) => {
   const { address, disconnect, getCosmWasmClient, getSigningCosmWasmClient } =
     useChain(chainName);
-  return (
+  
+  
+    return (
     <Menu>
       {({ isOpen }) => (
         <>
@@ -69,7 +71,7 @@ export const ConnectedWalletButton = ({
               >
                 {!!identityName
                   ? identityName
-                  : `${address?.substring(0, 15)}...`}
+                  : `${address?.substring(0, 11)}...`}
               </Text>
               <Spacer />
               <Divider
