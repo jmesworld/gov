@@ -212,7 +212,7 @@ export default function Home() {
             width="180px"
             height="48px"
             text={"New DAO"}
-            disabled={false}
+            disabled={!identityName}
             onClick={() => {
               if (status !== WalletStatus.Connected) {
                 setConnectButtonClicked(true);
