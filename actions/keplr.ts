@@ -37,9 +37,9 @@ export const addJMEStoKeplr = async () => {
       },
     ],
     gasPriceStep: {
-      low: 0.05,
-      average: 0.125,
-      high: 0.2,
+      low: 0.1,
+      average: 0.2,
+      high: 0.4,
     },
     features: ["stargate", "no-legacy-stdTx", "ibc-transfer"],
   });
