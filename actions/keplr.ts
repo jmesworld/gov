@@ -1,9 +1,9 @@
-import { chainName, chainId, rest, rpc } from "../config/defaults";
+import { chainName, chainId, rest_keplr, rpc_keplr } from "../config/defaults";
 export const addJMEStoKeplr = async () => {
   // @ts-ignore
   return await window.keplr.experimentalSuggestChain({
-    rpc: rpc,
-    rest: rest,
+    rpc: rpc_keplr,
+    rest: rest_keplr,
     chainId: chainId,
     chainName: chainName,
     stakeCurrency: {
