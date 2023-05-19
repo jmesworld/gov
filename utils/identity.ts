@@ -48,3 +48,28 @@ export function validateName(name: string): void | IdentityError {
     }
   }
 }
+
+export function countObjectsWithDuplicateNames(
+  objects: { name: string; address: string; votingPower: number }[]
+): number {
+  const nameCounts: Record<string, number> = {};
+
+  // Count the occurrences of each name
+  for (const obj of objects) {
+    if (obj.name in nameCounts) {
+      nameCounts[obj.name]++;
+    } else {
+      nameCounts[obj.name] = 1;
+    }
+  }
+
+  // Count the objects with duplicate names
+  let count = 0;
+  for (const name in nameCounts) {
+    if (nameCounts[name] > 1) {
+      count++;
+    }
+  }
+
+  return count;
+}

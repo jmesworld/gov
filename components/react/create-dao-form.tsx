@@ -18,7 +18,10 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { validateName } from "../../utils/identity";
+import {
+  countObjectsWithDuplicateNames,
+  validateName,
+} from "../../utils/identity";
 import { AddIcon, QuestionOutlineIcon } from "@chakra-ui/icons";
 import {
   IdentityserviceClient,
@@ -59,6 +62,7 @@ export const CreateDaoForm = ({
   const [isIdentityNamesValid, setIdentityNamesValid] = useState(false);
   const [focusedCosignerIndex, setFocusedCosignerIndex] = useState(Infinity);
   const [isCreatingDao, setIsCreatingDao] = useState(false);
+  const [doubleCounts, setDoubleCounts] = useState(0);
 
   const toast = useToast();
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
@@ -130,7 +134,8 @@ export const CreateDaoForm = ({
     totalVotingPower === 100 &&
     isDaoNameValid &&
     threshold > 0 &&
-    (isIdentityNamesValid || daoMembers.length === 1);
+    (isIdentityNamesValid || daoMembers.length === 1) &&
+    doubleCounts === 0;
 
   const idClient: IdentityserviceClient = new IdentityserviceClient(
     signingClient as SigningCosmWasmClient,
@@ -144,6 +149,11 @@ export const CreateDaoForm = ({
   }));
 
   const registerDaoMutation = useIdentityserviceRegisterDaoMutation();
+
+  useEffect(() => {
+    const dups = countObjectsWithDuplicateNames(daoMembers);
+    setDoubleCounts(dups);
+  });
 
   return (
     <Box>
@@ -167,6 +177,21 @@ export const CreateDaoForm = ({
         color={"purple"}
         onChange={(e) => setDaoName(e.target.value)}
       />
+      <Text
+        marginBottom={"8px"}
+        color={"rgba(0,0,0,0.7)"}
+        fontFamily={"DM Sans"}
+        fontWeight="normal"
+        fontSize={12}
+        marginLeft={"18px"}
+        marginTop={"8px"}
+      >
+        {daoName.length > 0
+          ? isDaoNameValid
+            ? ""
+            : validationResult.message
+          : ""}
+      </Text>
       <Flex width={"758px"} marginTop={"38px"} marginBottom={"19px"}>
         <Button
           variant={"outline"}
@@ -239,6 +264,7 @@ export const CreateDaoForm = ({
         <Flex key={index} marginBottom={"16px"}>
           <InputGroup width={"610px"} height={"48px"}>
             <Input
+              isReadOnly={index === 0}
               variant={"outline"}
               borderColor={"rgba(112,79,247,0.5)"}
               background={"rgba(112,79,247,0.1)"}
@@ -338,7 +364,6 @@ export const CreateDaoForm = ({
       ))}
       <Flex
         marginTop={"16px"}
-        marginBottom={"93px"}
         height={"48px"}
         alignItems={"center"}
         width={"758px"}
@@ -364,7 +389,7 @@ export const CreateDaoForm = ({
             width={"102px"}
             height={"100%"}
             borderColor={"rgba(112,79,247,0.5)"}
-            background={"purple"}
+            background={totalVotingPower === 100 ? "purple" : "red"}
             focusBorderColor="darkPurple"
             borderRadius={12}
             color={"white"}
@@ -385,6 +410,20 @@ export const CreateDaoForm = ({
         </InputGroup>
       </Flex>
       <Text
+        marginBottom={"8px"}
+        color={"red"}
+        fontFamily={"DM Sans"}
+        fontWeight="normal"
+        fontSize={18}
+        marginLeft={"12px"}
+        marginTop={"8px"}
+      >
+        {doubleCounts > 0
+          ? "Single member identity entered more than once!"
+          : ""}
+      </Text>
+      <Text
+        marginTop={"93px"}
         color={"rgba(15,0,86,0.8)"}
         fontFamily="DM Sans"
         fontSize={12}
