@@ -227,8 +227,8 @@ export const DaoMembersListItem = ({
             >
               <CircularProgressLabel
                 color="rgba(0,0,0,0.7)"
-                fontWeight="medium"
-                fontSize={14}
+                fontWeight="bold"
+                fontSize={10}
               >
                 {weightPercent}%
               </CircularProgressLabel>

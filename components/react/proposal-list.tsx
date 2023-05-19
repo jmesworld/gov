@@ -96,7 +96,7 @@ export const ProposalList = ({
 
 export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
   return (
-    <Flex>
+    <Flex width={"1137px"}>
       <Text
         color="rgba(15,0,86,0.8)"
         fontWeight="medium"
@@ -111,7 +111,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
-        marginLeft={isGov ? "17.942%" : "15.67%"}
+        marginLeft={isGov ? "204px" : "15.67%"}
         width={"32px"}
       >
         YES
@@ -262,16 +262,18 @@ export const ProposalListItem = ({
       >
         <Box>
           <Flex width={"100%"}>
-            <Text
-              width={isGov ? "281px" : "268px"}
-              color="white"
-              fontFamily={"DM Sans"}
-              fontWeight="normal"
-              fontSize={18}
-              marginLeft={"14px"}
-            >
-              {title.length > 20 ? title.substring(0, 20) + "..." : title}
-            </Text>
+            <Box>
+              <Text
+                width={isGov ? "281px" : "268px"}
+                color="white"
+                fontFamily={"DM Sans"}
+                fontWeight="normal"
+                fontSize={18}
+                marginLeft={"14px"}
+              >
+                {title.length > 20 ? title.substring(0, 20) + "..." : title}
+              </Text>
+            </Box>
             <Tooltip
               hasArrow={true}
               label={`${roundNumber(yesPercentActual * 100)}%`}
@@ -281,16 +283,18 @@ export const ProposalListItem = ({
               placement={"right"}
               borderRadius={"8px"}
             >
-              <Text
-                width={"60px"}
-                color="white"
-                fontFamily={"DM Sans"}
-                fontWeight="normal"
-                fontSize={18}
-                marginLeft={isGov ? "11.8734%" : "0%"}
-              >
-                {yes}
-              </Text>
+              <Box>
+                <Text
+                  width={"60px"}
+                  color="white"
+                  fontFamily={"DM Sans"}
+                  fontWeight="normal"
+                  fontSize={18}
+                  marginLeft={isGov ? "135px" : "0%"}
+                >
+                  {yes}
+                </Text>
+              </Box>
             </Tooltip>
             <Tooltip
               hasArrow={true}
@@ -300,81 +304,91 @@ export const ProposalListItem = ({
               direction={"rtl"}
               placement={"right"}
             >
+              <Box>
+                <Text
+                  width={"60px"}
+                  color="white"
+                  fontFamily={"DM Sans"}
+                  fontWeight="normal"
+                  fontSize={18}
+                  marginLeft={isGov ? "93px" : "7.416%"}
+                >
+                  {no}
+                </Text>
+              </Box>
+            </Tooltip>
+            <Box>
               <Text
-                width={"60px"}
+                width={"87px"}
                 color="white"
                 fontFamily={"DM Sans"}
                 fontWeight="normal"
                 fontSize={18}
-                marginLeft={isGov ? "8.1794%" : "7.416%"}
+                marginLeft={isGov ? "103px" : "6.8182%"}
               >
-                {no}
+                {threshold?.toString() + "%"}
               </Text>
-            </Tooltip>
-            <Text
-              width={"87px"}
-              color="white"
-              fontFamily={"DM Sans"}
-              fontWeight="normal"
-              fontSize={18}
-              marginLeft={isGov ? "9.059%" : "6.8182%"}
-            >
-              {threshold?.toString() + "%"}
-            </Text>
+            </Box>
           </Flex>
 
           <Flex alignItems={"center"}>
-            <Text
-              width={isGov ? "281px" : "268px"}
-              color="white"
-              fontFamily={"DM Sans"}
-              fontWeight="normal"
-              fontSize={14}
-              marginLeft={"14px"}
-              opacity={"70%"}
-            >
-              {type.length > 26 ? title.substring(0, 26) + "..." : type}
-            </Text>
+            <Box>
+              <Text
+                width={isGov ? "281px" : "268px"}
+                color="white"
+                fontFamily={"DM Sans"}
+                fontWeight="normal"
+                fontSize={14}
+                marginLeft={"14px"}
+                opacity={"70%"}
+              >
+                {type.length > 26 ? title.substring(0, 26) + "..." : type}
+              </Text>
+            </Box>
 
             <Box
               width={"9px"}
               height={"9px"}
               backgroundColor="#68FFF1"
-              marginLeft={isGov ? "11.8734%" : "0%"}
+              marginLeft={isGov ? "135px" : "0%"}
               borderRadius={90}
             />
-            <Text
-              color="white"
-              fontFamily={"DM Sans"}
-              fontWeight="normal"
-              fontSize={14}
-              marginLeft={"6px"}
-              opacity={"70%"}
-              width={"65px"}
-            >
-              {yesCount < 99 ? `${yesCount} votes` : `99+ votes`}
-            </Text>
+            <Box>
+              <Text
+                color="white"
+                fontFamily={"DM Sans"}
+                fontWeight="normal"
+                fontSize={14}
+                marginLeft={"6px"}
+                opacity={"70%"}
+                width={"65px"}
+              >
+                {yesCount < 99 ? `${yesCount} votes` : `99+ votes`}
+              </Text>
+            </Box>
 
             <Box
               alignSelf={"center"}
               width={"9px"}
               height={"9px"}
               backgroundColor="#FF5876"
-              marginLeft={isGov ? "6.42%" : "5.024%"}
+              marginLeft={isGov ? "73px" : "5.024%"}
               borderRadius={90}
             />
-            <Text
-              color="white"
-              fontFamily={"DM Sans"}
-              fontWeight="normal"
-              fontSize={14}
-              marginLeft={"6px"}
-              opacity={"70%"}
-              width={"65px"}
-              marginRight={isGov ? "7.212%" : "4.306%"}
-            >
-              {noCount < 99 ? `${noCount} votes` : `99+ votes`}
-            </Text>
+            <Box>
+              <Text
+                color="white"
+                fontFamily={"DM Sans"}
+                fontWeight="normal"
+                fontSize={14}
+                marginLeft={"6px"}
+                opacity={"70%"}
+                width={"65px"}
+                marginRight={isGov ? "82px" : "4.306%"}
+              >
+                {noCount < 99 ? `${noCount} votes` : `99+ votes`}
+              </Text>
+            </Box>
             <ProgressBar yesPercent={yesPercent} threshold={threshold} />
           </Flex>
         </Box>
