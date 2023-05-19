@@ -290,7 +290,7 @@ export const ProposalListItem = ({
                   fontFamily={"DM Sans"}
                   fontWeight="normal"
                   fontSize={18}
-                  marginLeft={isGov ? "135px" : "0%"}
+                  marginLeft={isGov ? "135px" : "0px"}
                 >
                   {yes}
                 </Text>
@@ -311,7 +311,7 @@ export const ProposalListItem = ({
                   fontFamily={"DM Sans"}
                   fontWeight="normal"
                   fontSize={18}
-                  marginLeft={isGov ? "93px" : "7.416%"}
+                  marginLeft={isGov ? "93px" : "62px"}
                 >
                   {no}
                 </Text>
@@ -324,7 +324,7 @@ export const ProposalListItem = ({
                 fontFamily={"DM Sans"}
                 fontWeight="normal"
                 fontSize={18}
-                marginLeft={isGov ? "103px" : "6.8182%"}
+                marginLeft={isGov ? "103px" : "57px"}
               >
                 {threshold?.toString() + "%"}
               </Text>
@@ -372,7 +372,7 @@ export const ProposalListItem = ({
               width={"9px"}
               height={"9px"}
               backgroundColor="#FF5876"
-              marginLeft={isGov ? "73px" : "5.024%"}
+              marginLeft={isGov ? "73px" : "42px"}
               borderRadius={90}
             />
             <Box>
@@ -384,7 +384,7 @@ export const ProposalListItem = ({
                 marginLeft={"6px"}
                 opacity={"70%"}
                 width={"65px"}
-                marginRight={isGov ? "82px" : "4.306%"}
+                marginRight={isGov ? "82px" : "36px"}
               >
                 {noCount < 99 ? `${noCount} votes` : `99+ votes`}
               </Text>
