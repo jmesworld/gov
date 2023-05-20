@@ -96,7 +96,7 @@ export const ProposalList = ({
 
 export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
   return (
-    <Flex width={"1137px"}>
+    <Flex>
       <Text
         color="rgba(15,0,86,0.8)"
         fontWeight="medium"
@@ -111,7 +111,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
-        marginLeft={isGov ? "204px" : "15.67%"}
+        marginLeft={isGov ? "204px" : "131px"}
         width={"32px"}
       >
         YES
@@ -121,7 +121,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
-        marginLeft={isGov ? "10.642%" : "10.766%"}
+        marginLeft={isGov ? "121px" : "90px"}
         width={"32px"}
       >
         NO
@@ -131,7 +131,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
-        marginLeft={isGov ? "11.522%" : "10.1675%"}
+        marginLeft={isGov ? "131px" : "85px"}
         width={"94px"}
       >
         % TO PASS
@@ -141,7 +141,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
-        marginLeft={isGov ? "16.271%" : "16.986%"}
+        marginLeft={isGov ? "190px" : "136px"}
         width={"94px"}
       >
         PASSING
@@ -389,13 +389,13 @@ export const ProposalListItem = ({
                 {noCount < 99 ? `${noCount} votes` : `99+ votes`}
               </Text>
             </Box>
-            <ProgressBar yesPercent={yesPercent} threshold={threshold} />
+            <ProgressBar yesPercent={yesPercent} threshold={threshold} isGov={isGov} />
           </Flex>
         </Box>
         <Flex
           width={"64px"}
           height={"24px"}
-          marginLeft={isGov ? "7.212%" : "5.383%"}
+          marginLeft={isGov ? "90px" : "49px"}
           borderRadius={"90px"}
           borderWidth={"1px"}
           borderColor={pass === "Yes" ? "green" : "red"}
@@ -420,15 +420,17 @@ export const ProposalListItem = ({
 export const ProgressBar = ({
   yesPercent,
   threshold,
+  isGov,
 }: {
   yesPercent: number;
   threshold: number;
+  isGov: boolean;
 }) => {
   return (
     <Progress
       value={yesPercent}
       backgroundColor={"#5136C2"}
-      width={"191px"}
+      width={ isGov ? "191px" : "180px"}
       height={"6px"}
       borderRadius={"10px"}
       variant={yesPercent <= threshold ? "red" : "green"}

@@ -489,7 +489,7 @@ export const CreateDaoForm = ({
           onClick={() => setCreateDaoSelected(false)}
         >
           <Text
-            color={"rgba(0,0,0,0.7)"}
+            color={"darkPurple"}
             fontFamily="DM Sans"
             fontSize={14}
             fontWeight="medium"

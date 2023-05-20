@@ -23,6 +23,7 @@ import OnboardingModal from "../components/react/onboarding-modal";
 import { useAccountBalance } from "../hooks/useAccountBalance";
 import CreateDao from "./CreateDao";
 import DaoProposal from "./DaoProposal";
+import CreateGovProposal from "./CreateGovProposal";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -43,6 +44,8 @@ export default function Home() {
   const [isNewDataUpdated, setDataUpdated] = useState(false);
   const [identityBalance, setIdentityBalance] = useState("");
   const [identityName, setIdentityName] = useState("");
+  const [isCreateGovProposalSelected, setCreateGovProposalSelected] =
+    useState(false);
 
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
@@ -171,6 +174,7 @@ export default function Home() {
               setCreateDaoSelected(false);
               setSelectedDao("");
               setSelectedDaoName("");
+              setCreateGovProposalSelected(false);
             }}
           />
           <Box height={"27px"} />
@@ -217,6 +221,7 @@ export default function Home() {
               if (status !== WalletStatus.Connected) {
                 setConnectButtonClicked(true);
               } else {
+                setCreateGovProposalSelected(false);
                 setCreateDaoSelected(true);
               }
             }}
@@ -226,19 +231,37 @@ export default function Home() {
             width="180px"
             height="48px"
             text="DAO Proposal"
-            disabled={status !== WalletStatus.Connected}
-            onClick={() => {}}
+            disabled={
+              status !== WalletStatus.Connected || isGovProposalSelected
+            }
+            onClick={() => {
+              setCreateGovProposalSelected(false);
+            }}
           />
           <NavBarButton
             width="180px"
             height="48px"
             text="GOV Proposal"
-            disabled={status !== WalletStatus.Connected}
-            onClick={() => {}}
+            disabled={
+              status !== WalletStatus.Connected || isGovProposalSelected
+            }
+            onClick={() => {
+              setCreateGovProposalSelected(true);
+            }}
           />
           <Flex height={"10px"} />
         </VStack>
-        {isCreateDaoSelected ? (
+        {isCreateGovProposalSelected ? (
+          <CreateGovProposal
+            identityName={identityName}
+            identityBalance={identityBalance}
+            isConnectButtonClicked={isConnectButtonClicked}
+            setConnectButtonClicked={setConnectButtonClicked}
+            selectedDao={selectedDao}
+            selectedDaoName={selectedDaoName}
+            setCreateGovProposalSelected={setCreateGovProposalSelected}
+          />
+        ) : isCreateDaoSelected ? (
           <CreateDao
             identityName={identityName}
             identityBalance={identityBalance}

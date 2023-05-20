@@ -65,7 +65,7 @@ export const DaoMembersList = ({ daoAddress }: { daoAddress: string }) => {
   });
 
   return (
-    <Box width={"265px"}>
+    <Box width={"265px"} marginLeft={"41px"}>
       <Flex>
         <Text
           color="rgba(15,0,86,0.8)"
