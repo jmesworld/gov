@@ -163,6 +163,9 @@ export default function CreateGovProposal({
 
   const createGovProposalMutation = useDaoMultisigProposeMutation();
 
+  const isFormValid =
+    proposalTitle.length > 1 && proposalDescription.length > 1;
+
   return (
     <Box
       width={"100%"}
@@ -224,6 +227,7 @@ export default function CreateGovProposal({
           </Text>
           {proposalTypes.map((proposalType, index) => (
             <ProposalType
+              key={proposalType}
               type={proposalType}
               isActive={proposalType === selectedProposalType}
               onClick={() => setSelectedProposalType(proposalType)}
@@ -466,7 +470,7 @@ export default function CreateGovProposal({
             </Button>
             <Box width={"12px"} />
             <Button
-              // disabled={!isFormValid}
+              disabled={!isFormValid}
               onClick={() => {
                 //
                 const proposalMsg = getProposalExecuteMsg({
@@ -476,11 +480,10 @@ export default function CreateGovProposal({
                   duration: fundingPeriod * 30 * 24 * 60 * 60, // months to seconds
                   title: proposalTitle,
                   description: proposalDescription,
-                  slot: getSlot(slotType),
+                  slot: getSlot(slotType) as Governance.CoreSlot,
                   revokeSlot: {
                     dao: selectedDao,
-                    // @ts-ignore
-                    slot: getSlot(slotType),
+                    slot: getSlot(slotType) as Governance.CoreSlot,
                   },
                   msgs: [
                     {
