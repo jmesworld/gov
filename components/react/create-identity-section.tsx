@@ -24,6 +24,7 @@ import { ExecuteMsg } from "../../client/Identityservice.types";
 import { chainName } from "../../config/defaults";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { toHex, toUtf8 } from "@cosmjs/encoding";
+import { StdFee } from "@cosmjs/stargate";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -33,8 +34,6 @@ const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 const NEXT_PUBLIC_BJMES_TOKEN_CONTRACT = process.env
   .NEXT_PUBLIC_BJMES_TOKEN_CONTRACT as string;
-
-let cosmWasmClient: CosmWasmClient;
 
 export const CreateIdentitySection = () => {
   const chainContext = useChain(chainName);
@@ -81,12 +80,9 @@ export const CreateIdentitySection = () => {
 
 export default function IdentityInputSection() {
   const chainContext = useChain(chainName);
-  const {
-    address,
-    status,
-    getCosmWasmClient,
-    getSigningCosmWasmClient,
-  } = chainContext;
+
+  const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
+    chainContext;
 
   const toast = useToast();
 
@@ -98,16 +94,25 @@ export default function IdentityInputSection() {
     chainID: CHAIN_ID,
   };
 
+  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
+    null
+  );
   useEffect(() => {
-    const init = async () => {
-      cosmWasmClient = await getCosmWasmClient();
-    };
-    init().catch(console.error);
-  });
-
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient]);
+  // console.log(cosmWasmClient)
   const args = { owner: address ? address : "" };
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
-    cosmWasmClient,
+    cosmWasmClient as CosmWasmClient,
     IDENTITY_SERVICE_CONTRACT
   );
 
@@ -118,6 +123,17 @@ export default function IdentityInputSection() {
     const contract = IDENTITY_SERVICE_CONTRACT;
 
     const msg: ExecuteMsg = { register_user: { name: identityName } };
+
+    const fee: StdFee = {
+      amount: [
+        {
+          denom: "ujmes",
+          amount: "2000",
+        },
+      ],
+      gas: "1000000",
+    };
+
     const execMsg: MsgExecuteContractEncodeObject = {
       typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
       value: MsgExecuteContract.fromPartial({
@@ -131,8 +147,9 @@ export default function IdentityInputSection() {
       const result = await signingCosmWasmClient.signAndBroadcast(
         address as string,
         [execMsg],
-        "auto"
+        fee
       );
+
       if (result.code === 0) {
         toast({
           title: "Identity created.",
@@ -194,7 +211,7 @@ export default function IdentityInputSection() {
           onBlur={() => {
             identityNameQuery.refetch();
           }}
-        ></Input>
+        />
         <Spacer />
         <CreateIdentityButton onClick={() => identityMutation.mutate()} />
       </Flex>

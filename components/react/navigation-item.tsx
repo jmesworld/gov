@@ -10,14 +10,8 @@ export const NavBarItem = ({
   isSelected: boolean;
   onClick: MouseEventHandler<HTMLDivElement>;
 }) => {
-
   return (
-    <Flex width={"200px"} height={"42px"} onClick={onClick}>
-      <Box
-        width={"3.77px"}
-        height={"100%"}
-        backgroundColor={isSelected ? "#A1F0C4" : "#7453FD"}
-      />
+    <Flex width={"200px"} height={"42px"} onClick={onClick} cursor={'pointer'}>
       <Flex
         width={"100%"}
         height={"100%"}

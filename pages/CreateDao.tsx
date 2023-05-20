@@ -14,26 +14,30 @@ import { useChain } from "@cosmos-kit/react";
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import PeriodInfo from "../components/react/period-info";
 import { ConnectWalletSection } from "../components/react/connect-wallet-section";
+import { CreateDaoForm } from "../components/react/create-dao-form";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
-export default function GovernanceProposal({
+export default function CreateDao({
   identityName,
   identityBalance,
   isConnectButtonClicked,
   setConnectButtonClicked,
+  setCreateDaoSelected,
 }: {
   identityName: string;
   identityBalance: string;
   isConnectButtonClicked: boolean;
   setConnectButtonClicked: Function;
+  setCreateDaoSelected: Function;
 }) {
   const { address, status, getCosmWasmClient } = useChain(chainName);
 
   const [viewDimension, setViewDimension] = useState(Array());
+  const [isFormValid, setFormValid] = useState(false);
 
   useEffect(() => {
     const { innerHeight, innerWidth } = window;
@@ -104,30 +108,24 @@ export default function GovernanceProposal({
           setConnectButtonClicked={setConnectButtonClicked}
         />
       </Flex>
-      <Flex height={"35px"} />
-      <GovHeader />
-      <Flex height={"46px"} />
-      <ProposalHeader isGov={true} />
-      <Flex height={"10px"} />
-      {!!governanceProposalQuery.data ? (
-        <ProposalList
-          proposals={governanceProposalQuery?.data?.proposals}
-          isGov={true}
-        />
-      ) : (
-        <Flex justifyContent="center" width="100%">
-          <Text
-            color="rgba(15,0,86,0.8)"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontStyle={"italic"}
-            fontSize={14}
-            marginTop={"24px"}
-          >
-            Loading Governance proposals...
-          </Text>
-        </Flex>
-      )}
+      <Flex height={"47px"} />
+      <Text
+        color={"darkPurple"}
+        fontWeight="bold"
+        fontSize={28}
+        fontFamily="DM Sans"
+      >
+        Create DAO
+      </Text>
+      <Flex height={"75px"} />
+      <CreateDaoForm
+        daoOwner={{
+          name: identityName,
+          address: address as string,
+          votingPower: 0,
+        }}
+        setCreateDaoSelected={setCreateDaoSelected}
+      />
     </Box>
   );
 }

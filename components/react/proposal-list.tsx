@@ -1,6 +1,7 @@
 import { DAOItemProps } from "../types";
 import {
   Box,
+  Button,
   Container,
   Divider,
   Flex,
@@ -8,6 +9,7 @@ import {
   Progress,
   ProgressLabel,
   Text,
+  Tooltip,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useEffect, useState } from "react";
@@ -27,8 +29,6 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
-let cosmWasmClient: CosmWasmClient;
-
 export const ProposalList = ({
   proposals,
   isGov,
@@ -42,14 +42,16 @@ export const ProposalList = ({
     return (
       <Flex justifyContent="center" width="100%">
         <Text
-          color="#000000"
+          color="rgba(15,0,86,0.8)"
           fontFamily={"DM Sans"}
           fontWeight="normal"
+          fontStyle={"italic"}
           fontSize={14}
           marginTop={"24px"}
         >
-          {" "}
-          No proposal has been created yet{" "}
+          {`There are currently no ${
+            isGov ? "Governance" : "Dao"
+          } Proposals available to view`}
         </Text>
       </Flex>
     );
@@ -59,9 +61,12 @@ export const ProposalList = ({
       const noVoters = proposal?.no_voters?.length;
       const totalVoters = isGov ? yesVoters + noVoters : 0;
 
-      const type = isGov
+      const propType = isGov
         ? JSON.stringify(proposal.prop_type).split(":")[0].slice(2)
         : "";
+      const type = isGov
+        ? propType.slice(0, propType.length - 1)
+        : proposal.description;
 
       return (
         <ProposalListItem
@@ -93,26 +98,26 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
   return (
     <Flex>
       <Text
-        color="#7453FD"
-        fontFamily={"DM Sans"}
+        color="rgba(15,0,86,0.8)"
         fontWeight="medium"
+        fontFamily="DM Sans"
         fontSize={12}
-        width={"151px"}
+        width={isGov ? "227px" : "151px"}
       >
-        {isGov ? "PROPOSALS" : "DAO PROPOSALS"}
+        {isGov ? "GOVERNANCE PROPOSALS" : "DAO PROPOSALS"}
       </Text>
       <Text
-        color="#7453FD"
+        color="rgba(15,0,86,0.8)"
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
-        marginLeft={isGov ? "280px" : "131"}
+        marginLeft={isGov ? "204px" : "131px"}
         width={"32px"}
       >
         YES
       </Text>
       <Text
-        color="#7453FD"
+        color="rgba(15,0,86,0.8)"
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
@@ -122,7 +127,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         NO
       </Text>
       <Text
-        color="#7453FD"
+        color="rgba(15,0,86,0.8)"
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
@@ -132,14 +137,14 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
         % TO PASS
       </Text>
       <Text
-        color="#7453FD"
+        color="rgba(15,0,86,0.8)"
         fontFamily={"DM Sans"}
         fontWeight="medium"
         fontSize={12}
-        marginLeft={isGov ? "185px" : "158px"}
+        marginLeft={isGov ? "190px" : "136px"}
         width={"94px"}
       >
-        PASS
+        PASSING
       </Text>
     </Flex>
   );
@@ -169,27 +174,31 @@ export const ProposalListItem = ({
   proposalId?: string;
 }) => {
   const chainContext = useChain(chainName);
-  const {
-    address,
-    isWalletConnected,
-    getCosmWasmClient,
-    getSigningCosmWasmClient,
-  } = chainContext;
+  const { address, getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
 
   const LCDOptions = {
     URL: LCD_URL,
     chainID: CHAIN_ID,
   };
 
+  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
+    null
+  );
   useEffect(() => {
-    const init = async () => {
-      cosmWasmClient = await getCosmWasmClient();
-    };
-    init().catch(console.error);
-  });
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient]);
 
   const daoQueryClient = new DaoMultisigQueryClient(
-    cosmWasmClient,
+    cosmWasmClient as CosmWasmClient,
     daoAddress as string
   );
 
@@ -231,8 +240,10 @@ export const ProposalListItem = ({
     ? votersQuery.data?.voters?.length
     : 0;
 
-  const yesPercent =
-    totalCount === 0 ? 0 : Math.ceil((yesCount / totalCount) * 100);
+  const yesPercentActual = yesCount !== 0 ? yesCount / totalCount : 0;
+  const noPercentActual = noCount !== 0 ? noCount / totalCount : 0;
+
+  const yesPercent = totalCount === 0 ? 0 : Math.floor(yesPercentActual * 100);
 
   const yes = totalCount === 0 ? "0%" : yesPercent.toString() + "%";
 
@@ -242,120 +253,165 @@ export const ProposalListItem = ({
 
   return (
     <>
-      <Box
+      <Flex
         height={"64px"}
         width={isGov ? "1137px" : "836px"}
-        backgroundColor="#704FF7"
+        backgroundColor="purple"
         borderRadius={12}
+        alignItems={"center"}
       >
-        <Flex paddingTop={"9px"}>
+        <Box>
+          <Flex width={"100%"}>
+            <Box>
+              <Text
+                width={isGov ? "281px" : "268px"}
+                color="white"
+                fontFamily={"DM Sans"}
+                fontWeight="normal"
+                fontSize={18}
+                marginLeft={"14px"}
+              >
+                {title.length > 20 ? title.substring(0, 20) + "..." : title}
+              </Text>
+            </Box>
+            <Tooltip
+              hasArrow={true}
+              label={`${roundNumber(yesPercentActual * 100)}%`}
+              bg={"midnight"}
+              color={"white"}
+              direction={"rtl"}
+              placement={"right"}
+              borderRadius={"8px"}
+            >
+              <Box>
+                <Text
+                  width={"60px"}
+                  color="white"
+                  fontFamily={"DM Sans"}
+                  fontWeight="normal"
+                  fontSize={18}
+                  marginLeft={isGov ? "135px" : "0px"}
+                >
+                  {yes}
+                </Text>
+              </Box>
+            </Tooltip>
+            <Tooltip
+              hasArrow={true}
+              label={`${roundNumber(noPercentActual * 100)}%`}
+              bg={"midnight"}
+              color={"white"}
+              direction={"rtl"}
+              placement={"right"}
+            >
+              <Box>
+                <Text
+                  width={"60px"}
+                  color="white"
+                  fontFamily={"DM Sans"}
+                  fontWeight="normal"
+                  fontSize={18}
+                  marginLeft={isGov ? "93px" : "62px"}
+                >
+                  {no}
+                </Text>
+              </Box>
+            </Tooltip>
+            <Box>
+              <Text
+                width={"87px"}
+                color="white"
+                fontFamily={"DM Sans"}
+                fontWeight="normal"
+                fontSize={18}
+                marginLeft={isGov ? "103px" : "57px"}
+              >
+                {threshold?.toString() + "%"}
+              </Text>
+            </Box>
+          </Flex>
+
+          <Flex alignItems={"center"}>
+            <Box>
+              <Text
+                width={isGov ? "281px" : "268px"}
+                color="white"
+                fontFamily={"DM Sans"}
+                fontWeight="normal"
+                fontSize={14}
+                marginLeft={"14px"}
+                opacity={"70%"}
+              >
+                {type.length > 26 ? title.substring(0, 26) + "..." : type}
+              </Text>
+            </Box>
+
+            <Box
+              width={"9px"}
+              height={"9px"}
+              backgroundColor="#68FFF1"
+              marginLeft={isGov ? "135px" : "0%"}
+              borderRadius={90}
+            />
+            <Box>
+              <Text
+                color="white"
+                fontFamily={"DM Sans"}
+                fontWeight="normal"
+                fontSize={14}
+                marginLeft={"6px"}
+                opacity={"70%"}
+                width={"65px"}
+              >
+                {yesCount < 99 ? `${yesCount} votes` : `99+ votes`}
+              </Text>
+            </Box>
+
+            <Box
+              alignSelf={"center"}
+              width={"9px"}
+              height={"9px"}
+              backgroundColor="#FF5876"
+              marginLeft={isGov ? "73px" : "42px"}
+              borderRadius={90}
+            />
+            <Box>
+              <Text
+                color="white"
+                fontFamily={"DM Sans"}
+                fontWeight="normal"
+                fontSize={14}
+                marginLeft={"6px"}
+                opacity={"70%"}
+                width={"65px"}
+                marginRight={isGov ? "82px" : "36px"}
+              >
+                {noCount < 99 ? `${noCount} votes` : `99+ votes`}
+              </Text>
+            </Box>
+            <ProgressBar yesPercent={yesPercent} threshold={threshold} isGov={isGov} />
+          </Flex>
+        </Box>
+        <Flex
+          width={"64px"}
+          height={"24px"}
+          marginLeft={isGov ? "90px" : "49px"}
+          borderRadius={"90px"}
+          borderWidth={"1px"}
+          borderColor={pass === "Yes" ? "green" : "red"}
+          backgroundColor={"transparent"}
+          justifyContent={"center"}
+        >
           <Text
-            width={isGov ? "281px" : "268px"}
             color="white"
-            fontFamily={"DM Sans"}
             fontWeight="normal"
-            fontSize={18}
-            marginLeft={"14px"}
-          >
-            {title}
-          </Text>
-          <Text
-            width={"60px"}
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={18}
-            marginLeft={isGov ? "137px" : "0px"}
-          >
-            {yes}
-          </Text>
-          <Text
-            width={"60px"}
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={18}
-            marginLeft={isGov ? "93px" : "62px"}
-          >
-            {no}
-          </Text>
-          <Text
-            width={"87px"}
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={18}
-            marginLeft={isGov ? "103px" : "57px"}
-          >
-            {threshold?.toString() + "%"}
-          </Text>
-          <Text
-            width={"44px"}
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={18}
-            marginLeft={isGov ? "192px" : "164px"}
+            fontSize={14}
+            fontFamily="DM Sans"
           >
             {pass}
           </Text>
         </Flex>
-
-        <Flex alignItems={"center"}>
-          <Text
-            width={isGov ? "281px" : "268px"}
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={14}
-            marginLeft={"14px"}
-            opacity={"70%"}
-          >
-            {type.slice(0, type.length - 1)}
-          </Text>
-
-          <Box
-            width={"9px"}
-            height={"9px"}
-            backgroundColor="#68FFF1"
-            marginLeft={isGov ? "137px" : "0px"}
-            borderRadius={90}
-          />
-          <Text
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={14}
-            marginLeft={"6px"}
-            opacity={"70%"}
-            width={"60px"}
-          >
-            {`${yesCount} votes`}
-          </Text>
-
-          <Box
-            alignSelf={"center"}
-            width={"9px"}
-            height={"9px"}
-            backgroundColor="#FF5876"
-            marginLeft={isGov ? "78px" : "47px"}
-            borderRadius={90}
-          />
-          <Text
-            color="white"
-            fontFamily={"DM Sans"}
-            fontWeight="normal"
-            fontSize={14}
-            marginLeft={"6px"}
-            opacity={"70%"}
-            width={"60px"}
-            marginRight={isGov ? "87px" : "41px"}
-          >
-            {`${noCount} votes`}
-          </Text>
-          <ProgressBar yesPercent={yesPercent} threshold={threshold} />
-        </Flex>
-      </Box>
+      </Flex>
       <Box height={"7px"} />
     </>
   );
@@ -364,18 +420,20 @@ export const ProposalListItem = ({
 export const ProgressBar = ({
   yesPercent,
   threshold,
+  isGov,
 }: {
   yesPercent: number;
   threshold: number;
+  isGov: boolean;
 }) => {
   return (
     <Progress
       value={yesPercent}
       backgroundColor={"#5136C2"}
-      width={"191px"}
+      width={ isGov ? "191px" : "180px"}
       height={"6px"}
       borderRadius={"10px"}
-      variant={yesPercent <= threshold ? "red" : "teal"}
+      variant={yesPercent <= threshold ? "red" : "green"}
     >
       <ProgressLabel marginLeft={threshold?.toString() + "%"} height={"8px"}>
         <Flex
@@ -392,3 +450,6 @@ export const ProgressBar = ({
     </Progress>
   );
 };
+
+export const roundNumber = (num: number) =>
+  Math.round((num + Number.EPSILON) * 100) / 100;

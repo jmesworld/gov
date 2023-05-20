@@ -3,28 +3,39 @@ import {
   Flex,
   Text,
   Image,
-  Box,
-  background,
   Button,
-  VStack,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Spacer,
+  Divider,
 } from "@chakra-ui/react";
 import { useChain } from "@cosmos-kit/react";
 import { chainName } from "../../config/defaults";
 
-export const ConnectedWalletButton = ({identityName}: {identityName: string}) => {
-  const chainContext = useChain(chainName);
-  const { address, disconnect } = chainContext;
-  return (
+export const ConnectedWalletButton = ({
+  identityName,
+  identityBalance,
+  setConnectButtonClicked,
+}: {
+  identityName: string;
+  identityBalance: string;
+   setConnectButtonClicked: Function;
+}) => {
+  const { address, disconnect, getCosmWasmClient, getSigningCosmWasmClient } =
+    useChain(chainName);
+  
+  
+    return (
     <Menu>
       {({ isOpen }) => (
         <>
           <MenuButton
-            _hover={{ bg: "#E7E2F8" }}
+            _hover={{ bg: "white" }}
+            _expanded={{ bg: "white" }}
+            backgroundColor="white"
+            borderColor="rgba(116, 83, 253, 0.3)"
             as={Button}
             rightIcon={
               isOpen ? (
@@ -32,95 +43,98 @@ export const ConnectedWalletButton = ({identityName}: {identityName: string}) =>
                   alignSelf={"center"}
                   width={"24px"}
                   height={"24px"}
-                  color={"#7453FD"}
+                  color={"purple"}
                 />
               ) : (
                 <ChevronDownIcon
                   alignSelf={"center"}
                   width={"24px"}
                   height={"24px"}
-                  color={"#7453FD"}
+                  color={"purple"}
                 />
               )
             }
-            width={"230px"}
-            height={"42px"}
-            backgroundColor="transparent"
-            borderColor="rgba(116, 83, 253, 0.3)"
+            width={"271px"}
+            height={"48px"}
             variant={"outline"}
             borderWidth={"1px"}
             borderRadius={"90px"}
           >
-            <Flex>
-              <Image src="/Wallet_Icon.svg" alt="Wallet Icon"></Image>
-              <Flex width={"117px"} paddingLeft={"8px"}>
-                <VStack spacing={0}>
-                  <Text
-                    color="#7453FD"
-                    fontFamily={"DM Sans"}
-                    fontWeight="medium"
-                    fontSize={14}
-                    alignSelf="self-start"
-                    padding={0}
-                  >{`Hi ${identityName}`}</Text>
-                  <Text
-                    color="#7453FD"
-                    fontFamily={"DM Sans"}
-                    fontWeight="medium"
-                    fontSize={12}
-                  >{`${address?.slice(0, 8)}...${address?.slice(
-                    address?.length - 10,
-                    address?.length
-                  )}`}</Text>
-                </VStack>
-              </Flex>
+            <Flex width={"100%"} alignItems={"center"}>
+              <Image src="/Wallet.svg" alt="Wallet Icon"></Image>
+              <Text
+                color="darkPurple"
+                fontWeight="medium"
+                fontSize={14}
+                marginLeft={"6px"}
+                fontFamily="DM Sans"
+              >
+                {!!identityName
+                  ? identityName
+                  : `${address?.substring(0, 11)}...`}
+              </Text>
+              <Spacer />
+              <Divider
+                orientation="vertical"
+                backgroundColor={"lilac"}
+                height={"22px"}
+                marginLeft={"9px"}
+                marginRight={"9px"}
+              />
+              <Image
+                src="/JMES_Icon.svg"
+                alt="JMES Icon"
+                width={"9px"}
+                height={"10.98px"}
+              />
+              <Text
+                color="midnight"
+                fontWeight="medium"
+                fontSize={14}
+                marginLeft={"6px"}
+                marginRight={"6px"}
+                noOfLines={1}
+                fontFamily="DM Sans"
+              >{`${!!identityBalance ? identityBalance : ""}`}</Text>
             </Flex>
           </MenuButton>
           <MenuList
-            backgroundColor="transparent"
-            borderColor={"rgba(116, 83, 253, 0.3)"}
+            backgroundColor="white"
+            _hover={{ bg: "white" }}
+            borderColor="rgba(116, 83, 253, 0.3)"
             borderWidth={1}
+            width={"271px"}
+            borderRadius={"20px"}
+            padding={0}
           >
-            <MenuItem>
-              <Flex>
-                <Image
-                  src="/Settings.svg"
-                  alt="Settings"
-                  width={"22.66px"}
-                  height={"22.66px"}
-                  backgroundColor="#E7E2F8"
-                ></Image>{" "}
-                <Text
-                  color="#7453FD"
-                  fontFamily={"DM Sans"}
-                  fontWeight="medium"
-                  fontSize={14}
-                  marginLeft={"18px"}
-                >
-                  Settings
-                </Text>
-              </Flex>
-            </MenuItem>
             <MenuItem
+              backgroundColor="white"
+              _hover={{ bg: "white" }}
+              borderRadius={"20px"}
               onClick={() => {
                 disconnect();
+                setConnectButtonClicked(false);
               }}
             >
               {" "}
-              <Flex>
+              <Flex
+                width={"100%"}
+                height={"38px"}
+                alignItems={"center"}
+                paddingLeft={"4px"}
+              >
                 <Image
-                  src="/Disconnect.svg"
+                  src="/Disconnect_Wallet.svg"
                   alt="Disconnect"
-                  width={"22.66px"}
-                  height={"22.66px"}
-                  backgroundColor="#E7E2F8"
+                  width={"24px"}
+                  height={"24px"}
                 ></Image>{" "}
                 <Text
-                  color="#7453FD"
-                  fontFamily={"DM Sans"}
+                  color="darkPurple"
                   fontWeight="medium"
                   fontSize={14}
-                  marginLeft={"18px"}
+                  marginLeft={"6px"}
+                  fontFamily="DM Sans"
                 >
                   Disconnect
                 </Text>

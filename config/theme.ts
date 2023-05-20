@@ -1,34 +1,45 @@
-import { extendTheme } from '@chakra-ui/react';
+import { extendTheme, theme } from "@chakra-ui/react";
 
 export const defaultThemeObject = {
   fonts: {
-    body: 'Inter, system-ui, sans-serif',
-    heading: 'Work Sans, system-ui, sans-serif'
+    body: `DM Sans, ${theme.fonts.body}`,
+    heading: `DM Sans, ${theme.fonts.heading}`,
   },
   colors: {
-    primary: {
-      '50': '#e5e7f9',
-      '100': '#bec4ef',
-      '200': '#929ce4',
-      '300': '#6674d9',
-      '400': '#4657d1',
-      '500': '#2539c9',
-      '600': '#2133c3',
-      '700': '#1b2cbc',
-      '800': '#1624b5',
-      '900': '#0d17a9'
-    }
+    purple: "#7453FD",
+    darkPurple: "#5136C2",
+    midnight: "#0F0056",
+    green: "#A1F0C4",
+    lilac: "#C6B4FC",
+    lightLilac: "#E7E2F8",
+    red: "#FF5876",
   },
   breakPoints: {
-    sm: '30em',
-    md: '48em',
-    lg: '62em',
-    xl: '80em',
-    '2xl': '96em'
+    sm: "30em",
+    md: "48em",
+    lg: "62em",
+    xl: "80em",
+    "2xl": "96em",
   },
   shadows: {
-    largeSoft: 'rgba(60, 64, 67, 0.15) 0px 2px 10px 6px;'
-  }
+    largeSoft: "rgba(60, 64, 67, 0.15) 0px 2px 10px 6px;",
+  },
+  components: {
+    Progress: {
+      variants: {
+        green: {
+          filledTrack: {
+            bg: "#A1F0C4",
+          },
+        },
+        red: {
+          filledTrack: {
+            bg: "#FF5876",
+          },
+        },
+      },
+    },
+  },
 };
 
 export const defaultTheme = extendTheme(defaultThemeObject);
