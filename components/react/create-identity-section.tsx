@@ -80,6 +80,7 @@ export const CreateIdentitySection = () => {
 
 export default function IdentityInputSection() {
   const chainContext = useChain(chainName);
+
   const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
     chainContext;
 
@@ -122,6 +123,7 @@ export default function IdentityInputSection() {
     const contract = IDENTITY_SERVICE_CONTRACT;
 
     const msg: ExecuteMsg = { register_user: { name: identityName } };
+
     const fee: StdFee = {
       amount: [
         {

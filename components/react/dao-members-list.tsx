@@ -28,7 +28,6 @@ const IDENTITY_SERVICE_CONTRACT = process.env
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
-
 const LCDOptions = {
   URL: LCD_URL,
   chainID: CHAIN_ID,
@@ -36,6 +35,7 @@ const LCDOptions = {
 
 export const DaoMembersList = ({ daoAddress }: { daoAddress: string }) => {
   const chainContext = useChain(chainName);
+
   const { address, getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
 
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
@@ -166,6 +166,7 @@ export const DaoMembersListItem = ({
 
   const identityserviceQueryClient = new IdentityserviceQueryClient(
     cosmWasmClient as CosmWasmClient,
+
     IDENTITY_SERVICE_CONTRACT
   );
 

@@ -32,6 +32,8 @@ const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
 const BJMES_TOKEN_CONTRACT = process.env
   .NEXT_PUBLIC_BJMES_TOKEN_CONTRACT as string;
 
+let cosmWasmClient: CosmWasmClient;
+
 export default function Home() {
   const { address, status, getCosmWasmClient } = useChain(chainName);
 
