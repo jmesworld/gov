@@ -86,14 +86,14 @@ export default function PeriodInfo() {
                   alignSelf={"center"}
                   width={"24px"}
                   height={"24px"}
-                  color={current_period === "posting" ? "purple" : "lilac"}
+                  color={current_period === "posting" ? "#7453FD" : "#C6B4FC"}
                 />
               ) : (
                 <ChevronDownIcon
                   alignSelf={"center"}
                   width={"24px"}
                   height={"24px"}
-                  color={current_period === "posting" ? "purple" : "lilac"}
+                  color={current_period === "posting" ? "#7453FD" : "#C6B4FC"}
                 />
               )
             }

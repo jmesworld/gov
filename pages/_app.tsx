@@ -8,7 +8,7 @@ import { SignerOptions } from "@cosmos-kit/core";
 import { assets } from "chain-registry";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Chain } from "@chain-registry/types";
-import jmesTestnet from "../config/chains/jmes-testnet-1/chain.json";
+import jmesTestnet from "../config/chains/jmes-testnet-3/chain.json";
 import { chainName } from "../config/defaults";
 import { KeplrExtensionWallet } from '@cosmos-kit/keplr-extension';
 
@@ -38,7 +38,6 @@ function CreateCosmosApp({ Component, pageProps }: AppProps) {
               rpc: [LCD_URL],
             },
           }}
-          wrappedWithChakra={true}
         >
           <Component {...pageProps} />
         </ChainProvider>
