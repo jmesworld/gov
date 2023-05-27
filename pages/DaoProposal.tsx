@@ -56,6 +56,10 @@ export default function DaoProposal({
   identityBalance,
   isConnectButtonClicked,
   setConnectButtonClicked,
+  setDaoProposalDetailOpen,
+  setSelectedDaoProposalTitle,
+  setSelectedDaoMembersList,
+  setSelectedProposalId,
 }: {
   daoAddress: string;
   daoName: string;
@@ -63,6 +67,10 @@ export default function DaoProposal({
   identityBalance: string;
   isConnectButtonClicked: boolean;
   setConnectButtonClicked: Function;
+  setDaoProposalDetailOpen: Function;
+  setSelectedDaoProposalTitle: Function;
+  setSelectedDaoMembersList: Function;
+  setSelectedProposalId: Function
 }) {
   const chainContext = useChain(chainName);
   const { address, getCosmWasmClient } = chainContext;
@@ -152,7 +160,7 @@ export default function DaoProposal({
       </Text>
       <Flex height={"46px"} />
       <Flex>
-        <Box width={"100%"}>
+        <Box>
           <ProposalHeader isGov={false} />
           <Flex height={"10px"} />
           {!!proposalsQuery.data ? (
@@ -160,6 +168,11 @@ export default function DaoProposal({
               proposals={proposalsQuery?.data?.proposals}
               isGov={false}
               daoAddress={daoAddress}
+              onClickListItem={() => {
+                setDaoProposalDetailOpen(true);
+              }}
+              setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+              setSelectedProposalId={setSelectedProposalId}
             />
           ) : (
             <Flex justifyContent="center" width="100%">
@@ -177,7 +190,10 @@ export default function DaoProposal({
           )}
         </Box>
         <Spacer />
-        <DaoMembersList daoAddress={daoAddress} />
+        <DaoMembersList
+          daoAddress={daoAddress}
+          setSelectedDaoMembersList={setSelectedDaoMembersList}
+        />
       </Flex>
     </Box>
   );

@@ -12,7 +12,7 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useEffect, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import { DaoMultisigQueryClient } from "../../client/DaoMultisig.client";
 import {
   useDaoMultisigListVotersQuery,
@@ -33,10 +33,16 @@ export const ProposalList = ({
   proposals,
   isGov,
   daoAddress,
+  onClickListItem,
+  setSelectedDaoProposalTitle,
+  setSelectedProposalId,
 }: {
   proposals: any;
   isGov: boolean;
   daoAddress?: string;
+  onClickListItem: MouseEventHandler<HTMLDivElement>;
+  setSelectedDaoProposalTitle: Function;
+  setSelectedProposalId: Function;
 }) => {
   if (!proposals || Array.from(proposals).length === 0) {
     return (
@@ -67,7 +73,6 @@ export const ProposalList = ({
       const type = isGov
         ? propType.slice(0, propType.length - 1)
         : proposal.description;
-
       return (
         <ProposalListItem
           key={proposal.id + proposal.description}
@@ -78,6 +83,7 @@ export const ProposalList = ({
           threshold={proposal.threshold?.absolute_percentage?.percentage}
           type={type}
           pass={
+            proposal.status === "passed" ||
             proposal.status === "success" ||
             proposal.status === "success_concluded"
               ? "Yes"
@@ -86,6 +92,9 @@ export const ProposalList = ({
           isGov={isGov}
           daoAddress={daoAddress}
           proposalId={proposal.id}
+          onClickListItem={onClickListItem}
+          setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+          setSelectedDaoProposalId={setSelectedProposalId}
         />
       );
     });
@@ -96,7 +105,7 @@ export const ProposalList = ({
 
 export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
   return (
-    <Flex>
+    <Flex flexGrow={1}>
       <Text
         color="rgba(15,0,86,0.8)"
         fontWeight="medium"
@@ -161,6 +170,9 @@ export const ProposalListItem = ({
   isGov,
   daoAddress,
   proposalId,
+  onClickListItem,
+  setSelectedDaoProposalTitle,
+  setSelectedDaoProposalId,
 }: {
   title: string;
   threshold: number | undefined;
@@ -172,6 +184,9 @@ export const ProposalListItem = ({
   isGov: boolean;
   daoAddress?: string;
   proposalId?: string;
+  onClickListItem: MouseEventHandler<HTMLDivElement>;
+  setSelectedDaoProposalTitle: Function;
+  setSelectedDaoProposalId: Function;
 }) => {
   const chainContext = useChain(chainName);
   const { address, getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
@@ -254,11 +269,18 @@ export const ProposalListItem = ({
   return (
     <>
       <Flex
+        flex={1}
         height={"64px"}
         width={isGov ? "1137px" : "836px"}
         backgroundColor="purple"
         borderRadius={12}
         alignItems={"center"}
+        onClick={(e) => {
+          onClickListItem(e);
+          setSelectedDaoProposalTitle(title);
+          setSelectedDaoProposalId(proposalId);
+        }}
+        cursor={"pointer"}
       >
         <Box>
           <Flex width={"100%"}>
@@ -389,7 +411,11 @@ export const ProposalListItem = ({
                 {noCount < 99 ? `${noCount} votes` : `99+ votes`}
               </Text>
             </Box>
-            <ProgressBar yesPercent={yesPercent} threshold={threshold} isGov={isGov} />
+            <ProgressBar
+              yesPercent={yesPercent}
+              threshold={threshold}
+              isGov={isGov}
+            />
           </Flex>
         </Box>
         <Flex
@@ -430,7 +456,7 @@ export const ProgressBar = ({
     <Progress
       value={yesPercent}
       backgroundColor={"#5136C2"}
-      width={ isGov ? "191px" : "180px"}
+      width={isGov ? "191px" : "180px"}
       height={"6px"}
       borderRadius={"10px"}
       variant={yesPercent <= threshold ? "red" : "green"}
