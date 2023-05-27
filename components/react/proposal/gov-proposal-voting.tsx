@@ -17,6 +17,7 @@ export interface GovProposalVoting {
   yesVotesCount: number;
   noVotesCount: number;
   yesVotesPercentage: number;
+  noVotesPercentage: number;
 }
 
 export const GovProposalVoting = (props: GovProposalVoting) => {
@@ -44,7 +45,7 @@ export const GovProposalVoting = (props: GovProposalVoting) => {
           ></GovProposalVotes>
           <GovProposalVotes
             type="no"
-            percentage={100 - props.yesVotesPercentage}
+            percentage={props.noVotesPercentage}
             votes={props.noVotesCount}
           ></GovProposalVotes>
         </HStack>

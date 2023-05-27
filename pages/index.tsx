@@ -53,7 +53,6 @@ export default function Home() {
   const [selectedDaoProposalTitle, setSelectedDaoProposalTitle] = useState("");
   const [selectedDaoMembersList, setSelectedDaoMembersList] = useState([]);
 
-
   const [isGovProposalDetailOpen, setGovProposalDetailOpen] = useState(false);
   const [selectedProposalId, setSelectedProposalId] = useState(-1);
 
@@ -79,6 +78,7 @@ export default function Home() {
       setCreateDaoSelected(false);
       setIsGovProposalSelected(true);
       setDaoProposalDetailOpen(false);
+      setGovProposalDetailOpen(false);
     }
   }, [status]);
 
@@ -221,6 +221,7 @@ export default function Home() {
               setSelectedDaoName={setSelectedDaoName}
               setCreateDaoSelected={setCreateDaoSelected}
               setDaoProposalDetailOpen={setDaoProposalDetailOpen}
+              setGovProposalDetailOpen={setGovProposalDetailOpen}
             />
           ) : (
             <></>
@@ -237,6 +238,7 @@ export default function Home() {
                 setCreateGovProposalSelected(false);
                 setCreateDaoSelected(true);
                 setDaoProposalDetailOpen(false);
+                setGovProposalDetailOpen(false);
               }
             }}
           />
@@ -251,6 +253,7 @@ export default function Home() {
             onClick={() => {
               setCreateGovProposalSelected(false);
               setDaoProposalDetailOpen(false);
+              setGovProposalDetailOpen(false);
             }}
           />
           <NavBarButton
@@ -263,12 +266,13 @@ export default function Home() {
             onClick={() => {
               setCreateGovProposalSelected(true);
               setDaoProposalDetailOpen(false);
+              setGovProposalDetailOpen(false);
             }}
           />
           <Flex height={"10px"} />
         </VStack>
         {isGovProposalDetailOpen ? (
-          <GovProposalDetail 
+          <GovProposalDetail
             proposalId={selectedProposalId}
             identityName={identityName}
             identityBalance={identityBalance}
@@ -312,6 +316,7 @@ export default function Home() {
             isConnectButtonClicked={isConnectButtonClicked}
             setConnectButtonClicked={setConnectButtonClicked}
             setSelectedProposalId={setSelectedProposalId}
+            setGovProposalDetailOpen={setGovProposalDetailOpen}
           />
         ) : (
           <DaoProposal
@@ -346,6 +351,7 @@ export const MyDaosList = ({
   setSelectedDaoName,
   setCreateDaoSelected,
   setDaoProposalDetailOpen,
+  setGovProposalDetailOpen,
 }: {
   daos: any;
   setIsGovProposalSelected: Function;
@@ -355,6 +361,7 @@ export const MyDaosList = ({
   setSelectedDaoName: Function;
   setCreateDaoSelected: Function;
   setDaoProposalDetailOpen: Function;
+  setGovProposalDetailOpen: Function;
 }) => {
   const chainContext = useChain(chainName);
   const { address } = chainContext;
@@ -381,6 +388,7 @@ export const MyDaosList = ({
             setSelectedDaoName(dao.name);
             setCreateDaoSelected(false);
             setDaoProposalDetailOpen(false);
+            setGovProposalDetailOpen(false);
           }}
         />
       )

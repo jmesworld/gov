@@ -26,12 +26,14 @@ export default function GovernanceProposal({
   isConnectButtonClicked,
   setConnectButtonClicked,
   setSelectedProposalId,
+  setGovProposalDetailOpen,
 }: {
   identityName: string;
   identityBalance: string;
   isConnectButtonClicked: boolean;
   setConnectButtonClicked: Function;
   setSelectedProposalId: Function;
+  setGovProposalDetailOpen: Function;
 }) {
   const { address, status, getCosmWasmClient } = useChain(chainName);
 
@@ -115,7 +117,9 @@ export default function GovernanceProposal({
         <ProposalList
           proposals={governanceProposalQuery?.data?.proposals}
           isGov={true}
-          onClickListItem={(e) => {}}
+          onClickListItem={(e) => {
+            setGovProposalDetailOpen(true);
+          }}
           setSelectedDaoProposalTitle={() => {}}
           setSelectedProposalId={setSelectedProposalId}
         />

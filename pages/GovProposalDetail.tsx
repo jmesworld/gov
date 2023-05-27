@@ -99,12 +99,11 @@ export default function GovProposalDetail({
 
   const proposalDescription = proposalDetailQuery?.data?.description ?? "";
   const expiryDate = proposalDetailQuery?.data?.voting_end ?? 0;
-  const averageBlockTime = 5; // Average block time in seconds
-  const genesisTimestamp = 1684768989000; // Genesis timestamp
   const expiryDateTimestamp = !!proposalDetailQuery?.data
-    ? genesisTimestamp + expiryDate * averageBlockTime * 1000
+    ? expiryDate * 1000
     : -1;
 
+  console.log(expiryDate)
   const threshold = "10.00"; //TODO: confirm threshold for Governance proposals
   const target = !!proposalDetailQuery?.data ? parseFloat(threshold) : 0;
 
@@ -114,8 +113,13 @@ export default function GovProposalDetail({
     parseInt(proposalDetailQuery?.data?.coins_yes as string) +
       parseInt(proposalDetailQuery?.data?.coins_no as string) ?? 100;
   const yesVotesPercentage =
-    (parseInt(proposalDetailQuery?.data?.coins_yes as string) / total ?? 0) *
-    100;
+    (total > 0
+      ? parseInt(proposalDetailQuery?.data?.coins_yes as string) / total
+      : 0) * 100;
+  const noVotesPercentage =
+    (total > 0
+      ? parseInt(proposalDetailQuery?.data?.coins_no as string) / total
+      : 0) * 100;
 
   const voted =
     (proposalDetailQuery?.data?.yes_voters?.includes(address as string) ||
@@ -151,10 +155,11 @@ export default function GovProposalDetail({
         <HStack spacing="54px" align="flex-start">
           <Box flexGrow={1}>
             <GovProposalVoting
-              target={target * 100}
+              target={target}
               yesVotesCount={yesVotesCount}
               noVotesCount={noVotesCount}
               yesVotesPercentage={yesVotesPercentage}
+              noVotesPercentage={noVotesPercentage}
             />
             <Box
               background="rgba(112, 79, 247, 0.1)"
@@ -175,10 +180,7 @@ export default function GovProposalDetail({
             </Box>
           </Box>
           <VStack width="330px" spacing="30px" align="flex-start">
-            <GovProposalMyVote
-              voted={voted}
-              proposalId={proposalId}
-            />
+            <GovProposalMyVote voted={voted} proposalId={proposalId} />
             {/* <ProposalDaoMembers
               selectedDaoMembersList={daoMembers}
             /> */}
