@@ -160,7 +160,7 @@ export default function DaoProposal({
       </Text>
       <Flex height={"46px"} />
       <Flex>
-        <Box>
+        <Box flexGrow={1}>
           <ProposalHeader isGov={false} />
           <Flex height={"10px"} />
           {!!proposalsQuery.data ? (
@@ -189,7 +189,6 @@ export default function DaoProposal({
             </Flex>
           )}
         </Box>
-        <Spacer />
         <DaoMembersList
           daoAddress={daoAddress}
           setSelectedDaoMembersList={setSelectedDaoMembersList}
