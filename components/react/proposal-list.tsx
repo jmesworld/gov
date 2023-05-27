@@ -85,6 +85,7 @@ export const ProposalList = ({
           pass={
             proposal.status === "passed" ||
             proposal.status === "success" ||
+            proposal.status === "executed" ||
             proposal.status === "success_concluded"
               ? "Yes"
               : "No"
