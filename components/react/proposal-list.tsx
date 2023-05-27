@@ -108,7 +108,7 @@ export const ProposalList = ({
 
 export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
   return (
-    <Flex flex={1} width={isGov ? "100%" : "100%"} backgroundColor={"red"}>
+    <Flex flex={1} width={isGov ? "100%" : "100%"}>
       <Flex flexGrow={1} width={"100%"}>
         <Box flexGrow={1}>
           <Text
@@ -303,7 +303,7 @@ export const ProposalListItem = ({
         }}
         cursor={"pointer"}
       >
-        <Box flexGrow={1} backgroundColor={"blue"}>
+        <Box flexGrow={1}>
           <Flex width={"100%"}>
             <Box flexGrow={1}>
               <Text
