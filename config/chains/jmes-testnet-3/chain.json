@@ -5,7 +5,7 @@
   "network_type": "testnet",
   "website": "https://www.jmes.cloud/",
   "pretty_name": "JMES Testnet",
-  "chain_id": "jmes-testnet-1",
+  "chain_id": "jmes-testnet-3",
   "daemon_name": "jmesd",
   "node_home": "$HOME/.jmes",
   "bech32_prefix": "jmes",
@@ -44,12 +44,8 @@
     "seeds": [],
     "persistent_peers": [
       {
-        "id": "2a39d42bb299b913e5dbbaf9a5e458fb3ff7536b",
-        "address": "164.92.191.45:2665"
-      },
-      {
-        "id": "eb490967a016bbcb361ab2ba1f6d2a2ca1eb8593",
-        "address": "46.101.197.51:26656"
+        "id": "b0f3ad1148b5a5dc4050f2ecaf31c8f17170a697",
+        "address": "209.38.204.236:26656"
       }
     ]
   },
@@ -68,7 +64,7 @@
     ],
     "grpc": [
       {
-        "address": "http://164.92.191.45:1889",
+        "address": "http://209.38.204.236:9090",
         "provider": "zeus"
       }
     ]

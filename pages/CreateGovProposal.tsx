@@ -473,54 +473,43 @@ export default function CreateGovProposal({
               disabled={!isFormValid}
               onClick={() => {
                 //
-                const proposalMsg = getProposalExecuteMsg({
-                  type: selectedProposalType,
-                  isFundingRequired: isFundingNeeded,
-                  amount: fundingAmount,
-                  duration: fundingPeriod * 30 * 24 * 60 * 60, // months to seconds
-                  title: proposalTitle,
-                  description: proposalDescription,
-                  slot: getSlot(slotType) as Governance.CoreSlot,
-                  revokeSlot: {
-                    dao: selectedDao,
+                const proposalMsg = {
+                  propose: getProposalExecuteMsg({
+                    type: selectedProposalType,
+                    isFundingRequired: isFundingNeeded,
+                    amount: fundingAmount,
+                    duration: fundingPeriod * 30 * 24 * 60 * 60, // months to seconds
+                    title: proposalTitle,
+                    description: proposalDescription,
                     slot: getSlot(slotType) as Governance.CoreSlot,
-                  },
-                  msgs: [
-                    {
-                      bank: {
-                        send: {
-                          amount: [
-                            {
-                              denom: "ujmes",
-                              amount: (fundingAmount * 10 ** 6).toString(),
-                            },
-                          ],
-                          to_address: selectedDao,
+                    revokeSlot: {
+                      dao: selectedDao,
+                      slot: getSlot(slotType) as Governance.CoreSlot,
+                    },
+                    msgs: [
+                      {
+                        bank: {
+                          send: {
+                            amount: [
+                              {
+                                denom: "ujmes",
+                                amount: "10000000",
+                              },
+                            ],
+                            to_address: selectedDao,
+                          },
                         },
                       },
-                    },
-                  ],
-                });
+                    ],
+                  }),
+                };
 
                 setCreatingGovProposal(true);
-
                 const wasmMsg: Governance.WasmMsg = {
                   execute: {
                     contract_addr: NEXT_PUBLIC_GOVERNANCE_CONTRACT,
-                    funds: [],
+                    funds: [{ amount: "10000000", denom: "ujmes" }],
                     msg: toBase64(proposalMsg),
-                  },
-                };
-
-                const msg: ExecuteMsg = {
-                  propose: {
-                    title: proposalTitle.trim(),
-                    description: proposalDescription.trim(),
-                    msgs: [
-                      {
-                        wasm: wasmMsg,
-                      },
-                    ],
                   },
                 };
 
@@ -536,7 +525,10 @@ export default function CreateGovProposal({
                         },
                       ],
                     },
-                    args: { fee },
+                    args: {
+                      fee,
+                      funds: [{ amount: "10000000", denom: "ujmes" }],
+                    },
                   })
                   .then((result) => {
                     toast({

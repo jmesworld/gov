@@ -33,7 +33,13 @@ const LCDOptions = {
   chainID: CHAIN_ID,
 };
 
-export const DaoMembersList = ({ daoAddress }: { daoAddress: string }) => {
+export const DaoMembersList = ({
+  daoAddress,
+  setSelectedDaoMembersList,
+}: {
+  daoAddress: string;
+  setSelectedDaoMembersList: Function;
+}) => {
   const chainContext = useChain(chainName);
 
   const { address, getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
@@ -100,6 +106,7 @@ export const DaoMembersList = ({ daoAddress }: { daoAddress: string }) => {
           members={
             !!daoMembersListQuery.data ? daoMembersListQuery.data?.voters : []
           }
+          setSelectedDaoMembersList={setSelectedDaoMembersList}
         />
       ) : (
         <Flex justifyContent="center" width="100%">
@@ -119,11 +126,18 @@ export const DaoMembersList = ({ daoAddress }: { daoAddress: string }) => {
   );
 };
 
-export const MembersList = ({ members }: { members: any }) => {
+export const MembersList = ({
+  members,
+  setSelectedDaoMembersList,
+}: {
+  members: any;
+  setSelectedDaoMembersList: Function;
+}) => {
   const totalWeight = members?.reduce(
     (acc: any, o: any) => acc + parseInt(o.weight),
     0
   );
+
   const membersList = members?.map((member: any) => {
     const weight = member.weight;
     return (
@@ -131,6 +145,8 @@ export const MembersList = ({ members }: { members: any }) => {
         key={member.addr}
         address={member.addr}
         weightPercent={(weight / totalWeight) * 100}
+        members={members}
+        setSelectedDaoMembersList={setSelectedDaoMembersList}
       />
     );
   });
@@ -141,9 +157,13 @@ export const MembersList = ({ members }: { members: any }) => {
 export const DaoMembersListItem = ({
   address,
   weightPercent,
+  members,
+  setSelectedDaoMembersList,
 }: {
   address: string;
   weightPercent: any;
+  members?: Array<any>;
+  setSelectedDaoMembersList: Function;
 }) => {
   const chainContext = useChain(chainName);
   const { getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
@@ -174,6 +194,22 @@ export const DaoMembersListItem = ({
     client: identityserviceQueryClient,
     args: { owner: address },
   });
+
+  useEffect(() => {
+    if (identityQuery.data) {
+      const updatedMembers = members?.map((item) => {
+        if (item.addr === address) {
+          return {
+            ...item,
+            name: identityQuery.data?.identity?.name as string,
+          };
+        }
+        return item;
+      });
+
+      setSelectedDaoMembersList(updatedMembers);
+    }
+  }, [identityQuery?.data]);
 
   return (
     <Flex

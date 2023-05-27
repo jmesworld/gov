@@ -24,6 +24,8 @@ import { useAccountBalance } from "../hooks/useAccountBalance";
 import CreateDao from "./CreateDao";
 import DaoProposal from "./DaoProposal";
 import CreateGovProposal from "./CreateGovProposal";
+import DaoProposalDetail from "./DaoProposalDetail";
+import GovProposalDetail from "./GovProposalDetail";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -31,8 +33,6 @@ const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 const BJMES_TOKEN_CONTRACT = process.env
   .NEXT_PUBLIC_BJMES_TOKEN_CONTRACT as string;
-
-let cosmWasmClient: CosmWasmClient;
 
 export default function Home() {
   const { address, status, getCosmWasmClient } = useChain(chainName);
@@ -48,6 +48,13 @@ export default function Home() {
   const [identityName, setIdentityName] = useState("");
   const [isCreateGovProposalSelected, setCreateGovProposalSelected] =
     useState(false);
+
+  const [isDaoProposalDetailOpen, setDaoProposalDetailOpen] = useState(false);
+  const [selectedDaoProposalTitle, setSelectedDaoProposalTitle] = useState("");
+  const [selectedDaoMembersList, setSelectedDaoMembersList] = useState([]);
+
+  const [isGovProposalDetailOpen, setGovProposalDetailOpen] = useState(false);
+  const [selectedProposalId, setSelectedProposalId] = useState(-1);
 
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
@@ -70,6 +77,8 @@ export default function Home() {
     if (status == WalletStatus.Disconnected) {
       setCreateDaoSelected(false);
       setIsGovProposalSelected(true);
+      setDaoProposalDetailOpen(false);
+      setGovProposalDetailOpen(false);
     }
   }, [status]);
 
@@ -177,6 +186,7 @@ export default function Home() {
               setSelectedDao("");
               setSelectedDaoName("");
               setCreateGovProposalSelected(false);
+              setDaoProposalDetailOpen(false);
             }}
           />
           <Box height={"27px"} />
@@ -210,6 +220,8 @@ export default function Home() {
               selectedDaoName={selectedDaoName}
               setSelectedDaoName={setSelectedDaoName}
               setCreateDaoSelected={setCreateDaoSelected}
+              setDaoProposalDetailOpen={setDaoProposalDetailOpen}
+              setGovProposalDetailOpen={setGovProposalDetailOpen}
             />
           ) : (
             <></>
@@ -225,6 +237,8 @@ export default function Home() {
               } else {
                 setCreateGovProposalSelected(false);
                 setCreateDaoSelected(true);
+                setDaoProposalDetailOpen(false);
+                setGovProposalDetailOpen(false);
               }
             }}
           />
@@ -238,6 +252,8 @@ export default function Home() {
             }
             onClick={() => {
               setCreateGovProposalSelected(false);
+              setDaoProposalDetailOpen(false);
+              setGovProposalDetailOpen(false);
             }}
           />
           <NavBarButton
@@ -249,11 +265,33 @@ export default function Home() {
             }
             onClick={() => {
               setCreateGovProposalSelected(true);
+              setDaoProposalDetailOpen(false);
+              setGovProposalDetailOpen(false);
             }}
           />
           <Flex height={"10px"} />
         </VStack>
-        {isCreateGovProposalSelected ? (
+        {isGovProposalDetailOpen ? (
+          <GovProposalDetail
+            proposalId={selectedProposalId}
+            identityName={identityName}
+            identityBalance={identityBalance}
+            isConnectButtonClicked={isConnectButtonClicked}
+            setConnectButtonClicked={setConnectButtonClicked}
+          />
+        ) : isDaoProposalDetailOpen ? (
+          <DaoProposalDetail
+            selectedDao={selectedDao}
+            selectedDaoName={selectedDaoName}
+            selectedDaoProposalTitle={selectedDaoProposalTitle}
+            selectedDaoMembersList={selectedDaoMembersList}
+            selectedDaoProposalId={selectedProposalId}
+            identityName={identityName}
+            identityBalance={identityBalance}
+            isConnectButtonClicked={isConnectButtonClicked}
+            setConnectButtonClicked={setConnectButtonClicked}
+          />
+        ) : isCreateGovProposalSelected ? (
           <CreateGovProposal
             identityName={identityName}
             identityBalance={identityBalance}
@@ -277,6 +315,8 @@ export default function Home() {
             identityBalance={identityBalance}
             isConnectButtonClicked={isConnectButtonClicked}
             setConnectButtonClicked={setConnectButtonClicked}
+            setSelectedProposalId={setSelectedProposalId}
+            setGovProposalDetailOpen={setGovProposalDetailOpen}
           />
         ) : (
           <DaoProposal
@@ -286,6 +326,10 @@ export default function Home() {
             identityBalance={identityBalance}
             isConnectButtonClicked={isConnectButtonClicked}
             setConnectButtonClicked={setConnectButtonClicked}
+            setDaoProposalDetailOpen={setDaoProposalDetailOpen}
+            setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+            setSelectedDaoMembersList={setSelectedDaoMembersList}
+            setSelectedProposalId={setSelectedProposalId}
           />
         )}
         {isConnectButtonClicked || status === WalletStatus.Connecting ? (
@@ -306,6 +350,8 @@ export const MyDaosList = ({
   selectedDaoName,
   setSelectedDaoName,
   setCreateDaoSelected,
+  setDaoProposalDetailOpen,
+  setGovProposalDetailOpen,
 }: {
   daos: any;
   setIsGovProposalSelected: Function;
@@ -314,6 +360,8 @@ export const MyDaosList = ({
   selectedDaoName: string;
   setSelectedDaoName: Function;
   setCreateDaoSelected: Function;
+  setDaoProposalDetailOpen: Function;
+  setGovProposalDetailOpen: Function;
 }) => {
   const chainContext = useChain(chainName);
   const { address } = chainContext;
@@ -339,6 +387,8 @@ export const MyDaosList = ({
             setSelectedDao(dao.address);
             setSelectedDaoName(dao.name);
             setCreateDaoSelected(false);
+            setDaoProposalDetailOpen(false);
+            setGovProposalDetailOpen(false);
           }}
         />
       )

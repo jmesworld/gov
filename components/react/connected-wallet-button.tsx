@@ -43,14 +43,14 @@ export const ConnectedWalletButton = ({
                   alignSelf={"center"}
                   width={"24px"}
                   height={"24px"}
-                  color={"purple"}
+                  color={"#7453FD"}
                 />
               ) : (
                 <ChevronDownIcon
                   alignSelf={"center"}
                   width={"24px"}
                   height={"24px"}
-                  color={"purple"}
+                  color={"#7453FD"}
                 />
               )
             }

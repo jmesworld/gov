@@ -5,14 +5,16 @@ import {
   Container,
   Divider,
   Flex,
+  HStack,
   Link,
   Progress,
   ProgressLabel,
+  Spacer,
   Text,
   Tooltip,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useEffect, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import { DaoMultisigQueryClient } from "../../client/DaoMultisig.client";
 import {
   useDaoMultisigListVotersQuery,
@@ -33,10 +35,16 @@ export const ProposalList = ({
   proposals,
   isGov,
   daoAddress,
+  onClickListItem,
+  setSelectedDaoProposalTitle,
+  setSelectedProposalId,
 }: {
   proposals: any;
   isGov: boolean;
   daoAddress?: string;
+  onClickListItem: MouseEventHandler<HTMLDivElement>;
+  setSelectedDaoProposalTitle: Function;
+  setSelectedProposalId: Function;
 }) => {
   if (!proposals || Array.from(proposals).length === 0) {
     return (
@@ -67,7 +75,6 @@ export const ProposalList = ({
       const type = isGov
         ? propType.slice(0, propType.length - 1)
         : proposal.description;
-
       return (
         <ProposalListItem
           key={proposal.id + proposal.description}
@@ -78,7 +85,9 @@ export const ProposalList = ({
           threshold={proposal.threshold?.absolute_percentage?.percentage}
           type={type}
           pass={
+            proposal.status === "passed" ||
             proposal.status === "success" ||
+            proposal.status === "executed" ||
             proposal.status === "success_concluded"
               ? "Yes"
               : "No"
@@ -86,6 +95,9 @@ export const ProposalList = ({
           isGov={isGov}
           daoAddress={daoAddress}
           proposalId={proposal.id}
+          onClickListItem={onClickListItem}
+          setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+          setSelectedDaoProposalId={setSelectedProposalId}
         />
       );
     });
@@ -96,56 +108,74 @@ export const ProposalList = ({
 
 export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
   return (
-    <Flex>
-      <Text
-        color="rgba(15,0,86,0.8)"
-        fontWeight="medium"
-        fontFamily="DM Sans"
-        fontSize={12}
-        width={isGov ? "227px" : "151px"}
+    <Flex flex={1} width={isGov ? "100%" : "100%"}>
+      <Flex flexGrow={1} width={"100%"}>
+        <Box flexGrow={1}>
+          <Text
+            color="rgba(15,0,86,0.8)"
+            fontWeight="medium"
+            fontFamily="DM Sans"
+            fontSize={12}
+            width={isGov ? "227px" : "151px"}
+          >
+            {isGov ? "GOVERNANCE PROPOSALS" : "DAO PROPOSALS"}
+          </Text>
+        </Box>
+        <Box flexGrow={1}>
+          <Text
+            color="rgba(15,0,86,0.8)"
+            fontFamily={"DM Sans"}
+            fontWeight="medium"
+            fontSize={12}
+            marginLeft={isGov ? "200px" : "170px"}
+            width={"32px"}
+          >
+            YES
+          </Text>
+        </Box>
+        <Box flexGrow={1}>
+          <Text
+            color="rgba(15,0,86,0.8)"
+            fontFamily={"DM Sans"}
+            fontWeight="medium"
+            fontSize={12}
+            marginLeft={isGov ? "130px" : "125px"}
+            marginRight={isGov ? "100px" : "100px"}
+            width={"32px"}
+          >
+            NO
+          </Text>
+        </Box>
+        <Box flexGrow={1}>
+          <Text
+            color="rgba(15,0,86,0.8)"
+            fontFamily={"DM Sans"}
+            fontWeight="medium"
+            fontSize={12}
+            marginLeft={isGov ? "100px" : "90px"}
+            marginRight={isGov ? "30px" : "60px"}
+            width={"94px"}
+          >
+            % TO PASS
+          </Text>
+        </Box>
+      </Flex>
+      <Flex
+        flexGrow={1}
+        marginLeft={isGov ? "76px" : "35px"}
+        marginRight={isGov ? "84px" : "35px"}
       >
-        {isGov ? "GOVERNANCE PROPOSALS" : "DAO PROPOSALS"}
-      </Text>
-      <Text
-        color="rgba(15,0,86,0.8)"
-        fontFamily={"DM Sans"}
-        fontWeight="medium"
-        fontSize={12}
-        marginLeft={isGov ? "204px" : "131px"}
-        width={"32px"}
-      >
-        YES
-      </Text>
-      <Text
-        color="rgba(15,0,86,0.8)"
-        fontFamily={"DM Sans"}
-        fontWeight="medium"
-        fontSize={12}
-        marginLeft={isGov ? "121px" : "90px"}
-        width={"32px"}
-      >
-        NO
-      </Text>
-      <Text
-        color="rgba(15,0,86,0.8)"
-        fontFamily={"DM Sans"}
-        fontWeight="medium"
-        fontSize={12}
-        marginLeft={isGov ? "131px" : "85px"}
-        width={"94px"}
-      >
-        % TO PASS
-      </Text>
-      <Text
-        color="rgba(15,0,86,0.8)"
-        fontFamily={"DM Sans"}
-        fontWeight="medium"
-        fontSize={12}
-        marginLeft={isGov ? "190px" : "136px"}
-        width={"94px"}
-      >
-        PASSING
-      </Text>
+        <Text
+          color="rgba(15,0,86,0.8)"
+          fontFamily={"DM Sans"}
+          fontWeight="medium"
+          fontSize={12}
+          textAlign={"center"}
+          width={"94px"}
+        >
+          PASSING
+        </Text>
+      </Flex>
     </Flex>
   );
 };
@@ -161,6 +191,9 @@ export const ProposalListItem = ({
   isGov,
   daoAddress,
   proposalId,
+  onClickListItem,
+  setSelectedDaoProposalTitle,
+  setSelectedDaoProposalId,
 }: {
   title: string;
   threshold: number | undefined;
@@ -172,6 +205,9 @@ export const ProposalListItem = ({
   isGov: boolean;
   daoAddress?: string;
   proposalId?: string;
+  onClickListItem: MouseEventHandler<HTMLDivElement>;
+  setSelectedDaoProposalTitle: Function;
+  setSelectedDaoProposalId: Function;
 }) => {
   const chainContext = useChain(chainName);
   const { address, getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
@@ -254,15 +290,22 @@ export const ProposalListItem = ({
   return (
     <>
       <Flex
+        flex={1}
         height={"64px"}
-        width={isGov ? "1137px" : "836px"}
+        width={isGov ? "100%" : "100%"}
         backgroundColor="purple"
         borderRadius={12}
         alignItems={"center"}
+        onClick={(e) => {
+          onClickListItem(e);
+          setSelectedDaoProposalTitle(title);
+          setSelectedDaoProposalId(proposalId);
+        }}
+        cursor={"pointer"}
       >
-        <Box>
+        <Box flexGrow={1}>
           <Flex width={"100%"}>
-            <Box>
+            <Box flexGrow={1}>
               <Text
                 width={isGov ? "281px" : "268px"}
                 color="white"
@@ -283,14 +326,14 @@ export const ProposalListItem = ({
               placement={"right"}
               borderRadius={"8px"}
             >
-              <Box>
+              <Box flexGrow={1}>
                 <Text
                   width={"60px"}
                   color="white"
                   fontFamily={"DM Sans"}
                   fontWeight="normal"
                   fontSize={18}
-                  marginLeft={isGov ? "135px" : "0px"}
+                  marginLeft={isGov ? "112px" : "-18px"}
                 >
                   {yes}
                 </Text>
@@ -304,27 +347,28 @@ export const ProposalListItem = ({
               direction={"rtl"}
               placement={"right"}
             >
-              <Box>
+              <Box flexGrow={1}>
                 <Text
                   width={"60px"}
                   color="white"
                   fontFamily={"DM Sans"}
                   fontWeight="normal"
                   fontSize={18}
-                  marginLeft={isGov ? "93px" : "62px"}
+                  marginLeft={isGov ? "72px" : "42px"}
+                  marginRight={isGov ? "60px" : "102px"}
                 >
                   {no}
                 </Text>
               </Box>
             </Tooltip>
-            <Box>
+            <Box flexGrow={1}>
               <Text
                 width={"87px"}
                 color="white"
                 fontFamily={"DM Sans"}
                 fontWeight="normal"
                 fontSize={18}
-                marginLeft={isGov ? "103px" : "57px"}
+                marginLeft={isGov ? "103px" : "12px"}
               >
                 {threshold?.toString() + "%"}
               </Text>
@@ -332,7 +376,7 @@ export const ProposalListItem = ({
           </Flex>
 
           <Flex alignItems={"center"}>
-            <Box>
+            <Box flexGrow={1}>
               <Text
                 width={isGov ? "281px" : "268px"}
                 color="white"
@@ -353,7 +397,7 @@ export const ProposalListItem = ({
               marginLeft={isGov ? "135px" : "0%"}
               borderRadius={90}
             />
-            <Box>
+            <Box flexGrow={1}>
               <Text
                 color="white"
                 fontFamily={"DM Sans"}
@@ -375,7 +419,7 @@ export const ProposalListItem = ({
               marginLeft={isGov ? "73px" : "42px"}
               borderRadius={90}
             />
-            <Box>
+            <Box flexGrow={1}>
               <Text
                 color="white"
                 fontFamily={"DM Sans"}
@@ -389,13 +433,20 @@ export const ProposalListItem = ({
                 {noCount < 99 ? `${noCount} votes` : `99+ votes`}
               </Text>
             </Box>
-            <ProgressBar yesPercent={yesPercent} threshold={threshold} isGov={isGov} />
+            <Box flexGrow={1}>
+              <ProgressBar
+                yesPercent={yesPercent}
+                threshold={threshold}
+                isGov={isGov}
+              />
+            </Box>
           </Flex>
         </Box>
         <Flex
           width={"64px"}
           height={"24px"}
           marginLeft={isGov ? "90px" : "49px"}
+          marginRight={isGov ? "98px" : "49px"}
           borderRadius={"90px"}
           borderWidth={"1px"}
           borderColor={pass === "Yes" ? "green" : "red"}
@@ -412,7 +463,7 @@ export const ProposalListItem = ({
           </Text>
         </Flex>
       </Flex>
-      <Box height={"7px"} />
+      <Box flexGrow={1} height={"7px"} />
     </>
   );
 };
@@ -430,7 +481,7 @@ export const ProgressBar = ({
     <Progress
       value={yesPercent}
       backgroundColor={"#5136C2"}
-      width={ isGov ? "191px" : "180px"}
+      width={isGov ? "191px" : "180px"}
       height={"6px"}
       borderRadius={"10px"}
       variant={yesPercent <= threshold ? "red" : "green"}
