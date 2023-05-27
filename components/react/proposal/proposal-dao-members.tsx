@@ -2,6 +2,7 @@ import { Text, VStack, HStack, Tooltip, Image } from "@chakra-ui/react";
 import { useEffect } from "react";
 
 import { ProposalDaoMember } from "./proposal-dao-member";
+import { m } from "framer-motion";
 
 export const ProposalDaoMembers = ({
   selectedDaoMembersList,
@@ -47,7 +48,7 @@ export const ProposalDaoMembers = ({
       </HStack>
 
       {selectedDaoMembersList.map((member) => (
-        <ProposalDaoMember name={member?.name} percent={member?.weight} />
+        <ProposalDaoMember key={member?.name} name={member?.name} percent={member?.weight} />
       ))}
     </VStack>
   );
