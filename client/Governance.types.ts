@@ -21,6 +21,7 @@ export interface CoreSlotsResponse {
   brand?: SlotVoteResult | null;
   core_tech?: SlotVoteResult | null;
   creative?: SlotVoteResult | null;
+  biz_tech?: SlotVoteResult | null;  
   [k: string]: unknown;
 }
 export interface SlotVoteResult {
@@ -218,7 +219,12 @@ export type CoreSlot = {
   core_tech: {
     [k: string]: unknown;
   };
+} | {
+  biz_tech: {
+    [k: string]: unknown;
+  };  
 };
+
 export type VoteOption = "yes" | "no";
 export interface Coin {
   amount: Uint128;

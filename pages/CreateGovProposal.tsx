@@ -315,8 +315,9 @@ export default function CreateGovProposal({
                 >
                   <Stack direction="row" spacing={"35px"}>
                     <Radio value="brand">Brand</Radio>
-                    <Radio value="core-tech">Core Tech</Radio>
-                    <Radio value="creative">Creative</Radio>
+                    <Radio value="creative">Community Engagement</Radio>
+                    <Radio value="core-tech">Core Tech</Radio>   
+                    <Radio value="biz-tech">Business Tech</Radio>                                       
                   </Stack>
                 </RadioGroup>
               </Flex>
@@ -675,5 +676,7 @@ const getSlot = (type: string) => {
       return { creative: {} };
     case "core-tech":
       return { core_tech: {} };
+    case "biz-tech":
+        return { biz_tech: {} };      
   }
 };
