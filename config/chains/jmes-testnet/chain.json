@@ -1,11 +1,11 @@
 {
   "$schema": "../chain.schema.json",
-  "chain_name": "JMES Testnet 888",
+  "chain_name": "JMES Testnet",
   "status": "live",
   "network_type": "testnet",
   "website": "https://www.jmes.cloud/",
-  "pretty_name": "JMES Testnet 888",
-  "chain_id": "jmes-888",
+  "pretty_name": "JMES Testnet",
+  "chain_id": "jmes-testnet",
   "daemon_name": "jmesd",
   "node_home": "$HOME/.jmes",
   "bech32_prefix": "jmes",
@@ -37,39 +37,35 @@
       "darwin/amd64": "https://github.com/terra-money/core/releases/download/v2.2.0/terra_2.2.0_Darwin_x86_64.tar.gz"
     },
     "genesis": {
-      "genesis_url": "http://http://51.38.52.37:1889/genesis.json"
+      "genesis_url": "http://209.38.210.115:1889/genesis.json"
     }
   },
   "peers": {
     "seeds": [],
     "persistent_peers": [
       {
-        "id": "24ef20ecc3fc8c34755fad4af92c67eaf6a7b795",
-        "address": "164.90.208.140:26656"
-      },
-      {
-        "id": "c3fa45f72c551a115dce166b77efb297e7d0a864",
-        "address": "http://51.38.52.37:26656"
+        "id": "b0f3ad1148b5a5dc4050f2ecaf31c8f17170a697",
+        "address": "209.38.210.115:26656"
       }
     ]
   },
   "apis": {
     "rpc": [
       {
-        "address": "http://51.38.52.37:1889",
-        "provider": "devnode"
+        "address": "https://validator-proxy-service-o6lht.ondigitalocean.app/rpc",
+        "provider": "jmesworld"
       }
     ],
     "rest": [
       {
-        "address": "http://51.38.52.37:1889",
-        "provider": "devnode"
+        "address": "https://validator-proxy-service-o6lht.ondigitalocean.app/rpc",
+        "provider": "jmesworld"
       }
     ],
     "grpc": [
       {
-        "address": "http://51.38.52.37:9090",
-        "provider": "devnode"
+        "address": "http://209.38.210.115:9090",
+        "provider": "zeus"
       }
     ]
   },
