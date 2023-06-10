@@ -1,4 +1,14 @@
+import { Dispatch, SetStateAction } from "react";
 import { chainName, chainId, rest_keplr, rpc_keplr } from "../config/defaults";
+
+export const checkForKeplrInstalled = async () => {
+  if (typeof window !== "undefined" && !window.keplr) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
 export const addJMEStoKeplr = async () => {
   // @ts-ignore
   return await window.keplr.experimentalSuggestChain({
@@ -48,8 +58,12 @@ export const addJMEStoKeplr = async () => {
 export const checkJMESInKeplr = async () => {
   let key: any = undefined;
   try {
-    // @ts-ignore
     key = await window.keplr.getKey(chainId);
+    if (key) {
+      return true;
+    } else {
+      return false;
+    }
   } catch (error) {
     console.log(error);
   }
