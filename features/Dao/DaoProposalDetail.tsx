@@ -10,9 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { useChain } from "@cosmos-kit/react";
 import { chainName } from "../../config/defaults";
-import { ProposalHeader } from "../../components/Proposal/ProposalHeader";
-import { ProposalVoting } from "../../components/Proposal/ProposalVoting";
-import { ProposalMyVote } from "../../components/Proposal/ProposalMyVote";
+
 import {
   CosmWasmClient,
   SigningCosmWasmClient,
@@ -23,6 +21,9 @@ import {
   useDaoMultisigListVotesQuery,
   useDaoMultisigListVotersQuery,
 } from "../../client/DaoMultisig.react-query";
+import { ProposalHeader } from "../components/Proposal/ProposalHeader";
+import { ProposalMyVote } from "../components/Proposal/ProposalMyVote";
+import { ProposalVoting } from "../components/Proposal/ProposalVoting";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;

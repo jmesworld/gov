@@ -2,8 +2,9 @@ import { VStack, Box, Flex, Text, Spacer } from "@chakra-ui/react";
 import { WalletStatus } from "@cosmos-kit/core";
 import { NavBarItem } from "./NavBarItem";
 import { NavBarButton } from "./NavBarButton";
-import MyDaosList from "../../features/Dao/MyDaoList";
-import { JMESLogo } from "../JMESLogo";
+
+import { JMESLogo } from "../Assets/JMESLogo";
+import MyDaosList from "../../Dao/MyDaoList";
 
 interface NavBarProps {
   status: WalletStatus;

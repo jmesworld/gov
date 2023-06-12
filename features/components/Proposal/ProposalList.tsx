@@ -1,27 +1,21 @@
 import {
   Box,
-  Button,
-  Container,
-  Divider,
   Flex,
-  HStack,
-  Link,
   Progress,
   ProgressLabel,
-  Spacer,
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import NextLink from "next/link";
 import { MouseEventHandler, useEffect, useState } from "react";
-import { DaoMultisigQueryClient } from "../../client/DaoMultisig.client";
+
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { useChain } from "@cosmos-kit/react";
+import { DaoMultisigQueryClient } from "../../../client/DaoMultisig.client";
 import {
   useDaoMultisigListVotersQuery,
   useDaoMultisigListVotesQuery,
-} from "../../client/DaoMultisig.react-query";
-import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { useChain } from "@cosmos-kit/react";
-import { chainName } from "../../config/defaults";
+} from "../../../client/DaoMultisig.react-query";
+import { chainName } from "../../../config/defaults";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;

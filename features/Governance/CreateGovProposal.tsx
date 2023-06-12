@@ -23,7 +23,7 @@ import { useEffect, useState } from "react";
 import { StdFee } from "@cosmjs/amino";
 import { DaoMultisigClient } from "../../client/DaoMultisig.client";
 import { useDaoMultisigProposeMutation } from "../../client/DaoMultisig.react-query";
-import { ProposalType } from "../../components/Proposal/ProposalType";
+
 import { chainName } from "../../config/defaults";
 import { toBase64 } from "../../utils/identity";
 import * as Governance from "../../client/Governance.types";

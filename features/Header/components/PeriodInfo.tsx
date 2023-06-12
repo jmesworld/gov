@@ -12,10 +12,10 @@ import {
 } from "@chakra-ui/react";
 import { useChain } from "@cosmos-kit/react";
 import { useEffect, useState } from "react";
-import { GovernanceQueryClient } from "../client/Governance.client";
-import { useGovernancePeriodInfoQuery } from "../client/Governance.react-query";
-import { chainName } from "../config/defaults";
-import { timestampToDateTime, timestampToDaysLeft } from "../utils/time";
+import { GovernanceQueryClient } from "../../../client/Governance.client";
+import { useGovernancePeriodInfoQuery } from "../../../client/Governance.react-query";
+import { chainName } from "../../../config/defaults";
+import { timestampToDaysLeft, timestampToDateTime } from "../../../utils/time";
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;

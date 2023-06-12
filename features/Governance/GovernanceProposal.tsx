@@ -1,18 +1,17 @@
-import { Box, Flex, Spacer, Text } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { GovernanceQueryClient } from "../../client/Governance.client";
 import { useGovernanceProposalsQuery } from "../../client/Governance.react-query";
 import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
 import { useIdentityserviceGetIdentityByOwnerQuery } from "../../client/Identityservice.react-query";
 
-import {
-  ProposalHeader,
-  ProposalList,
-} from "../../components/Proposal/ProposalList";
-import { chainName } from "../../config/defaults";
-import { useChain } from "@cosmos-kit/react";
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { useChain } from "@cosmos-kit/react";
+
+import { chainName } from "../../config/defaults";
 import GovHeader from "./GovHeader";
+import { ProposalHeader } from "../components/Proposal/ProposalHeader";
+import { ProposalList } from "../components/Proposal/ProposalList";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;

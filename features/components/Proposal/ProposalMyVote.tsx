@@ -7,15 +7,17 @@ import {
   CircularProgress,
 } from "@chakra-ui/react";
 import { useChain } from "@cosmos-kit/react";
-import { chainName } from "../../config/defaults";
+
 import { useEffect, useState } from "react";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { DaoMultisigClient } from "../../client/DaoMultisig.client";
-import {
-  useDaoMultisigExecuteMutation,
-  useDaoMultisigVoteMutation,
-} from "../../client/DaoMultisig.react-query";
+
 import { StdFee } from "@cosmjs/amino";
+import { DaoMultisigClient } from "../../../client/DaoMultisig.client";
+import {
+  useDaoMultisigVoteMutation,
+  useDaoMultisigExecuteMutation,
+} from "../../../client/DaoMultisig.react-query";
+import { chainName } from "../../../config/defaults";
 
 const fee: StdFee = {
   amount: [{ amount: "30000", denom: "ujmes" }],

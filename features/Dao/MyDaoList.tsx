@@ -1,7 +1,7 @@
 import { Flex } from "@chakra-ui/react";
 import { useChain } from "@cosmos-kit/react";
 import { chainName } from "../../config/defaults";
-import { NavBarItem } from "../../components/NavBar/NavBarItem";
+import { NavBarItem } from "../components/NavBar/NavBarItem";
 
 const MyDaosList = ({
   daos,

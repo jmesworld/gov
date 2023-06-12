@@ -16,10 +16,11 @@ import {
 } from "@cosmjs/cosmwasm-stargate";
 import { GovernanceQueryClient } from "../../client/Governance.client";
 import { useGovernanceProposalQuery } from "../../client/Governance.react-query";
-import { ProposalHeader } from "../../components/Proposal/ProposalHeader";
+
 import { chainName } from "../../config/defaults";
 import GovProposalMyVote from "./GovProposalMyVote";
 import GovProposalVoting from "./GovProposalVoting";
+import { ProposalHeader } from "../components/Proposal/ProposalHeader";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;

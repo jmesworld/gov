@@ -14,20 +14,16 @@ import {
   CircularProgress,
 } from "@chakra-ui/react";
 import { useChain } from "@cosmos-kit/react";
-
 import { useEffect, useState } from "react";
 import {
   CosmWasmClient,
   MsgExecuteContractEncodeObject,
   SigningCosmWasmClient,
 } from "@cosmjs/cosmwasm-stargate";
-
 import { StdFee } from "@cosmjs/stargate";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { toHex, toUtf8 } from "@cosmjs/encoding";
-
 import { WalletStatus } from "@cosmos-kit/core";
-
 import { chainName } from "../../../config/defaults";
 import OnboardingProgressIndicator from "./OnboardingProgressIndicator";
 import {
@@ -98,33 +94,56 @@ export const ChooseUsernameCard = ({
         handleUpdateCard(radioGroup.indexOf(currentCard));
       }, 2000);
     }
-  }, []);
+  }, [identityName]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      console.log("interval");
-      if (address) {
-        getCosmWasmClient()
-          .then((cosmWasmClient) => {
-            if (!cosmWasmClient || !address) {
-              return;
-            }
-            setCosmWasmClient(cosmWasmClient);
-          })
-          .catch((error) => console.log(error));
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient || !address) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
 
-        getSigningCosmWasmClient()
-          .then((signingClient) => {
-            if (!signingClient) {
-              return;
-            }
-            setSigningClient(signingClient);
-          })
-          .catch((error) => console.log(error));
-      }
-    }, 1000);
-    clearInterval(interval);
-  }, []);
+      getSigningCosmWasmClient()
+        .then((signingClient) => {
+          if (!signingClient) {
+            return;
+          }
+          setSigningClient(signingClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient, getSigningCosmWasmClient]);
+
+  /*Modified useffect (more current) */
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     console.log("interval");
+  //     if (address) {
+  //       getCosmWasmClient()
+  //         .then((cosmWasmClient) => {
+  //           if (!cosmWasmClient || !address) {
+  //             return;
+  //           }
+  //           setCosmWasmClient(cosmWasmClient);
+  //         })
+  //         .catch((error) => console.log(error));
+
+  //       getSigningCosmWasmClient()
+  //         .then((signingClient) => {
+  //           if (!signingClient) {
+  //             return;
+  //           }
+  //           setSigningClient(signingClient);
+  //         })
+  //         .catch((error) => console.log(error));
+  //     }
+  //   }, 1000);
+  //   clearInterval(interval);
+  // }, []);
 
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     cosmWasmClient as CosmWasmClient,

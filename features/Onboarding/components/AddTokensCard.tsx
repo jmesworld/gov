@@ -18,6 +18,7 @@ import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { useAccountBalance } from "../../../hooks/useAccountBalance";
 import { useIdentityserviceGetIdentityByOwnerQuery } from "../../../client/Identityservice.react-query";
 import { IdentityserviceQueryClient } from "../../../client/Identityservice.client";
+import Error from "next/error";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -43,38 +44,33 @@ const AddTokensCard = ({
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
   );
-
   const [isAddTokensCardVisible, setAddTokensCardVisible] = useState(true);
-
   const { address, disconnect, getCosmWasmClient, wallet } =
     useChain(chainName);
   const identityBalanceQuery = useAccountBalance(address as string);
-  const balance: any = identityBalanceQuery.data ?? 0;
 
+  const balance: any = identityBalanceQuery.data ?? 0;
   const identityserviceQueryClient: IdentityserviceQueryClient =
     new IdentityserviceQueryClient(
       cosmWasmClient as CosmWasmClient,
       IDENTITY_SERVICE_CONTRACT
     );
 
-  const identityNameQuery = useIdentityserviceGetIdentityByOwnerQuery({
-    client: identityserviceQueryClient,
-    args: { owner: address as string },
-    options: {
-      onSuccess: (data) => {
-        if (!!data?.identity?.name.toString()) {
-          setIdentityName(data?.identity?.name.toString());
-        }
-      },
-      onError: (error) => {
-        console.log(error);
-      },
-    },
-  });
+  const handleIdentityNameQueryError = (error: any) => {
+    console.log(error);
+    if (balance > 0 && identityName === undefined) {
+      setIsInitalizing(false);
+      console.log("error fetching identity", identityName);
+      setCurrentCard(radioGroup[radioGroup.indexOf(currentCard) + 1]);
+    }
+  };
 
-  const handleUpdateCard = () => {
+  const handleIdentityNameQuerySuccess = (data: any) => {
+    if (!!data?.identity?.name.toString()) {
+      setIdentityName(data?.identity?.name.toString());
+    }
+
     if (balance > 0 && identityName !== undefined) {
-      // setCurrentCard(null); //this is a hack to remove the current card from the screen. A better way to do this is to have a state variable that controls whether or not the card is visible. For example, you could have a state variable called "isCardVisible" and set it to true or false depending on whether or not you want the card to be visible. Then, you could use a ternary operator to render the card only if isCardVisible is true. For example: {isCardVisible ? <Card /> : null}. This is better because it is more explicit.
       console.log("success fetching identity", identityName);
       setAddTokensCardVisible(false);
       setIsInitalizing(false);
@@ -85,25 +81,81 @@ const AddTokensCard = ({
     }
   };
 
-  useEffect(() => {
-    getCosmWasmClient()
-      .then((cosmWasmClient) => {
-        if (!cosmWasmClient || !address) {
-          return;
-        }
-        setCosmWasmClient(cosmWasmClient);
-      })
-      .catch((error) => console.log(error));
-  }, [address, getCosmWasmClient]);
+  const identityNameQuery = useIdentityserviceGetIdentityByOwnerQuery({
+    client: identityserviceQueryClient,
+    args: { owner: address as string },
+    options: {
+      onSuccess: (data) => handleIdentityNameQuerySuccess(data),
+      onError: (error) => handleIdentityNameQueryError(error),
+    },
+  });
 
-  useEffect(() => {
-    if (identityNameQuery.isSuccess) {
-      handleUpdateCard();
-    } else if (identityNameQuery.isError) {
-      handleUpdateCard();
+  const fetchCosmWasmClient = async () => {
+    try {
+      const client = await getCosmWasmClient();
+      setCosmWasmClient(client);
+    } catch (error) {
+      console.log(error);
     }
-  }),
-    [];
+  };
+  useEffect(() => {
+    if (identityNameQuery.isInitialLoading) {
+      fetchCosmWasmClient();
+    } else if (identityNameQuery.isError) {
+      handleIdentityNameQueryError(identityNameQuery.error);
+    } else if (identityNameQuery.isSuccess) {
+      handleIdentityNameQuerySuccess(identityNameQuery.data);
+    } else {
+      console.log("identityNameQuery", identityNameQuery);
+    }
+  }, [
+    identityNameQuery.isInitialLoading,
+    identityNameQuery.isSuccess,
+    identityNameQuery.isError,
+  ]);
+
+  // const useIdentityNameQuery = async () => {
+  //   try {
+  //     const data = await identityserviceQueryClient.getIdentityByOwner({
+  //       owner: address as string,
+  //     });
+  //     handleIdentityNameQuerySuccess(data);
+  //   } catch (error) {
+  //     handleIdentityNameQueryError(error);
+  //   }
+
+  // }
+  // useEffect(() => {
+  //   getCosmWasmClient()
+  //     .then((cosmWasmClient) => {
+  //       if (!cosmWasmClient || !address) {
+  //         return;
+  //       }
+  //       setCosmWasmClient(cosmWasmClient);
+  //     })
+  //     .catch((error) => console.log(error));
+  // }, [address, getCosmWasmClient, identityNameQuery.isLoading]);
+
+  // useEffect(() => {
+  //   identityNameQuery
+  // }),[];
+  // const handleUpdateCard = () => {
+  //   if (balance > 0 && identityName !== undefined) {
+  //     // setCurrentCard(null); //this is a hack to remove the current card from the screen. A better way to do this is to have a state variable that controls whether or not the card is visible. For example, you could have a state variable called "isCardVisible" and set it to true or false depending on whether or not you want the card to be visible. Then, you could use a ternary operator to render the card only if isCardVisible is true. For example: {isCardVisible ? <Card /> : null}. This is better because it is more explicit.
+  //     console.log("success fetching identity", identityName);
+  //     setAddTokensCardVisible(false);
+  //     setIsInitalizing(false);
+  //   } else if (balance > 0 && identityName === undefined) {
+  //     setIsInitalizing(false);
+  //     console.log("error fetching identity", identityName);
+  //     setCurrentCard(radioGroup[radioGroup.indexOf(currentCard) + 1]);
+  //   }
+  // };
+  // useEffect(() => {
+  //   if (identityNameQuery.isSuccess || identityNameQuery.isError) {
+  //     handleUpdateCard();
+  //   }
+  // }),[];
 
   return (
     <>

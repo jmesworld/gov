@@ -8,13 +8,12 @@ import { useGovernancePeriodInfoQuery } from "../../client/Governance.react-quer
 import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
 import { useIdentityserviceGetIdentityByOwnerQuery } from "../../client/Identityservice.react-query";
 import DaoMembersList from "./DaoMemberList";
-import {
-  ProposalHeader,
-  ProposalList,
-} from "../../components/Proposal/ProposalList";
+
 import { chainName } from "../../config/defaults";
 import { DaoMultisigQueryClient } from "../../client/DaoMultisig.client";
 import { useDaoMultisigListProposalsQuery } from "../../client/DaoMultisig.react-query";
+import { ProposalHeader } from "../components/Proposal/ProposalHeader";
+import { ProposalList } from "../components/Proposal/ProposalList";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;

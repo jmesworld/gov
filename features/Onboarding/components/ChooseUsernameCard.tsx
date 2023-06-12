@@ -62,11 +62,17 @@ const ChooseUsernameCard = ({
   setIsInitalizing,
   identityName,
 }: ChooseUsernameCardProps) => {
-  // const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-  //   null
-  // );
-  // const [signingClient, setSigningClient] =
-  //   useState<SigningCosmWasmClient | null>(null);
+  const [identityNameInput, setIdentityNameInput] = useState("");
+  const [isIdentityNameAvailable, setIsIdentityNameAvailable] = useState(false);
+  const [isCreatingIdentity, setIsCreatingIdentity] = useState(false);
+  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
+    null
+  );
+  const [signingClient, setSigningClient] =
+    useState<SigningCosmWasmClient | null>(null);
+  const chainContext = useChain(chainName);
+  const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
+    chainContext;
 
   // useEffect(() => {
   //   if (address) {
@@ -88,18 +94,6 @@ const ChooseUsernameCard = ({
   //   }
   // }, [address]);
 
-  const [identityNameInput, setIdentityNameInput] = useState("");
-  const [isIdentityNameAvailable, setIsIdentityNameAvailable] = useState(false);
-  const [isCreatingIdentity, setIsCreatingIdentity] = useState(false);
-  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-    null
-  );
-  const [signingClient, setSigningClient] =
-    useState<SigningCosmWasmClient | null>(null);
-  const chainContext = useChain(chainName);
-  const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
-    chainContext;
-  const toast = useToast();
   useEffect(() => {
     if (address) {
       (async () => {
@@ -120,52 +114,29 @@ const ChooseUsernameCard = ({
     }
   }, [address]);
 
-  useEffect(() => {
-    if (identityName?.length > 0) {
-      setIdentityNameInput(identityName as string);
-      setTimeout(() => {
-        handleUpdateCard(radioGroup.indexOf(currentCard));
-      }, 2000);
-    }
-  }, []);
+  // const handleUpdateCard = useCallback(
+  //   (index: number) => {
+  //     setCurrentCard(radioGroup[index + 1]);
+  //     setIsInitalizing(false);
+  //   },
+  //   [radioGroup, setCurrentCard, setIsInitalizing]
+  // );
+  // useEffect(() => {
+  //   if (identityName?.length > 0) {
+  //     setIdentityNameInput(identityName as string);
+  //     setTimeout(() => {
+  //       handleUpdateCard(radioGroup.indexOf(currentCard));
+  //     }, 2000);
+  //   }
+  // }, []);
 
-  const validationResult: void | IdentityError =
-    validateName(identityNameInput);
-
-  const isIdentityNameValid = !validationResult?.name;
-
-  const client = new IdentityserviceQueryClient(
-    cosmWasmClient as CosmWasmClient,
-    IDENTITY_SERVICE_CONTRACT
-  );
+  const toast = useToast();
+  const identityMutation = useIdentityserviceRegisterUserMutation();
   const idClient = new IdentityserviceClient(
     signingClient as SigningCosmWasmClient,
     address as string,
     IDENTITY_SERVICE_CONTRACT
   );
-
-  const handleUpdateCard = useCallback(
-    (index: number) => {
-      setCurrentCard(radioGroup[index + 1]);
-      setIsInitalizing(false);
-    },
-    [radioGroup, setCurrentCard, setIsInitalizing]
-  );
-
-  const identityNameQuery = useIdentityserviceGetIdentityByNameQuery({
-    client,
-    args: { name: identityNameInput },
-    options: {
-      onSuccess: (data) => {
-        if (!!!data?.identity?.name.toString()) {
-          setIsIdentityNameAvailable(true);
-        }
-      },
-      enabled: identityNameInput?.length > 2,
-    },
-  });
-
-  const identityMutation = useIdentityserviceRegisterUserMutation();
 
   const handleCreateIdentity = async () => {
     setIsCreatingIdentity(true);
@@ -208,6 +179,34 @@ const ChooseUsernameCard = ({
 
     setIsInitalizing(false);
   };
+
+  const validationResult: void | IdentityError =
+    validateName(identityNameInput);
+
+  const isIdentityNameValid = !validationResult?.name;
+
+  const client = new IdentityserviceQueryClient(
+    cosmWasmClient as CosmWasmClient,
+    IDENTITY_SERVICE_CONTRACT
+  );
+
+  const identityNameQuery = useIdentityserviceGetIdentityByNameQuery({
+    client,
+    args: { name: identityNameInput },
+    options: {
+      onSuccess: (data) => {
+        console.log(data);
+        console.log(!!!data?.identity?.name.toString());
+        if (!!!data?.identity?.name.toString()) {
+          setIsIdentityNameAvailable(true);
+        }
+      },
+      onError: (error) => {
+        console.log(error); //this error
+      },
+      enabled: identityNameInput?.length > 2,
+    },
+  });
 
   return (
     <Box

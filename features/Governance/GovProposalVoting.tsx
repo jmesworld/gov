@@ -9,8 +9,9 @@ import {
   VStack,
   Divider,
 } from "@chakra-ui/react";
-import { ProposalProgress } from "../../components/Proposal/ProposalProgress";
+
 import GovProposalVotes from "./GovProposalVotes";
+import { ProposalProgress } from "../components/Proposal/ProposalProgress";
 
 export interface GovProposalVoting {
   target: number;
