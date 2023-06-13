@@ -91,13 +91,13 @@ export default function DaoProposalDetail({
   const votesQuery = useDaoMultisigListVotesQuery({
     client: daoMultisigQueryClient,
     args: { proposalId: selectedDaoProposalId },
-    options: { refetchInterval: 10 },
+    options: { refetchInterval: 10000 },
   });
 
   const votersQuery = useDaoMultisigListVotersQuery({
     client: daoMultisigQueryClient,
     args: {},
-    options: { refetchInterval: 10 },
+    options: { refetchInterval: 10000 },
   });
 
   const proposalDescription = proposalDetailQuery?.data?.description ?? "";

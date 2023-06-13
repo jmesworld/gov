@@ -73,7 +73,7 @@ export default function GovProposalDetail({
       id: proposalId,
     },
     options: {
-      refetchInterval: 10,
+      refetchInterval: 10000,
     },
   });
 

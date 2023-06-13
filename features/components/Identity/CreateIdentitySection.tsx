@@ -18,13 +18,14 @@ import { WalletStatus } from "@cosmos-kit/core";
 import { useChain } from "@cosmos-kit/react";
 import { useMutation } from "@tanstack/react-query";
 import { MouseEventHandler, useEffect, useState } from "react";
-import { IdentityserviceQueryClient } from "../client/Identityservice.client";
-import { useIdentityserviceGetIdentityByNameQuery } from "../client/Identityservice.react-query";
-import { ExecuteMsg } from "../client/Identityservice.types";
-import { chainName } from "../config/defaults";
+
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { toHex, toUtf8 } from "@cosmjs/encoding";
 import { StdFee } from "@cosmjs/stargate";
+import { ExecuteMsg } from "../../../client/Identityservice.types";
+import { IdentityserviceQueryClient } from "../../../client/Identityservice.client";
+import { useIdentityserviceGetIdentityByNameQuery } from "../../../client/Identityservice.react-query";
+import { chainName } from "../../../config/defaults";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;

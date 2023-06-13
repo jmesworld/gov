@@ -3,8 +3,8 @@ import { WalletStatus } from "@cosmos-kit/core";
 import { NavBarItem } from "./NavBarItem";
 import { NavBarButton } from "./NavBarButton";
 
-import { JMESLogo } from "../Assets/JMESLogo";
-import MyDaosList from "../../Dao/MyDaoList";
+import { JMESLogo } from "../components/Assets/JMESLogo";
+import MyDaosList from "../Dao/MyDaoList";
 
 interface NavBarProps {
   status: WalletStatus;

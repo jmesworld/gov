@@ -234,13 +234,13 @@ export const ProposalListItem = ({
   const votesQuery = useDaoMultisigListVotesQuery({
     client: daoQueryClient,
     args: { proposalId: proposalId ? parseInt(proposalId as string) : 0 },
-    options: { refetchInterval: 10 },
+    options: { refetchInterval: 10000 },
   });
 
   const votersQuery = useDaoMultisigListVotersQuery({
     client: daoQueryClient,
     args: {},
-    options: { refetchInterval: 10 },
+    options: { refetchInterval: 10000 },
   });
 
   yesCount = isGov

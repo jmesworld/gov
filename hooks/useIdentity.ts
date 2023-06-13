@@ -49,22 +49,25 @@ const IDENTITY_HELPERS = {
     const identity = await idClient.registerUser({ name: identityNameInput });
     return identity;
   },
-
-  setCosmWasmClient: (cosmWasmClient: CosmWasmClient) => {
+  signingClient: SigningCosmWasmClient,
+  cosmWasmClient: CosmWasmClient,
+  setCosmWasmClient: (cosmWasmClient: any) => {
     const client = new IdentityserviceQueryClient(
       cosmWasmClient,
       IDENTITY_SERVICE_CONTRACT
     );
     return client;
   },
-  setSigningClient: (signingClient: SigningCosmWasmClient, address: string) => {
+
+  setSigningClient: (signingClient: any, address: any) => {
     const idClient = new IdentityserviceClient(
-      signingClient,
-      address,
+      signingClient as SigningCosmWasmClient,
+      address as string,
       IDENTITY_SERVICE_CONTRACT
     );
     return idClient;
   },
+
   setIdentityName: (identity: any) => {
     return identity?.data?.identity?.name as string;
   },
@@ -139,7 +142,7 @@ const useIdentity = async ({
   const identity = await handleMutation.mutateAsync({
     client: idClient,
     msg: { name: identityNameInput },
-    args: { fee },
+    args: { fee: tx_fee },
   });
   const isIdentityNameValid = !validationResult?.name;
 

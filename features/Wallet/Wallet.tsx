@@ -56,7 +56,7 @@ const Wallet = () => {
       disconnect={
         <Disconnected buttonText="Connect Wallet" onClick={onClickConnect} />
       }
-      connecting={<Connecting />} //set connect to true if !!identity && balance (which will then display the onboarding modal) or handle this within the error param
+      connecting={<Connecting />}
       connected={
         <Connected buttonText={"My Wallet"} onClick={onClickOpenView} />
       }

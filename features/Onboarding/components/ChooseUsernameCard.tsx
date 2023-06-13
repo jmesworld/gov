@@ -73,7 +73,52 @@ const ChooseUsernameCard = ({
   const chainContext = useChain(chainName);
   const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
     chainContext;
+  const validationResult: void | IdentityError =
+    validateName(identityNameInput);
+  const isIdentityNameValid = !validationResult?.name;
+  const toast = useToast();
+  // const handleUpdateCard = useCallback(
+  //   (index: number) => {
+  //     setCurrentCard(radioGroup[index + 1]);
+  //     setIsInitalizing(false);
+  //   },
+  //   [radioGroup, setCurrentCard, setIsInitalizing]
+  // );
+  const handleUpdateCard = (index: number) => {
+    // const index = radioGroup.indexOf(currentCard);
+    setCurrentCard(radioGroup[index + 1]);
+    setIsInitalizing(false);
+  };
 
+  useEffect(() => {
+    if (identityName?.length > 0) {
+      setIdentityNameInput(identityName as string);
+      setTimeout(() => {
+        handleUpdateCard(radioGroup.indexOf(currentCard));
+      }, 2000);
+    }
+  }, [identityName]);
+  //original
+  useEffect(() => {
+    getCosmWasmClient()
+      .then((cosmWasmClient) => {
+        if (!cosmWasmClient || !address) {
+          return;
+        }
+        setCosmWasmClient(cosmWasmClient);
+      })
+      .catch((error) => console.log(error));
+
+    getSigningCosmWasmClient()
+      .then((signingClient) => {
+        if (!signingClient) {
+          return;
+        }
+        setSigningClient(signingClient);
+      })
+      .catch((error) => console.log(error));
+  }, []);
+  //current
   // useEffect(() => {
   //   if (address) {
   //     (async () => {
@@ -93,50 +138,6 @@ const ChooseUsernameCard = ({
   //     })();
   //   }
   // }, [address]);
-
-  useEffect(() => {
-    if (address) {
-      (async () => {
-        try {
-          const cosmWasmClient = await getCosmWasmClient();
-          setCosmWasmClient(cosmWasmClient);
-        } catch (error) {
-          console.log(error);
-        }
-
-        try {
-          const signingClient = await getSigningCosmWasmClient();
-          setSigningClient(signingClient);
-        } catch (error) {
-          console.log(error);
-        }
-      })();
-    }
-  }, [address]);
-
-  // const handleUpdateCard = useCallback(
-  //   (index: number) => {
-  //     setCurrentCard(radioGroup[index + 1]);
-  //     setIsInitalizing(false);
-  //   },
-  //   [radioGroup, setCurrentCard, setIsInitalizing]
-  // );
-  // useEffect(() => {
-  //   if (identityName?.length > 0) {
-  //     setIdentityNameInput(identityName as string);
-  //     setTimeout(() => {
-  //       handleUpdateCard(radioGroup.indexOf(currentCard));
-  //     }, 2000);
-  //   }
-  // }, []);
-
-  const toast = useToast();
-  const identityMutation = useIdentityserviceRegisterUserMutation();
-  const idClient = new IdentityserviceClient(
-    signingClient as SigningCosmWasmClient,
-    address as string,
-    IDENTITY_SERVICE_CONTRACT
-  );
 
   const handleCreateIdentity = async () => {
     setIsCreatingIdentity(true);
@@ -180,23 +181,23 @@ const ChooseUsernameCard = ({
     setIsInitalizing(false);
   };
 
-  const validationResult: void | IdentityError =
-    validateName(identityNameInput);
-
-  const isIdentityNameValid = !validationResult?.name;
-
-  const client = new IdentityserviceQueryClient(
+  const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     cosmWasmClient as CosmWasmClient,
     IDENTITY_SERVICE_CONTRACT
   );
+
+  const idClient: IdentityserviceClient = new IdentityserviceClient(
+    signingClient as SigningCosmWasmClient,
+    address as string,
+    IDENTITY_SERVICE_CONTRACT
+  );
+  const identityMutation = useIdentityserviceRegisterUserMutation();
 
   const identityNameQuery = useIdentityserviceGetIdentityByNameQuery({
     client,
     args: { name: identityNameInput },
     options: {
       onSuccess: (data) => {
-        console.log(data);
-        console.log(!!!data?.identity?.name.toString());
         if (!!!data?.identity?.name.toString()) {
           setIsIdentityNameAvailable(true);
         }
@@ -217,12 +218,34 @@ const ChooseUsernameCard = ({
     >
       <Flex>
         <Flex width={"100%"} justifyContent={"space-between"}>
+          <IconButton
+            aria-label=""
+            background={"transparent"}
+            color={"white"}
+            icon={<ArrowBackIcon width={"24px"} height={"24px"} />}
+            marginTop={"62.75px"}
+            marginLeft={"8px"}
+            _hover={{ backgroundColor: "transparent" }}
+            onClick={() =>
+              handleUpdateCard(radioGroup.indexOf(currentCard) - 2)
+            }
+          />
           <Image
             src="/Computer.svg"
             alt="icon"
             width={"288px"}
             height={"275.8px"}
             justifySelf={"center"}
+          />
+          <IconButton
+            aria-label=""
+            background={"transparent"}
+            color={"white"}
+            icon={<CloseIcon height={"24px"} />}
+            marginTop={"62.75px"}
+            marginRight={"8px"}
+            _hover={{ backgroundColor: "transparent" }}
+            onClick={() => handleUpdateCard(Infinity)}
           />
         </Flex>
 
@@ -302,7 +325,45 @@ const ChooseUsernameCard = ({
         <Spacer />
         <Button
           disabled={!isIdentityNameAvailable || !isIdentityNameValid}
-          onClick={async () => await handleCreateIdentity()}
+          // onClick={async () => await handleCreateIdentity()}
+          onClick={() => {
+            setIsCreatingIdentity(true);
+            identityMutation
+              .mutateAsync({
+                client: idClient,
+                msg: {
+                  name: identityNameInput,
+                },
+                args: { fee },
+              })
+              .then((result) => {
+                toast({
+                  title: "Identity created.",
+                  description: "We've created your Identity for you.",
+                  status: "success",
+                  duration: 9000,
+                  isClosable: true,
+                  containerStyle: {
+                    backgroundColor: "darkPurple",
+                    borderRadius: 12,
+                  },
+                });
+              })
+              .catch((error) => {
+                toast({
+                  title: "Identity creation error",
+                  description: error.toString(),
+                  status: "error",
+                  duration: 9000,
+                  isClosable: true,
+                  containerStyle: {
+                    backgroundColor: "red",
+                    borderRadius: 12,
+                  },
+                });
+              })
+              .finally(() => setIsCreatingIdentity(false));
+          }}
           backgroundColor={"green"}
           borderRadius={90}
           alignContent="end"

@@ -79,7 +79,7 @@ export default function DaoProposal({
   const periodInfoQuery = useGovernancePeriodInfoQuery({
     client: governanceQueryClient,
     options: {
-      refetchInterval: 10,
+      refetchInterval: 10000,
     },
   });
 
@@ -91,7 +91,7 @@ export default function DaoProposal({
     client: daoQueryClient,
     args: { limit: 10000 },
     options: {
-      refetchInterval: 10,
+      refetchInterval: 10000,
     },
   });
 

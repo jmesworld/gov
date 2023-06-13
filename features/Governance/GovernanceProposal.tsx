@@ -37,6 +37,18 @@ export default function GovernanceProposal({
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
   );
+  // useEffect(() => {
+  //   if (address) {
+  //     getCosmWasmClient()
+  //       .then((cosmWasmClient) => {
+  //         if (!cosmWasmClient) {
+  //           return;
+  //         }
+  //         setCosmWasmClient(cosmWasmClient);
+  //       })
+  //       .catch((error) => console.log(error));
+  //   }
+  // }, [address, getCosmWasmClient]);
   useEffect(() => {
     if (address) {
       getCosmWasmClient()
@@ -75,7 +87,7 @@ export default function GovernanceProposal({
     client: governanceQueryClient,
     args: {},
     options: {
-      refetchInterval: 10,
+      refetchInterval: 10000,
     },
   });
 

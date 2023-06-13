@@ -8,6 +8,10 @@ import { addJMEStoKeplr, checkJMESInKeplr } from "../../../actions/keplr";
 import { ConnectedWalletButton } from "./ConnectedWalletButton";
 import { ConnectWalletButton } from "./ConnectWalletButton";
 
+import useClient from "../../../hooks/useClient";
+import { useAccountBalance } from "../../../hooks/useAccountBalance";
+import { useChain } from "@cosmos-kit/react";
+import { chainName } from "../../../config/defaults";
 export const Disconnected = ({
   buttonText,
   onClick,
@@ -27,8 +31,16 @@ export const Connected = ({
   buttonText: string;
   onClick: MouseEventHandler<HTMLButtonElement>;
 }) => {
+  const { getName } = useClient();
+  const { address } = useChain(chainName);
+  const fetchBal = useAccountBalance(address as string).data ?? 0;
+
+  const identityName = getName();
+
   return (
     <ConnectedWalletButton
+      identityName={identityName}
+      identityBalance={fetchBal}
       buttonText={buttonText}
       onClickConnectBtn={onClick}
     />

@@ -11,6 +11,11 @@ export interface ChooseChainInfo {
 }
 
 export enum WalletStatus {
+  Init = "Init",
+  Connecting = "Connecting",
+  Connected = "Connected",
+  ConnectFailed = "ConnectFailed",
+  Disconnected = "Disconnected",
   NotInit = "NotInit",
   Loading = "Loading",
   Loaded = "Loaded",
@@ -22,7 +27,15 @@ export interface DAOItemProps {
   address: string;
   // TODO: Add more fields
 }
-
+export interface NavBarProps {
+  status: WalletStatus;
+  address: any;
+  identityName: string;
+  isGovProposalSelected: boolean;
+  isCreateDaoSelected: boolean;
+  selectedDao: string;
+  selectedDaoName: string;
+}
 export interface DAOCosigner {
   name: string;
   weight: number;

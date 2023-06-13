@@ -14,17 +14,14 @@ import {
 import { useChain } from "@cosmos-kit/react";
 import { chainName } from "../../../config/defaults";
 import { ConnectedWalletType } from "../../types";
+
 export const ConnectedWalletButton = ({
   identityName,
   identityBalance,
-  setConnectButtonClicked,
-  buttonText,
   isLoading,
   isDisabled,
-  onClickConnectBtn,
 }: ConnectedWalletType) => {
-  const { address, disconnect, getCosmWasmClient, getSigningCosmWasmClient } =
-    useChain(chainName);
+  const { address, disconnect } = useChain(chainName);
 
   return (
     <Menu>

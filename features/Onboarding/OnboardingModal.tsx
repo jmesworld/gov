@@ -12,6 +12,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import AddJMESCard from "./components/AddJMESCard";
 import AddTokensCard from "./components/AddTokensCard";
+//import { AddTokensCard } from "./components/AddTokensCardOriginal";
+//import { ChooseUsernameCard } from "./components/ChooseUsernameOriginal";
 import ChooseUsernameCard from "./components/ChooseUsernameCard";
 import ConnectWalletCard from "./components/ConnectWalletCard";
 
@@ -194,7 +196,6 @@ export const OnboardingComponent = ({
           currentCard={currentCard}
           setCurrentCard={setCurrentCard}
           setIsInitalizing={setIsInitializing}
-          setIdentityName={setIdentityName}
         />
       );
     case "choose-username-card":
