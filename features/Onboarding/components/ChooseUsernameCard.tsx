@@ -77,15 +77,8 @@ const ChooseUsernameCard = ({
     validateName(identityNameInput);
   const isIdentityNameValid = !validationResult?.name;
   const toast = useToast();
-  // const handleUpdateCard = useCallback(
-  //   (index: number) => {
-  //     setCurrentCard(radioGroup[index + 1]);
-  //     setIsInitalizing(false);
-  //   },
-  //   [radioGroup, setCurrentCard, setIsInitalizing]
-  // );
+
   const handleUpdateCard = (index: number) => {
-    // const index = radioGroup.indexOf(currentCard);
     setCurrentCard(radioGroup[index + 1]);
     setIsInitalizing(false);
   };
@@ -98,7 +91,7 @@ const ChooseUsernameCard = ({
       }, 2000);
     }
   }, [identityName]);
-  //original
+
   useEffect(() => {
     getCosmWasmClient()
       .then((cosmWasmClient) => {
@@ -117,8 +110,8 @@ const ChooseUsernameCard = ({
         setSigningClient(signingClient);
       })
       .catch((error) => console.log(error));
-  }, []);
-  //current
+  }, [getCosmWasmClient, getSigningCosmWasmClient]);
+
   // useEffect(() => {
   //   if (address) {
   //     (async () => {
@@ -138,48 +131,6 @@ const ChooseUsernameCard = ({
   //     })();
   //   }
   // }, [address]);
-
-  const handleCreateIdentity = async () => {
-    setIsCreatingIdentity(true);
-
-    await identityMutation
-      .mutateAsync({
-        client: idClient,
-        msg: {
-          name: identityNameInput,
-        },
-        args: { fee },
-      })
-      .then((result) => {
-        toast({
-          title: "Identity created.",
-          description: "We've created your Identity for you.",
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-          containerStyle: {
-            backgroundColor: "darkPurple",
-            borderRadius: 12,
-          },
-        });
-      })
-      .catch((error) => {
-        toast({
-          title: "Identity creation error",
-          description: error.toString(),
-          status: "error",
-          duration: 9000,
-          isClosable: true,
-          containerStyle: {
-            backgroundColor: "red",
-            borderRadius: 12,
-          },
-        });
-      })
-      .finally(() => setIsCreatingIdentity(false));
-
-    setIsInitalizing(false);
-  };
 
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     cosmWasmClient as CosmWasmClient,

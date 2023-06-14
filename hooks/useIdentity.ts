@@ -17,65 +17,6 @@ import { IDENTITY_SERVICE_CONTRACT, chainName } from "../config/defaults";
 import { IdentityError, validateName } from "../utils/identity";
 import { StdFee } from "@cosmjs/amino";
 
-const IDENTITY_HELPERS = {
-  validateName: (name: string) => {
-    const validationResult = validateName(name);
-    return validationResult;
-  },
-  isIdentityNameValid: (validationResult: void | IdentityError) => {
-    return !validationResult?.name;
-  },
-  isIdentityNameAvailable: (i: any) => {
-    return !!!i?.data?.identity?.name.toString();
-  },
-  getIdentityByOwner: async (
-    client: IdentityserviceQueryClient,
-    address: string
-  ) => {
-    const identity = await client.getIdentityByOwner({ owner: address });
-    return identity;
-  },
-  getIdentityByName: async (
-    client: IdentityserviceQueryClient,
-    name: string
-  ) => {
-    const identity = await client.getIdentityByName({ name });
-    return identity;
-  },
-  handleMutation: async (
-    idClient: IdentityserviceClient,
-    identityNameInput: string
-  ) => {
-    const identity = await idClient.registerUser({ name: identityNameInput });
-    return identity;
-  },
-  signingClient: SigningCosmWasmClient,
-  cosmWasmClient: CosmWasmClient,
-  setCosmWasmClient: (cosmWasmClient: any) => {
-    const client = new IdentityserviceQueryClient(
-      cosmWasmClient,
-      IDENTITY_SERVICE_CONTRACT
-    );
-    return client;
-  },
-
-  setSigningClient: (signingClient: any, address: any) => {
-    const idClient = new IdentityserviceClient(
-      signingClient as SigningCosmWasmClient,
-      address as string,
-      IDENTITY_SERVICE_CONTRACT
-    );
-    return idClient;
-  },
-
-  setIdentityName: (identity: any) => {
-    return identity?.data?.identity?.name as string;
-  },
-  setIdentityNameInput: (identityNameInput: string) => {
-    return identityNameInput;
-  },
-};
-
 interface IdentityHook {
   cosmWasmClient: CosmWasmClient;
   signingClient: SigningCosmWasmClient;

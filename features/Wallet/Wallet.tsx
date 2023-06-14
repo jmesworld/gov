@@ -28,15 +28,6 @@ const Wallet = () => {
     logoUrl,
   } = useChain(chainName);
 
-  //const { fetchIdentity, identityName, setCosmWasmClient } = useIdentity();
-
-  // const chain = {
-  //   chainName,
-  //   label: chainInfo.pretty_name,
-  //   value: chainName,
-  //   icon: logoUrl,
-  // };
-
   // Events
   const onClickConnect: MouseEventHandler = async (e) => {
     e.preventDefault();

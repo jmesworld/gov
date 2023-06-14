@@ -31,11 +31,11 @@ export const Connected = ({
   buttonText: string;
   onClick: MouseEventHandler<HTMLButtonElement>;
 }) => {
-  const { getName } = useClient();
+  const { handleGetIdentity } = useClient();
+
+  const identityName = handleGetIdentity();
   const { address } = useChain(chainName);
   const fetchBal = useAccountBalance(address as string).data ?? 0;
-
-  const identityName = getName();
 
   return (
     <ConnectedWalletButton

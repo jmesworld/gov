@@ -99,17 +99,15 @@ export default function IdentityInputSection() {
     null
   );
   useEffect(() => {
-    if (address) {
-      getCosmWasmClient()
-        .then((cosmWasmClient) => {
-          if (!cosmWasmClient) {
-            return;
-          }
-          setCosmWasmClient(cosmWasmClient);
-        })
-        .catch((error) => console.log(error));
-    }
-  }, [address, getCosmWasmClient]);
+    getCosmWasmClient()
+      .then((cosmWasmClient) => {
+        if (!cosmWasmClient) {
+          return;
+        }
+        setCosmWasmClient(cosmWasmClient);
+      })
+      .catch((error) => console.log(error));
+  }, [getCosmWasmClient]);
   // console.log(cosmWasmClient)
   const args = { owner: address ? address : "" };
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(

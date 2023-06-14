@@ -27,21 +27,17 @@ export default function PeriodInfo() {
   >(undefined);
 
   useEffect(() => {
-    if (address) {
-      getCosmWasmClient()
-        .then((cosmWasmClient) => {
-          if (!cosmWasmClient) {
-            return;
-          }
-          const client = new GovernanceQueryClient(
-            cosmWasmClient,
-            NEXT_PUBLIC_GOVERNANCE_CONTRACT
-          );
-          setGovernanceQueryClient(client);
-        })
-        .catch((error) => console.log(error));
-    }
-  }, [address, getCosmWasmClient]);
+    getCosmWasmClient().then((cosmWasmClient) => {
+      if (!cosmWasmClient) {
+        return;
+      }
+      const client = new GovernanceQueryClient(
+        cosmWasmClient,
+        NEXT_PUBLIC_GOVERNANCE_CONTRACT
+      );
+      setGovernanceQueryClient(client);
+    });
+  }, [getCosmWasmClient]);
 
   const periodInfoQuery = useGovernancePeriodInfoQuery({
     client: governanceQueryClient,

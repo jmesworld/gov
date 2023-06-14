@@ -22,8 +22,8 @@ import { chainName } from "../../config/defaults";
 import { checkJMESInKeplr } from "../../actions/keplr";
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
-import InstallKeplrCard from "./components/InstallKeplrCard";
 import OnboardingProgressIndicator from "./components/OnboardingProgressIndicator";
+import useClient from "../../hooks/useClient";
 
 interface OnboardingModalProps {
   isOpen: any;
@@ -67,24 +67,33 @@ export default function OnboardingModal() {
     }
   }, [status]);
 
+  const client = useClient();
+
   useEffect(() => {
-    let cards = new Array();
-    checkJMESInKeplr()
-      .then((val) => {
-        if (!val) {
-          cards.push("add-jmes-card");
-        }
-        if (status !== WalletStatus.Connected) {
-          cards.push("connect-wallet-card");
-        }
-        cards.push("add-tokens-card");
-        cards.push("choose-username-card");
-      })
-      .then(() => {
-        setRadioGroup([...cards]);
-        setCurrentCard(cards[0]);
-        setIsInitializing(false);
-      });
+    const identity = client.handleGetIdentity();
+
+    if (!identity) {
+      let cards = new Array();
+      checkJMESInKeplr()
+        .then((val) => {
+          if (!val) {
+            cards.push("add-jmes-card");
+          }
+          if (status !== WalletStatus.Connected) {
+            cards.push("connect-wallet-card");
+          }
+          cards.push("add-tokens-card");
+          cards.push("choose-username-card");
+        })
+        .then(() => {
+          setRadioGroup([...cards]);
+          setCurrentCard(cards[0]);
+          setIsInitializing(false);
+        });
+    } else {
+      setIsInitializing(false);
+      console.log("identity", identity);
+    }
   }, [status]);
 
   const handleClose = () => {
@@ -160,17 +169,6 @@ export const OnboardingComponent = ({
   setIdentityName: Function;
 }) => {
   switch (currentCard) {
-    case "install-keplr-card":
-      return (
-        <InstallKeplrCard
-          radioGroup={radioGroup}
-          currentCard={currentCard}
-          setCurrentCard={setCurrentCard}
-          setIsInitalizing={setIsInitializing}
-          onClose={onClose}
-        />
-      );
-
     case "add-jmes-card":
       return (
         <AddJMESCard

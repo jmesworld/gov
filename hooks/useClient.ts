@@ -1,21 +1,30 @@
-import {
-  CosmWasmClient,
-  SigningCosmWasmClient,
-} from "@cosmjs/cosmwasm-stargate";
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { useChain } from "@cosmos-kit/react";
-
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { chainName, IDENTITY_SERVICE_CONTRACT } from "../config/defaults";
+import { GovernanceQueryClient } from "../client/Governance.client";
 import { IdentityserviceQueryClient } from "../client/Identityservice.client";
 import { useIdentityserviceGetIdentityByOwnerQuery } from "../client/Identityservice.react-query";
-import { chainName, IDENTITY_SERVICE_CONTRACT } from "../config/defaults";
-import { useInterval } from "@chakra-ui/react";
-import { WalletStatus } from "@cosmos-kit/core";
+
+const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
+  .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
 export default function useClient() {
-  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient>();
-
-  const { address, getCosmWasmClient, getSigningCosmWasmClient, status } =
+  const { address, getCosmWasmClient, getSigningCosmWasmClient } =
     useChain(chainName);
+  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>();
+  useEffect(() => {
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient || !address) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient]);
 
   const identityserviceClient = new IdentityserviceQueryClient(
     cosmWasmClient as CosmWasmClient,
@@ -26,34 +35,55 @@ export default function useClient() {
     client: identityserviceClient,
     args: { owner: address ? address : "" },
   });
-  //could possibly not be fetching in incorrect order?
-  const getName = () => {
-    const identityNameString = identityOwnerQuery.data?.identity?.name;
 
-    return identityNameString;
+  const handleGetIdentity = () => {
+    const status = identityOwnerQuery.status;
+    if (status == "success") {
+      return identityOwnerQuery.data?.identity?.name;
+    } else if (status == "loading") {
+      return "loading";
+    } else if (status == "error") {
+      return "error";
+    }
   };
   const checkIdentity = () => {
     const isIdentityCreated = identityOwnerQuery.data?.identity;
     return isIdentityCreated;
   };
-  const fetchSigningClient = async () => {
-    const fetchedSigningClient = await getSigningCosmWasmClient();
-    return { fetchedSigningClient: fetchedSigningClient };
-  };
-  const fetchCosmClient = async () => {
-    const fetchedCosmWasmClient = await getCosmWasmClient();
-
+  const fetchSigningCosmClient = async () => {
+    const client = await getSigningCosmWasmClient();
     return {
-      fetchedCosmWasmClient: fetchedCosmWasmClient,
+      signingCosmWasmClient: client,
     };
   };
 
+  const fetchCosmClient = async () => {
+    const client = await getCosmWasmClient();
+
+    return {
+      cosmWasmClient: client,
+    };
+  };
+
+  const fetchGovernanceClient = async () => {
+    getCosmWasmClient().then((cosmWasmClient) => {
+      if (!cosmWasmClient) {
+        return;
+      }
+      const governanceClient = new GovernanceQueryClient(
+        cosmWasmClient,
+        NEXT_PUBLIC_GOVERNANCE_CONTRACT
+      );
+      return { governanceClient };
+    });
+  };
   return {
     identityOwnerQuery,
     identityserviceClient,
     checkIdentity,
-    fetchSigningClient,
-    getName,
+    fetchSigningCosmClient,
+    handleGetIdentity,
     fetchCosmClient,
+    fetchGovernanceClient,
   };
 }

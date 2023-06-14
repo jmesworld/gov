@@ -12,15 +12,11 @@ import jmesTestnet from "../config/chains/jmes-testnet/chain.json";
 import { chainName } from "../config/defaults";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import OnboardingModal from "../features/Onboarding/OnboardingModal";
-import { IdentityProvider } from "../context/IdentityContext";
-import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { useState } from "react";
+
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const chains: Chain[] = [jmesTestnet];
 
 function CreateCosmosApp({ Component, pageProps }: AppProps) {
-  const [cosmWasmClient, setCosmWasmClient] = useState<any>();
-
   const signerOptions: SignerOptions = {
     // stargate: (_chain: Chain) => {
     //   return getSigningCosmosClientOptions();
@@ -39,9 +35,6 @@ function CreateCosmosApp({ Component, pageProps }: AppProps) {
           walletModal={undefined}
           modalViews={{
             Connected: OnboardingModal,
-            Connecting: OnboardingModal,
-            Rejected: OnboardingModal,
-            Error: () => <></>,
           }}
           signerOptions={signerOptions}
           endpointOptions={{
@@ -53,7 +46,6 @@ function CreateCosmosApp({ Component, pageProps }: AppProps) {
           <Component {...pageProps} />
         </ChainProvider>
       </ChakraProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }
