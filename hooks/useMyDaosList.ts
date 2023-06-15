@@ -17,6 +17,6 @@ export function useMyDaosList(
       );
       setDataUpdated(true);
     },
-    refetchInterval: 10,
+    refetchInterval: 10000,
   });
 }

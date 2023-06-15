@@ -1,3 +1,19 @@
+import {
+  CosmWasmClient,
+  SigningCosmWasmClient,
+} from "@cosmjs/cosmwasm-stargate";
+import {
+  IdentityserviceQueryClient,
+  IdentityserviceClient,
+} from "../client/Identityservice.client";
+import {
+  useIdentityserviceGetIdentityByNameQuery,
+  useIdentityserviceGetIdentityByOwnerQuery,
+  useIdentityserviceRegisterUserMutation,
+} from "../client/Identityservice.react-query";
+import { IDENTITY_SERVICE_CONTRACT } from "../config/defaults";
+import { useState } from "react";
+
 export interface IdentityError {
   message: string;
   name?: string;
@@ -10,6 +26,92 @@ export interface IdentityError {
 const MIN_NAME_LENGTH = 3;
 const MAX_NAME_LENGTH = 32;
 const invalid_char = /[^a-zA-Z0-9_]/;
+
+export const IDENTITY_HELPERS = {
+  validateName: (name: string) => {
+    const validationResult = validateName(name);
+    return validationResult;
+  },
+  isIdentityNameValid: (validationResult: void | IdentityError) => {
+    return !validationResult?.name;
+  },
+  isIdentityNameAvailable: (i: any) => {
+    return !!!i?.data?.identity?.name.toString();
+  },
+  getIdentityByOwner: async (
+    client: IdentityserviceQueryClient,
+    address: string
+  ) => {
+    const identity = await client.getIdentityByOwner({ owner: address });
+    return identity;
+  },
+  getIdentityByName: async (
+    client: IdentityserviceQueryClient,
+    name: string
+  ) => {
+    const identity = await client.getIdentityByName({ name });
+    return identity;
+  },
+
+  signingClient: SigningCosmWasmClient,
+  cosmWasmClient: CosmWasmClient,
+
+  setCosmWasmClient: (cosmWasmClient: any) => {
+    const client = new IdentityserviceQueryClient(
+      cosmWasmClient,
+      IDENTITY_SERVICE_CONTRACT
+    );
+    return client;
+  },
+
+  setSigningClient: (signingClient: any, address: any) => {
+    const idClient = new IdentityserviceClient(
+      signingClient as SigningCosmWasmClient,
+      address as string,
+      IDENTITY_SERVICE_CONTRACT
+    );
+    return idClient;
+  },
+  setIdentityNameInput: (identityNameInput: string) => {
+    return identityNameInput;
+  },
+  useIdentityserviceGetIdentityByNameQuery: ({
+    client,
+    args,
+    options,
+  }: any) => {
+    return useIdentityserviceGetIdentityByNameQuery({
+      client: IDENTITY_HELPERS.setSigningClient(client, args),
+      args: { name: args },
+      options: {
+        onSuccess: (data: any) => {
+          if (!!!data?.identity?.name.toString()) {
+            return true;
+          }
+        },
+        enabled: args?.length > 2,
+      },
+    });
+  },
+
+  useIdentityserviceGetIdentityByOwnerQuery: ({
+    client,
+    args,
+    options,
+  }: any) => {
+    return useIdentityserviceGetIdentityByOwnerQuery({
+      client: IDENTITY_HELPERS.setCosmWasmClient(client),
+      args: { owner: args },
+      options: {
+        refetchInterval: 5000,
+        onSuccess: (data: any) => {
+          const identityName = data?.identity?.name as string;
+          return identityName;
+        },
+      },
+    });
+  },
+};
 
 export function validateName(name: string): void | IdentityError {
   const length = name.length;
