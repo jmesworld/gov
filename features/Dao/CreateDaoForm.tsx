@@ -181,6 +181,7 @@ const CreateDaoForm = ({
         DAO NAME
       </Text>
       <Input
+        spellCheck="false"
         variant={"outline"}
         width={"798px"}
         height={"48px"}
