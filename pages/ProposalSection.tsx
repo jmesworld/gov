@@ -1,8 +1,9 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
+import useClient from "../hooks/useClient";
 
 const DaoProposalDetail = dynamic(
-  () => import("../features/Dao/DaoProposalDetail")
+  () => import("../features/Dao/components/DaoProposalDetail")
 );
 const GovProposalDetail = dynamic(
   () => import("../features/Governance/GovProposalDetail")
@@ -11,17 +12,18 @@ const GovernanceProposal = dynamic(
   () => import("../features/Governance/GovernanceProposal")
 );
 const CreateDao = dynamic(() => import("../features/Dao/CreateDao"));
-const DaoProposal = dynamic(() => import("../features/Dao/DaoProposal"));
+const DaoProposal = dynamic(
+  () => import("../features/Dao/components/DaoProposal")
+);
+
 const CreateGovProposal = dynamic(
   () => import("../features/Governance/CreateGovProposal")
 );
-import useClient from "../hooks/useClient";
 
-export const ProposalSection = (
-  setSelectedSection: any,
-  selectedSection: any
-) => {
-  const { data } = useClient();
+const ProposalSection = () => {
+  const { handleGetIdentity } = useClient();
+  const identity = handleGetIdentity() as string;
+  const [selectedSection, setSelectedSection] = useState<any>("govProposal");
   const renderSelectedSection = () => {
     switch (selectedSection) {
       case "govProposalDetail":
@@ -41,23 +43,21 @@ export const ProposalSection = (
           <CreateGovProposal
             selectedDao={selectedSection}
             selectedDaoName={selectedSection}
-            setCreateGovProposalSelected={setSelectedSection(
-              "createGovProposal"
-            )}
+            setCreateGovProposalSelected={selectedSection}
           />
         );
       case "createDao":
         return (
           <CreateDao
             setCreateDaoSelected={setSelectedSection("createDao")}
-            identityName={data.identityName}
+            identityName={identity}
           />
         );
       case "govProposal":
         return (
           <GovernanceProposal
             setSelectedProposalId={selectedSection.proposal_id}
-            setGovProposalDetailOpen={setSelectedSection("govProposalDetail")}
+            setGovProposalDetailOpen={selectedSection.govProposal_detail_open}
           />
         );
       default:
@@ -76,3 +76,5 @@ export const ProposalSection = (
 
   return <>{renderSelectedSection()}</>;
 };
+
+export default ProposalSection;

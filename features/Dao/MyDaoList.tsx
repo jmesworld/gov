@@ -3,7 +3,7 @@ import { useChain } from "@cosmos-kit/react";
 import { chainName } from "../../config/defaults";
 import { NavBarItem } from "../NavBar/NavBarItem";
 
-const MyDaosList = ({
+const MyDaoList = ({
   daos,
   setIsGovProposalSelected,
   selectedDao,
@@ -62,4 +62,4 @@ const MyDaosList = ({
     );
   }
 };
-export default MyDaosList;
+export default MyDaoList;

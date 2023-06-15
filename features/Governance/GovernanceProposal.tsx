@@ -96,7 +96,7 @@ export default function GovernanceProposal({
       <Flex height={"35px"} />
       <GovHeader />
       <Flex height={"46px"} />
-      <ProposalHeader isGov={true} />
+      <ProposalHeader daoName={""} proposalTitle={""} proposalExpiry={0} />
       <Flex height={"10px"} />
 
       <ProposalList

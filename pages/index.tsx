@@ -4,12 +4,13 @@ import { WalletStatus } from "@cosmos-kit/core";
 import { useChain } from "@cosmos-kit/react";
 import dynamic from "next/dynamic";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { chainName } from "../config/defaults";
 import { Header, NavBar } from "../features";
 import useClient from "../hooks/useClient";
+const SpendDaoFunds = dynamic(() => import("../features/Dao/SpendDaoFunds"));
 const DaoProposalDetail = dynamic(
-  () => import("../features/Dao/DaoProposalDetail")
+  () => import("../features/Dao/components/DaoProposalDetail")
 );
 const GovProposalDetail = dynamic(
   () => import("../features/Governance/GovProposalDetail")
@@ -18,18 +19,23 @@ const GovernanceProposal = dynamic(
   () => import("../features/Governance/GovernanceProposal")
 );
 const CreateDao = dynamic(() => import("../features/Dao/CreateDao"));
-const DaoProposal = dynamic(() => import("../features/Dao/DaoProposal"));
+const DaoProposal = dynamic(
+  () => import("../features/Dao/components/DaoProposal")
+);
 const CreateGovProposal = dynamic(
   () => import("../features/Governance/CreateGovProposal")
 );
 
 export default function Home() {
-  const [identityName, setIdentityName] = useState("");
+  const [identityName, setIdentityName] = useState<string | undefined>();
+
+  const client = useClient();
+
   const { address, status } = useChain(chainName);
 
   //cleanup
   const [isConnectButtonClicked, setConnectButtonClicked] = useState(false);
-  const [isGovProposalSelected, setIsGovProposalSelected] = useState(true);
+  const [isGovProposalSelected, setIsGovProposalSelected] = useState(false);
   const [isCreateDaoSelected, setCreateDaoSelected] = useState(false);
   const [selectedDao, setSelectedDao] = useState("");
   const [selectedDaoName, setSelectedDaoName] = useState("");
@@ -41,37 +47,38 @@ export default function Home() {
   const [selectedDaoMembersList, setSelectedDaoMembersList] = useState([]);
   const [isGovProposalDetailOpen, setGovProposalDetailOpen] = useState(false);
   const [selectedProposalId, setSelectedProposalId] = useState(-1);
-  const {
-    checkIdentity,
-    fetchSigningCosmClient,
-    handleGetIdentity,
-    fetchCosmClient,
-    fetchGovernanceClient,
-  } = useClient();
+
+  const handleConnected = useCallback(() => {
+    Promise.all([
+      client.fetchCosmClient(),
+      client.fetchSigningCosmClient(),
+      client.fetchGovernanceClient(),
+      client.checkIdentity(),
+      client.handleGetIdentity(),
+    ]).then((values) => {
+      const [
+        cosmClient,
+        signingCosmClient,
+        governanceClient,
+        identity,
+        identityName,
+      ] = values;
+      setIdentityName(identityName);
+      console.log(values);
+    });
+  }, [client]);
 
   useEffect(() => {
     if (status === WalletStatus.Connected) {
-      const identity = handleGetIdentity() as string;
-      fetchCosmClient();
-      fetchSigningCosmClient();
-      checkIdentity();
-      fetchGovernanceClient();
-      setIdentityName(identity);
+      handleConnected();
+      setIsGovProposalSelected(true);
     } else if (status === WalletStatus.Disconnected) {
       setCreateDaoSelected(false);
       setIsGovProposalSelected(true);
       setDaoProposalDetailOpen(false);
       setGovProposalDetailOpen(false);
     }
-  }, [
-    status,
-    isConnectButtonClicked,
-    handleGetIdentity,
-    fetchCosmClient,
-    fetchSigningCosmClient,
-    checkIdentity,
-    fetchGovernanceClient,
-  ]);
+  }, [handleConnected, status]);
 
   return (
     <Container
@@ -87,7 +94,7 @@ export default function Home() {
         <NavBar
           status={status}
           address={address}
-          identityName={identityName}
+          identityName={identityName as string}
           isGovProposalSelected={isGovProposalSelected}
           setIsGovProposalSelected={setIsGovProposalSelected}
           isCreateDaoSelected={isCreateDaoSelected}
@@ -117,12 +124,17 @@ export default function Home() {
           {isGovProposalDetailOpen ? (
             <GovProposalDetail proposalId={selectedProposalId} />
           ) : isDaoProposalDetailOpen ? (
-            <DaoProposalDetail
+            // <DaoProposalDetail
+            //   selectedDao={selectedDao}
+            //   selectedDaoName={selectedDaoName}
+            //   selectedDaoProposalTitle={selectedDaoProposalTitle}
+            //   selectedDaoMembersList={selectedDaoMembersList}
+            //   selectedDaoProposalId={selectedProposalId}
+            // />
+            <SpendDaoFunds
               selectedDao={selectedDao}
               selectedDaoName={selectedDaoName}
-              selectedDaoProposalTitle={selectedDaoProposalTitle}
-              selectedDaoMembersList={selectedDaoMembersList}
-              selectedDaoProposalId={selectedProposalId}
+              setCreateGovProposalSelected={setCreateGovProposalSelected}
             />
           ) : isCreateGovProposalSelected ? (
             <CreateGovProposal

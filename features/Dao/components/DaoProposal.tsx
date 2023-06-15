@@ -3,17 +3,17 @@ import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { useChain } from "@cosmos-kit/react";
 import { useEffect, useState } from "react";
 
-import { GovernanceQueryClient } from "../../client/Governance.client";
-import { useGovernancePeriodInfoQuery } from "../../client/Governance.react-query";
-import { IdentityserviceQueryClient } from "../../client/Identityservice.client";
-import { useIdentityserviceGetIdentityByOwnerQuery } from "../../client/Identityservice.react-query";
-import DaoMembersList from "./DaoMemberList";
+import { GovernanceQueryClient } from "../../../client/Governance.client";
+import { useGovernancePeriodInfoQuery } from "../../../client/Governance.react-query";
+import { IdentityserviceQueryClient } from "../../../client/Identityservice.client";
+import { useIdentityserviceGetIdentityByOwnerQuery } from "../../../client/Identityservice.react-query";
+import DaoMembersList from "../DaoMemberList";
 
-import { chainName } from "../../config/defaults";
-import { DaoMultisigQueryClient } from "../../client/DaoMultisig.client";
-import { useDaoMultisigListProposalsQuery } from "../../client/DaoMultisig.react-query";
-import { ProposalHeader } from "../components/Proposal/ProposalHeader";
-import { ProposalList } from "../components/Proposal/ProposalList";
+import { chainName } from "../../../config/defaults";
+import { DaoMultisigQueryClient } from "../../../client/DaoMultisig.client";
+import { useDaoMultisigListProposalsQuery } from "../../../client/DaoMultisig.react-query";
+import { ProposalHeader } from "../../components/Proposal/ProposalHeader";
+import { ProposalList } from "../../components/Proposal/ProposalList";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -109,7 +109,7 @@ export default function DaoProposal({
       <Flex height={"46px"} />
       <Flex>
         <Box flexGrow={1}>
-          <ProposalHeader isGov={false} />
+          <ProposalHeader daoName={""} proposalTitle={""} proposalExpiry={0} />
           <Flex height={"10px"} />
           {!!proposalsQuery.data ? (
             <ProposalList

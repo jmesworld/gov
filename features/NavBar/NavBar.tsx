@@ -1,10 +1,11 @@
 import { VStack, Box, Flex, Text, Spacer } from "@chakra-ui/react";
 import { WalletStatus } from "@cosmos-kit/core";
+import dynamic from "next/dynamic";
 import { NavBarItem } from "./NavBarItem";
 import { NavBarButton } from "./NavBarButton";
-
 import { JMESLogo } from "../components/Assets/JMESLogo";
-import MyDaosList from "../Dao/MyDaoList";
+
+const MyDaoList = dynamic(() => import("../Dao/MyDaoList"));
 
 interface NavBarProps {
   status: WalletStatus;
@@ -104,7 +105,7 @@ const NavBar = ({
       {typeof window !== "undefined" &&
       address !== "undefined" &&
       !(localStorage.getItem("myDaosData") as string)?.includes("undefined") ? (
-        <MyDaosList
+        <MyDaoList
           daos={localStorage.getItem("myDaosData") as string}
           selectedDao={selectedDao}
           setSelectedDao={setSelectedDao}
@@ -139,10 +140,10 @@ const NavBar = ({
         width="180px"
         height="48px"
         text="DAO Proposal"
-        disabled={status !== WalletStatus.Connected || isGovProposalSelected}
+        disabled={status !== WalletStatus.Connected}
         onClick={() => {
           setCreateGovProposalSelected(false);
-          setDaoProposalDetailOpen(false);
+          setDaoProposalDetailOpen(true);
           setGovProposalDetailOpen(false);
         }}
       />
@@ -150,7 +151,7 @@ const NavBar = ({
         width="180px"
         height="48px"
         text="GOV Proposal"
-        disabled={status !== WalletStatus.Connected || isGovProposalSelected}
+        disabled={status !== WalletStatus.Connected}
         onClick={() => {
           setCreateGovProposalSelected(true);
           setDaoProposalDetailOpen(false);

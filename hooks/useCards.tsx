@@ -58,7 +58,6 @@ export const OnboardingComponent = ({
           currentCard={currentCard}
           setCurrentCard={setCurrentCard}
           setIsInitalizing={setIsInitializing}
-          setIdentityName={setIdentityName}
         />
       );
     case "choose-username-card":

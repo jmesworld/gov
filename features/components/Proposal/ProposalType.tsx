@@ -21,7 +21,7 @@ export const ProposalType = ({
       paddingLeft={"10.16PX"}
       paddingRight={"12PX"}
       backgroundColor={isActive ? "darkPurple" : "purple"}
-      cursor={'pointer'}
+      cursor={"pointer"}
       onClick={onClick}
     >
       <Image
@@ -56,6 +56,8 @@ const getLabel = (type: string) => {
       return "Revoke Core Slot";
     case "improvement":
       return "Improvement";
+    case "spend-funds":
+      return "spend-funds";
     default:
       return "";
   }
@@ -71,6 +73,8 @@ const getImgSrc = (type: string) => {
       return "/RevokeCoreSlot_Type.svg";
     case "improvement":
       return "/Improvement_Type.svg";
+    case "spend-funds":
+      return "/Spend_key.svg";
     default:
       return "";
   }

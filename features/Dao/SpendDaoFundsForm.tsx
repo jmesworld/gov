@@ -71,29 +71,6 @@ const CreateDaoForm = ({
   const [signingClient, setSigningClient] =
     useState<SigningCosmWasmClient | null>(null);
 
-  // useEffect(() => {
-  //   if (address) {
-  //     console.log("update");
-  //     getCosmWasmClient()
-  //       .then((cosmWasmClient) => {
-  //         if (!cosmWasmClient) {
-  //           return;
-  //         }
-  //         setCosmWasmClient(cosmWasmClient);
-  //       })
-  //       .catch((error) => console.log(error));
-
-  //     getSigningCosmWasmClient()
-  //       .then((signingClient) => {
-  //         if (!signingClient) {
-  //           return;
-  //         }
-  //         setSigningClient(signingClient);
-  //       })
-  //       .catch((error) => console.log(error));
-  //   }
-  // }, [address, getCosmWasmClient, getSigningCosmWasmClient]);
-
   useEffect(() => {
     if (address) {
       console.log("update");

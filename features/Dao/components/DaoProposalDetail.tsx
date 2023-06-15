@@ -9,21 +9,21 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useChain } from "@cosmos-kit/react";
-import { chainName } from "../../config/defaults";
+import { chainName } from "../../../config/defaults";
 
 import {
   CosmWasmClient,
   SigningCosmWasmClient,
 } from "@cosmjs/cosmwasm-stargate";
-import { DaoMultisigQueryClient } from "../../client/DaoMultisig.client";
+import { DaoMultisigQueryClient } from "../../../client/DaoMultisig.client";
 import {
   useDaoMultisigProposalQuery,
   useDaoMultisigListVotesQuery,
   useDaoMultisigListVotersQuery,
-} from "../../client/DaoMultisig.react-query";
-import { ProposalHeader } from "../components/Proposal/ProposalHeader";
-import { ProposalMyVote } from "../components/Proposal/ProposalMyVote";
-import { ProposalVoting } from "../components/Proposal/ProposalVoting";
+} from "../../../client/DaoMultisig.react-query";
+import { ProposalHeader } from "../../components/Proposal/ProposalHeader";
+import { ProposalMyVote } from "../../components/Proposal/ProposalMyVote";
+import { ProposalVoting } from "../../components/Proposal/ProposalVoting";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
