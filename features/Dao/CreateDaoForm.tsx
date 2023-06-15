@@ -182,7 +182,7 @@ const CreateDaoForm = ({
       </Text>
       <Input
         variant={"outline"}
-        width={"758px"}
+        width={"798px"}
         height={"48px"}
         borderColor={"rgba(112,79,247,0.5)"}
         background={"rgba(112,79,247,0.1)"}
@@ -206,7 +206,7 @@ const CreateDaoForm = ({
             : validationResult.message
           : ""}
       </Text>
-      <Flex width={"758px"} marginTop={"38px"} marginBottom={"19px"}>
+      <Flex width={"798px"} marginTop={"38px"} marginBottom={"19px"}>
         <Button
           variant={"outline"}
           borderColor={"purple"}
@@ -276,8 +276,9 @@ const CreateDaoForm = ({
       </Flex>
       {daoMembers.map((daoMember, index) => (
         <Flex key={index} marginBottom={"16px"}>
-          <InputGroup width={"610px"} height={"48px"}>
+          <InputGroup width={"650px"} height={"48px"}>
             <Input
+              spellCheck="false"
               isReadOnly={index === 0}
               variant={"outline"}
               borderColor={"rgba(112,79,247,0.5)"}
@@ -301,7 +302,7 @@ const CreateDaoForm = ({
               }}
             />
             <InputRightElement
-              width="75%"
+              width="65%"
               justifyContent={"start"}
               height={"100%"}
             >
@@ -384,7 +385,7 @@ const CreateDaoForm = ({
         marginTop={"16px"}
         height={"48px"}
         alignItems={"center"}
-        width={"758px"}
+        width={"798px"}
       >
         <QuestionOutlineIcon
           width={"16px"}
@@ -465,18 +466,21 @@ const CreateDaoForm = ({
         >
           <SliderFilledTrack backgroundColor={"green"} />
         </SliderTrack>
-        <Tooltip
-          isOpen
-          hasArrow={true}
-          label={`${threshold} %`}
-          bg={"purple"}
-          color={"white"}
-          direction={"rtl"}
-          placement={"top"}
-          borderRadius={"10px"}
-        >
-          <SliderThumb height={"32px"} />
-        </Tooltip>
+        <SliderThumb height={"32px"} position={"relative"}>
+          <Box height="30px" width="55px" background="#7453FD" position="absolute" bottom="calc(100% + 15px)" left="50%" transform="translateX(-50%)" borderRadius={12} boxShadow="0px 3.5px 5.5px rgba(0, 0, 0, 0.02)"
+            _after={{ content: '""', borderTop: '13px solid #7453FD', borderLeft: '7.5px solid transparent', borderRight: '7.5px solid transparent', position: 'absolute', top: 'calc(100% - 1px)', left: '50%', transform: 'translateX(-50%)' }}>
+            <Text
+              color="#FFFFFF"
+              fontFamily={"DM Sans"}
+              fontWeight="400"
+              fontSize={14}
+              lineHeight="12px"
+              textAlign="center"
+              marginTop="9px">
+              {`${threshold} %`}
+            </Text>
+          </Box>
+        </SliderThumb>
       </Slider>
       <Flex
         marginTop={"12px"}
