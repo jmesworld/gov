@@ -76,4 +76,4 @@
       "tx_page": "http://explorer.jmes.cloud/transactions/${txHash}"
     }
   ]
-
+}
