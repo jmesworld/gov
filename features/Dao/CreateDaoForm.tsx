@@ -50,9 +50,11 @@ const fee: StdFee = {
 const CreateDaoForm = ({
   daoOwner,
   setCreateDaoSelected,
+  identityName,
 }: {
   daoOwner: { name: string; address: string; votingPower: number };
   setCreateDaoSelected: Function;
+  identityName: string;
 }) => {
   const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
     useChain(chainName);

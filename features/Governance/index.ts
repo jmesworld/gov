@@ -19,4 +19,4 @@ const Governance = {
   GovProposalMyVote,
 };
 
-export default Governance;
+export { Governance };

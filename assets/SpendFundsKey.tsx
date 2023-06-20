@@ -1,6 +1,6 @@
 import { Box, Flex, Image } from "@chakra-ui/react";
 
-export const JMESLogo = () => {
+export const SpendFundsKey = () => {
   return (
     <Image
       src="/SpendKey.svg"

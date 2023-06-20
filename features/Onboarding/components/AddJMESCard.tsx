@@ -15,28 +15,20 @@ import OnboardingProgressIndicator from "./OnboardingProgressIndicator";
 
 const AddJMESCard = ({
   radioGroup,
-  currentCard,
-  setCurrentCard,
-  setIsInitalizing,
+  index,
 }: {
   radioGroup: Array<String>;
   currentCard: String;
-  setCurrentCard: Function;
-  setIsInitalizing: Function;
+  index: number;
 }) => {
-  const handleUpdateCard = (index: number) => {
-    // const index = radioGroup.indexOf(currentCard);
-    setCurrentCard(radioGroup[index + 1]);
-    setIsInitalizing(false);
-  };
-
   const handleAddJmesToKeplr = () => {
     addJMEStoKeplr()
       .then((res) => {
         console.log("success");
       })
       .catch((error) => console.log(error));
-    handleUpdateCard(radioGroup.indexOf(currentCard));
+
+    radioGroup[index + 1];
   };
 
   return (

@@ -17,19 +17,16 @@ const ConnectWalletCard = ({
   radioGroup,
   currentCard,
   setCurrentCard,
-  setIsInitalizing,
 }: {
   radioGroup: Array<String>;
   currentCard: String;
   setCurrentCard: Function;
-  setIsInitalizing: Function;
 }) => {
   const { connect, walletRepo } = useChain(chainName);
 
   const handleUpdateCard = (index: number) => {
     // const index = radioGroup.indexOf(currentCard);
     setCurrentCard(radioGroup[index + 1]);
-    setIsInitalizing(false);
   };
 
   const handleConnectWallet = () => {

@@ -10,7 +10,8 @@ import { useChain } from "@cosmos-kit/react";
 
 import { chainName } from "../../config/defaults";
 import GovHeader from "./GovHeader";
-import { ProposalHeader } from "../components/Proposal/ProposalHeader";
+import { ProposalHeader } from "../components/Proposal/ProposalList";
+//import { ProposalHeader } from "../components/Proposal/ProposalHeader";
 import { ProposalList } from "../components/Proposal/ProposalList";
 
 const IDENTITY_SERVICE_CONTRACT = process.env
@@ -96,7 +97,7 @@ export default function GovernanceProposal({
       <Flex height={"35px"} />
       <GovHeader />
       <Flex height={"46px"} />
-      <ProposalHeader daoName={""} proposalTitle={""} proposalExpiry={0} />
+      <ProposalHeader isGov={true} />
       <Flex height={"10px"} />
 
       <ProposalList

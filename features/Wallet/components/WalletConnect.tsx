@@ -7,11 +7,43 @@ import { addJMEStoKeplr, checkJMESInKeplr } from "../../../actions/keplr";
 
 import { ConnectedWalletButton } from "./ConnectedWalletButton";
 import { ConnectWalletButton } from "./ConnectWalletButton";
-
-import useClient from "../../../hooks/useClient";
+import { useClientIdentity } from "../../../hooks/useClientIdentity";
+// import useClient from "../../../hooks/useClient";
 import { useAccountBalance } from "../../../hooks/useAccountBalance";
 import { useChain } from "@cosmos-kit/react";
 import { chainName } from "../../../config/defaults";
+
+export const Connected = ({
+  buttonText,
+  onClick,
+}: {
+  buttonText: string;
+  onClick: MouseEventHandler<HTMLButtonElement>;
+}) => {
+  const { identityName, identityOwnerQuery } = useClientIdentity();
+  const { address } = useChain(chainName);
+  const fetchBal = useAccountBalance(address as string).data ?? 0;
+
+  return (
+    <ConnectedWalletButton
+      identityName={
+        identityOwnerQuery.status === "loading" ||
+        identityOwnerQuery.status === "error"
+          ? identityOwnerQuery.refetch() && "loading.."
+          : identityName ?? "fetching identity.."
+      }
+      identityBalance={fetchBal}
+      buttonText={buttonText}
+      onClickConnectBtn={onClick}
+    />
+  );
+};
+
+//returns circular loading
+export const Connecting = () => {
+  return <ConnectWalletButton isLoading={true} />;
+};
+
 export const Disconnected = ({
   buttonText,
   onClick,
@@ -22,33 +54,6 @@ export const Disconnected = ({
   return (
     <ConnectWalletButton buttonText={buttonText} onClickConnectBtn={onClick} />
   );
-};
-
-export const Connected = ({
-  buttonText,
-  onClick,
-}: {
-  buttonText: string;
-  onClick: MouseEventHandler<HTMLButtonElement>;
-}) => {
-  const { handleGetIdentity } = useClient();
-
-  const identityName = handleGetIdentity();
-  const { address } = useChain(chainName);
-  const fetchBal = useAccountBalance(address as string).data ?? 0;
-
-  return (
-    <ConnectedWalletButton
-      identityName={identityName}
-      identityBalance={fetchBal}
-      buttonText={buttonText}
-      onClickConnectBtn={onClick}
-    />
-  );
-};
-
-export const Connecting = () => {
-  return <ConnectWalletButton isLoading={true} />;
 };
 
 export const Rejected = ({
@@ -155,14 +160,6 @@ export const NotExist = ({
     />
   );
 };
-
-export const UserBalance = ({
-  balance,
-  onClick,
-}: {
-  balance: string;
-  onClick: MouseEventHandler<HTMLButtonElement>;
-}) => {};
 
 export const WalletConnect = ({
   walletStatus,
