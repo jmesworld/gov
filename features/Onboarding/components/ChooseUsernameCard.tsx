@@ -330,7 +330,7 @@ const ChooseUsernameCard = ({
                     .mutateAsync({
                       client: idClient,
                       msg: {
-                        name: identityNameInput,
+                        name: query,
                       },
                       args: { fee },
                     })
