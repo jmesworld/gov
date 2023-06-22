@@ -37,7 +37,7 @@ export default function PeriodInfo() {
       );
       setGovernanceQueryClient(client);
     });
-  }, [getCosmWasmClient]);
+  }, []);
 
   const periodInfoQuery = useGovernancePeriodInfoQuery({
     client: governanceQueryClient,

@@ -1,16 +1,15 @@
-import { VStack, Box, Flex, Text, Spacer } from "@chakra-ui/react";
+import { VStack, Box, Flex, Text, Spacer, Image } from "@chakra-ui/react";
 import { WalletStatus } from "@cosmos-kit/core";
 import dynamic from "next/dynamic";
 import { NavBarItem } from "./NavBarItem";
 import { NavBarButton } from "./NavBarButton";
-import { JMESLogo } from "../components/Assets/JMESLogo";
 
 const MyDaoList = dynamic(() => import("../Dao/MyDaoList"));
 
 interface NavBarProps {
   status: WalletStatus;
   address: any;
-  identityName: string;
+  identityName: string | undefined;
   isGovProposalSelected: boolean;
   setIsGovProposalSelected: React.Dispatch<React.SetStateAction<boolean>>;
   isCreateDaoSelected: boolean;
@@ -52,12 +51,17 @@ const NavBar = ({
       // overflowY="scroll"
       alignItems="start"
     >
-      <JMESLogo />
+      <Image
+        src="./Logo.svg"
+        alt="JMES"
+        width={"83.37px"}
+        height={"24px"}
+        marginLeft={"26px"}
+      />
       <Box height={"30px"} />
       <Flex
         width={"200px"}
         height={"42px"}
-        // marginTop={"30px"}
         paddingLeft={"26px"}
         backgroundColor={"#7453FD"}
       >
@@ -91,7 +95,6 @@ const NavBar = ({
         paddingLeft={"26px"}
         backgroundColor={"#7453FD"}
       >
-        {" "}
         <Text
           color="#A1F0C4"
           fontFamily={"DM Sans"}

@@ -22,7 +22,9 @@ export const ConnectedWalletButton = ({
   isDisabled,
 }: ConnectedWalletType) => {
   const { address, disconnect } = useChain(chainName);
-
+  const handleDisconnect = () => {
+    disconnect();
+  };
   return (
     <Menu>
       {({ isOpen }) => (
@@ -130,9 +132,7 @@ export const ConnectedWalletButton = ({
               backgroundColor="white"
               _hover={{ bg: "white" }}
               borderRadius={"20px"}
-              onClick={() => {
-                disconnect();
-              }}
+              onClick={handleDisconnect}
             >
               <Flex
                 width={"100%"}

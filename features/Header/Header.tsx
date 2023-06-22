@@ -1,6 +1,6 @@
 import { Flex, Spacer } from "@chakra-ui/react";
 
-import Wallet from "../Wallet";
+import Wallet from "../Wallet/Wallet";
 import PeriodInfo from "./components/PeriodInfo";
 
 const Header = () => {

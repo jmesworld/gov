@@ -1,7 +1,7 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { ChainProvider } from "@cosmos-kit/react";
-import { ChakraProvider } from "@chakra-ui/react";
+import { Box, ChakraProvider, Modal } from "@chakra-ui/react";
 import { defaultTheme } from "../config";
 import { wallets as keplrWallets } from "@cosmos-kit/keplr";
 import { SignerOptions } from "@cosmos-kit/core";
@@ -11,8 +11,11 @@ import { Chain } from "@chain-registry/types";
 import jmesTestnet from "../config/chains/jmes-testnet/chain.json";
 import { chainName } from "../config/defaults";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import OnboardingModal from "../features/Onboarding/OnboardingModal";
-
+//import OnboardingModal from "../features/Onboarding/OnboardingModal";
+import { WalletModal } from "../features/Wallet/components/WalletModal";
+import { CosmWasmProvider } from "../contexts/ClientContext";
+import { WalletViewProps } from "@cosmos-kit/core";
+import React from "react";
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const chains: Chain[] = [jmesTestnet];
 
@@ -34,7 +37,7 @@ function CreateCosmosApp({ Component, pageProps }: AppProps) {
           wallets={[...keplrWallets]}
           walletModal={undefined}
           modalViews={{
-            Connected: OnboardingModal,
+            Connected: WalletModal,
           }}
           signerOptions={signerOptions}
           endpointOptions={{
@@ -43,9 +46,12 @@ function CreateCosmosApp({ Component, pageProps }: AppProps) {
             },
           }}
         >
-          <Component {...pageProps} />
+          <CosmWasmProvider>
+            <Component {...pageProps} />
+          </CosmWasmProvider>
         </ChainProvider>
       </ChakraProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

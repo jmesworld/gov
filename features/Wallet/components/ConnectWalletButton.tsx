@@ -31,7 +31,6 @@ export const ConnectWalletButton = ({
       isDisabled={isDisabled}
       onClick={onClickConnectBtn}
     >
-      <Icon as={icon ? icon : IoWallet} mr={2} />
       {buttonText ? buttonText : "Connect Wallet"}
     </Button>
   );
