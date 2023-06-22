@@ -138,7 +138,7 @@ const NavBar = ({
         }}
       />
       <Spacer />
-      <NavBarButton
+      {/* <NavBarButton
         width="180px"
         height="48px"
         text="DAO Proposal"
@@ -148,7 +148,7 @@ const NavBar = ({
           setDaoProposalDetailOpen(true);
           setGovProposalDetailOpen(false);
         }}
-      />
+      /> */}
       <NavBarButton
         width="180px"
         height="48px"
