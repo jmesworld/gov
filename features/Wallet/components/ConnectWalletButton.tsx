@@ -1,8 +1,6 @@
-import { Button, Icon } from "@chakra-ui/react";
-import { WalletStatus } from "@cosmos-kit/core";
-
+import { Button } from "@chakra-ui/react";
 import { ConnectWalletType } from "../../types";
-import { IoWallet } from "react-icons/io5";
+
 export const ConnectWalletButton = ({
   buttonText,
   isLoading,
@@ -30,6 +28,7 @@ export const ConnectWalletButton = ({
       isLoading={isLoading}
       isDisabled={isDisabled}
       onClick={onClickConnectBtn}
+      fontWeight={"400"}
     >
       {buttonText ? buttonText : "Connect Wallet"}
     </Button>

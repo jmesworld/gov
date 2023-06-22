@@ -68,7 +68,7 @@ export default function PeriodInfo() {
       {({ isOpen }) => (
         <>
           <MenuButton
-            disabled={false}
+            disabled={!!data ? false : true}
             as={Button}
             rightIcon={
               isOpen ? (
