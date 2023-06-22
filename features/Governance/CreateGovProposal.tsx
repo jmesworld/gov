@@ -102,7 +102,7 @@ export default function CreateGovProposal({
     address as string,
     selectedDao
   );
-
+  console.log(address);
   // Dynamically show required sections for different proposal types
   const isSlotTypeRequired =
     selectedProposalType === "core-slot" ||
@@ -435,7 +435,7 @@ export default function CreateGovProposal({
                     ],
                   }),
                 };
-
+                console.log(proposalMsg);
                 setCreatingGovProposal(true);
                 const wasmMsg: Governance.WasmMsg = {
                   execute: {

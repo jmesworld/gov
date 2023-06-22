@@ -3,7 +3,7 @@ import { WalletStatus } from "@cosmos-kit/core";
 import dynamic from "next/dynamic";
 import { NavBarItem } from "./NavBarItem";
 import { NavBarButton } from "./NavBarButton";
-
+import { useClientIdentity } from "../../hooks/useClientIdentity";
 const MyDaoList = dynamic(() => import("../Dao/MyDaoList"));
 
 interface NavBarProps {
@@ -27,7 +27,7 @@ interface NavBarProps {
 const NavBar = ({
   status,
   address,
-  identityName,
+
   isGovProposalSelected,
   setIsGovProposalSelected,
   isCreateDaoSelected,
@@ -41,6 +41,7 @@ const NavBar = ({
   selectedDaoName,
   setConnectButtonClicked,
 }: NavBarProps) => {
+  const { identityName } = useClientIdentity();
   return (
     <VStack
       width={"200px"}
@@ -143,7 +144,7 @@ const NavBar = ({
         width="180px"
         height="48px"
         text="DAO Proposal"
-        disabled={status !== WalletStatus.Connected}
+        disabled={!identityName}
         onClick={() => {
           setCreateGovProposalSelected(false);
           setDaoProposalDetailOpen(true);
@@ -154,7 +155,7 @@ const NavBar = ({
         width="180px"
         height="48px"
         text="GOV Proposal"
-        disabled={status !== WalletStatus.Connected}
+        disabled={!identityName}
         onClick={() => {
           setCreateGovProposalSelected(true);
           setDaoProposalDetailOpen(false);

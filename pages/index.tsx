@@ -25,7 +25,7 @@ const { CreateGovProposal, GovProposalDetail, GovernanceProposal } = Governance;
 
 export default function Home() {
   const [isConnectButtonClicked, setConnectButtonClicked] = useState(false);
-  const [isGovProposalSelected, setIsGovProposalSelected] = useState(false);
+  const [isGovProposalSelected, setIsGovProposalSelected] = useState(true);
   const [isCreateDaoSelected, setCreateDaoSelected] = useState(false);
   const [selectedDao, setSelectedDao] = useState("");
   const [selectedDaoName, setSelectedDaoName] = useState("");
