@@ -25,9 +25,8 @@ interface NavBarProps {
 }
 
 const NavBar = ({
-  status,
   address,
-
+  status,
   isGovProposalSelected,
   setIsGovProposalSelected,
   isCreateDaoSelected,
@@ -66,7 +65,6 @@ const NavBar = ({
         paddingLeft={"26px"}
         backgroundColor={"#7453FD"}
       >
-        {" "}
         <Text
           color="#A1F0C4"
           fontFamily={"DM Sans"}
@@ -127,9 +125,9 @@ const NavBar = ({
         width="180px"
         height="48px"
         text={"New DAO"}
-        disabled={!identityName}
+        disabled={status !== WalletStatus.Connected}
         onClick={() => {
-          if (status !== WalletStatus.Connected) {
+          if (!WalletStatus.Connected) {
             setConnectButtonClicked(true);
           } else {
             setCreateGovProposalSelected(false);
@@ -144,7 +142,7 @@ const NavBar = ({
         width="180px"
         height="48px"
         text="DAO Proposal"
-        disabled={!identityName}
+        disabled={status !== WalletStatus.Connected}
         onClick={() => {
           setCreateGovProposalSelected(false);
           setDaoProposalDetailOpen(true);
@@ -155,7 +153,7 @@ const NavBar = ({
         width="180px"
         height="48px"
         text="GOV Proposal"
-        disabled={!identityName}
+        disabled={status !== WalletStatus.Connected}
         onClick={() => {
           setCreateGovProposalSelected(true);
           setDaoProposalDetailOpen(false);

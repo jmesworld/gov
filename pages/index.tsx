@@ -37,7 +37,8 @@ export default function Home() {
   const [isGovProposalDetailOpen, setGovProposalDetailOpen] = useState(false);
   const [selectedProposalId, setSelectedProposalId] = useState(-1);
 
-  const { address } = useChain(chainName);
+  const { address, status } = useChain(chainName);
+
   return (
     <>
       <Container
@@ -51,7 +52,7 @@ export default function Home() {
         </Head>
         <Flex padding={0} width={"100vw"} height={"100vh"}>
           <NavBar
-            status={WalletStatus.Connected}
+            status={status}
             address={address}
             identityName={""}
             isGovProposalSelected={isGovProposalSelected}
