@@ -1,6 +1,12 @@
-import { extendTheme, theme } from "@chakra-ui/react";
+import { extendTheme, theme, type ThemeConfig } from "@chakra-ui/react";
+
+const config: ThemeConfig = {
+  initialColorMode: 'light',
+  useSystemColorMode: false,
+}
 
 export const defaultThemeObject = {
+  config,
   fonts: {
     body: `DM Sans, ${theme.fonts.body}`,
     heading: `DM Sans, ${theme.fonts.heading}`,
