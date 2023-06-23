@@ -55,6 +55,7 @@ export default function Home() {
             status={status}
             address={address}
             identityName={""}
+            isCreateGovProposalSelected={isCreateGovProposalSelected}
             isGovProposalSelected={isGovProposalSelected}
             setIsGovProposalSelected={setIsGovProposalSelected}
             isCreateDaoSelected={isCreateDaoSelected}
