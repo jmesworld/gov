@@ -9,7 +9,10 @@ import { ConnectedWalletButton } from "./ConnectedWalletButton";
 import { ConnectWalletButton } from "./ConnectWalletButton";
 import { useClientIdentity } from "../../../hooks/useClientIdentity";
 // import useClient from "../../../hooks/useClient";
-import { useAccountBalance } from "../../../hooks/useAccountBalance";
+import {
+  useAccountBalance,
+  useStakedBalance,
+} from "../../../hooks/useAccountBalance";
 import { useChain } from "@cosmos-kit/react";
 import { chainName } from "../../../config/defaults";
 
@@ -23,6 +26,7 @@ export const Connected = ({
   const { identityName, identityOwnerQuery } = useClientIdentity();
   const { address } = useChain(chainName);
   const fetchBal = useAccountBalance(address as string).data ?? 0;
+  const fetchStake = useStakedBalance(address as string).data ?? 0;
 
   return (
     <ConnectedWalletButton
@@ -33,6 +37,7 @@ export const Connected = ({
           : identityName ?? "fetching identity.."
       }
       identityBalance={fetchBal}
+      identityStake={fetchStake}
       buttonText={buttonText}
       onClickConnectBtn={onClick}
     />
