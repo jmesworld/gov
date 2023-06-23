@@ -18,6 +18,7 @@ import { ConnectedWalletType } from "../../types";
 export const ConnectedWalletButton = ({
   identityName,
   identityBalance,
+  identityStake,
   isLoading,
   isDisabled,
 }: ConnectedWalletType) => {
@@ -122,8 +123,8 @@ export const ConnectedWalletButton = ({
                 noOfLines={1}
                 fontFamily="DM Sans"
               >{`${
-                !!identityBalance
-                  ? parseFloat(identityBalance as string).toFixed(1)
+                !!identityStake
+                  ? parseFloat(identityStake as string).toFixed(1)
                   : "0.0"
               }`}</Text>
             </Flex>

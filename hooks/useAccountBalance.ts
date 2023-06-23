@@ -28,3 +28,34 @@ export function useAccountBalance(address: string) {
     }
   );
 }
+
+export function useStakedBalance(address: string) {
+  return useQuery(
+    ["stakedBalance", address],
+    async () => {
+      const requestUrl = `${rest}/cosmos/staking/v1beta1/delegations/${address}`;
+
+      const response = await fetch(requestUrl);
+      if (!response.ok) {
+        console.error(response);
+        throw new Error("Failed to fetch account balance");
+      }
+      const data = await response.json();
+      const balance =
+        data.delegation_responses.length === 0
+          ? 0
+          : data.delegation_responses[0].balance.amount;
+      return balance / 1000000;
+    },
+    {
+      onSuccess: (data) => {
+        console.log(data);
+        return data;
+      },
+      onError: (error) => {
+        console.error(error);
+      },
+      refetchInterval: 60 * 1000,
+    }
+  );
+}
