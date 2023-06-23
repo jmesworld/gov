@@ -13,6 +13,7 @@ interface NavBarProps {
   isGovProposalSelected: boolean;
   setIsGovProposalSelected: React.Dispatch<React.SetStateAction<boolean>>;
   isCreateDaoSelected: boolean;
+  isCreateGovProposalSelected: boolean;
   setCreateDaoSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedDao: React.Dispatch<React.SetStateAction<string>>;
   setSelectedDaoName: React.Dispatch<React.SetStateAction<string>>;
@@ -30,6 +31,7 @@ const NavBar = ({
   isGovProposalSelected,
   setIsGovProposalSelected,
   isCreateDaoSelected,
+  isCreateGovProposalSelected,
   setCreateDaoSelected,
   setSelectedDao,
   setSelectedDaoName,
@@ -41,6 +43,7 @@ const NavBar = ({
   setConnectButtonClicked,
 }: NavBarProps) => {
   const { identityName } = useClientIdentity();
+  console.log(isGovProposalSelected, isCreateDaoSelected)
   return (
     <VStack
       width={"200px"}
@@ -77,7 +80,7 @@ const NavBar = ({
       </Flex>
       <NavBarItem
         text="Proposals"
-        isSelected={isGovProposalSelected}
+        isSelected={isGovProposalSelected && !isCreateDaoSelected && !isCreateGovProposalSelected}
         onClick={() => {
           setIsGovProposalSelected(true);
           setCreateDaoSelected(false);
