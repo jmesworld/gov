@@ -27,7 +27,6 @@ const MyDaoList = ({
   const chainContext = useChain(chainName);
   const { address } = chainContext;
   const daosJSON = JSON.parse(daos);
-
   if (!daosJSON) {
     return <></>;
   }
@@ -42,7 +41,11 @@ const MyDaoList = ({
         <NavBarItem
           key={dao.name}
           text={dao.name}
-          isSelected={selectedDao === dao.address ? true : false}
+          isSelected={
+            selectedDao === dao.address || selectedDaoName === dao.name
+              ? true
+              : false
+          }
           onClick={() => {
             setIsGovProposalSelected(false);
             setSelectedDao(dao.address);

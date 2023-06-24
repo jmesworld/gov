@@ -20,7 +20,7 @@ export default function OnboardingModal() {
   const balance = useAccountBalance(chainName);
   const { disconnect } = useChain(chainName);
   const { identityName } = useCosmWasmClient();
-  console.log(identityName);
+
   const { identityOwnerQuery } = useClientIdentity();
   const identityNameStatus = identityOwnerQuery.status;
 

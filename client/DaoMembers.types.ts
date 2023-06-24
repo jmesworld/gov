@@ -4,6 +4,7 @@
 * and run the @cosmwasm/ts-codegen generate command to regenerate this file.
 */
 
+export type Addr = string;
 export type Duration = {
   height: number;
 } | {
@@ -12,6 +13,7 @@ export type Duration = {
 export type Decimal = string;
 export interface InstantiateMsg {
   dao_name: string;
+  governance_addr: Addr;
   max_voting_period: Duration;
   members: Member[];
   threshold_percentage: Decimal;

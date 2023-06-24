@@ -29,6 +29,7 @@ interface NavBarProps {
 const NavBar = ({
   address,
   status,
+  identityName,
   isGovProposalSelected,
   setIsGovProposalSelected,
   isCreateDaoSelected,
@@ -43,8 +44,6 @@ const NavBar = ({
   selectedDaoName,
   setConnectButtonClicked,
 }: NavBarProps) => {
-  const { identityName } = useClientIdentity();
-
   return (
     <VStack
       width={"200px"}
@@ -133,7 +132,7 @@ const NavBar = ({
         width="180px"
         height="48px"
         text={"New DAO"}
-        disabled={status !== WalletStatus.Connected}
+        disabled={status !== WalletStatus.Connected || !!!identityName}
         onClick={() => {
           if (!WalletStatus.Connected) {
             setConnectButtonClicked(true);
@@ -146,22 +145,27 @@ const NavBar = ({
         }}
       />
       <Spacer />
-      {/* <NavBarButton
+      <NavBarButton
         width="180px"
         height="48px"
         text="DAO Proposal"
-        disabled={status !== WalletStatus.Connected}
+        // disabled={status !== WalletStatus.Connected}
+        disabled={true} // TODO: remove later
         onClick={() => {
           setCreateGovProposalSelected(false);
           setDaoProposalDetailOpen(true);
           setGovProposalDetailOpen(false);
         }}
-      /> */}
+      />
       <NavBarButton
         width="180px"
         height="48px"
         text="GOV Proposal"
-        disabled={status !== WalletStatus.Connected || isGovProposalSelected}
+        disabled={
+          status !== WalletStatus.Connected ||
+          isGovProposalSelected ||
+          !!!identityName
+        }
         onClick={() => {
           setCreateGovProposalSelected(true);
           setDaoProposalDetailOpen(false);

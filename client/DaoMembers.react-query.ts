@@ -7,7 +7,7 @@
 import { UseQueryOptions, useQuery, useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee, Coin } from "@cosmjs/amino";
-import { Duration, Decimal, InstantiateMsg, Member, ExecuteMsg, QueryMsg, AdminResponse, Threshold, ConfigResponse, HooksResponse, MemberListResponse, MemberResponse, TotalWeightResponse } from "./DaoMembers.types";
+import { Addr, Duration, Decimal, InstantiateMsg, Member, ExecuteMsg, QueryMsg, AdminResponse, Threshold, ConfigResponse, HooksResponse, MemberListResponse, MemberResponse, TotalWeightResponse } from "./DaoMembers.types";
 import { DaoMembersQueryClient, DaoMembersClient } from "./DaoMembers.client";
 export const daoMembersQueryKeys = {
   contract: ([{

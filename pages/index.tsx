@@ -5,8 +5,7 @@ import { useChain } from "@cosmos-kit/react";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useCallback, useEffect, useState } from "react";
-import { chainName } from "../config/defaults";
-//import { useCosmWasmClient } from "../contexts/ClientContext";
+import { chainName, IDENTITY_SERVICE_CONTRACT, rpc } from "../config/defaults";
 import { useClientIdentity } from "../hooks/useClientIdentity";
 import {
   NavBar,
@@ -18,8 +17,12 @@ import {
 } from "../features";
 
 import SpendDaoFundsForm from "../features/Dao/SpendDaoFundsForm";
+import CreateDaoForm from "../features/Dao/CreateDaoForm";
+import { IdentityserviceQueryClient } from "../client/Identityservice.client";
+import { useIdentityserviceGetIdentityByOwnerQuery } from "../client/Identityservice.react-query";
+import { useMyDaosList } from "../hooks/useMyDaosList";
 
-const { DaoProposal, CreateDaoForm } = Dao;
+const { DaoProposal } = Dao;
 
 const { CreateGovProposal, GovProposalDetail, GovernanceProposal } = Governance;
 
@@ -38,7 +41,51 @@ export default function Home() {
   const [selectedProposalId, setSelectedProposalId] = useState(-1);
 
   const { address, status } = useChain(chainName);
+  //const { identityName, identityOwnerQuery } = useClientIdentity(); <---- hook does not return up-to-date query result
 
+  //TODO: @hunter - please fix/remove L44-L71 once useClientIdenitity() hook's behaviour is stable. Adding this temporarily
+  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
+    null
+  );
+  useEffect(() => {
+    CosmWasmClient.connect(rpc)
+      .then((cosmWasmClient) => {
+        if (!cosmWasmClient) {
+          return;
+        }
+        setCosmWasmClient(cosmWasmClient);
+      })
+      .catch((error) => console.log(error));
+  }, []);
+  const identityserviceClient = new IdentityserviceQueryClient(
+    cosmWasmClient as CosmWasmClient,
+    IDENTITY_SERVICE_CONTRACT
+  );
+  const identityOwnerQuery = useIdentityserviceGetIdentityByOwnerQuery({
+    client: identityserviceClient,
+    args: { owner: address as string },
+    options: {
+      refetchOnMount: true,
+    },
+  });
+  const identityName = identityOwnerQuery?.data?.identity?.name;
+  // -- End of temporary fix ---
+
+  // This essentially triggers a function that updates the user's list of daos in the backgroud. Could be improved
+  const myDaos = useMyDaosList(
+    address as string,
+    cosmWasmClient as CosmWasmClient,
+    setSelectedDao,
+    setSelectedDaoName,
+    () => {
+      // reset state
+      setIsGovProposalSelected(false);
+      setCreateDaoSelected(false);
+      setDaoProposalDetailOpen(false);
+      setGovProposalDetailOpen(false);
+    }
+  );
+  
   return (
     <>
       <Container
@@ -54,7 +101,7 @@ export default function Home() {
           <NavBar
             status={status}
             address={address}
-            identityName={""}
+            identityName={identityName}
             isCreateGovProposalSelected={isCreateGovProposalSelected}
             isGovProposalSelected={isGovProposalSelected}
             setIsGovProposalSelected={setIsGovProposalSelected}
@@ -100,10 +147,10 @@ export default function Home() {
               <SpendDaoFundsForm
                 daoOwner={{
                   address: address as string,
-                  name: "",
+                  name: identityName as string,
                   votingPower: 0,
                 }}
-                identityName={""}
+                identityName={identityName as string}
                 setCreateDaoSelected={setCreateDaoSelected}
                 selectedDao={selectedDao}
                 selectedDaoName={selectedDaoName}
@@ -116,6 +163,11 @@ export default function Home() {
               />
             ) : isCreateDaoSelected ? (
               <CreateDaoForm
+                daoOwner={{
+                  address: address as string,
+                  name: identityName as string,
+                  votingPower: 0,
+                }}
                 setCreateDaoSelected={setCreateDaoSelected}
               />
             ) : isGovProposalSelected ? (
