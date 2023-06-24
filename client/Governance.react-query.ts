@@ -56,12 +56,12 @@ export function useGovernanceWinningGrantsQuery<TData = WinningGrantsResponse>({
     enabled: !!client && (options?.enabled != undefined ? options.enabled : true)
   });
 }
-export interface GovernanceCoreSlotsQuery<TData> extends GovernanceReactQuery<CoreSlotsResponse, TData> {}
-export function useGovernanceCoreSlotsQuery<TData = CoreSlotsResponse>({
+export interface GovernanceCoreSlotsQuery<TData> extends GovernanceReactQuery<CoreSlot, TData> {}
+export function useGovernanceCoreSlotsQuery<TData = CoreSlot>({
   client,
   options
 }: GovernanceCoreSlotsQuery<TData>) {
-  return useQuery<CoreSlotsResponse, Error, TData>(governanceQueryKeys.coreSlots(client?.contractAddress), () => client ? client.coreSlots() : Promise.reject(new Error("Invalid client")), { ...options,
+  return useQuery<CoreSlot, Error, TData>(governanceQueryKeys.coreSlots(client?.contractAddress), () => client ? client.coreSlots() : Promise.reject(new Error("Invalid client")), { ...options,
     enabled: !!client && (options?.enabled != undefined ? options.enabled : true)
   });
 }
@@ -263,11 +263,10 @@ export interface GovernanceProposeMutation {
 export function useGovernanceProposeMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, GovernanceProposeMutation>, "mutationFn">) {
   return useMutation<ExecuteResult, Error, GovernanceProposeMutation>(({
     client,
-    msg,
     args: {
       fee,
       memo,
       funds
     } = {}
-  }) => client.propose(msg, fee, memo, funds), options);
+  }) => client.propose(fee, memo, funds), options);
 }

@@ -526,7 +526,7 @@ const SpendDaoFundsForm = ({
                       height: 1180000,
                     },
                     members: members,
-                    thresholdPercentage: (threshold / 100).toString(),
+                    thresholdPercentage: threshold,
                   },
                   args: { fee },
                 })

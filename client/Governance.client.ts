@@ -23,7 +23,7 @@ export interface GovernanceReadOnlyInterface {
     limit?: number;
     start?: number;
   }) => Promise<ProposalsResponse>;
-  coreSlots: () => Promise<CoreSlotsResponse>;
+  coreSlots: () => Promise<CoreSlot>;
   winningGrants: () => Promise<WinningGrantsResponse>;
 }
 export class GovernanceQueryClient implements GovernanceReadOnlyInterface {
@@ -76,7 +76,7 @@ export class GovernanceQueryClient implements GovernanceReadOnlyInterface {
       }
     });
   };
-  coreSlots = async (): Promise<CoreSlotsResponse> => {
+  coreSlots = async (): Promise<CoreSlot> => {
     return this.client.queryContractSmart(this.contractAddress, {
       core_slots: {}
     });
