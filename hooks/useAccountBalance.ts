@@ -67,7 +67,10 @@ export function formatBalance(value: number): string {
   const suffix = suffixes[base];
   const scaledValue = value / Math.pow(10, base * 3);
 
-  const formattedValue = new Intl.NumberFormat().format(scaledValue);
+  const formattedValue = scaledValue.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  });
 
   return `${formattedValue}${suffix}`;
 }
