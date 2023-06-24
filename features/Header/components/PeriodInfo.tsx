@@ -14,7 +14,7 @@ import { useChain } from "@cosmos-kit/react";
 import { useEffect, useState } from "react";
 import { GovernanceQueryClient } from "../../../client/Governance.client";
 import { useGovernancePeriodInfoQuery } from "../../../client/Governance.react-query";
-import { chainName } from "../../../config/defaults";
+import { chainName, rpc } from "../../../config/defaults";
 import {
   formatDuration,
   momentLeft,
@@ -30,9 +30,9 @@ export default function PeriodInfo() {
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
   );
+  
   useEffect(() => {
-    if (address) {
-      getCosmWasmClient()
+      CosmWasmClient.connect(rpc)
         .then((cosmWasmClient) => {
           if (!cosmWasmClient) {
             return;
@@ -40,8 +40,7 @@ export default function PeriodInfo() {
           setCosmWasmClient(cosmWasmClient);
         })
         .catch((error) => console.log(error));
-    }
-  }, [address, getCosmWasmClient]);
+  }, []);
 
   const governanceQueryClient = new GovernanceQueryClient(
     cosmWasmClient as CosmWasmClient,
