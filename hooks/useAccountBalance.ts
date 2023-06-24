@@ -14,7 +14,7 @@ export function useAccountBalance(address: string) {
       }
       const data = await response.json();
       const balance = data.balances.length === 0 ? 0 : data.balances[0].amount;
-      return formatNumber(balance / 1000000);
+      return balance / 1000000;
     },
     {
       onSuccess: (data) => {
@@ -44,7 +44,7 @@ export function useStakedBalance(address: string) {
         data.delegation_responses.length === 0
           ? 0
           : data.delegation_responses[0].balance.amount;
-      return formatNumber(balance / 1000000);
+      return balance / 1000000;
     },
     {
       onSuccess: (data) => {
@@ -59,7 +59,7 @@ export function useStakedBalance(address: string) {
 }
 
 
-function formatNumber(value: number): string {
+export function formatBalance(value: number): string {
   if(value == 0) {return "0.0";}
 
   const suffixes = ["", "k", "m", "b", "t"];

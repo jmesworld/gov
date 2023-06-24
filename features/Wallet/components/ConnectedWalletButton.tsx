@@ -14,6 +14,7 @@ import {
 import { useChain } from "@cosmos-kit/react";
 import { chainName } from "../../../config/defaults";
 import { ConnectedWalletType } from "../../types";
+import { formatBalance } from "../../../hooks/useAccountBalance";
 
 export const ConnectedWalletButton = ({
   identityName,
@@ -98,7 +99,7 @@ export const ConnectedWalletButton = ({
                 fontFamily="DM Sans"
               >{`${
                 !!identityBalance
-                  ? identityBalance
+                  ? formatBalance(identityBalance as number)
                   : "0.0"
               }`}</Text>
 
@@ -123,9 +124,7 @@ export const ConnectedWalletButton = ({
                 noOfLines={1}
                 fontFamily="DM Sans"
               >{`${
-                !!identityStake
-                  ? identityStake
-                  : "0.0"
+                !!identityStake ? formatBalance(identityStake as number) : "0.0"
               }`}</Text>
             </Flex>
           </MenuButton>
@@ -167,7 +166,7 @@ export const ConnectedWalletButton = ({
                 >
                   Disconnect
                 </Text>
-                <Spacer/>
+                <Spacer />
               </Flex>
             </MenuItem>
           </MenuList>
