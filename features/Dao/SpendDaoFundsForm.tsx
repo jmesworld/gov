@@ -81,7 +81,7 @@ const SpendDaoFundsForm = ({
   const [signingClient, setSigningClient] =
     useState<SigningCosmWasmClient | null>(null);
   const balance = useAccountBalance(address as string);
-  const [bal, setBal] = useState(balance.data as number);
+  const [bal, setBal] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const proposalTypes = ["spend-funds"];
   const [selectedProposalType, setSelectedProposalType] = useState(
