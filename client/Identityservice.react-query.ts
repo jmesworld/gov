@@ -7,7 +7,7 @@
 import { UseQueryOptions, useQuery, useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee, Coin } from "@cosmjs/amino";
-import { Addr, DaosResponse, ExecuteMsg, Duration, Decimal, DaoMembersInstantiateMsg, Member, IdType, GetIdentityByNameResponse, Identity, GetIdentityByOwnerResponse, InstantiateMsg, QueryMsg, Ordering } from "./Identityservice.types";
+import { Addr, DaosResponse, ExecuteMsg, Duration, RegisterDaoMsg, Member, IdType, GetIdentityByNameResponse, Identity, GetIdentityByOwnerResponse, InstantiateMsg, QueryMsg, Ordering } from "./Identityservice.types";
 import { IdentityserviceQueryClient, IdentityserviceClient } from "./Identityservice.client";
 export const identityserviceQueryKeys = {
   contract: ([{
@@ -93,7 +93,7 @@ export interface IdentityserviceRegisterDaoMutation {
     daoName: string;
     maxVotingPeriod: Duration;
     members: Member[];
-    thresholdPercentage: Decimal;
+    thresholdPercentage: number;
   };
   args?: {
     fee?: number | StdFee | "auto";

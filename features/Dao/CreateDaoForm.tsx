@@ -50,19 +50,14 @@ const fee: StdFee = {
 
 const CreateDaoForm = ({
   setCreateDaoSelected,
+  daoOwner,
 }: {
   setCreateDaoSelected: Function;
+  daoOwner: { name: string; address: string; votingPower: number };
 }) => {
   const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
     useChain(chainName);
 
-  const {identityName} = useClientIdentity()
-
-  const daoOwner = {
-    name: identityName as string,
-    address: address as string,
-    votingPower: 0,
-  }
   const [daoName, setDaoName] = useState("");
   const [daoMembers, setDaoMembers] = useState([daoOwner]);
   const [threshold, setThreshold] = useState(50);
@@ -77,19 +72,29 @@ const CreateDaoForm = ({
   );
   const [signingClient, setSigningClient] =
     useState<SigningCosmWasmClient | null>(null);
+  useEffect(() => {
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
 
-  // useEffect(() => {
-  //   if (address) {
-  //     getCosmWasmClient()
-  //       .then((cosmWasmClient) => {
-  //         if (!cosmWasmClient) {
-  //           return;
-  //         }
-  //         setCosmWasmClient(cosmWasmClient);
-  //       })
-  //       .catch((error) => console.log(error));
-  //   }
-  // }, [address, getCosmWasmClient]);
+      getSigningCosmWasmClient()
+        .then((signingClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setSigningClient(signingClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient, getSigningCosmWasmClient]);
+
+  useEffect(() => {});
 
   const totalVotingPower = daoMembers.reduce(
     (sum, member) => sum + (!!member?.votingPower ? member?.votingPower : 0),
@@ -153,6 +158,7 @@ const CreateDaoForm = ({
     setDoubleCounts(dups);
   });
 
+  // console.log(daoMembers[0]);
   return (
     <Box marginTop={"35px"}>
       <Text
@@ -516,10 +522,10 @@ const CreateDaoForm = ({
                 msg: {
                   daoName: daoName.trim(),
                   maxVotingPeriod: {
-                    height: 1180000,
+                    time: 2419200, //28 days
                   },
                   members: members,
-                  thresholdPercentage: (threshold / 100).toString(),
+                  thresholdPercentage: threshold,
                 },
                 args: { fee },
               })

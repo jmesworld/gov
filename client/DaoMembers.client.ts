@@ -6,7 +6,7 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { Duration, Decimal, InstantiateMsg, Member, ExecuteMsg, QueryMsg, AdminResponse, Threshold, ConfigResponse, HooksResponse, MemberListResponse, MemberResponse, TotalWeightResponse } from "./DaoMembers.types";
+import { Addr, Duration, Decimal, InstantiateMsg, Member, ExecuteMsg, QueryMsg, AdminResponse, Threshold, ConfigResponse, HooksResponse, MemberListResponse, MemberResponse, TotalWeightResponse } from "./DaoMembers.types";
 export interface DaoMembersReadOnlyInterface {
   contractAddress: string;
   admin: () => Promise<AdminResponse>;

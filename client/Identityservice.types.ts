@@ -15,19 +15,19 @@ export type ExecuteMsg = {
     [k: string]: unknown;
   };
 } | {
-  register_dao: DaoMembersInstantiateMsg;
+  register_dao: RegisterDaoMsg;
 };
 export type Duration = {
   height: number;
 } | {
   time: number;
 };
-export type Decimal = string;
-export interface DaoMembersInstantiateMsg {
+export interface RegisterDaoMsg {
   dao_name: string;
   max_voting_period: Duration;
   members: Member[];
-  threshold_percentage: Decimal;
+  threshold_percentage: number;
+  [k: string]: unknown;
 }
 export interface Member {
   addr: string;
@@ -51,6 +51,7 @@ export interface GetIdentityByOwnerResponse {
 export interface InstantiateMsg {
   dao_members_code_id: number;
   dao_multisig_code_id: number;
+  governance_addr: Addr;
   owner: Addr;
   [k: string]: unknown;
 }
