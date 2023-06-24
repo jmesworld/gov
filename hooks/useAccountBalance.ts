@@ -48,12 +48,26 @@ export function useStakedBalance(address: string) {
     },
     {
       onSuccess: (data) => {
-        return data;
+         return data;
       },
       onError: (error) => {
         console.error(error);
       },
-      refetchInterval: 60 * 1000,
+      refetchInterval: 6 * 1000,
     }
   );
+}
+
+
+export function formatBalance(value: number): string {
+  if(value == 0) {return "0.0";}
+
+  const suffixes = ["", "k", "m", "b", "t"];
+  const base = Math.floor(Math.log10(Math.abs(value)) / 3);
+  const suffix = suffixes[base];
+  const scaledValue = value / Math.pow(10, base * 3);
+
+  const formattedValue = new Intl.NumberFormat().format(scaledValue);
+
+  return `${formattedValue}${suffix}`;
 }
