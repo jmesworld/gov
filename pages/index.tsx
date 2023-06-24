@@ -21,6 +21,7 @@ import CreateDaoForm from "../features/Dao/CreateDaoForm";
 import { IdentityserviceQueryClient } from "../client/Identityservice.client";
 import { useIdentityserviceGetIdentityByOwnerQuery } from "../client/Identityservice.react-query";
 import { useMyDaosList } from "../hooks/useMyDaosList";
+import DaoProposalDetail from "../features/Dao/components/DaoProposalDetail";
 
 const { DaoProposal } = Dao;
 
@@ -85,7 +86,7 @@ export default function Home() {
       setGovProposalDetailOpen(false);
     }
   );
-  
+
   return (
     <>
       <Container
@@ -132,28 +133,12 @@ export default function Home() {
             {isGovProposalDetailOpen ? (
               <GovProposalDetail proposalId={selectedProposalId} />
             ) : isDaoProposalDetailOpen ? (
-              // <DaoProposalDetail
-              //   selectedDao={selectedDao}
-              //   selectedDaoName={selectedDaoName}
-              //   selectedDaoProposalTitle={selectedDaoProposalTitle}
-              //   selectedDaoMembersList={selectedDaoMembersList}
-              //   selectedDaoProposalId={selectedProposalId}
-              // />
-              // <SpendDaoFunds
-              //   selectedDao={selectedDao}
-              //   selectedDaoName={selectedDaoName}
-              //   setCreateGovProposalSelected={setCreateGovProposalSelected}
-              // />
-              <SpendDaoFundsForm
-                daoOwner={{
-                  address: address as string,
-                  name: identityName as string,
-                  votingPower: 0,
-                }}
-                identityName={identityName as string}
-                setCreateDaoSelected={setCreateDaoSelected}
+              <DaoProposalDetail
                 selectedDao={selectedDao}
                 selectedDaoName={selectedDaoName}
+                selectedDaoProposalTitle={selectedDaoProposalTitle}
+                selectedDaoMembersList={selectedDaoMembersList}
+                selectedDaoProposalId={selectedProposalId}
               />
             ) : isCreateGovProposalSelected ? (
               <CreateGovProposal
