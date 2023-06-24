@@ -37,7 +37,7 @@ const fee: StdFee = {
   gas: "10000000",
 };
 
-const proposalTypes = ["text", "core-slot", "revoke-core-slot", "improvement"];
+const proposalTypes = ["text", "core-slot", "revoke-proposal", "improvement"];
 
 export default function CreateGovProposal({
   selectedDao,
@@ -62,6 +62,7 @@ export default function CreateGovProposal({
   const [fundingAmount, setFundingAmount] = useState(0);
   const [fundingPeriod, setFundingPeriod] = useState(0);
   const [isCreatingGovProposal, setCreatingGovProposal] = useState(false);
+  const [revokeProposalId, setRevokeId] = useState(-1);
 
   const [viewDimension, setViewDimension] = useState(Array());
 
@@ -102,12 +103,11 @@ export default function CreateGovProposal({
     address as string,
     selectedDao
   );
-  console.log(address);
+
   // Dynamically show required sections for different proposal types
-  const isSlotTypeRequired =
-    selectedProposalType === "core-slot" ||
-    selectedProposalType === "revoke-core-slot";
-  const isFundigRequired = selectedProposalType === "text";
+  const isSlotTypeRequired = selectedProposalType === "core-slot";
+  const isFundigRequired =
+    selectedProposalType === "text" || selectedProposalType === "core-slot";
   const isImproventRequired = selectedProposalType === "improvement";
 
   const createGovProposalMutation = useDaoMultisigProposeMutation();
@@ -201,6 +201,34 @@ export default function CreateGovProposal({
             onChange={(e) => setProposalDescription(e.target.value)}
             placeholder={"Description"}
           />
+          {selectedProposalType === "revoke-proposal" ? (
+            <Box marginTop={"10px"} width={"872px"}>
+              <Divider
+                width={"872px"}
+                color={"red"}
+                orientation="horizontal"
+                height={"2px"}
+                p={0}
+                borderColor={"lilac"}
+              />
+              <Input
+                variant={"outline"}
+                width={"874px"}
+                height={"50px"}
+                type={"number"}
+                borderColor={"rgba(112,79,247,0.5)"}
+                background={"rgba(112,79,247,0.1)"}
+                focusBorderColor="darkPurple"
+                borderRadius={12}
+                marginTop={"12px"}
+                color={"purple"}
+                onChange={(e) => setRevokeId(parseInt(e.target.value))}
+                placeholder={"Proposal ID"}
+              />
+            </Box>
+          ) : (
+            ""
+          )}
           {isImproventRequired ? (
             <Box marginTop={"10px"} width={"872px"}>
               <Divider
@@ -414,10 +442,7 @@ export default function CreateGovProposal({
                     title: proposalTitle,
                     description: proposalDescription,
                     slot: getSlot(slotType) as Governance.CoreSlot,
-                    revokeSlot: {
-                      dao: selectedDao,
-                      slot: getSlot(slotType) as Governance.CoreSlot,
-                    },
+                    revoke_proposal_id: revokeProposalId,
                     msgs: [
                       {
                         bank: {
@@ -533,7 +558,7 @@ const getProposalExecuteMsg = ({
   title,
   description,
   slot,
-  revokeSlot,
+  revoke_proposal_id,
   msgs,
   isFundingRequired,
   amount,
@@ -543,7 +568,7 @@ const getProposalExecuteMsg = ({
   title: string;
   description: string;
   slot?: Governance.CoreSlot;
-  revokeSlot?: Governance.RevokeCoreSlot;
+  revoke_proposal_id?: number;
   msgs?: Governance.CosmosMsgForEmpty[];
   isFundingRequired?: boolean;
   amount?: number;
@@ -553,21 +578,16 @@ const getProposalExecuteMsg = ({
   let msg: Governance.ProposalMsg;
   switch (type) {
     case "text":
-      msg = isFundingRequired
-        ? {
-            funding: {
-              description: description,
-              title: title,
-              amount: amount?.toString() as string,
-              duration: duration as number,
-            },
-          }
-        : {
-            text_proposal: {
-              description: description,
-              title: title,
-            },
-          };
+      msg = {
+        text_proposal: {
+          description: description,
+          title: title,
+          funding: {
+            amount: amount?.toString() as string,
+            duration_in_blocks: duration as number,
+          },
+        },
+      };
       return msg;
     case "core-slot":
       msg = {
@@ -575,15 +595,19 @@ const getProposalExecuteMsg = ({
           description: description,
           title: title,
           slot: slot as Governance.CoreSlot,
+          funding: {
+            amount: amount?.toString() as string,
+            duration_in_blocks: duration as number,
+          },
         },
       };
       return msg;
-    case "revoke-core-slot":
+    case "revoke-proposal":
       msg = {
-        revoke_core_slot: {
+        revoke_proposal: {
           description: description,
+          revoke_proposal_id: revoke_proposal_id as number,
           title: title,
-          revoke_slot: revokeSlot as Governance.RevokeCoreSlot,
         },
       };
       return msg;

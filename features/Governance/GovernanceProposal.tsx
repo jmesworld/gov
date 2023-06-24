@@ -8,7 +8,7 @@ import { useIdentityserviceGetIdentityByOwnerQuery } from "../../client/Identity
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { useChain } from "@cosmos-kit/react";
 
-import { chainName } from "../../config/defaults";
+import { chainName, rpc } from "../../config/defaults";
 import GovHeader from "./GovHeader";
 import { ProposalHeader } from "../components/Proposal/ProposalList";
 //import { ProposalHeader } from "../components/Proposal/ProposalHeader";
@@ -52,7 +52,7 @@ export default function GovernanceProposal({
   // }, [address, getCosmWasmClient]);
   useEffect(() => {
     if (address) {
-      getCosmWasmClient()
+      CosmWasmClient.connect(rpc)
         .then((cosmWasmClient) => {
           if (!cosmWasmClient) {
             return;

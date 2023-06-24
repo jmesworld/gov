@@ -7,7 +7,7 @@
 import { UseQueryOptions, useQuery, useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { StdFee } from "@cosmjs/amino";
-import { Addr, Uint128, ConfigResponse, Decimal, CoreSlotsResponse, SlotVoteResult, ExecuteMsg, ProposalMsg, Feature, CosmosMsgForEmpty, BankMsg, StakingMsg, DistributionMsg, WasmMsg, Binary, CoreSlot, VoteOption, Coin, Empty, RevokeCoreSlot, InstantiateMsg, ProposalPeriod, PeriodInfoResponse, ProposalType, ProposalStatus, ProposalResponse, ProposalsResponse, QueryMsg } from "./Governance.types";
+import { Addr, Uint128, ConfigResponse, ExecuteMsg, ProposalMsg, Feature, CosmosMsgForEmpty, BankMsg, StakingMsg, DistributionMsg, Binary, IbcMsg, Timestamp, Uint64, WasmMsg, GovMsg, VoteOption, CoreSlot, Funding, Coin, Empty, IbcTimeout, IbcTimeoutBlock, Decimal, GovernanceCoreSlotsResponse, SlotVoteResult, InstantiateMsg, ProposalPeriod, PeriodInfoResponse, ProposalType, ProposalStatus, ProposalResponse, ProposalsResponse, QueryMsg, WinningGrantsResponse, WinningGrant } from "./Governance.types";
 import { GovernanceQueryClient, GovernanceClient } from "./Governance.client";
 export const governanceQueryKeys = {
   contract: ([{
@@ -35,6 +35,10 @@ export const governanceQueryKeys = {
   coreSlots: (contractAddress: string | undefined, args?: Record<string, unknown>) => ([{ ...governanceQueryKeys.address(contractAddress)[0],
     method: "core_slots",
     args
+  }] as const),
+  winningGrants: (contractAddress: string | undefined, args?: Record<string, unknown>) => ([{ ...governanceQueryKeys.address(contractAddress)[0],
+    method: "winning_grants",
+    args
   }] as const)
 };
 export interface GovernanceReactQuery<TResponse, TData = TResponse> {
@@ -43,12 +47,21 @@ export interface GovernanceReactQuery<TResponse, TData = TResponse> {
     initialData?: undefined;
   };
 }
-export interface GovernanceCoreSlotsQuery<TData> extends GovernanceReactQuery<CoreSlotsResponse, TData> {}
-export function useGovernanceCoreSlotsQuery<TData = CoreSlotsResponse>({
+export interface GovernanceWinningGrantsQuery<TData> extends GovernanceReactQuery<WinningGrantsResponse, TData> {}
+export function useGovernanceWinningGrantsQuery<TData = WinningGrantsResponse>({
+  client,
+  options
+}: GovernanceWinningGrantsQuery<TData>) {
+  return useQuery<WinningGrantsResponse, Error, TData>(governanceQueryKeys.winningGrants(client?.contractAddress), () => client ? client.winningGrants() : Promise.reject(new Error("Invalid client")), { ...options,
+    enabled: !!client && (options?.enabled != undefined ? options.enabled : true)
+  });
+}
+export interface GovernanceCoreSlotsQuery<TData> extends GovernanceReactQuery<CoreSlot, TData> {}
+export function useGovernanceCoreSlotsQuery<TData = CoreSlot>({
   client,
   options
 }: GovernanceCoreSlotsQuery<TData>) {
-  return useQuery<CoreSlotsResponse, Error, TData>(governanceQueryKeys.coreSlots(client?.contractAddress), () => client ? client.coreSlots() : Promise.reject(new Error("Invalid client")), { ...options,
+  return useQuery<CoreSlot, Error, TData>(governanceQueryKeys.coreSlots(client?.contractAddress), () => client ? client.coreSlots() : Promise.reject(new Error("Invalid client")), { ...options,
     enabled: !!client && (options?.enabled != undefined ? options.enabled : true)
   });
 }
@@ -174,8 +187,7 @@ export function useGovernanceSetCoreSlotMutation(options?: Omit<UseMutationOptio
 export interface GovernanceSetContractMutation {
   client: GovernanceClient;
   msg: {
-    artistCurator: string;
-    distribution: string;
+    artDealer: string;
     identityservice: string;
   };
   args?: {

@@ -52,8 +52,8 @@ const getLabel = (type: string) => {
       return "Text";
     case "core-slot":
       return "Core Slot";
-    case "revoke-core-slot":
-      return "Revoke Core Slot";
+    case "revoke-proposal":
+      return "Revoke";
     case "improvement":
       return "Improvement";
     case "spend-funds":
@@ -69,7 +69,7 @@ const getImgSrc = (type: string) => {
       return "/Text_Type.svg";
     case "core-slot":
       return "/CoreSlot_Type.svg";
-    case "revoke-core-slot":
+    case "revoke-proposal":
       return "/RevokeCoreSlot_Type.svg";
     case "improvement":
       return "/Improvement_Type.svg";

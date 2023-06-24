@@ -158,7 +158,7 @@ export function countObjectsWithDuplicateNames(
 
   // Count the occurrences of each name
   for (const obj of objects) {
-    if (obj.name in nameCounts) {
+    if (obj.name in nameCounts && obj.name.length > 0) {
       nameCounts[obj.name]++;
     } else {
       nameCounts[obj.name] = 1;
