@@ -154,7 +154,16 @@ const CreateDaoForm = ({
   });
 
   return (
-    <Box>
+    <Box marginTop={"35px"}>
+      <Text
+        color={"purple"}
+        fontWeight="normal"
+        fontFamily="DM Sans"
+        fontSize={28}
+        marginBottom={"60px"}
+      >
+        Create DAO
+      </Text>
       <Text
         color={"rgba(15,0,86,0.8)"}
         fontFamily="DM Sans"
