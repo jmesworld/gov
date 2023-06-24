@@ -25,7 +25,7 @@ export function useMyDaosList(
       //Automatically select the newly created Dao
       if (!!existingData) {
         setSelectedDao(newData[address][0]?.address);
-        setSelectedDaoName(newData[address][0]?.address);
+        setSelectedDaoName(newData[address][0]?.name);
         callback();
       }
     }
