@@ -28,16 +28,17 @@ export const useClientIdentity = (): CosmWasmClientContext => {
   );
   const [signingClient, setSigningClient] =
     useState<SigningCosmWasmClient | null>(null);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<any>(null);
   const [walletAddress, setWalletAddress] = useState(address as string);
+  const [identityName, setIdentityName] = useState<string | null>(null);
 
   const connectCosmWalletClient = async () => {
     const cosmClient = await getCosmWasmClient();
     setCosmWasmClient(cosmClient);
     return cosmClient;
   };
+
   const connectSigningCosmWalletClient = async () => {
     const signingCosmClient = await getSigningCosmWasmClient();
     setSigningClient(signingCosmClient);
@@ -57,17 +58,6 @@ export const useClientIdentity = (): CosmWasmClientContext => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    connectWalletClient();
-
-    // connectWalletClient().then(({ cosmClient, signingCosmClient }) => {
-    //   setCosmWasmClient(cosmClient);
-    //   setSigningClient(signingCosmClient);
-    //   setWalletAddress(address as string);
-    //   setLoading(false);
-    // });
-  }, []);
 
   const disconnect = () => {
     if (cosmWasmClient) {
@@ -91,7 +81,15 @@ export const useClientIdentity = (): CosmWasmClientContext => {
     },
   });
 
-  const identityName = identityOwnerQuery.data?.identity?.name;
+  useEffect(() => {
+    if (identityOwnerQuery.data?.identity?.name) {
+      setIdentityName(identityOwnerQuery.data.identity.name);
+    }
+  }, [identityOwnerQuery.data]);
+
+  useEffect(() => {
+    connectWalletClient();
+  }, []);
 
   return {
     signingClient,
