@@ -8,7 +8,7 @@ export function useMyDaosList(
   cosmWasmClient: CosmWasmClient,
   setSelectedDao: Function,
   setSelectedDaoName: Function,
-  callback: Function,
+  callback: Function
 ) {
   const updateLocalStorage = (data: any) => {
     let storeData = new Map<string, any>();
@@ -21,11 +21,13 @@ export function useMyDaosList(
     // Compare new data with existing data
     if (JSON.stringify(newData) !== JSON.stringify(existingParsedData)) {
       localStorage.setItem("myDaosData", JSON.stringify(newData));
-      
+
       //Automatically select the newly created Dao
-      setSelectedDao(newData[address][0]?.address);
-      setSelectedDaoName(newData[address][0]?.address);
-      callback();
+      if (!!existingData) {
+        setSelectedDao(newData[address][0]?.address);
+        setSelectedDaoName(newData[address][0]?.address);
+        callback();
+      }
     }
   };
 
