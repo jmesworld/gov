@@ -16,33 +16,38 @@ import { GovernanceQueryClient } from "../../../client/Governance.client";
 import { useGovernancePeriodInfoQuery } from "../../../client/Governance.react-query";
 import { chainName } from "../../../config/defaults";
 import { momentLeft, timestampToDateTime } from "../../../utils/time";
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
 export default function PeriodInfo() {
   const { address, getCosmWasmClient } = useChain(chainName);
-  const [governanceQueryClient, setGovernanceQueryClient] = useState<
-    GovernanceQueryClient | undefined
-  >(undefined);
-
+  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
+    null
+  );
   useEffect(() => {
-    getCosmWasmClient().then((cosmWasmClient) => {
-      if (!cosmWasmClient) {
-        return;
-      }
-      const client = new GovernanceQueryClient(
-        cosmWasmClient,
-        NEXT_PUBLIC_GOVERNANCE_CONTRACT
-      );
-      setGovernanceQueryClient(client);
-    });
-  }, []);
+    if (address) {
+      getCosmWasmClient()
+        .then((cosmWasmClient) => {
+          if (!cosmWasmClient) {
+            return;
+          }
+          setCosmWasmClient(cosmWasmClient);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [address, getCosmWasmClient]);
 
+  const governanceQueryClient = new GovernanceQueryClient(
+    cosmWasmClient as CosmWasmClient,
+    NEXT_PUBLIC_GOVERNANCE_CONTRACT
+  );
   const periodInfoQuery = useGovernancePeriodInfoQuery({
     client: governanceQueryClient,
     options: {
       enabled: governanceQueryClient !== null, // The query will only run when governanceQueryClient is not null
+      refetchInterval: 10000,
     },
   });
 
