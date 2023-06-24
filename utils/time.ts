@@ -1,9 +1,7 @@
-export const timestampToDaysLeft = (timestamp: any) => {
-  const now = Date.now();
-  const diff = timestamp * 1000 - now;
+import moment from "moment";
 
-  const day_count = Math.ceil(diff / (1000 * 3600 * 24));
-  return `${day_count} ${day_count === 1 ? "day" : "days"}`;
+export const momentLeft = (timestamp: any) => {
+  return moment(new Date(timestamp * 1000), "YYYY-MM-DD").fromNow();
 };
 
 export const timestampToDateTime = (timestamp: number) => {

@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { GovernanceQueryClient } from "../../../client/Governance.client";
 import { useGovernancePeriodInfoQuery } from "../../../client/Governance.react-query";
 import { chainName } from "../../../config/defaults";
-import { timestampToDaysLeft, timestampToDateTime } from "../../../utils/time";
+import { momentLeft, timestampToDateTime } from "../../../utils/time";
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -60,8 +60,7 @@ export default function PeriodInfo() {
   const voting_period_length = data?.voting_period_length;
   const next_period_start =
     current_period === "posting" ? next_posting_start : next_voting_start;
-  const next_period_start_in_days =
-    timestampToDaysLeft(next_period_start).toString();
+  const next_period_start_time_left = momentLeft(next_period_start).toString();
 
   return (
     <Menu>
@@ -144,7 +143,7 @@ export default function PeriodInfo() {
                   paddingLeft={"10px"}
                 >
                   {!!periodInfoQuery?.data
-                    ? `${next_period_start_in_days} remaining`
+                    ? `${next_period_start_time_left}`
                     : ""}
                 </Text>
               </Flex>
