@@ -36,6 +36,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useIdentityserviceRegisterDaoMutation } from "../../client/Identityservice.react-query";
 import { StdFee } from "@cosmjs/amino";
+import { useClientIdentity } from "../../hooks/useClientIdentity";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -48,16 +49,20 @@ const fee: StdFee = {
 };
 
 const CreateDaoForm = ({
-  daoOwner,
   setCreateDaoSelected,
-  identityName,
 }: {
-  daoOwner: { name: string; address: string; votingPower: number };
   setCreateDaoSelected: Function;
-  identityName: string;
 }) => {
   const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
     useChain(chainName);
+
+  const {identityName} = useClientIdentity()
+
+  const daoOwner = {
+    name: identityName as string,
+    address: address as string,
+    votingPower: 0,
+  }
   const [daoName, setDaoName] = useState("");
   const [daoMembers, setDaoMembers] = useState([daoOwner]);
   const [threshold, setThreshold] = useState(50);
@@ -75,7 +80,6 @@ const CreateDaoForm = ({
 
   // useEffect(() => {
   //   if (address) {
-  //     console.log("update");
   //     getCosmWasmClient()
   //       .then((cosmWasmClient) => {
   //         if (!cosmWasmClient) {
@@ -84,31 +88,8 @@ const CreateDaoForm = ({
   //         setCosmWasmClient(cosmWasmClient);
   //       })
   //       .catch((error) => console.log(error));
-
-  //     getSigningCosmWasmClient()
-  //       .then((signingClient) => {
-  //         if (!signingClient) {
-  //           return;
-  //         }
-  //         setSigningClient(signingClient);
-  //       })
-  //       .catch((error) => console.log(error));
   //   }
-  // }, [address, getCosmWasmClient, getSigningCosmWasmClient]);
-
-  useEffect(() => {
-    if (address) {
-      console.log("update");
-      getCosmWasmClient()
-        .then((cosmWasmClient) => {
-          if (!cosmWasmClient) {
-            return;
-          }
-          setCosmWasmClient(cosmWasmClient);
-        })
-        .catch((error) => console.log(error));
-    }
-  }, [address, getCosmWasmClient]);
+  // }, [address, getCosmWasmClient]);
 
   const totalVotingPower = daoMembers.reduce(
     (sum, member) => sum + (!!member?.votingPower ? member?.votingPower : 0),
@@ -227,7 +208,7 @@ const CreateDaoForm = ({
           justifyContent={"start"}
         >
           <Flex marginLeft={"0px"} alignItems={"center"}>
-            <AddIcon boxSize={"10px"} color="purple" />
+            <AddIcon boxSize={"10px"} color="#7453FD" />
             <Text
               color="purple"
               fontWeight="medium"
