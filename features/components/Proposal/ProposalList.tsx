@@ -310,50 +310,53 @@ export const ProposalListItem = ({
                 {title.length > 20 ? title.substring(0, 20) + "..." : title}
               </Text>
             </Box>
-            <Tooltip
-              hasArrow={true}
-              label={`${roundNumber(yesPercentActual * 100)}%`}
-              bg={"midnight"}
-              color={"white"}
-              direction={"rtl"}
-              placement={"right"}
-              borderRadius={"8px"}
+            <Box
+              flexGrow={1}
+              marginLeft={isGov ? "112px" : "-18px"}
             >
-              <Box flexGrow={1}>
+              <Tooltip
+                hasArrow={true}
+                label={`${roundNumber(yesPercentActual * 100)}%`}
+                bg={"midnight"}
+                color={"white"}
+                direction={"rtl"}
+                placement={"right"}
+                borderRadius={"8px"}
+              >
                 <Text
                   width={"60px"}
                   color="white"
                   fontFamily={"DM Sans"}
                   fontWeight="normal"
                   fontSize={18}
-                  marginLeft={isGov ? "112px" : "-18px"}
                 >
                   {yes}
                 </Text>
-              </Box>
-            </Tooltip>
+              </Tooltip>
+            </Box>
+            <Box flexGrow={1} marginLeft={isGov ? "72px" : "42px"}>
             <Tooltip
-              hasArrow={true}
-              label={`${roundNumber(noPercentActual * 100)}%`}
-              bg={"midnight"}
-              color={"white"}
-              direction={"rtl"}
-              placement={"right"}
-            >
-              <Box flexGrow={1}>
+                hasArrow={true}
+                label={`${roundNumber(yesPercentActual * 100)}%`}
+                bg={"midnight"}
+                color={"white"}
+                direction={"rtl"}
+                placement={"right"}
+                borderRadius={"8px"}
+              >
                 <Text
                   width={"60px"}
                   color="white"
                   fontFamily={"DM Sans"}
                   fontWeight="normal"
                   fontSize={18}
-                  marginLeft={isGov ? "72px" : "42px"}
-                  marginRight={isGov ? "60px" : "102px"}
                 >
                   {no}
                 </Text>
-              </Box>
-            </Tooltip>
+              </Tooltip>
+            </Box>
+
+            <Box marginRight={isGov ? "60px" : "102px"} />
             <Box flexGrow={1}>
               <Text
                 width={"87px"}
