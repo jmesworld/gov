@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { NavBarItem } from "./NavBarItem";
 import { NavBarButton } from "./NavBarButton";
 import { useClientIdentity } from "../../hooks/useClientIdentity";
+import { useEffect, useState } from "react";
 const MyDaoList = dynamic(() => import("../Dao/MyDaoList"));
 
 interface NavBarProps {
@@ -43,7 +44,7 @@ const NavBar = ({
   setConnectButtonClicked,
 }: NavBarProps) => {
   const { identityName } = useClientIdentity();
-  console.log(isGovProposalSelected, isCreateDaoSelected)
+
   return (
     <VStack
       width={"200px"}
@@ -80,7 +81,11 @@ const NavBar = ({
       </Flex>
       <NavBarItem
         text="Proposals"
-        isSelected={isGovProposalSelected && !isCreateDaoSelected && !isCreateGovProposalSelected}
+        isSelected={
+          isGovProposalSelected &&
+          !isCreateDaoSelected &&
+          !isCreateGovProposalSelected
+        }
         onClick={() => {
           setIsGovProposalSelected(true);
           setCreateDaoSelected(false);
@@ -156,7 +161,7 @@ const NavBar = ({
         width="180px"
         height="48px"
         text="GOV Proposal"
-        disabled={status !== WalletStatus.Connected}
+        disabled={status !== WalletStatus.Connected || isGovProposalSelected}
         onClick={() => {
           setCreateGovProposalSelected(true);
           setDaoProposalDetailOpen(false);

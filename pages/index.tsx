@@ -116,12 +116,6 @@ export default function Home() {
               />
             ) : isCreateDaoSelected ? (
               <CreateDaoForm
-                daoOwner={{
-                  address: address as string,
-                  name: "",
-                  votingPower: 0,
-                }}
-                identityName={""}
                 setCreateDaoSelected={setCreateDaoSelected}
               />
             ) : isGovProposalSelected ? (

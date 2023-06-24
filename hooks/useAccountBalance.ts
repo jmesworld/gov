@@ -18,7 +18,6 @@ export function useAccountBalance(address: string) {
     },
     {
       onSuccess: (data) => {
-        console.log(data);
         return data;
       },
       onError: (error) => {
@@ -49,7 +48,6 @@ export function useStakedBalance(address: string) {
     },
     {
       onSuccess: (data) => {
-        console.log(data);
         return data;
       },
       onError: (error) => {
