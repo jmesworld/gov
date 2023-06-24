@@ -118,14 +118,11 @@ export default function DaoProposalDetail({
 
   const totalCount = !!votersQuery.data ? votersQuery.data?.voters?.length : 0;
 
-  const yesPercentage = Math.floor(
-    (yesCount !== 0 ? yesCount / totalCount : 0) * 100
-  );
-
   const threshold =
     // @ts-ignore
-    proposalDetailQuery?.data?.threshold?.absolute_percentage?.percentage;
-  const target = !!proposalDetailQuery?.data ? parseFloat(threshold) : 0;
+    proposalDetailQuery?.data?.threshold?.absolute_count;
+  const target = !!threshold ? threshold.weight : 0;
+  const yesPercentage = !!threshold ? threshold.total_weight : 0;
 
   const votes = votesQuery?.data?.votes ?? [];
 

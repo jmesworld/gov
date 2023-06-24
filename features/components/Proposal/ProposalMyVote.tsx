@@ -254,7 +254,7 @@ export const ProposalMyVote = (props: ProposalMyVote) => {
               .then((result) => {
                 toast({
                   title: "Proposal executed.",
-                  description: "We've submitted your Vote.",
+                  description: "Proposal executed successfully.",
                   status: "success",
                   duration: 9000,
                   isClosable: true,
@@ -266,7 +266,7 @@ export const ProposalMyVote = (props: ProposalMyVote) => {
               })
               .catch((error) => {
                 toast({
-                  title: "Vote creation error",
+                  title: "Proposal execution error",
                   description: error.toString(),
                   status: "error",
                   duration: 9000,

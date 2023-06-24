@@ -37,6 +37,8 @@ const fee: StdFee = {
   gas: "10000000",
 };
 
+const default_funding_duration = (3 * 30 * 86400) / 5 // convert 3 months to number of blocks
+
 const proposalTypes = ["text", "core-slot", "revoke-proposal", "improvement"];
 
 export default function CreateGovProposal({
@@ -60,7 +62,7 @@ export default function CreateGovProposal({
   const [slotType, setSlotType] = useState("brand");
   const [isFundingNeeded, setFundingNeeded] = useState(false);
   const [fundingAmount, setFundingAmount] = useState(0);
-  const [fundingPeriod, setFundingPeriod] = useState(0);
+  const [fundingPeriod, setFundingPeriod] = useState(default_funding_duration);
   const [isCreatingGovProposal, setCreatingGovProposal] = useState(false);
   const [revokeProposalId, setRevokeId] = useState(-1);
 
@@ -365,7 +367,7 @@ export default function CreateGovProposal({
                       focusBorderColor="darkPurple"
                       color={"purple"}
                       onChange={(e) =>
-                        setFundingPeriod(parseInt(e.target.value))
+                        setFundingPeriod(parseInt(e.target.value) * 30 * 86400) // convert period in months to blocks
                       }
                       border="none"
                       borderBottom="1px solid"
