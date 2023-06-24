@@ -47,7 +47,7 @@ export default function PeriodInfo() {
     client: governanceQueryClient,
     options: {
       enabled: governanceQueryClient !== null, // The query will only run when governanceQueryClient is not null
-      refetchInterval: 10000,
+      refetchInterval: 5000,
     },
   });
 
