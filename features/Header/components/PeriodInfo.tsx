@@ -15,7 +15,11 @@ import { useEffect, useState } from "react";
 import { GovernanceQueryClient } from "../../../client/Governance.client";
 import { useGovernancePeriodInfoQuery } from "../../../client/Governance.react-query";
 import { chainName } from "../../../config/defaults";
-import { momentLeft, timestampToDateTime } from "../../../utils/time";
+import {
+  formatDuration,
+  momentLeft,
+  timestampToDateTime,
+} from "../../../utils/time";
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -57,12 +61,18 @@ export default function PeriodInfo() {
   const next_posting_start = data?.next_posting_start;
   const current_block = data?.current_block;
   const current_posting_start = data?.current_posting_start;
-  const current_time_in_cycle = data?.current_time_in_cycle;
+  const current_time_in_cycle = formatDuration(
+    data?.current_time_in_cycle as number
+  );
   const current_voting_start = data?.current_voting_start;
   const current_voting_end = data?.current_voting_end;
-  const cycle_length = data?.cycle_length;
-  const posting_period_length = data?.posting_period_length;
-  const voting_period_length = data?.voting_period_length;
+  const cycle_length = formatDuration(data?.cycle_length as number);
+  const posting_period_length = formatDuration(
+    data?.posting_period_length as number
+  );
+  const voting_period_length = formatDuration(
+    data?.voting_period_length as number
+  );
   const next_period_start =
     current_period === "posting" ? next_posting_start : next_voting_start;
   const next_period_start_time_left = momentLeft(next_period_start).toString();
@@ -261,7 +271,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                {current_time_in_cycle} days
+                {current_time_in_cycle}
               </Text>
             </Flex>
             <Divider
@@ -339,7 +349,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                {cycle_length} days
+                {cycle_length}
               </Text>
             </Flex>
             <Divider
@@ -417,7 +427,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                {posting_period_length} days
+                {posting_period_length}
               </Text>
             </Flex>
             <Divider
@@ -443,7 +453,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                {voting_period_length} days
+                {voting_period_length}
               </Text>
             </Flex>
           </MenuList>
