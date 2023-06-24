@@ -1,7 +1,7 @@
 import moment from "moment";
 
 export const momentLeft = (timestamp: any) => {
-  return moment(new Date(timestamp * 1000), "YYYY-MM-DD").fromNow();
+  return moment(new Date(timestamp * 1000), "YYYY-MM-DD").fromNow(true) + " left";
 };
 
 export const timestampToDateTime = (timestamp: number) => {
