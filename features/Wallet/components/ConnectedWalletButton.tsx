@@ -18,12 +18,14 @@ import { ConnectedWalletType } from "../../types";
 export const ConnectedWalletButton = ({
   identityName,
   identityBalance,
+  identityStake,
   isLoading,
   isDisabled,
 }: ConnectedWalletType) => {
   const { address, disconnect } = useChain(chainName);
   const handleDisconnect = () => {
     disconnect();
+    window.location.reload();
   };
   return (
     <Menu>
@@ -94,7 +96,11 @@ export const ConnectedWalletButton = ({
                 marginLeft={"5px"}
                 noOfLines={1}
                 fontFamily="DM Sans"
-              >{`${!!identityBalance ? identityBalance : "0000.0000"}`}</Text>
+              >{`${
+                !!identityBalance
+                  ? parseFloat(identityBalance as string).toFixed(1)
+                  : "0.0"
+              }`}</Text>
 
               <Divider
                 orientation="vertical"
@@ -116,7 +122,11 @@ export const ConnectedWalletButton = ({
                 marginLeft={"5px"}
                 noOfLines={1}
                 fontFamily="DM Sans"
-              >{`${!!identityBalance ? identityBalance : "0000.0000"}`}</Text>
+              >{`${
+                !!identityStake
+                  ? parseFloat(identityStake as string).toFixed(1)
+                  : "0.0"
+              }`}</Text>
             </Flex>
           </MenuButton>
           <MenuList

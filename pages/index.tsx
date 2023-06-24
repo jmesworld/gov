@@ -25,7 +25,7 @@ const { CreateGovProposal, GovProposalDetail, GovernanceProposal } = Governance;
 
 export default function Home() {
   const [isConnectButtonClicked, setConnectButtonClicked] = useState(false);
-  const [isGovProposalSelected, setIsGovProposalSelected] = useState(false);
+  const [isGovProposalSelected, setIsGovProposalSelected] = useState(true);
   const [isCreateDaoSelected, setCreateDaoSelected] = useState(false);
   const [selectedDao, setSelectedDao] = useState("");
   const [selectedDaoName, setSelectedDaoName] = useState("");
@@ -37,7 +37,8 @@ export default function Home() {
   const [isGovProposalDetailOpen, setGovProposalDetailOpen] = useState(false);
   const [selectedProposalId, setSelectedProposalId] = useState(-1);
 
-  const { address } = useChain(chainName);
+  const { address, status } = useChain(chainName);
+
   return (
     <>
       <Container
@@ -51,9 +52,10 @@ export default function Home() {
         </Head>
         <Flex padding={0} width={"100vw"} height={"100vh"}>
           <NavBar
-            status={WalletStatus.Connected}
+            status={status}
             address={address}
             identityName={""}
+            isCreateGovProposalSelected={isCreateGovProposalSelected}
             isGovProposalSelected={isGovProposalSelected}
             setIsGovProposalSelected={setIsGovProposalSelected}
             isCreateDaoSelected={isCreateDaoSelected}

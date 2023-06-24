@@ -3,7 +3,7 @@ import { WalletStatus } from "@cosmos-kit/core";
 import dynamic from "next/dynamic";
 import { NavBarItem } from "./NavBarItem";
 import { NavBarButton } from "./NavBarButton";
-
+import { useClientIdentity } from "../../hooks/useClientIdentity";
 const MyDaoList = dynamic(() => import("../Dao/MyDaoList"));
 
 interface NavBarProps {
@@ -13,6 +13,7 @@ interface NavBarProps {
   isGovProposalSelected: boolean;
   setIsGovProposalSelected: React.Dispatch<React.SetStateAction<boolean>>;
   isCreateDaoSelected: boolean;
+  isCreateGovProposalSelected: boolean;
   setCreateDaoSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedDao: React.Dispatch<React.SetStateAction<string>>;
   setSelectedDaoName: React.Dispatch<React.SetStateAction<string>>;
@@ -25,12 +26,12 @@ interface NavBarProps {
 }
 
 const NavBar = ({
-  status,
   address,
-  identityName,
+  status,
   isGovProposalSelected,
   setIsGovProposalSelected,
   isCreateDaoSelected,
+  isCreateGovProposalSelected,
   setCreateDaoSelected,
   setSelectedDao,
   setSelectedDaoName,
@@ -41,6 +42,8 @@ const NavBar = ({
   selectedDaoName,
   setConnectButtonClicked,
 }: NavBarProps) => {
+  const { identityName } = useClientIdentity();
+  console.log(isGovProposalSelected, isCreateDaoSelected)
   return (
     <VStack
       width={"200px"}
@@ -65,7 +68,6 @@ const NavBar = ({
         paddingLeft={"26px"}
         backgroundColor={"#7453FD"}
       >
-        {" "}
         <Text
           color="#A1F0C4"
           fontFamily={"DM Sans"}
@@ -78,7 +80,7 @@ const NavBar = ({
       </Flex>
       <NavBarItem
         text="Proposals"
-        isSelected={isGovProposalSelected}
+        isSelected={isGovProposalSelected && !isCreateDaoSelected && !isCreateGovProposalSelected}
         onClick={() => {
           setIsGovProposalSelected(true);
           setCreateDaoSelected(false);
@@ -126,9 +128,9 @@ const NavBar = ({
         width="180px"
         height="48px"
         text={"New DAO"}
-        disabled={!identityName}
+        disabled={status !== WalletStatus.Connected}
         onClick={() => {
-          if (status !== WalletStatus.Connected) {
+          if (!WalletStatus.Connected) {
             setConnectButtonClicked(true);
           } else {
             setCreateGovProposalSelected(false);
@@ -139,7 +141,7 @@ const NavBar = ({
         }}
       />
       <Spacer />
-      <NavBarButton
+      {/* <NavBarButton
         width="180px"
         height="48px"
         text="DAO Proposal"
@@ -149,7 +151,7 @@ const NavBar = ({
           setDaoProposalDetailOpen(true);
           setGovProposalDetailOpen(false);
         }}
-      />
+      /> */}
       <NavBarButton
         width="180px"
         height="48px"

@@ -54,6 +54,7 @@ export interface ConnectedWalletType {
   username?: string;
   identityName?: string;
   identityBalance?: string | number;
+  identityStake?: string | number;
   buttonText?: string;
   isLoading?: boolean;
   isDisabled?: boolean;
