@@ -17,4 +17,8 @@ a {
   box-sizing: border-box;
 }
 
+.card-animation {
+  opacity: 0;
+}
+
 
