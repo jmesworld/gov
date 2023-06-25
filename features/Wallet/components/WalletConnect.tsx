@@ -29,6 +29,7 @@ export const Connected = ({
       identityName={
         identityOwnerQuery.status === "loading" ||
         identityOwnerQuery.status === "error"
+        // @ts-ignore
           ? identityOwnerQuery.refetch() && "loading.."
           : identityName ?? "fetching identity.."
       }

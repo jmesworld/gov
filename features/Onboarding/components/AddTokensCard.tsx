@@ -18,8 +18,7 @@ import { useCosmWasmClient } from "../../../contexts/ClientContext";
 import { useChain } from "@cosmos-kit/react";
 import { chainName } from "../../../config/defaults";
 
-const AddTokensCard = (isOpen: any) => {
-  console.log();
+const AddTokensCard = () => {
   const toast = useToast();
   const { address } = useChain(chainName);
   const { identityName, walletAddress, disconnect } = useCosmWasmClient();
@@ -29,7 +28,7 @@ const AddTokensCard = (isOpen: any) => {
   return (
     <>
       <Modal
-        isOpen={isOpen}
+        isOpen={true}
         onClose={() => {}}
         isCentered={true}
         closeOnOverlayClick={false}
@@ -119,7 +118,7 @@ const AddTokensCard = (isOpen: any) => {
                       fontFamily="DM Sans"
                     >
                       {`${
-                        identityBalanceQuery.isSuccess ? balance : "loading..."
+                        identityBalanceQuery.isSuccess ? balance.unstaked : "loading..."
                       }`}
                     </Text>
                   </Flex>

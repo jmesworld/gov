@@ -53,12 +53,10 @@ const fee: StdFee = {
 };
 interface ChooseUsernameCardProps {
   identityName: String;
-  isOpen: any;
 }
 
 const ChooseUsernameCard = ({
   identityName,
-  isOpen,
 }: ChooseUsernameCardProps) => {
   const [identityNameInput, setIdentityNameInput] = useState("");
   const [isIdentityNameAvailable, setIsIdentityNameAvailable] = useState(false);
@@ -70,7 +68,7 @@ const ChooseUsernameCard = ({
     useState<SigningCosmWasmClient | null>(null);
   const chainContext = useChain(chainName);
 
-  const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
+  const { address, status, closeView, getCosmWasmClient, getSigningCosmWasmClient } =
     chainContext;
 
   const toast = useToast();
@@ -106,7 +104,6 @@ const ChooseUsernameCard = ({
   // }, [address, getCosmWasmClient, getSigningCosmWasmClient]);
 
   useEffect(() => {
-    console.log("address", address);
     if (address) {
       (async () => {
         try {
@@ -198,7 +195,7 @@ const ChooseUsernameCard = ({
 
   return (
     <Modal
-      isOpen={isOpen}
+      isOpen={true}
       onClose={() => {}}
       isCentered={true}
       closeOnOverlayClick={false}
@@ -346,6 +343,7 @@ const ChooseUsernameCard = ({
                           borderRadius: 12,
                         },
                       });
+                      closeView()
                     })
                     .catch((error) => {
                       toast({

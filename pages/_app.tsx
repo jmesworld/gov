@@ -16,6 +16,7 @@ import { WalletModal } from "../features/Wallet/components/WalletModal";
 import { CosmWasmProvider } from "../contexts/ClientContext";
 import { WalletViewProps } from "@cosmos-kit/core";
 import React from "react";
+import { AppStateProvider } from "../contexts/AppStateContext";
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const chains: Chain[] = [jmesTestnet];
 
@@ -47,7 +48,9 @@ function CreateCosmosApp({ Component, pageProps }: AppProps) {
           }}
         >
           <CosmWasmProvider>
+            <AppStateProvider>
             <Component {...pageProps} />
+            </AppStateProvider>
           </CosmWasmProvider>
         </ChainProvider>
       </ChakraProvider>
