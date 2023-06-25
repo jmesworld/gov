@@ -8,7 +8,18 @@ import { IdentityserviceQueryClient } from "../client/Identityservice.client";
 import { useIdentityserviceGetIdentityByOwnerQuery } from "../client/Identityservice.react-query";
 import { IDENTITY_SERVICE_CONTRACT, chainName } from "../config/defaults";
 
-export const useClientIdentity = () => {
+export interface CosmWasmClientContext {
+  walletAddress: string;
+  cosmWasmClient: CosmWasmClient | null;
+  signingClient: SigningCosmWasmClient | null;
+  loading: boolean;
+  error: any;
+  disconnect: Function;
+  identityOwnerQuery: any;
+  identityName: any;
+}
+
+export const useClientIdentity = (): CosmWasmClientContext => {
   const { address, getCosmWasmClient, getSigningCosmWasmClient } =
     useChain(chainName);
 

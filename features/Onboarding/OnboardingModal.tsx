@@ -63,7 +63,6 @@ export default function OnboardingModal() {
                     <AddTokensCard />
                   ) : balance.data?.unstaked && !identityName ? (
                     <ChooseUsernameCard
-                      isOpen={true}
                       identityName={identityName}
                     />
                   ) : balance && identityName ? null : (
