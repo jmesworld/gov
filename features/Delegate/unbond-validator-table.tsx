@@ -2,8 +2,14 @@ import { Text, Box, Image } from "@chakra-ui/react";
 import { useState } from "react";
 
 interface ValidatorProps {
-    validatorsData: Object;
+    validatorsData: validatorsData[];
     selectValidator: Function;
+}
+
+interface validatorsData {
+    name: string;
+    bJmes: string;
+    url: string;
 }
 
 export const UnBondValidatorTable = ({validatorsData, selectValidator}: ValidatorProps) => {
