@@ -30,15 +30,23 @@ export const DelegateValidatorTable = ({validatorsData, selectValidator}: Valida
 
     return (
         <Box position="relative" height="380px" overflowY="scroll">
-            <Text
-            color="#fff"
-            fontFamily={"DM Sans"}
-            fontWeight="500"
-            fontSize={12}
-            margin="40px 0 10px">
-                Select a validator to bond to
-            </Text>
-            <Box display="flex" justifyContent="flex-start" padding="8px 0" position="sticky" top="0" background="#5136C2" zIndex="99">
+            <Box
+            width="100%"
+            position="sticky"
+            top="0"
+            background="#5136C2"
+            zIndex="99"
+            padding="20px 0 10px">
+                <Text
+                color="#fff"
+                fontFamily={"DM Sans"}
+                fontWeight="500"
+                fontSize={12}>
+                    Select a validator to bond to
+                </Text>
+            </Box>
+            
+            <Box display="flex" justifyContent="flex-start" padding="8px 0" position="sticky" top="48px" background="#5136C2" zIndex="99">
                 <Text
                 color="lilac"
                 fontFamily={"DM Sans"}
