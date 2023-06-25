@@ -2,8 +2,15 @@ import { Text, Box, Image } from "@chakra-ui/react";
 import { useState } from "react";
 
 interface ValidatorProps {
-    validatorsData: Object;
+    validatorsData: validatorsData[];
     selectValidator: Function;
+}
+
+interface validatorsData {
+    name: string;
+    commission: string;
+    votingPower: string;
+    url: string;
 }
 
 export const DelegateValidatorTable = ({validatorsData, selectValidator}: ValidatorProps) => {

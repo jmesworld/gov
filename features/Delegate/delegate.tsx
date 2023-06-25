@@ -77,7 +77,7 @@ export const Delegate = () => {
     setValidatorSelected(false);
   }
 
-  const handleTabsChange = (index) => {
+  const handleTabsChange = (index: number) => {
     setTabIndex(index)
   }
 
