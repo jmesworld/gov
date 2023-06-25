@@ -15,9 +15,9 @@ export const WalletModal = () => {
   const balance = useAccountBalance(address as string);
 
   const renderCard = () => {
-    if (!identityName && balance.data === 0) {
+    if (!identityName && balance.data?.unstaked === 0) {
       return <AddTokensCard isOpen={true} />;
-    } else if (!identityName && balance.data !== 0) {
+    } else if (!identityName && balance.data?.unstaked !== 0) {
       return <ChooseUsernameCard identityName={identityName} isOpen={true} />;
     } else {
       return null;
