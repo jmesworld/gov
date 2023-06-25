@@ -13,7 +13,7 @@ export function useAccountBalance(address: string) {
         throw new Error("Failed to fetch account balance");
       }
       const data = await response.json();
-      const balance = data.balances.length === 0 ? 0 : data.balances[0].amount;
+      const balance = data.balances.length === 0 ? 0 : data.balances[1].amount;
       return balance / 1000000;
     },
     {
