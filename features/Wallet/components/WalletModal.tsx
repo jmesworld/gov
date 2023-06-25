@@ -30,7 +30,6 @@ export const WalletModal = () => {
       !identityName &&
       identityOwnerQuery?.status !== "loading"
     ) {
-      console.log("show user name")
       return (
         <CSSTransition
           classNames="card-animation"
@@ -41,6 +40,7 @@ export const WalletModal = () => {
         </CSSTransition>
       );
     } else {
+      closeView();
       return null;
     }
   };
