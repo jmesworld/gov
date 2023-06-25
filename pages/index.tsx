@@ -1,3 +1,4 @@
+import { Delegate } from "../features/Delegate/delegate";
 import { Box, Container, Flex, Spacer } from "@chakra-ui/react";
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { WalletStatus } from "@cosmos-kit/core";
@@ -162,6 +163,7 @@ export default function Home() {
               setSelectedProposalId={setSelectedProposalId}
             />
           )}
+          <Delegate />
         </Box>
       </Flex>
     </Container>
