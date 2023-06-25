@@ -1,4 +1,10 @@
-import { Box, Container, Flex, Spacer } from "@chakra-ui/react";
+import {
+  Box,
+  Container,
+  Flex,
+  Spacer,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { WalletStatus } from "@cosmos-kit/core";
 import { useChain } from "@cosmos-kit/react";
@@ -24,7 +30,7 @@ import { useMyDaosList } from "../hooks/useMyDaosList";
 import DaoProposalDetail from "../features/Dao/components/DaoProposalDetail";
 
 const { DaoProposal } = Dao;
-
+const { MobileViewDisabled } = Onboarding;
 const { CreateGovProposal, GovProposalDetail, GovernanceProposal } = Governance;
 
 export default function Home() {
@@ -41,6 +47,7 @@ export default function Home() {
   const [isGovProposalDetailOpen, setGovProposalDetailOpen] = useState(false);
   const [selectedProposalId, setSelectedProposalId] = useState(-1);
 
+  const isMobileView = useBreakpointValue({ base: true, md: false });
   const { address, status } = useChain(chainName);
   //const { identityName, identityOwnerQuery } = useClientIdentity(); <---- hook does not return up-to-date query result
 
@@ -89,90 +96,94 @@ export default function Home() {
 
   return (
     <>
-      <Container
-        maxW="100%"
-        padding={0}
-        backgroundColor={"rgba(198, 180, 252, 0.3)"}
-      >
-        <Head>
-          <title>JMES Governance</title>
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
-        <Flex padding={0} width={"100vw"} height={"100vh"}>
-          <NavBar
-            status={status}
-            address={address}
-            identityName={identityName}
-            isCreateGovProposalSelected={isCreateGovProposalSelected}
-            isGovProposalSelected={isGovProposalSelected}
-            setIsGovProposalSelected={setIsGovProposalSelected}
-            isCreateDaoSelected={isCreateDaoSelected}
-            setCreateDaoSelected={setCreateDaoSelected}
-            setSelectedDao={setSelectedDao}
-            setSelectedDaoName={setSelectedDaoName}
-            setCreateGovProposalSelected={setCreateGovProposalSelected}
-            setDaoProposalDetailOpen={setDaoProposalDetailOpen}
-            setGovProposalDetailOpen={setGovProposalDetailOpen}
-            selectedDao={selectedDao}
-            selectedDaoName={selectedDaoName}
-            setConnectButtonClicked={setConnectButtonClicked}
-          />
-          <Box
-            width={"100%"}
-            height={"100%"}
-            paddingLeft={"54px"}
-            paddingTop={"25px"}
-            paddingRight={"54px"}
-            overflowY="scroll"
-          >
-            <Flex width={"100%"}>
-              <Spacer />
-              <Header />
-            </Flex>
+      {isMobileView ? (
+        <MobileViewDisabled />
+      ) : (
+        <Container
+          maxW="100%"
+          padding={0}
+          backgroundColor={"rgba(198, 180, 252, 0.3)"}
+        >
+          <Head>
+            <title>JMES Governance</title>
+            <link rel="icon" href="/favicon.ico" />
+          </Head>
+          <Flex padding={0} width={"100vw"} height={"100vh"}>
+            <NavBar
+              status={status}
+              address={address}
+              identityName={identityName}
+              isCreateGovProposalSelected={isCreateGovProposalSelected}
+              isGovProposalSelected={isGovProposalSelected}
+              setIsGovProposalSelected={setIsGovProposalSelected}
+              isCreateDaoSelected={isCreateDaoSelected}
+              setCreateDaoSelected={setCreateDaoSelected}
+              setSelectedDao={setSelectedDao}
+              setSelectedDaoName={setSelectedDaoName}
+              setCreateGovProposalSelected={setCreateGovProposalSelected}
+              setDaoProposalDetailOpen={setDaoProposalDetailOpen}
+              setGovProposalDetailOpen={setGovProposalDetailOpen}
+              selectedDao={selectedDao}
+              selectedDaoName={selectedDaoName}
+              setConnectButtonClicked={setConnectButtonClicked}
+            />
+            <Box
+              width={"100%"}
+              height={"100%"}
+              paddingLeft={"54px"}
+              paddingTop={"25px"}
+              paddingRight={"54px"}
+              overflowY="scroll"
+            >
+              <Flex width={"100%"}>
+                <Spacer />
+                <Header />
+              </Flex>
 
-            {isGovProposalDetailOpen ? (
-              <GovProposalDetail proposalId={selectedProposalId} />
-            ) : isDaoProposalDetailOpen ? (
-              <DaoProposalDetail
-                selectedDao={selectedDao}
-                selectedDaoName={selectedDaoName}
-                selectedDaoProposalTitle={selectedDaoProposalTitle}
-                selectedDaoMembersList={selectedDaoMembersList}
-                selectedDaoProposalId={selectedProposalId}
-              />
-            ) : isCreateGovProposalSelected ? (
-              <CreateGovProposal
-                selectedDao={selectedDao}
-                selectedDaoName={selectedDaoName}
-                setCreateGovProposalSelected={setCreateGovProposalSelected}
-              />
-            ) : isCreateDaoSelected ? (
-              <CreateDaoForm
-                daoOwner={{
-                  address: address as string,
-                  name: identityName as string,
-                  votingPower: 0,
-                }}
-                setCreateDaoSelected={setCreateDaoSelected}
-              />
-            ) : isGovProposalSelected ? (
-              <GovernanceProposal
-                setSelectedProposalId={setSelectedProposalId}
-                setGovProposalDetailOpen={setGovProposalDetailOpen}
-              />
-            ) : (
-              <DaoProposal
-                daoAddress={selectedDao}
-                daoName={selectedDaoName}
-                setDaoProposalDetailOpen={setDaoProposalDetailOpen}
-                setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-                setSelectedDaoMembersList={setSelectedDaoMembersList}
-                setSelectedProposalId={setSelectedProposalId}
-              />
-            )}
-          </Box>
-        </Flex>
-      </Container>
+              {isGovProposalDetailOpen ? (
+                <GovProposalDetail proposalId={selectedProposalId} />
+              ) : isDaoProposalDetailOpen ? (
+                <DaoProposalDetail
+                  selectedDao={selectedDao}
+                  selectedDaoName={selectedDaoName}
+                  selectedDaoProposalTitle={selectedDaoProposalTitle}
+                  selectedDaoMembersList={selectedDaoMembersList}
+                  selectedDaoProposalId={selectedProposalId}
+                />
+              ) : isCreateGovProposalSelected ? (
+                <CreateGovProposal
+                  selectedDao={selectedDao}
+                  selectedDaoName={selectedDaoName}
+                  setCreateGovProposalSelected={setCreateGovProposalSelected}
+                />
+              ) : isCreateDaoSelected ? (
+                <CreateDaoForm
+                  daoOwner={{
+                    address: address as string,
+                    name: identityName as string,
+                    votingPower: 0,
+                  }}
+                  setCreateDaoSelected={setCreateDaoSelected}
+                />
+              ) : isGovProposalSelected ? (
+                <GovernanceProposal
+                  setSelectedProposalId={setSelectedProposalId}
+                  setGovProposalDetailOpen={setGovProposalDetailOpen}
+                />
+              ) : (
+                <DaoProposal
+                  daoAddress={selectedDao}
+                  daoName={selectedDaoName}
+                  setDaoProposalDetailOpen={setDaoProposalDetailOpen}
+                  setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+                  setSelectedDaoMembersList={setSelectedDaoMembersList}
+                  setSelectedProposalId={setSelectedProposalId}
+                />
+              )}
+            </Box>
+          </Flex>
+        </Container>
+      )}
     </>
   );
 }

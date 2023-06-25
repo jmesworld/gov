@@ -13,6 +13,7 @@ const ConnectWalletCard = dynamic(
   () => import("./components/ConnectWalletCard")
 );
 const InstallKeplrCard = dynamic(() => import("./components/InstallKeplrCard"));
+const MobileViewDisabled = dynamic(() => import("./components/MobileViewDisabled"));
 
 const Onboarding = {
   OnboardingModal,
@@ -22,6 +23,7 @@ const Onboarding = {
   ChooseUsernameCard,
   ConnectWalletCard,
   InstallKeplrCard,
+  MobileViewDisabled
 };
 
 export { Onboarding };
