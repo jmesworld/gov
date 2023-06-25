@@ -40,7 +40,7 @@ export const WalletModal = () => {
         </CSSTransition>
       );
     } else {
-      closeView();
+      //closeView();
       return null;
     }
   };
