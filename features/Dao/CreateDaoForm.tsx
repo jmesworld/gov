@@ -157,10 +157,8 @@ const CreateDaoForm = ({
   useEffect(() => {
     const dups = countObjectsWithDuplicateNames(daoMembers);
     setDoubleCounts(dups);
-    console.log("due");
   });
 
-  const debouncedRefetch = debounce(idsByNamesQuery.refetch, 1); //
 
   return (
     <Box marginTop={"35px"}>
@@ -296,8 +294,8 @@ const CreateDaoForm = ({
                 setDaoMembers(daoMembers);
                 setIdentityNamesValid(false);
               }}
-              onBlur={() => debouncedRefetch()}
-              onKeyDown={() => debouncedRefetch()}
+              onBlur={() => idsByNamesQuery.refetch()}
+              onKeyDown={() => idsByNamesQuery.refetch()}
               onFocus={() => {
                 setFocusedCosignerIndex(index);
               }}
@@ -317,8 +315,8 @@ const CreateDaoForm = ({
                   ? !validateName(daoMember?.name)?.name
                     ? !idsByNamesQuery.isFetching ||
                       idsByNamesQuery.isRefetching
-                      ? idsByNamesQuery?.data?.at(index).length > 43
-                        ? idsByNamesQuery?.data?.at(index).slice(0, 43) + "..."
+                      ? idsByNamesQuery?.data?.at(index)?.length > 43
+                        ? idsByNamesQuery?.data?.at(index)?.slice(0, 43) + "..."
                         : idsByNamesQuery?.data?.at(index)
                       : index === focusedCosignerIndex
                       ? "Checking..."
