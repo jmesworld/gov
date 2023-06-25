@@ -37,6 +37,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useIdentityserviceRegisterDaoMutation } from "../../client/Identityservice.react-query";
 import { StdFee } from "@cosmjs/amino";
 import { useClientIdentity } from "../../hooks/useClientIdentity";
+import { debounce } from "lodash";
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -156,9 +157,11 @@ const CreateDaoForm = ({
   useEffect(() => {
     const dups = countObjectsWithDuplicateNames(daoMembers);
     setDoubleCounts(dups);
+    console.log("due");
   });
 
-  // console.log(daoMembers[0]);
+  const debouncedRefetch = debounce(idsByNamesQuery.refetch, 1); //
+
   return (
     <Box marginTop={"35px"}>
       <Text
@@ -293,7 +296,8 @@ const CreateDaoForm = ({
                 setDaoMembers(daoMembers);
                 setIdentityNamesValid(false);
               }}
-              onBlur={() => idsByNamesQuery.refetch()}
+              onBlur={() => debouncedRefetch()}
+              onKeyDown={() => debouncedRefetch()}
               onFocus={() => {
                 setFocusedCosignerIndex(index);
               }}
@@ -311,8 +315,11 @@ const CreateDaoForm = ({
               >
                 {index > 0
                   ? !validateName(daoMember?.name)?.name
-                    ? !idsByNamesQuery.isFetching
-                      ? idsByNamesQuery?.data?.at(index)
+                    ? !idsByNamesQuery.isFetching ||
+                      idsByNamesQuery.isRefetching
+                      ? idsByNamesQuery?.data?.at(index).length > 43
+                        ? idsByNamesQuery?.data?.at(index).slice(0, 43) + "..."
+                        : idsByNamesQuery?.data?.at(index)
                       : index === focusedCosignerIndex
                       ? "Checking..."
                       : idsByNamesQuery?.data?.at(index)
