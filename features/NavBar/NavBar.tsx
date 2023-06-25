@@ -44,6 +44,7 @@ const NavBar = ({
   selectedDaoName,
   setConnectButtonClicked,
 }: NavBarProps) => {
+  console.log(identityName)
   return (
     <VStack
       width={"200px"}
@@ -51,7 +52,7 @@ const NavBar = ({
       backgroundColor={"#7453FD"}
       paddingTop={"30px"}
       paddingLeft={"0px"}
-      // overflowY="scroll"
+      overflowY="scroll"
       alignItems="start"
     >
       <Image

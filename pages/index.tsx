@@ -50,12 +50,37 @@ export default function Home() {
   const { selectedProposalId, setSelectedProposalId } = useAppState();
 
   const { address, status } = useChain(chainName);
-  const { identityName, identityOwnerQuery } = useClientIdentity();
+  // const { identityName, identityOwnerQuery } = useClientIdentity(); <- hook temporarily disabled
 
-  //TODO: @hunter - This essentially triggers a function that updates the user's list of daos in the backgroud. Could be improved
+  //TODO: @hunter - please fix/remove L44-L71 once useClientIdenitity() hook's behaviour is stable. Adding this temporarily
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
   );
+  useEffect(() => {
+    CosmWasmClient.connect(rpc)
+      .then((cosmWasmClient) => {
+        if (!cosmWasmClient) {
+          return;
+        }
+        setCosmWasmClient(cosmWasmClient);
+      })
+      .catch((error) => console.log(error));
+  }, []);
+  const identityserviceClient = new IdentityserviceQueryClient(
+    cosmWasmClient as CosmWasmClient,
+    IDENTITY_SERVICE_CONTRACT
+  );
+  const identityOwnerQuery = useIdentityserviceGetIdentityByOwnerQuery({
+    client: identityserviceClient,
+    args: { owner: address as string },
+    options: {
+      refetchOnMount: true,
+    },
+  });
+  const identityName = identityOwnerQuery?.data?.identity?.name;
+  // -- End of temporary fix ---
+
+   // This essentially triggers a function that updates the user's list of daos in the backgroud. Could be improved
   const myDaos = useMyDaosList(
     address as string,
     cosmWasmClient as CosmWasmClient,
