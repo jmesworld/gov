@@ -47,7 +47,6 @@ export default function Home() {
   const [isGovProposalDetailOpen, setGovProposalDetailOpen] = useState(false);
   const [selectedProposalId, setSelectedProposalId] = useState(-1);
 
-  const isMobileView = useBreakpointValue({ base: true, md: false }) ?? false;
   const { address, status } = useChain(chainName);
   //const { identityName, identityOwnerQuery } = useClientIdentity(); <---- hook does not return up-to-date query result
 
@@ -93,6 +92,8 @@ export default function Home() {
       setGovProposalDetailOpen(false);
     }
   );
+
+  const isMobileView = useBreakpointValue({ base: true, md: false });
 
   return (
     <>
