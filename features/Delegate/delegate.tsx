@@ -31,6 +31,114 @@ const validatorsData = {
       "commission": "5",
       "votingPower": "10",
       "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
+    },
+    {
+      "name": "D Validator",
+      "commission": "5",
+      "votingPower": "10",
+      "url": ""
     }
   ],
   "bondedValidators": [
@@ -56,7 +164,7 @@ export const Delegate = () => {
   const [sliderValue, setSliderValue] = useState(50)
   const [jmesValue, setJmesValue] = useState(totalJmes/2)
   const [bJmesValue, setBJmesValue] = useState(totalJmes/2)
-  const [tabIndex, setTabIndex] = useState(0)
+  const [tabIndex, setTabIndex] = useState(1)
   const [validatorSelected, setValidatorSelected] = useState(false);
 
   useEffect(() => {
@@ -113,7 +221,7 @@ export const Delegate = () => {
                       lineHeight="20px"
                       textAlign="center"
                       marginBottom="12px">
-                      From
+                      {bonding ? 'From' : 'To'}
                     </Text>
                     <Box width="200px" height="72px" borderRadius={12} background="#5136C2" paddingTop="9px">
                       <Text
@@ -158,7 +266,7 @@ export const Delegate = () => {
                       lineHeight="20px"
                       textAlign="center"
                       marginBottom="12px">
-                      To
+                      {bonding ? 'To' : 'From'}
                     </Text>
                     <Box width="200px" height="72px" borderRadius={12} background="#5136C2" paddingTop="9px">
                       <Text
