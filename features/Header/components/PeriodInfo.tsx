@@ -443,7 +443,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                Voting Posting Length
+                Voting Period Length
               </Text>
               <Spacer />
               <Text
