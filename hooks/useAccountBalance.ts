@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { rest } from "../config/defaults";
 
+const JMES_DENOM = "ujmes";
+const BJMES_DENOM = "bujmes";
 export function useAccountBalance(address: string) {
   return useQuery(
     ["accountBalance", address],
@@ -13,8 +15,16 @@ export function useAccountBalance(address: string) {
         throw new Error("Failed to fetch account balance");
       }
       const data = await response.json();
-      const balance = data.balances.length === 0 ? 0 : data.balances[0].amount;
-      return balance / 1000000;
+      console.log(data)
+      const unstakedBalance =
+        data.balances.find((i: any) => i.denom === JMES_DENOM)?.amount ?? 0;
+      const stakedBalance =
+        data.balances.find((i: any) => i.denom === BJMES_DENOM)?.amount ?? 0;
+        console.log(stakedBalance)
+      return {
+        unstaked: unstakedBalance / 1000000,
+        staked: stakedBalance / 1000000,
+      };
     },
     {
       onSuccess: (data) => {
@@ -28,39 +38,10 @@ export function useAccountBalance(address: string) {
   );
 }
 
-export function useStakedBalance(address: string) {
-  return useQuery(
-    ["stakedBalance", address],
-    async () => {
-      const requestUrl = `${rest}/cosmos/staking/v1beta1/delegations/${address}`;
-
-      const response = await fetch(requestUrl);
-      if (!response.ok) {
-        console.error(response);
-        throw new Error("Failed to fetch account balance");
-      }
-      const data = await response.json();
-      const balance =
-        data.delegation_responses.length === 0
-          ? 0
-          : data.delegation_responses[0].balance.amount;
-      return balance / 1000000;
-    },
-    {
-      onSuccess: (data) => {
-         return data;
-      },
-      onError: (error) => {
-        console.error(error);
-      },
-      refetchInterval: 6 * 1000,
-    }
-  );
-}
-
-
 export function formatBalance(value: number): string {
-  if(value == 0) {return "0.0";}
+  if (value == 0) {
+    return "0.0";
+  }
 
   const suffixes = ["", "k", "m", "b", "t"];
   const base = Math.floor(Math.log10(Math.abs(value)) / 3);

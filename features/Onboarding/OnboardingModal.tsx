@@ -59,9 +59,9 @@ export default function OnboardingModal() {
                     position: "fixed",
                   }}
                 >
-                  {balance.data === 0 ? (
+                  {balance.data?.unstaked === 0 ? (
                     <AddTokensCard />
-                  ) : balance.data && !identityName ? (
+                  ) : balance.data?.unstaked && !identityName ? (
                     <ChooseUsernameCard
                       isOpen={true}
                       identityName={identityName}
