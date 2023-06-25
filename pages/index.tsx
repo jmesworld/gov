@@ -4,6 +4,7 @@ import { useEffect, useMemo } from 'react';
 import { chainName, IDENTITY_SERVICE_CONTRACT } from '../config/defaults';
 import { Governance } from '../features';
 
+import { Delegate } from '../features/Delegate/delegate';
 import { IdentityserviceQueryClient } from '../client/Identityservice.client';
 import { useIdentityserviceGetIdentityByOwnerQuery } from '../client/Identityservice.react-query';
 import { useMyDaosList } from '../hooks/useMyDaosList';
@@ -70,6 +71,7 @@ const Home: NextPageWithLayout = () => {
           }}
         />
       )}
+      <Delegate />
     </>
   );
 };

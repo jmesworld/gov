@@ -227,7 +227,7 @@ const CreateDaoForm = ({
           <Flex marginLeft={"0px"} alignItems={"center"}>
             <AddIcon boxSize={"10px"} color="#7453FD" />
             <Text
-              color="purple"
+              color="#7453fd"
               fontWeight="medium"
               fontSize={14}
               marginLeft={"10px"}
