@@ -176,7 +176,7 @@ export default function Home() {
                 />
               )}
 
-              {isGovProposalSelected && (
+              {isGovProposalSelected && !isGovProposalDetailOpen &&(
                 <GovernanceProposal
                   setSelectedProposalId={setSelectedProposalId}
                   setGovProposalDetailOpen={setGovProposalDetailOpen}
