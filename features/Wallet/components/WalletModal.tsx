@@ -8,15 +8,17 @@ import { useAccountBalance } from "../../../hooks/useAccountBalance";
 import { useClientIdentity } from "../../../hooks/useClientIdentity";
 
 export const WalletModal = () => {
-  const { address, closeView, disconnect } = useChain(chainName);
+  const { address, closeView, openView, disconnect } = useChain(chainName);
   const { identityName, identityOwnerQuery } = useClientIdentity();
   const balance = useAccountBalance(address as string);
 
   const renderCard = () => {
-    if (
-      balance.data?.unstaked === 0 &&
-      identityOwnerQuery?.status !== "loading"
-    ) {
+    if (identityOwnerQuery?.status !== "success") {
+      // TODO: we could show a loading indicator/animation here instead
+      return <></>;
+    }
+
+    if (balance.data?.unstaked === 0 ) {
       return (
         <CSSTransition
           classNames="card-animation"
@@ -26,10 +28,7 @@ export const WalletModal = () => {
           <AddTokensCard />
         </CSSTransition>
       );
-    } else if (
-      !identityName &&
-      identityOwnerQuery?.status !== "loading"
-    ) {
+    } else if (!identityName) {
       return (
         <CSSTransition
           classNames="card-animation"
@@ -41,7 +40,7 @@ export const WalletModal = () => {
       );
     } else {
       closeView();
-      return null;
+      return <></>;
     }
   };
 
