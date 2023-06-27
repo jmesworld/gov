@@ -35,7 +35,7 @@ function CreateCosmosApp({ Component, pageProps }: AppProps) {
         <ChainProvider
           chains={chains}
           assetLists={assets}
-          wallets={[...keplrWallets]}
+          wallets={[keplrWallets[0]]}
           walletModal={undefined}
           modalViews={{
             Connected: WalletModal,
@@ -49,7 +49,7 @@ function CreateCosmosApp({ Component, pageProps }: AppProps) {
         >
           <CosmWasmProvider>
             <AppStateProvider>
-            <Component {...pageProps} />
+              <Component {...pageProps} />
             </AppStateProvider>
           </CosmWasmProvider>
         </ChainProvider>
