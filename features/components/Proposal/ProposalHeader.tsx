@@ -1,12 +1,5 @@
-import {
-  Flex,
-  HStack,
-  Box,
-  Link,
-  Text,
-  Tooltip,
-  Image,
-} from "@chakra-ui/react";
+import { Flex, HStack, Text, Tooltip, Image, Box } from '@chakra-ui/react';
+import { Link } from '../genial/Link';
 
 export const ProposalHeader = ({
   daoName,
@@ -19,18 +12,20 @@ export const ProposalHeader = ({
 }) => {
   return (
     <Flex direction="column">
-      <Text
-        color={"#5136C2"}
+      <Box
+        color={'#5136C2'}
         fontFamily="DM Sans"
         fontWeight="medium"
         fontSize={28}
       >
-        <Link href="#" textDecoration={"underline"}>
-          {daoName}
+        <Link href="/">
+          <Text decoration="underline" display="inline-block" cursor="pointer">
+            {daoName}
+          </Text>
         </Link>
         &nbsp;&#x2022;&nbsp;
         {proposalTitle}
-      </Text>
+      </Box>
       <HStack hidden={proposalExpiry <= 0} marginTop="38px" marginBottom="16px">
         <Text
           textTransform="uppercase"
@@ -45,8 +40,8 @@ export const ProposalHeader = ({
           <Image
             src="/tooltip.svg"
             alt="Info"
-            width={"13.33px"}
-            height={"13.33px"}
+            width={'13.33px'}
+            height={'13.33px'}
           ></Image>
         </Tooltip>
       </HStack>
@@ -62,6 +57,6 @@ const convertTimestamp = (timestamp: number) => {
     month: 'long',
     year: 'numeric',
     hour: 'numeric',
-    minute: 'numeric'
+    minute: 'numeric',
   });
 };

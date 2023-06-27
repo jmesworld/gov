@@ -1,75 +1,38 @@
-import {
-  Box,
-  Container,
-  Flex,
-  Spacer,
-  useBreakpointValue,
-} from "@chakra-ui/react";
-import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { WalletStatus } from "@cosmos-kit/core";
-import { useChain } from "@cosmos-kit/react";
-import dynamic from "next/dynamic";
-import Head from "next/head";
-import { useCallback, useEffect, useState } from "react";
-import { chainName, IDENTITY_SERVICE_CONTRACT, rpc } from "../config/defaults";
-import { useClientIdentity } from "../hooks/useClientIdentity";
-import {
-  NavBar,
-  Header,
-  Dao,
-  Governance,
-  Onboarding,
-  Wallet,
-} from "../features";
+import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import { useChain } from '@cosmos-kit/react';
+import { useEffect, useMemo } from 'react';
+import { chainName, IDENTITY_SERVICE_CONTRACT } from '../config/defaults';
+import { Governance } from '../features';
 
-import SpendDaoFundsForm from "../features/Dao/SpendDaoFundsForm";
-import CreateDaoForm from "../features/Dao/CreateDaoForm";
-import { IdentityserviceQueryClient } from "../client/Identityservice.client";
-import { useIdentityserviceGetIdentityByOwnerQuery } from "../client/Identityservice.react-query";
-import { useMyDaosList } from "../hooks/useMyDaosList";
-import DaoProposalDetail from "../features/Dao/components/DaoProposalDetail";
-import { useAppState } from "../contexts/AppStateContext";
+import { IdentityserviceQueryClient } from '../client/Identityservice.client';
+import { useIdentityserviceGetIdentityByOwnerQuery } from '../client/Identityservice.react-query';
+import { useMyDaosList } from '../hooks/useMyDaosList';
+import { useAppState } from '../contexts/AppStateContext';
+import { useCosmWasmClientContext } from '../contexts/CosmWasmClient';
+import { NextPageWithLayout } from './_app';
+import { useRouter } from 'next/router';
 
-const { DaoProposal } = Dao;
-const { MobileViewDisabled } = Onboarding;
-const { CreateGovProposal, GovProposalDetail, GovernanceProposal } = Governance;
+const { GovernanceProposal } = Governance;
 
-export default function Home() {
-  const { isConnectButtonClicked, setConnectButtonClicked } = useAppState();
-  const { isGovProposalSelected, setIsGovProposalSelected } = useAppState();
-  const { isCreateDaoSelected, setCreateDaoSelected } = useAppState();
-  const { selectedDao, setSelectedDao } = useAppState();
-  const { selectedDaoName, setSelectedDaoName } = useAppState();
-  const { isCreateGovProposalSelected, setCreateGovProposalSelected } =
-    useAppState();
-  const { selectedDaoProposalTitle, setSelectedDaoProposalTitle } =
-    useAppState();
-  const { selectedDaoMembersList, setSelectedDaoMembersList } = useAppState();
-  const { isDaoProposalDetailOpen, setDaoProposalDetailOpen } = useAppState();
-  const { isGovProposalDetailOpen, setGovProposalDetailOpen } = useAppState();
-  const { selectedProposalId, setSelectedProposalId } = useAppState();
+const Home: NextPageWithLayout = () => {
+  const { cosmWasmClient } = useCosmWasmClientContext();
+  const router = useRouter();
 
-  const { address, status } = useChain(chainName);
-  // const { identityName, identityOwnerQuery } = useClientIdentity(); <- hook temporarily disabled
+  const { setSelectedDaoName, setSelectedDao, setIdentityName } = useAppState();
 
-  //TODO: @hunter - please fix/remove L44-L71 once useClientIdenitity() hook's behaviour is stable. Adding this temporarily
-  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-    null
+  const { address } = useChain(chainName);
+
+  const identityserviceClient = useMemo(
+    () =>
+      cosmWasmClient
+        ? new IdentityserviceQueryClient(
+            cosmWasmClient as CosmWasmClient,
+            IDENTITY_SERVICE_CONTRACT,
+          )
+        : undefined,
+    [cosmWasmClient],
   );
-  useEffect(() => {
-    CosmWasmClient.connect(rpc)
-      .then((cosmWasmClient) => {
-        if (!cosmWasmClient) {
-          return;
-        }
-        setCosmWasmClient(cosmWasmClient);
-      })
-      .catch((error) => console.log(error));
-  }, []);
-  const identityserviceClient = new IdentityserviceQueryClient(
-    cosmWasmClient as CosmWasmClient,
-    IDENTITY_SERVICE_CONTRACT
-  );
+
   const identityOwnerQuery = useIdentityserviceGetIdentityByOwnerQuery({
     client: identityserviceClient,
     args: { owner: address as string },
@@ -78,129 +41,36 @@ export default function Home() {
     },
   });
   const identityName = identityOwnerQuery?.data?.identity?.name;
+
+  useEffect(() => {
+    identityName && setIdentityName(identityName);
+  }, [identityName, setIdentityName]);
   // -- End of temporary fix ---
 
-   // This essentially triggers a function that updates the user's list of daos in the backgroud. Could be improved
-  const myDaos = useMyDaosList(
+  // This essentially triggers a function that updates the user's list of daos in the backgroud. Could be improved
+  useMyDaosList(
     address as string,
     cosmWasmClient as CosmWasmClient,
     setSelectedDao,
     setSelectedDaoName,
     () => {
-      // reset state
-      setIsGovProposalSelected(false);
-      setCreateDaoSelected(false);
-      setDaoProposalDetailOpen(false);
-      setGovProposalDetailOpen(false);
-    }
+      router.push('/');
+    },
   );
   // ---- End of code to be improved ------
 
-  const isMobileView = useBreakpointValue({ base: true, md: false });
-
   return (
     <>
-      {isMobileView ? (
-        <MobileViewDisabled />
-      ) : (
-        <Container
-          maxW="100%"
-          padding={0}
-          backgroundColor={"rgba(198, 180, 252, 0.3)"}
-        >
-          <Head>
-            <title>JMES Governance</title>
-            <link rel="icon" href="/favicon.ico" />
-          </Head>
-          <Flex padding={0} width={"100vw"} height={"100vh"}>
-            <NavBar
-              status={status}
-              address={address}
-              identityName={identityName as string}
-              isCreateGovProposalSelected={isCreateGovProposalSelected}
-              isGovProposalSelected={isGovProposalSelected}
-              setIsGovProposalSelected={setIsGovProposalSelected}
-              isCreateDaoSelected={isCreateDaoSelected}
-              setCreateDaoSelected={setCreateDaoSelected}
-              setSelectedDao={setSelectedDao}
-              setSelectedDaoName={setSelectedDaoName}
-              setCreateGovProposalSelected={setCreateGovProposalSelected}
-              setDaoProposalDetailOpen={setDaoProposalDetailOpen}
-              setGovProposalDetailOpen={setGovProposalDetailOpen}
-              selectedDao={selectedDao}
-              selectedDaoName={selectedDaoName}
-              setConnectButtonClicked={setConnectButtonClicked}
-            />
-            <Box
-              width={"100%"}
-              height={"100%"}
-              paddingLeft={"54px"}
-              paddingTop={"25px"}
-              paddingRight={"54px"}
-              overflowY="scroll"
-            >
-              <Flex width={"100%"}>
-                <Spacer />
-                <Header />
-              </Flex>
-              {isGovProposalDetailOpen && (
-                <GovProposalDetail proposalId={selectedProposalId} />
-              )}
-
-              {isDaoProposalDetailOpen && (
-                <DaoProposalDetail
-                  selectedDao={selectedDao}
-                  selectedDaoName={selectedDaoName}
-                  selectedDaoProposalTitle={selectedDaoProposalTitle}
-                  selectedDaoMembersList={selectedDaoMembersList}
-                  selectedDaoProposalId={selectedProposalId}
-                />
-              )}
-
-              {isCreateGovProposalSelected && (
-                <CreateGovProposal
-                  selectedDao={selectedDao}
-                  selectedDaoName={selectedDaoName}
-                  setCreateGovProposalSelected={setCreateGovProposalSelected}
-                />
-              )}
-
-              {isCreateDaoSelected && (
-                <CreateDaoForm
-                  daoOwner={{
-                    address: address as string,
-                    name: identityName as string,
-                    votingPower: 0,
-                  }}
-                  setCreateDaoSelected={setCreateDaoSelected}
-                />
-              )}
-
-              {isGovProposalSelected && !isGovProposalDetailOpen &&(
-                <GovernanceProposal
-                  setSelectedProposalId={setSelectedProposalId}
-                  setGovProposalDetailOpen={setGovProposalDetailOpen}
-                />
-              )}
-
-              {!isGovProposalDetailOpen &&
-                !isDaoProposalDetailOpen &&
-                !isCreateGovProposalSelected &&
-                !isCreateDaoSelected &&
-                !isGovProposalSelected && (
-                  <DaoProposal
-                    daoAddress={selectedDao}
-                    daoName={selectedDaoName}
-                    setDaoProposalDetailOpen={setDaoProposalDetailOpen}
-                    setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-                    setSelectedDaoMembersList={setSelectedDaoMembersList}
-                    setSelectedProposalId={setSelectedProposalId}
-                  />
-                )}
-            </Box>
-          </Flex>
-        </Container>
+      {!cosmWasmClient && 'loading ...'}
+      {cosmWasmClient && (
+        <GovernanceProposal
+          cosmWasmClient={cosmWasmClient}
+          setSelectedProposalId={(id: number) => {
+            router.push(`/proposals/${id}`);
+          }}
+        />
       )}
     </>
   );
-}
+};
+export default Home;

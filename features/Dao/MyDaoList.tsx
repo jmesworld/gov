@@ -1,32 +1,36 @@
-import { Flex } from "@chakra-ui/react";
-import { useChain } from "@cosmos-kit/react";
-import { chainName } from "../../config/defaults";
-import { NavBarItem } from "../NavBar/NavBarItem";
+import { Flex } from '@chakra-ui/react';
+import { useChain } from '@cosmos-kit/react';
+import { chainName } from '../../config/defaults';
+import { NavBarItem } from '../NavBar/NavBarItem';
+import { Link } from '../components/genial/Link';
+import { useAppState } from '../../contexts/AppStateContext';
+import { useRouter } from 'next/router';
+import { useMemo } from 'react';
 
 const MyDaoList = ({
   daos,
-  setIsGovProposalSelected,
-  selectedDao,
   setSelectedDao,
-  selectedDaoName,
   setSelectedDaoName,
-  setCreateDaoSelected,
-  setDaoProposalDetailOpen,
-  setGovProposalDetailOpen,
 }: {
   daos: any;
-  setIsGovProposalSelected: Function;
   selectedDao: string;
   setSelectedDao: Function;
   selectedDaoName: string;
   setSelectedDaoName: Function;
-  setCreateDaoSelected: Function;
-  setDaoProposalDetailOpen: Function;
-  setGovProposalDetailOpen: Function;
 }) => {
+  const router = useRouter();
   const chainContext = useChain(chainName);
+  const { selectedDao } = useAppState();
   const { address } = chainContext;
-  const daosJSON = JSON.parse(daos);
+
+  const daosJSON = useMemo(() => {
+    try {
+      return JSON.parse(daos);
+    } catch (err) {
+      return undefined;
+    }
+  }, [daos]);
+
   if (!daosJSON) {
     return <></>;
   }
@@ -38,29 +42,40 @@ const MyDaoList = ({
   } else {
     const daoItems = daosJSON[address as string].map(
       (dao: { name: any; address: any }) => (
-        <NavBarItem
-          key={dao.name}
-          text={dao.name}
-          isSelected={
-            selectedDao === dao.address || selectedDaoName === dao.name
-              ? true
-              : false
-          }
-          onClick={() => {
-            setIsGovProposalSelected(false);
-            setSelectedDao(dao.address);
-            setSelectedDaoName(dao.name);
-            setCreateDaoSelected(false);
-            setDaoProposalDetailOpen(false);
-            setGovProposalDetailOpen(false);
+        <Link.withStatus
+          key={dao.address}
+          matchFunc={route => {
+            return (
+              (route.pathname === '/dao/[id]' &&
+                route.query?.id === dao.address) ||
+              ((route.pathname === '/proposals/create' ||
+                router.pathname === '/dao/create') &&
+                selectedDao === dao.address)
+            );
           }}
-        />
-      )
+          href={`/dao/${dao.address}`}
+        >
+          {({ isActive }) => (
+            <NavBarItem
+              key={dao.name}
+              text={dao.name}
+              isSelected={isActive}
+              onClick={e => {
+                if (router.route === '/proposals/create') {
+                  e.preventDefault();
+                }
+                setSelectedDao(dao.address);
+                setSelectedDaoName(dao.name);
+              }}
+            />
+          )}
+        </Link.withStatus>
+      ),
     );
     return (
       <>
         <ul>{daoItems}</ul>
-        <Flex height={"20px"} />
+        <Flex height={'20px'} />
       </>
     );
   }
