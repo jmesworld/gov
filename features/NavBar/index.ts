@@ -1,5 +1,5 @@
-import dynamic from "next/dynamic";
+import dynamic from 'next/dynamic';
 
-const NavBar = dynamic(() => import("./NavBar"));
+const NavBar = dynamic(() => import('./NavBar'));
 
 export { NavBar };

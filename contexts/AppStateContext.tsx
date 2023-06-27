@@ -1,5 +1,5 @@
-import React from "react";
-import { ReactNode, createContext, useContext, useState } from "react";
+import React from 'react';
+import { ReactNode, createContext, useContext, useState } from 'react';
 
 interface AppState {
   isConnectButtonClicked: boolean;
@@ -24,16 +24,18 @@ interface AppState {
   setDaoProposalDetailOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setGovProposalDetailOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedProposalId: (value: number) => void;
+  identityName: string | undefined;
+  setIdentityName: (val: string) => void;
 }
 
 const AppStateContext = createContext<AppState>({
   isConnectButtonClicked: false,
   isGovProposalSelected: true,
   isCreateDaoSelected: false,
-  selectedDao: "",
-  selectedDaoName: "",
+  selectedDao: '',
+  selectedDaoName: '',
   isCreateGovProposalSelected: false,
-  selectedDaoProposalTitle: "",
+  selectedDaoProposalTitle: '',
   selectedDaoMembersList: [],
   isDaoProposalDetailOpen: false,
   isGovProposalDetailOpen: false,
@@ -49,6 +51,8 @@ const AppStateContext = createContext<AppState>({
   setDaoProposalDetailOpen: () => {},
   setGovProposalDetailOpen: () => {},
   setSelectedProposalId: () => {},
+  identityName: undefined,
+  setIdentityName: () => {},
 });
 
 type AppStateProviderProps = {
@@ -59,18 +63,20 @@ export function AppStateProvider({ children }: AppStateProviderProps) {
   const [isConnectButtonClicked, setConnectButtonClicked] = useState(false);
   const [isGovProposalSelected, setIsGovProposalSelected] = useState(true);
   const [isCreateDaoSelected, setCreateDaoSelected] = useState(false);
-  const [selectedDao, setSelectedDao] = useState("");
-  const [selectedDaoName, setSelectedDaoName] = useState("");
+  const [selectedDao, setSelectedDao] = useState('');
+  const [selectedDaoName, setSelectedDaoName] = useState('');
   const [isCreateGovProposalSelected, setCreateGovProposalSelected] =
     useState(false);
-  const [selectedDaoProposalTitle, setSelectedDaoProposalTitle] = useState("");
+  const [selectedDaoProposalTitle, setSelectedDaoProposalTitle] = useState('');
   const [selectedDaoMembersList, setSelectedDaoMembersList] = useState<any[]>(
-    []
+    [],
   );
   const [isDaoProposalDetailOpen, setDaoProposalDetailOpen] = useState(false);
   const [isGovProposalDetailOpen, setGovProposalDetailOpen] = useState(false);
   const [selectedProposalId, setSelectedProposalId] = useState(-1);
-  
+  const [identityName, setIdentityName] = useState<string | undefined>(
+    undefined,
+  );
 
   const value: AppState = {
     isConnectButtonClicked,
@@ -95,6 +101,8 @@ export function AppStateProvider({ children }: AppStateProviderProps) {
     setDaoProposalDetailOpen,
     setGovProposalDetailOpen,
     setSelectedProposalId,
+    identityName,
+    setIdentityName,
   };
 
   return (
@@ -107,7 +115,7 @@ export function AppStateProvider({ children }: AppStateProviderProps) {
 export function useAppState() {
   const context = React.useContext(AppStateContext);
   if (!context) {
-    throw new Error("useAppState must be used within an AppStateProvider");
+    throw new Error('useAppState must be used within an AppStateProvider');
   }
   return context;
 }

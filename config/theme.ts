@@ -12,6 +12,7 @@ export const defaultThemeObject = {
     heading: `DM Sans, ${theme.fonts.heading}`,
   },
   colors: {
+    bg: "#e1dafe",
     purple: "#7453FD",
     darkPurple: "#5136C2",
     midnight: "#0F0056",

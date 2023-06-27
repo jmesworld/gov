@@ -6,24 +6,24 @@ import {
   HStack,
   Text,
   VStack,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { useChain } from "@cosmos-kit/react";
-import { chainName } from "../../../config/defaults";
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { useChain } from '@cosmos-kit/react';
+import { chainName } from '../../../config/defaults';
 
 import {
   CosmWasmClient,
   SigningCosmWasmClient,
-} from "@cosmjs/cosmwasm-stargate";
-import { DaoMultisigQueryClient } from "../../../client/DaoMultisig.client";
+} from '@cosmjs/cosmwasm-stargate';
+import { DaoMultisigQueryClient } from '../../../client/DaoMultisig.client';
 import {
   useDaoMultisigProposalQuery,
   useDaoMultisigListVotesQuery,
   useDaoMultisigListVotersQuery,
-} from "../../../client/DaoMultisig.react-query";
-import { ProposalHeader } from "../../components/Proposal/ProposalHeader";
-import { ProposalMyVote } from "../../components/Proposal/ProposalMyVote";
-import { ProposalVoting } from "../../components/Proposal/ProposalVoting";
+} from '../../../client/DaoMultisig.react-query';
+import { ProposalHeader } from '../../components/Proposal/ProposalHeader';
+import { ProposalMyVote } from '../../components/Proposal/ProposalMyVote';
+import { ProposalVoting } from '../../components/Proposal/ProposalVoting';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -47,35 +47,35 @@ export default function DaoProposalDetail({
     useChain(chainName);
 
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-    null
+    null,
   );
   const [signingClient, setSigningClient] =
     useState<SigningCosmWasmClient | null>(null);
   useEffect(() => {
     if (address) {
       getCosmWasmClient()
-        .then((cosmWasmClient) => {
+        .then(cosmWasmClient => {
           if (!cosmWasmClient) {
             return;
           }
           setCosmWasmClient(cosmWasmClient);
         })
-        .catch((error) => console.log(error));
+        .catch(error => console.log(error));
 
       getSigningCosmWasmClient()
-        .then((signingClient) => {
+        .then(signingClient => {
           if (!signingClient) {
             return;
           }
           setSigningClient(signingClient);
         })
-        .catch((error) => console.log(error));
+        .catch(error => console.log(error));
     }
   }, [address, getCosmWasmClient]);
 
   const daoMultisigQueryClient = new DaoMultisigQueryClient(
     cosmWasmClient as CosmWasmClient,
-    selectedDao as string
+    selectedDao as string,
   );
 
   const proposalDetailQuery = useDaoMultisigProposalQuery({
@@ -100,7 +100,7 @@ export default function DaoProposalDetail({
     options: { refetchInterval: 10000 },
   });
 
-  const proposalDescription = proposalDetailQuery?.data?.description ?? "";
+  const proposalDescription = proposalDetailQuery?.data?.description ?? '';
   // @ts-ignore
   const expiryDate = proposalDetailQuery?.data?.expires?.at_height ?? 0;
   const averageBlockTime = 5; // Average block time in seconds
@@ -111,8 +111,8 @@ export default function DaoProposalDetail({
 
   const yesCount = !!votesQuery.data
     ? (votesQuery.data?.votes.filter(
-        (vote) =>
-          vote.proposal_id === selectedDaoProposalId && vote.vote === "yes"
+        vote =>
+          vote.proposal_id === selectedDaoProposalId && vote.vote === 'yes',
       )?.length as number)
     : 0;
 
@@ -127,19 +127,19 @@ export default function DaoProposalDetail({
   const votes = votesQuery?.data?.votes ?? [];
 
   const myVotingInfo = votersQuery?.data?.voters.filter(
-    (voter) => voter.addr === (address as string)
+    voter => voter.addr === (address as string),
   ) ?? [{ weight: 0 }];
   const myVotingPower = myVotingInfo[0]?.weight;
 
-  const passed = proposalDetailQuery?.data?.status === "passed";
+  const passed = proposalDetailQuery?.data?.status === 'passed';
   const myVotes =
     votesQuery?.data?.votes.filter(
-      (vote) => vote.voter === (address as string)
+      vote => vote.voter === (address as string),
     ) ?? [];
 
   return (
     <>
-      <Flex height={"47px"} />
+      <Flex height={'47px'} />
       <ProposalHeader
         daoName={selectedDaoName}
         proposalTitle={selectedDaoProposalTitle}
@@ -185,7 +185,7 @@ export default function DaoProposalDetail({
           </VStack>
         </HStack>
       ) : (
-        <Center marginTop={"80px"}>
+        <Center marginTop={'80px'}>
           <CircularProgress isIndeterminate color="darkPurple" />
         </Center>
       )}

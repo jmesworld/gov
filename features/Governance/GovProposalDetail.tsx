@@ -6,21 +6,22 @@ import {
   HStack,
   Text,
   VStack,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { useChain } from "@cosmos-kit/react";
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { useChain } from '@cosmos-kit/react';
 
 import {
   CosmWasmClient,
   SigningCosmWasmClient,
-} from "@cosmjs/cosmwasm-stargate";
-import { GovernanceQueryClient } from "../../client/Governance.client";
-import { useGovernanceProposalQuery } from "../../client/Governance.react-query";
+} from '@cosmjs/cosmwasm-stargate';
+import { GovernanceQueryClient } from '../../client/Governance.client';
+import { useGovernanceProposalQuery } from '../../client/Governance.react-query';
 
-import { chainName } from "../../config/defaults";
-import GovProposalMyVote from "./GovProposalMyVote";
-import GovProposalVoting from "./GovProposalVoting";
-import { ProposalHeader } from "../components/Proposal/ProposalHeader";
+import { chainName } from '../../config/defaults';
+import GovProposalMyVote from './GovProposalMyVote';
+import GovProposalVoting from './GovProposalVoting';
+import { ProposalHeader } from '../components/Proposal/ProposalHeader';
+import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -32,39 +33,13 @@ export default function GovProposalDetail({
 }: {
   proposalId: number;
 }) {
-  const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
-    useChain(chainName);
+  const { cosmWasmClient } = useCosmWasmClientContext();
 
-  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-    null
-  );
-  const [signingClient, setSigningClient] =
-    useState<SigningCosmWasmClient | null>(null);
-  useEffect(() => {
-    if (address) {
-      getCosmWasmClient()
-        .then((cosmWasmClient) => {
-          if (!cosmWasmClient) {
-            return;
-          }
-          setCosmWasmClient(cosmWasmClient);
-        })
-        .catch((error) => console.log(error));
-
-      getSigningCosmWasmClient()
-        .then((signingClient) => {
-          if (!signingClient) {
-            return;
-          }
-          setSigningClient(signingClient);
-        })
-        .catch((error) => console.log(error));
-    }
-  }, [address, getCosmWasmClient]);
+  const { address } = useChain(chainName);
 
   const govQueryClient = new GovernanceQueryClient(
     cosmWasmClient as CosmWasmClient,
-    GOVERNANCE_CONTRACT
+    GOVERNANCE_CONTRACT,
   );
 
   const proposalDetailQuery = useGovernanceProposalQuery({
@@ -77,15 +52,15 @@ export default function GovProposalDetail({
     },
   });
 
-  const proposalDescription = proposalDetailQuery?.data?.description ?? "";
+  const proposalDescription = proposalDetailQuery?.data?.description ?? '';
   const expiryDate = proposalDetailQuery?.data?.voting_end ?? 0;
-  const expiryDateTimestamp = !!proposalDetailQuery?.data
+  const expiryDateTimestamp = proposalDetailQuery?.data
     ? expiryDate * 1000
     : -1;
 
   console.log(expiryDate);
-  const threshold = "10.00"; //TODO: confirm threshold for Governance proposals
-  const target = !!proposalDetailQuery?.data ? parseFloat(threshold) : 0;
+  const threshold = '10.00'; //TODO: confirm threshold for Governance proposals
+  const target = proposalDetailQuery?.data ? parseFloat(threshold) : 0;
 
   const yesVotesCount = proposalDetailQuery?.data?.yes_voters.length ?? 0;
   const noVotesCount = proposalDetailQuery?.data?.no_voters.length ?? 0;
@@ -108,13 +83,13 @@ export default function GovProposalDetail({
 
   return (
     <>
-      <Flex height={"47px"} />
+      <Flex height={'47px'} />
       <ProposalHeader
-        daoName={"Governance Proposal"}
-        proposalTitle={proposalDetailQuery?.data?.title ?? ""}
+        daoName={'Governance Proposal'}
+        proposalTitle={proposalDetailQuery?.data?.title ?? ''}
         proposalExpiry={expiryDateTimestamp}
       />
-      {!!proposalDetailQuery.data ? (
+      {proposalDetailQuery.data ? (
         <HStack spacing="54px" align="flex-start">
           <Box flexGrow={1}>
             <GovProposalVoting
@@ -150,7 +125,7 @@ export default function GovProposalDetail({
           </VStack>
         </HStack>
       ) : (
-        <Center marginTop={"80px"}>
+        <Center marginTop={'80px'}>
           <CircularProgress isIndeterminate color="darkPurple" />
         </Center>
       )}
