@@ -51,7 +51,7 @@ const NavBar = ({
       backgroundColor={"#7453FD"}
       paddingTop={"30px"}
       paddingLeft={"0px"}
-      // overflowY="scroll"
+      overflowY="scroll"
       alignItems="start"
     >
       <Image
@@ -136,6 +136,7 @@ const NavBar = ({
         onClick={() => {
           if (!WalletStatus.Connected) {
             setConnectButtonClicked(true);
+            setIsGovProposalSelected(false);
           } else {
             setCreateGovProposalSelected(false);
             setCreateDaoSelected(true);

@@ -28,29 +28,31 @@ import { IdentityserviceQueryClient } from "../client/Identityservice.client";
 import { useIdentityserviceGetIdentityByOwnerQuery } from "../client/Identityservice.react-query";
 import { useMyDaosList } from "../hooks/useMyDaosList";
 import DaoProposalDetail from "../features/Dao/components/DaoProposalDetail";
+import { useAppState } from "../contexts/AppStateContext";
 
 const { DaoProposal } = Dao;
 const { MobileViewDisabled } = Onboarding;
 const { CreateGovProposal, GovProposalDetail, GovernanceProposal } = Governance;
 
 export default function Home() {
-  const [isConnectButtonClicked, setConnectButtonClicked] = useState(false);
-  const [isGovProposalSelected, setIsGovProposalSelected] = useState(true);
-  const [isCreateDaoSelected, setCreateDaoSelected] = useState(false);
-  const [selectedDao, setSelectedDao] = useState("");
-  const [selectedDaoName, setSelectedDaoName] = useState("");
-  const [isCreateGovProposalSelected, setCreateGovProposalSelected] =
-    useState(false);
-  const [selectedDaoProposalTitle, setSelectedDaoProposalTitle] = useState("");
-  const [selectedDaoMembersList, setSelectedDaoMembersList] = useState([]);
-  const [isDaoProposalDetailOpen, setDaoProposalDetailOpen] = useState(false);
-  const [isGovProposalDetailOpen, setGovProposalDetailOpen] = useState(false);
-  const [selectedProposalId, setSelectedProposalId] = useState(-1);
+  const { isConnectButtonClicked, setConnectButtonClicked } = useAppState();
+  const { isGovProposalSelected, setIsGovProposalSelected } = useAppState();
+  const { isCreateDaoSelected, setCreateDaoSelected } = useAppState();
+  const { selectedDao, setSelectedDao } = useAppState();
+  const { selectedDaoName, setSelectedDaoName } = useAppState();
+  const { isCreateGovProposalSelected, setCreateGovProposalSelected } =
+    useAppState();
+  const { selectedDaoProposalTitle, setSelectedDaoProposalTitle } =
+    useAppState();
+  const { selectedDaoMembersList, setSelectedDaoMembersList } = useAppState();
+  const { isDaoProposalDetailOpen, setDaoProposalDetailOpen } = useAppState();
+  const { isGovProposalDetailOpen, setGovProposalDetailOpen } = useAppState();
+  const { selectedProposalId, setSelectedProposalId } = useAppState();
 
   const { address, status } = useChain(chainName);
-  //const { identityName, identityOwnerQuery } = useClientIdentity(); <---- hook does not return up-to-date query result
+  // const { identityName, identityOwnerQuery } = useClientIdentity(); <- hook temporarily disabled
 
-  //TODO: @hunter - please fix/remove L44-L71 once useClientIdenitity() hook's behaviour is stable. Adding this temporarily
+  //TODO: @hunter - please fix/remove L55-L81 once useClientIdenitity() hook's behaviour is stable. Adding this temporarily
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
   );
@@ -78,7 +80,7 @@ export default function Home() {
   const identityName = identityOwnerQuery?.data?.identity?.name;
   // -- End of temporary fix ---
 
-  // This essentially triggers a function that updates the user's list of daos in the backgroud. Could be improved
+   // This essentially triggers a function that updates the user's list of daos in the backgroud. Could be improved
   const myDaos = useMyDaosList(
     address as string,
     cosmWasmClient as CosmWasmClient,
@@ -92,6 +94,7 @@ export default function Home() {
       setGovProposalDetailOpen(false);
     }
   );
+  // ---- End of code to be improved ------
 
   const isMobileView = useBreakpointValue({ base: true, md: false });
 
@@ -113,7 +116,7 @@ export default function Home() {
             <NavBar
               status={status}
               address={address}
-              identityName={identityName}
+              identityName={identityName as string}
               isCreateGovProposalSelected={isCreateGovProposalSelected}
               isGovProposalSelected={isGovProposalSelected}
               setIsGovProposalSelected={setIsGovProposalSelected}
@@ -140,10 +143,11 @@ export default function Home() {
                 <Spacer />
                 <Header />
               </Flex>
-
-              {isGovProposalDetailOpen ? (
+              {isGovProposalDetailOpen && (
                 <GovProposalDetail proposalId={selectedProposalId} />
-              ) : isDaoProposalDetailOpen ? (
+              )}
+
+              {isDaoProposalDetailOpen && (
                 <DaoProposalDetail
                   selectedDao={selectedDao}
                   selectedDaoName={selectedDaoName}
@@ -151,13 +155,17 @@ export default function Home() {
                   selectedDaoMembersList={selectedDaoMembersList}
                   selectedDaoProposalId={selectedProposalId}
                 />
-              ) : isCreateGovProposalSelected ? (
+              )}
+
+              {isCreateGovProposalSelected && (
                 <CreateGovProposal
                   selectedDao={selectedDao}
                   selectedDaoName={selectedDaoName}
                   setCreateGovProposalSelected={setCreateGovProposalSelected}
                 />
-              ) : isCreateDaoSelected ? (
+              )}
+
+              {isCreateDaoSelected && !isGovProposalSelected && (
                 <CreateDaoForm
                   daoOwner={{
                     address: address as string,
@@ -166,21 +174,29 @@ export default function Home() {
                   }}
                   setCreateDaoSelected={setCreateDaoSelected}
                 />
-              ) : isGovProposalSelected ? (
+              )}
+
+              {isGovProposalSelected && !isGovProposalDetailOpen &&(
                 <GovernanceProposal
                   setSelectedProposalId={setSelectedProposalId}
                   setGovProposalDetailOpen={setGovProposalDetailOpen}
                 />
-              ) : (
-                <DaoProposal
-                  daoAddress={selectedDao}
-                  daoName={selectedDaoName}
-                  setDaoProposalDetailOpen={setDaoProposalDetailOpen}
-                  setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-                  setSelectedDaoMembersList={setSelectedDaoMembersList}
-                  setSelectedProposalId={setSelectedProposalId}
-                />
               )}
+
+              {!isGovProposalDetailOpen &&
+                !isDaoProposalDetailOpen &&
+                !isCreateGovProposalSelected &&
+                !isCreateDaoSelected &&
+                !isGovProposalSelected && (
+                  <DaoProposal
+                    daoAddress={selectedDao}
+                    daoName={selectedDaoName}
+                    setDaoProposalDetailOpen={setDaoProposalDetailOpen}
+                    setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+                    setSelectedDaoMembersList={setSelectedDaoMembersList}
+                    setSelectedProposalId={setSelectedProposalId}
+                  />
+                )}
             </Box>
           </Flex>
         </Container>
