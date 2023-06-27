@@ -52,7 +52,7 @@ export default function Home() {
   const { address, status } = useChain(chainName);
   // const { identityName, identityOwnerQuery } = useClientIdentity(); <- hook temporarily disabled
 
-  //TODO: @hunter - please fix/remove L44-L71 once useClientIdenitity() hook's behaviour is stable. Adding this temporarily
+  //TODO: @hunter - please fix/remove L55-L81 once useClientIdenitity() hook's behaviour is stable. Adding this temporarily
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null
   );
@@ -165,7 +165,7 @@ export default function Home() {
                 />
               )}
 
-              {isCreateDaoSelected && (
+              {isCreateDaoSelected && !isGovProposalSelected && (
                 <CreateDaoForm
                   daoOwner={{
                     address: address as string,

@@ -44,7 +44,6 @@ const NavBar = ({
   selectedDaoName,
   setConnectButtonClicked,
 }: NavBarProps) => {
-  console.log(identityName)
   return (
     <VStack
       width={"200px"}
@@ -137,6 +136,7 @@ const NavBar = ({
         onClick={() => {
           if (!WalletStatus.Connected) {
             setConnectButtonClicked(true);
+            setIsGovProposalSelected(false);
           } else {
             setCreateGovProposalSelected(false);
             setCreateDaoSelected(true);
