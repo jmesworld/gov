@@ -1,0 +1,148 @@
+export const validatorsData = {
+  validators: [
+    {
+      name: 'A Validator',
+      commission: '10',
+      votingPower: '10',
+      url: 'www.google.com',
+    },
+    {
+      name: 'C Validator',
+      commission: '7',
+      votingPower: '5',
+      url: '',
+    },
+    {
+      name: 'F Validator',
+      commission: '50',
+      votingPower: '15',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+    {
+      name: 'D Validator',
+      commission: '5',
+      votingPower: '10',
+      url: '',
+    },
+  ],
+  bondedValidators: [
+    {
+      name: 'A Validator',
+      bJmes: '1000',
+      url: '',
+    },
+    {
+      name: 'C Validator',
+      bJmes: '750',
+      url: 'www.google.com',
+    },
+  ],
+};
