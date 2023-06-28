@@ -456,6 +456,9 @@ const CreateDaoForm = ({
         defaultValue={DEFAULT_DAO_THRESHOLD}
         width={'722px'}
         onChange={val => setThreshold(val)}
+        min={1}
+        max={100}
+        step={1}
       >
         <SliderTrack
           height={'16px'}
