@@ -69,6 +69,7 @@ export default function PeriodInfo({ cosmWasmClient }: Props) {
   const next_period_start =
     current_period === 'posting' ? next_posting_start : next_voting_start;
   const next_period_start_time_left = momentLeft(next_period_start).toString();
+  
 
   return (
     <Menu>
@@ -128,6 +129,11 @@ export default function PeriodInfo({ cosmWasmClient }: Props) {
                   fontFamily="DM Sans"
                   color={current_period === 'posting' ? 'darkPurple' : 'green'}
                   paddingRight={'10px'}
+                  style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
                 >
                   Current cycle:{' '}
                   {periodInfoQuery?.data
@@ -149,6 +155,11 @@ export default function PeriodInfo({ cosmWasmClient }: Props) {
                   fontFamily="DM Sans"
                   color={current_period === 'posting' ? 'midnight' : 'lilac'}
                   paddingLeft={'10px'}
+                  style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
                 >
                   {periodInfoQuery?.data
                     ? `${next_period_start_time_left}`
