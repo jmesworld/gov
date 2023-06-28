@@ -122,7 +122,7 @@ export default function PeriodInfo({ cosmWasmClient }: Props) {
                 width={'22px'}
                 height={'22px'}
               />
-              <Flex alignItems={'center'} width={'100%'} paddingLeft={'8px'}>
+              <Flex alignItems={'center'} width={'95%'} paddingLeft={'8px'}>
                 <Text
                   fontWeight={'bold'}
                   fontSize={'14'}
