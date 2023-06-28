@@ -47,6 +47,8 @@ const fee: StdFee = {
   gas: '10000000',
 };
 
+const DEFAULT_DAO_THRESHOLD = 100; // 100% threshold by default
+
 const CreateDaoForm = ({
   setCreateDaoSelected,
   daoOwner,
@@ -59,7 +61,7 @@ const CreateDaoForm = ({
 
   const [daoName, setDaoName] = useState('');
   const [daoMembers, setDaoMembers] = useState([daoOwner]);
-  const [threshold, setThreshold] = useState(50);
+  const [threshold, setThreshold] = useState(DEFAULT_DAO_THRESHOLD);
   const [isIdentityNamesValid, setIdentityNamesValid] = useState(false);
   const [focusedCosignerIndex, setFocusedCosignerIndex] = useState(Infinity);
   const [isCreatingDao, setIsCreatingDao] = useState(false);
@@ -451,7 +453,7 @@ const CreateDaoForm = ({
       </Text>
       <Slider
         aria-label="dao-proposal-threshold"
-        defaultValue={50}
+        defaultValue={DEFAULT_DAO_THRESHOLD}
         width={'722px'}
         onChange={val => setThreshold(val)}
       >
