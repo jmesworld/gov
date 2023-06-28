@@ -1,7 +1,7 @@
-import { useChain } from "@cosmos-kit/react";
-import { Box, GridItem, Icon, Stack } from "@chakra-ui/react";
-import { MouseEventHandler, useState } from "react";
-import { FiAlertCircle, FiAlertOctagon, FiAlertTriangle } from "react-icons/fi";
+import { useChain } from '@cosmos-kit/react';
+import { Box, GridItem, Icon, Stack } from '@chakra-ui/react';
+import { MouseEventHandler, useState } from 'react';
+import { FiAlertCircle, FiAlertOctagon, FiAlertTriangle } from 'react-icons/fi';
 import {
   Error,
   Connected,
@@ -12,9 +12,9 @@ import {
   Rejected,
   RejectedWarn,
   WalletConnect,
-} from "./components";
-import { chainName } from "../../config/defaults";
-import { useCosmWasmClient } from "../../contexts/ClientContext";
+} from './components';
+import { chainName } from '../../config/defaults';
+import { useCosmWasmClient } from '../../contexts/ClientContext';
 
 const Wallet = () => {
   const {
@@ -29,13 +29,13 @@ const Wallet = () => {
     logoUrl,
   } = useChain(chainName);
 
-  const onClickConnect: MouseEventHandler = async (e) => {
+  const onClickConnect: MouseEventHandler = async e => {
     e.preventDefault();
 
     await connect();
   };
 
-  const onClickOpenView: MouseEventHandler = (e) => {
+  const onClickOpenView: MouseEventHandler = e => {
     e.preventDefault();
     openView();
   };
@@ -49,30 +49,12 @@ const Wallet = () => {
       }
       connecting={<Connecting />}
       connected={
-        <Connected buttonText={"My Wallet"} onClick={onClickOpenView} />
+        <Connected buttonText={'My Wallet'} onClick={onClickOpenView} />
       }
       rejected={<Rejected buttonText="Reconnect" onClick={onClickConnect} />}
       error={<Error buttonText="Change Wallet" onClick={onClickOpenView} />}
       notExist={
         <NotExist buttonText="Install Wallet" onClick={onClickOpenView} />
-      }
-    />
-  );
-
-  const connectWalletWarn = (
-    <ConnectStatusWarn
-      walletStatus={status}
-      rejected={
-        <RejectedWarn
-          icon={<Icon as={FiAlertTriangle} mt={1} />}
-          wordOfWarning={`${wallet?.prettyName}: ${message}`}
-        />
-      }
-      error={
-        <RejectedWarn
-          icon={<Icon as={FiAlertCircle} mt={1} />}
-          wordOfWarning={`${wallet?.prettyName}: ${message}`}
-        />
       }
     />
   );
@@ -87,7 +69,24 @@ const Wallet = () => {
       px={4}
     >
       <Box>{connectWalletButton}</Box>
-      {connectWalletWarn && <GridItem>{connectWalletWarn}</GridItem>}
+
+      <GridItem>
+        <ConnectStatusWarn
+          walletStatus={status}
+          rejected={
+            <RejectedWarn
+              icon={<Icon as={FiAlertTriangle} mt={1} />}
+              wordOfWarning={`${wallet?.prettyName}: ${message}`}
+            />
+          }
+          error={
+            <RejectedWarn
+              icon={<Icon as={FiAlertCircle} mt={1} />}
+              wordOfWarning={`${wallet?.prettyName}: ${message}`}
+            />
+          }
+        />
+      </GridItem>
     </Stack>
   );
 };

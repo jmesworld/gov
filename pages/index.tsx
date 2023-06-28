@@ -60,6 +60,10 @@ const Home: NextPageWithLayout = () => {
   );
   // ---- End of code to be improved ------
 
+  const onClose = () => {
+    router.back();
+  };
+
   return (
     <>
       {!cosmWasmClient && 'loading ...'}
@@ -71,7 +75,9 @@ const Home: NextPageWithLayout = () => {
           }}
         />
       )}
-      <Delegate />
+      {router.query.modal && router.query.modal === 'delegate' && (
+        <Delegate onClose={onClose} />
+      )}
     </>
   );
 };

@@ -182,8 +182,8 @@ export default function CreateGovProposal({
             variant={'outline'}
             width={'874px'}
             height={'48px'}
-            borderColor={'rgba(112,79,247,0.5)'}
-            background={'rgba(112,79,247,0.1)'}
+            borderColor={'primary.500'}
+            background={'primary.100'}
             focusBorderColor="darkPurple"
             borderRadius={12}
             color={'purple'}
@@ -195,8 +195,8 @@ export default function CreateGovProposal({
             variant={'outline'}
             width={'874px'}
             height={'320px'}
-            borderColor={'rgba(112,79,247,0.5)'}
-            background={'rgba(112,79,247,0.1)'}
+            borderColor={'primary.500'}
+            background={'primary.100'}
             focusBorderColor="darkPurple"
             borderRadius={12}
             color={'purple'}
@@ -218,8 +218,8 @@ export default function CreateGovProposal({
                 width={'874px'}
                 height={'50px'}
                 type={'number'}
-                borderColor={'rgba(112,79,247,0.5)'}
-                background={'rgba(112,79,247,0.1)'}
+                borderColor={'primary.500'}
+                background={'primary.100'}
                 focusBorderColor="darkPurple"
                 borderRadius={12}
                 marginTop={'12px'}
@@ -245,8 +245,8 @@ export default function CreateGovProposal({
                 variant={'outline'}
                 width={'874px'}
                 height={'138px'}
-                borderColor={'rgba(112,79,247,0.5)'}
-                background={'rgba(112,79,247,0.1)'}
+                borderColor={'primary.500'}
+                background={'primary.100'}
                 focusBorderColor="darkPurple"
                 borderRadius={12}
                 marginTop={'12px'}
@@ -333,7 +333,7 @@ export default function CreateGovProposal({
                     <Input
                       width={'106px'}
                       height={'41px'}
-                      borderColor={'rgba(112,79,247,0.5)'}
+                      borderColor={'primary.500'}
                       background={'transparent'}
                       color={'purple'}
                       onChange={e => setFundingAmount(parseInt(e.target.value))}
@@ -360,7 +360,7 @@ export default function CreateGovProposal({
                     <Input
                       width={'106px'}
                       height={'41px'}
-                      borderColor={'rgba(112,79,247,0.5)'}
+                      borderColor={'primary.500'}
                       background={'transparent'}
                       focusBorderColor="darkPurple"
                       color={'purple'}
