@@ -6,7 +6,6 @@ const DAOProposal = () => {
     selectedDao,
     selectedDaoName,
     selectedDaoProposalTitle,
-    selectedDaoMembersList,
     selectedProposalId,
   } = useAppState();
   return (
@@ -14,7 +13,6 @@ const DAOProposal = () => {
       selectedDao={selectedDao}
       selectedDaoName={selectedDaoName}
       selectedDaoProposalTitle={selectedDaoProposalTitle}
-      selectedDaoMembersList={selectedDaoMembersList}
       selectedDaoProposalId={selectedProposalId}
     />
   );
