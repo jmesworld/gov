@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   Box,
   Center,
@@ -7,14 +8,10 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
 import { useChain } from '@cosmos-kit/react';
 import { chainName } from '../../../config/defaults';
 
-import {
-  CosmWasmClient,
-  SigningCosmWasmClient,
-} from '@cosmjs/cosmwasm-stargate';
+import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { DaoMultisigQueryClient } from '../../../client/DaoMultisig.client';
 import {
   useDaoMultisigProposalQuery,
@@ -24,15 +21,12 @@ import {
 import { ProposalHeader } from '../../components/Proposal/ProposalHeader';
 import { ProposalMyVote } from '../../components/Proposal/ProposalMyVote';
 import { ProposalVoting } from '../../components/Proposal/ProposalVoting';
+import { useCosmWasmClientContext } from '../../../contexts/CosmWasmClient';
 
-const IDENTITY_SERVICE_CONTRACT = process.env
-  .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
-
-type DaoProposalDetail = {
+type Props = {
   selectedDao: string;
   selectedDaoName: string;
   selectedDaoProposalTitle: string;
-  selectedDaoMembersList: Array<any>;
   selectedDaoProposalId: number;
 };
 
@@ -40,38 +34,11 @@ export default function DaoProposalDetail({
   selectedDao,
   selectedDaoName,
   selectedDaoProposalTitle,
-  selectedDaoMembersList,
   selectedDaoProposalId,
-}: DaoProposalDetail) {
-  const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
-    useChain(chainName);
+}: Props) {
+  const { address } = useChain(chainName);
 
-  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-    null,
-  );
-  const [signingClient, setSigningClient] =
-    useState<SigningCosmWasmClient | null>(null);
-  useEffect(() => {
-    if (address) {
-      getCosmWasmClient()
-        .then(cosmWasmClient => {
-          if (!cosmWasmClient) {
-            return;
-          }
-          setCosmWasmClient(cosmWasmClient);
-        })
-        .catch(error => console.log(error));
-
-      getSigningCosmWasmClient()
-        .then(signingClient => {
-          if (!signingClient) {
-            return;
-          }
-          setSigningClient(signingClient);
-        })
-        .catch(error => console.log(error));
-    }
-  }, [address, getCosmWasmClient]);
+  const { cosmWasmClient } = useCosmWasmClientContext();
 
   const daoMultisigQueryClient = new DaoMultisigQueryClient(
     cosmWasmClient as CosmWasmClient,
@@ -101,28 +68,19 @@ export default function DaoProposalDetail({
   });
 
   const proposalDescription = proposalDetailQuery?.data?.description ?? '';
-  // @ts-ignore
+  /// @ts-ignore
   const expiryDate = proposalDetailQuery?.data?.expires?.at_height ?? 0;
   const averageBlockTime = 5; // Average block time in seconds
   const genesisTimestamp = 1684768989000; // Genesis timestamp
-  const expiryDateTimestamp = !!proposalDetailQuery?.data
+  const expiryDateTimestamp = proposalDetailQuery?.data
     ? genesisTimestamp + expiryDate * averageBlockTime * 1000
     : -1;
 
-  const yesCount = !!votesQuery.data
-    ? (votesQuery.data?.votes.filter(
-        vote =>
-          vote.proposal_id === selectedDaoProposalId && vote.vote === 'yes',
-      )?.length as number)
-    : 0;
-
-  const totalCount = !!votersQuery.data ? votersQuery.data?.voters?.length : 0;
-
   const threshold =
-    // @ts-ignore
+    /// @ts-ignore
     proposalDetailQuery?.data?.threshold?.absolute_count;
-  const target = !!threshold ? threshold.weight : 0;
-  const yesPercentage = !!threshold ? threshold.total_weight : 0;
+  const target = threshold ? threshold.weight : 0;
+  const yesPercentage = threshold ? threshold.total_weight : 0;
 
   const votes = votesQuery?.data?.votes ?? [];
 
@@ -145,7 +103,7 @@ export default function DaoProposalDetail({
         proposalTitle={selectedDaoProposalTitle}
         proposalExpiry={expiryDateTimestamp}
       />
-      {!!proposalDetailQuery.data ? (
+      {proposalDetailQuery.data ? (
         <HStack spacing="54px" align="flex-start">
           <Box flexGrow={1}>
             <ProposalVoting
