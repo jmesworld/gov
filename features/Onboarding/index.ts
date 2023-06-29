@@ -1,19 +1,21 @@
-import dynamic from "next/dynamic";
+import dynamic from 'next/dynamic';
 
-const OnboardingModal = dynamic(() => import("./OnboardingModal"));
+const OnboardingModal = dynamic(() => import('./OnboardingModal'));
 const OnboardingProgressIndicator = dynamic(
-  () => import("./components/OnboardingProgressIndicator")
+  () => import('./components/OnboardingProgressIndicator'),
 );
-const AddJMESCard = dynamic(() => import("./components/AddJMESCard"));
-const AddTokensCard = dynamic(() => import("./components/AddTokensCard"));
+const AddJMESCard = dynamic(() => import('./components/AddJMESCard'));
+const AddTokensCard = dynamic(() => import('./components/AddTokensCard'));
 const ChooseUsernameCard = dynamic(
-  () => import("./components/ChooseUsernameCard")
+  () => import('./ChooseUsernameModal'),
 );
 const ConnectWalletCard = dynamic(
-  () => import("./components/ConnectWalletCard")
+  () => import('./components/ConnectWalletCard'),
 );
-const InstallKeplrCard = dynamic(() => import("./components/InstallKeplrCard"));
-const MobileViewDisabled = dynamic(() => import("./components/MobileViewDisabled"));
+const InstallKeplrCard = dynamic(() => import('./components/InstallKeplrCard'));
+const MobileViewDisabled = dynamic(
+  () => import('./components/MobileViewDisabled'),
+);
 
 const Onboarding = {
   OnboardingModal,
@@ -23,7 +25,7 @@ const Onboarding = {
   ChooseUsernameCard,
   ConnectWalletCard,
   InstallKeplrCard,
-  MobileViewDisabled
+  MobileViewDisabled,
 };
 
 export { Onboarding };

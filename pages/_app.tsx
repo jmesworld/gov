@@ -11,7 +11,7 @@ import { Chain } from '@chain-registry/types';
 import jmesTestnet from '../config/chains/jmes-testnet/chain.json';
 import { chainName } from '../config/defaults';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-//import OnboardingModal from "../features/Onboarding/OnboardingModal";
+import OnboardingModal from '../features/Onboarding/OnboardingModal';
 import { WalletModal } from '../features/Wallet/components/WalletModal';
 import { CosmWasmProvider } from '../contexts/ClientContext';
 import React, { ReactElement } from 'react';
@@ -22,6 +22,7 @@ const chains: Chain[] = [jmesTestnet];
 
 import type { NextPage } from 'next';
 import { Layout } from '../layouts/main';
+import { IdentityContextProvider } from '../contexts/IdentityContext';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   Layout?: ({ children }: { children: ReactElement }) => ReactElement;
@@ -45,34 +46,39 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <>
       <ChakraProvider theme={defaultTheme}>
-        <CosmWasmClientContextProvider>
-          <QueryClientProvider client={queryClient}>
-            <ChainProvider
-              chains={chains}
-              assetLists={assets}
-              wallets={[keplrWallets[0]]}
-              walletModal={undefined}
-              modalViews={{
-                Connected: WalletModal,
-              }}
-              signerOptions={signerOptions}
-              endpointOptions={{
-                [chainName]: {
-                  rpc: [LCD_URL],
-                },
-              }}
-            >
-              <CosmWasmProvider>
-                <AppStateProvider>
-                  <Layout>
-                    <Component {...pageProps} />
-                  </Layout>
-                </AppStateProvider>
-              </CosmWasmProvider>
-            </ChainProvider>
-            <ReactQueryDevtools initialIsOpen={false} />
-          </QueryClientProvider>
-        </CosmWasmClientContextProvider>
+        <QueryClientProvider client={queryClient}>
+          <ChainProvider
+            chains={chains}
+            assetLists={assets}
+            wallets={[keplrWallets[0]]}
+            walletModal={undefined}
+            modalViews={{
+              Connected: WalletModal,
+            }}
+            signerOptions={signerOptions}
+            endpointOptions={{
+              [chainName]: {
+                rpc: [LCD_URL],
+              },
+            }}
+          >
+            <CosmWasmClientContextProvider>
+              <IdentityContextProvider>
+                <CosmWasmProvider>
+                  <AppStateProvider>
+                    <Layout>
+                      <>
+                        <Component {...pageProps} />
+                        <OnboardingModal />
+                      </>
+                    </Layout>
+                  </AppStateProvider>
+                </CosmWasmProvider>
+                <ReactQueryDevtools initialIsOpen={false} />
+              </IdentityContextProvider>
+            </CosmWasmClientContextProvider>
+          </ChainProvider>
+        </QueryClientProvider>
       </ChakraProvider>
     </>
   );

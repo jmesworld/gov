@@ -1,7 +1,7 @@
 import { useChain } from '@cosmos-kit/react';
 import { Box, GridItem, Icon, Stack } from '@chakra-ui/react';
-import { MouseEventHandler, useState } from 'react';
-import { FiAlertCircle, FiAlertOctagon, FiAlertTriangle } from 'react-icons/fi';
+import { MouseEventHandler } from 'react';
+import { FiAlertCircle, FiAlertTriangle } from 'react-icons/fi';
 import {
   Error,
   Connected,
@@ -14,24 +14,12 @@ import {
   WalletConnect,
 } from './components';
 import { chainName } from '../../config/defaults';
-import { useCosmWasmClient } from '../../contexts/ClientContext';
 
 const Wallet = () => {
-  const {
-    connect,
-    openView,
-    status,
-    username,
-    address,
-    message,
-    wallet,
-    chain: chainInfo,
-    logoUrl,
-  } = useChain(chainName);
+  const { connect, openView, status, message, wallet } = useChain(chainName);
 
   const onClickConnect: MouseEventHandler = async e => {
     e.preventDefault();
-
     await connect();
   };
 

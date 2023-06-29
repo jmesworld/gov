@@ -3,7 +3,7 @@ import { chainName } from "../../../config/defaults";
 import { useState } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import AddTokensCard from "../../Onboarding/components/AddTokensCard";
-import ChooseUsernameCard from "../../Onboarding/components/ChooseUsernameCard";
+import ChooseUsernameCard from "../../Onboarding/ChooseUsernameModal";
 import { useAccountBalance } from "../../../hooks/useAccountBalance";
 import { useClientIdentity } from "../../../hooks/useClientIdentity";
 
