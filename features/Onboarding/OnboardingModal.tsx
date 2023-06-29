@@ -10,26 +10,33 @@ import {
 import AddTokensCard from './components/AddTokensCard';
 import ChooseUsernameCard from './ChooseUsernameModal';
 
-import { useAccountBalance } from '../../hooks/useAccountBalance';
-
 import { useIdentityContext } from '../../contexts/IdentityContext';
+import { useBalanceContext } from '../../contexts/balanceContext';
+import { useMemo } from 'react';
 
 export default function OnboardingModal() {
-  const { loadingIdentity, getIdentityName, address, disconnect } =
+  const { loadingIdentity, getIdentityName, disconnect, address } =
     useIdentityContext();
-  const balance = useAccountBalance(address, 1 * 1000);
   const identityName = getIdentityName();
+  const { balance } = useBalanceContext();
+
+  const isOpen = useMemo(() => {
+    if (loadingIdentity || !address) {
+      return false;
+    }
+    if (!identityName) {
+      return true;
+    }
+    if (!balance?.unstaked) {
+      return true;
+    }
+    return false;
+  }, [address, balance?.unstaked, identityName, loadingIdentity]);
+
   return (
     <>
       <Modal
-        isOpen={
-          !identityName &&
-          !loadingIdentity &&
-          !!(
-            balance.data?.unstaked === 0 ||
-            (balance.data?.unstaked && !identityName)
-          )
-        }
+        isOpen={isOpen}
         onClose={() => {
           disconnect?.();
         }}
@@ -57,9 +64,9 @@ export default function OnboardingModal() {
                     position: 'fixed',
                   }}
                 >
-                  {balance.data?.unstaked === 0 ? (
+                  {balance?.unstaked === 0 ? (
                     <AddTokensCard />
-                  ) : balance.data?.unstaked && !identityName ? (
+                  ) : balance?.unstaked && !identityName ? (
                     <ChooseUsernameCard identityName={identityName ?? ''} />
                   ) : balance && identityName ? null : (
                     <CircularProgress isIndeterminate color="white" />
