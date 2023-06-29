@@ -21,45 +21,37 @@ import {
   TabPanels,
   TabPanel,
   TabIndicator,
+  Spinner,
 } from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import { DelegateUnbondingTable } from './delegate-unbonding-table';
 import { DelegateValidatorTable } from './delegate-validator-table';
-import { UnBondValidatorTable } from './unbond-validator-table';
-import { validatorsData } from './mock/validator';
+// import { validatorsData } from './mock/validator';
+import { useDelegate } from './hooks/useDelegate';
 
 type Props = {
   onClose: () => void;
 };
 
-const totalJmes = 1000;
-const totalBondedJmes = 1000;
 export const Delegate = ({ onClose }: Props) => {
-  const [bonding, setBonding] = useState<boolean>(true);
-  const [sliderValue, setSliderValue] = useState<number>(50);
-  const [jmesValue, setJmesValue] = useState<number>(totalJmes / 2);
-  const [bJmesValue, setBJmesValue] = useState<number>(totalJmes / 2);
   const [tabIndex, setTabIndex] = useState<number>(1);
-  const [validatorSelected, setValidatorSelected] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (bonding) {
-      // Bond
-      setBJmesValue((totalJmes / 100) * sliderValue + totalBondedJmes);
-      setJmesValue((totalJmes / 100) * (100 - sliderValue));
-    } else {
-      //UnBond
-      setJmesValue(totalJmes + (totalBondedJmes / 100) * sliderValue);
-      setBJmesValue((totalBondedJmes / 100) * (100 - sliderValue));
-    }
-  }, [sliderValue, bonding]);
-
-  const updateBonding = () => {
-    setBonding(!bonding);
-    setTabIndex(1);
-    setValidatorSelected(false);
-  };
+  const {
+    toggleBonding,
+    onChangeSlider,
+    sliderValue,
+    bonding,
+    bJmesValue,
+    jmesValue,
+    selectedValidator,
+    validatorList,
+    isValidatorsLoading,
+    setBondingState,
+    valueToMove,
+    isMovingNotValid,
+    delegateTokens,
+    delegatingToken,
+  } = useDelegate();
 
   const handleTabsChange = (index: number) => {
     setTabIndex(index);
@@ -67,7 +59,7 @@ export const Delegate = ({ onClose }: Props) => {
 
   return (
     <>
-      <Modal isOpen={true} onClose={onClose}>
+      <Modal closeOnOverlayClick={false} isOpen={true} onClose={onClose}>
         <ModalOverlay bg="rgba(15, 0, 86, 0.6)" />
         <ModalContent
           maxH="506px"
@@ -156,13 +148,14 @@ export const Delegate = ({ onClose }: Props) => {
                         background={bonding ? 'green' : 'lilac'}
                         justifyContent="center"
                         alignItems="center"
-                        onClick={() => updateBonding()}
+                        onClick={toggleBonding}
                       >
                         <Image
                           src="/arrow.svg"
                           alt="icon"
                           width={'19px'}
                           height={'15px'}
+                          transition={'.2s all'}
                           transform={
                             bonding ? 'rotate(0deg)' : 'rotate(180deg)'
                           }
@@ -214,8 +207,9 @@ export const Delegate = ({ onClose }: Props) => {
                 </Flex>
                 <Box marginTop="75px">
                   <Slider
+                    isDisabled={delegatingToken}
                     defaultValue={50}
-                    onChange={val => setSliderValue(val)}
+                    onChange={onChangeSlider}
                   >
                     <SliderTrack
                       background="darkPurple"
@@ -294,9 +288,13 @@ export const Delegate = ({ onClose }: Props) => {
                       </Box>
                     </SliderThumb>
                   </Slider>
+
+                  <Text color="red" fontSize="sm" height="4" textShadow="md">
+                    {isMovingNotValid}
+                  </Text>
                 </Box>
                 <Button
-                  display="block"
+                  display="flex"
                   backgroundColor={bonding ? 'green' : 'lilac'}
                   borderRadius={90}
                   alignContent="end"
@@ -304,13 +302,23 @@ export const Delegate = ({ onClose }: Props) => {
                   width="auto"
                   height={'48px'}
                   alignSelf="center"
+                  onClick={delegateTokens}
                   _hover={{ bg: bonding ? 'green' : 'lilac' }}
                   variant={'outline'}
                   borderWidth={'1px'}
                   borderColor={'rgba(0,0,0,0.1)'}
-                  margin="35px auto 40px"
-                  disabled={!validatorSelected}
+                  marginTop="30px"
+                  marginBottom="40px"
+                  marginX="auto"
+                  disabled={
+                    !selectedValidator ||
+                    !!isMovingNotValid ||
+                    !!delegatingToken
+                  }
                 >
+                  {delegatingToken && (
+                    <Spinner mr={4} size="sm" color="white" />
+                  )}
                   <Text
                     color="midnight"
                     fontFamily={'DM Sans'}
@@ -326,9 +334,7 @@ export const Delegate = ({ onClose }: Props) => {
                       height={'10px'}
                       marginLeft="8px"
                     />
-                    {bonding
-                      ? bJmesValue - totalBondedJmes
-                      : jmesValue - totalBondedJmes}
+                    {valueToMove}
                   </Text>
                 </Button>
                 <Text
@@ -425,14 +431,22 @@ export const Delegate = ({ onClose }: Props) => {
                     <TabPanel padding={0}>
                       {bonding ? (
                         <DelegateValidatorTable
-                          validatorsData={validatorsData.validators}
-                          selectValidator={setValidatorSelected}
+                          selectedValidator={selectedValidator}
+                          loading={isValidatorsLoading}
+                          validatorsData={validatorList}
+                          onSelectValidator={id => {
+                            setBondingState(p => ({
+                              ...p,
+                              selectedValidator: id,
+                            }));
+                          }}
                         />
                       ) : (
-                        <UnBondValidatorTable
-                          validatorsData={validatorsData.bondedValidators}
-                          selectValidator={setValidatorSelected}
-                        />
+                        <></>
+                        // <UnBondValidatorTable
+                        //   validatorsData={ValidatorsData?.bondedValidators}
+                        //   selectValidator={() => {}}
+                        // />
                       )}
                     </TabPanel>
                   </TabPanels>
