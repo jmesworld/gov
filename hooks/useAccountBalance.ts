@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { rest } from '../config/defaults';
+import { JMES_DENOM, BJMES_DENOM } from '../lib/constants';
 
-const JMES_DENOM = 'ujmes';
-const BJMES_DENOM = 'bujmes';
 export function useAccountBalance(
   address: string | undefined,
   refetchInterval = 60 * 1000,

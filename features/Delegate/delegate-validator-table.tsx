@@ -1,34 +1,19 @@
-import { Text, Box, Image } from '@chakra-ui/react';
-import { useState } from 'react';
+import { Text, Box, Image, Spinner } from '@chakra-ui/react';
+import { Core } from 'jmes';
 
 interface ValidatorProps {
-  validatorsData: validatorsData[];
-  selectValidator: (val: boolean) => void;
+  validatorsData?: Core.Validator[];
+  selectedValidator: string | null;
+  onSelectValidator: (id: string | null) => void;
+  loading: boolean;
 }
-
-interface validatorsData {
-  name: string;
-  commission: string;
-  votingPower: string;
-  url: string;
-}
-
+// TODO: FIX propety names
 export const DelegateValidatorTable = ({
   validatorsData,
-  selectValidator,
+  onSelectValidator,
+  selectedValidator,
+  loading,
 }: ValidatorProps) => {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
-  function setSelectedValidator(idx: number) {
-    if (idx === activeIndex) {
-      setActiveIndex(null);
-      selectValidator(false);
-      return;
-    }
-    setActiveIndex(idx);
-    selectValidator(true);
-  }
-
   return (
     <Box position="relative" height="380px" overflowY="scroll">
       <Box
@@ -89,63 +74,73 @@ export const DelegateValidatorTable = ({
           Voting Power
         </Text>
       </Box>
-
-      {validatorsData.map((validator, i) => (
-        <Box
-          key={`${validator.name.toLowerCase().replace(/\s/g, '')}-${i}`}
-          onClick={() => setSelectedValidator(i)}
-          display="flex"
-          justifyContent="flex-start"
-          padding={activeIndex === i ? '8px' : '8px 0'}
-          background={activeIndex === i ? '#704FF7' : ''}
-          borderRadius={activeIndex === i ? '4px' : ''}
-          cursor="pointer"
-        >
-          <Text
-            color="#fff"
-            fontFamily={'DM Sans'}
-            fontWeight="500"
-            fontSize={12}
-            lineHeight="20px"
-            width="36%"
+      {loading && <Spinner size="sm" />}
+      {validatorsData?.map(validator => {
+        const id = validator.consensus_pubkey.key;
+        return (
+          <Box
+            key={id}
+            onClick={() => onSelectValidator(id)}
+            display="flex"
+            justifyContent="flex-start"
+            padding={selectedValidator === id ? '8px' : '8px 0'}
+            background={selectedValidator === id ? '#704FF7' : ''}
+            borderRadius={validator.consensus_pubkey.key === id ? '4px' : ''}
+            cursor="pointer"
           >
-            {validator.name}
-          </Text>
-          <Text
-            color="#fff"
-            fontFamily={'DM Sans'}
-            fontWeight="500"
-            fontSize={12}
-            lineHeight="20px"
-            width="30%"
-          >
-            {validator.commission}%
-          </Text>
-          <Text
-            color="#fff"
-            fontFamily={'DM Sans'}
-            fontWeight="500"
-            fontSize={12}
-            lineHeight="20px"
-            width="30%"
-          >
-            {validator.votingPower}%
-          </Text>
-          {validator.url && (
-            <Box width="4%">
-              <a href={validator.url} rel="noreferrer" target="_blank">
-                <Image
-                  src="/link.svg"
-                  alt="external link"
-                  width={'12px'}
-                  height={'12px'}
-                  margin="3px 0"
-                />
-              </a>
-            </Box>
-          )}
-        </Box>
-      ))}
+            <Text
+              color="#fff"
+              fontFamily={'DM Sans'}
+              fontWeight="500"
+              fontSize={12}
+              lineHeight="20px"
+              width="36%"
+            >
+              {validator.description.moniker}
+            </Text>
+            <Text
+              color="#fff"
+              fontFamily={'DM Sans'}
+              fontWeight="500"
+              fontSize={12}
+              lineHeight="20px"
+              width="30%"
+            >
+              {validator.commission.commission_rates.rate
+                .toDecimalPlaces(2)
+                .toString()}
+              %
+            </Text>
+            <Text
+              color="#fff"
+              fontFamily={'DM Sans'}
+              fontWeight="500"
+              fontSize={12}
+              lineHeight="20px"
+              width="30%"
+            >
+              {/* {validator.commission.}% */}
+            </Text>
+            {validator.description.website && (
+              <Box width="4%">
+                <a
+                  href={validator.description.website}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <Image
+                    src="/link.svg"
+                    alt="external link"
+                    width={'12px'}
+                    height={'12px'}
+                    margin="3px 0"
+                  />
+                </a>
+              </Box>
+            )}
+          </Box>
+        );
+      })}
     </Box>
   );
 };
