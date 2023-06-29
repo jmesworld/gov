@@ -14,6 +14,7 @@ import { ProposalVotes } from "./ProposalVotes";
 
 export interface ProposalVoting {
   yesPercentage: number;
+  noPercentage: number;
   target: number;
   votes: Array<any>;
 }
@@ -34,8 +35,9 @@ export const ProposalVoting = (props: ProposalVoting) => {
           To Pass
         </Text>
         <ProposalProgress
-          progress={props.yesPercentage}
-          target={props.target}
+          yesPercent={40}
+          noPercent={60}
+          target={50}
         />
         <Divider borderColor="rgba(81, 54, 194, 0.3)" />
         <HStack align="flex-start" spacing="10px" width="100%">

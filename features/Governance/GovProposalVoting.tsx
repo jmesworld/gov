@@ -34,8 +34,9 @@ const GovProposalVoting = (props: GovProposalVoting) => {
           To Pass
         </Text>
         <ProposalProgress
-          progress={props.yesVotesPercentage}
-          target={props.target}
+          yesPercent={40}
+          noPercent={60}
+          target={50}
         />
         <Divider borderColor="rgba(81, 54, 194, 0.3)" />
         <HStack align="flex-start" spacing="10px" width="100%">
