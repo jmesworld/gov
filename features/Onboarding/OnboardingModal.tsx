@@ -5,35 +5,33 @@ import {
   ModalBody,
   ModalContent,
   ModalOverlay,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 
-import AddTokensCard from "./components/AddTokensCard";
-import ChooseUsernameCard from "./components/ChooseUsernameCard";
-import { useChain } from "@cosmos-kit/react";
-import { chainName } from "../../config/defaults";
+import AddTokensCard from './components/AddTokensCard';
+import ChooseUsernameCard from './ChooseUsernameModal';
 
-import { useAccountBalance } from "../../hooks/useAccountBalance";
-import { useCosmWasmClient } from "../../contexts/ClientContext";
-import { useClientIdentity } from "../../hooks/useClientIdentity";
+import { useAccountBalance } from '../../hooks/useAccountBalance';
+
+import { useIdentityContext } from '../../contexts/IdentityContext';
 
 export default function OnboardingModal() {
-  const balance = useAccountBalance(chainName);
-  const { disconnect } = useChain(chainName);
-  const { identityName } = useCosmWasmClient();
-
-  const { identityOwnerQuery } = useClientIdentity();
-  const identityNameStatus = identityOwnerQuery.status;
-
+  const { loadingIdentity, getIdentityName, address, disconnect } =
+    useIdentityContext();
+  const balance = useAccountBalance(address, 1 * 1000);
+  const identityName = getIdentityName();
   return (
     <>
       <Modal
         isOpen={
-          identityOwnerQuery.isSuccess || identityNameStatus === "loading"
-            ? false
-            : true
+          !identityName &&
+          !loadingIdentity &&
+          !!(
+            balance.data?.unstaked === 0 ||
+            (balance.data?.unstaked && !identityName)
+          )
         }
         onClose={() => {
-          disconnect();
+          disconnect?.();
         }}
         isCentered
         closeOnOverlayClick={false}
@@ -43,28 +41,26 @@ export default function OnboardingModal() {
           <ModalContent
             maxW="500px"
             maxH="675px"
-            alignItems={"center"}
-            borderRadius={"12px"}
+            alignItems={'center'}
+            borderRadius={'12px'}
           >
             <ModalBody padding={0}>
               <Box
-                backgroundColor={"#704FF7"}
-                width={"500px"}
-                height={"500px"}
-                borderRadius={"12px"}
+                backgroundColor={'#704FF7'}
+                width={'500px'}
+                height={'500px'}
+                borderRadius={'12px'}
               >
                 <span
                   style={{
                     zIndex: 99999,
-                    position: "fixed",
+                    position: 'fixed',
                   }}
                 >
                   {balance.data?.unstaked === 0 ? (
                     <AddTokensCard />
                   ) : balance.data?.unstaked && !identityName ? (
-                    <ChooseUsernameCard
-                      identityName={identityName}
-                    />
+                    <ChooseUsernameCard identityName={identityName ?? ''} />
                   ) : balance && identityName ? null : (
                     <CircularProgress isIndeterminate color="white" />
                   )}

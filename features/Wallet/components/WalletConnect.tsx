@@ -1,17 +1,16 @@
-import React, { MouseEventHandler, ReactNode, useEffect } from "react";
-import { Icon, Stack, Text, useColorModeValue } from "@chakra-ui/react";
+/* eslint-disable prettier/prettier */
+import React, { MouseEventHandler, ReactNode, useEffect } from 'react';
+import { Icon, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 
-import { FiAlertTriangle } from "react-icons/fi";
-import { WalletStatus } from "@cosmos-kit/core";
-import { addJMEStoKeplr, checkJMESInKeplr } from "../../../actions/keplr";
+import { FiAlertTriangle } from 'react-icons/fi';
+import { WalletStatus } from '@cosmos-kit/core';
+import { addJMEStoKeplr, checkJMESInKeplr } from '../../../actions/keplr';
 
-import { ConnectedWalletButton } from "./ConnectedWalletButton";
-import { ConnectWalletButton } from "./ConnectWalletButton";
-import { useClientIdentity } from "../../../hooks/useClientIdentity";
+import { ConnectedWalletButton } from './ConnectedWalletButton';
+import { ConnectWalletButton } from './ConnectWalletButton';
 // import useClient from "../../../hooks/useClient";
-import { useAccountBalance } from "../../../hooks/useAccountBalance";
-import { useChain } from "@cosmos-kit/react";
-import { chainName } from "../../../config/defaults";
+import { useAccountBalance } from '../../../hooks/useAccountBalance';
+import { useIdentityContext } from '../../../contexts/IdentityContext';
 
 export const Connected = ({
   buttonText,
@@ -20,19 +19,12 @@ export const Connected = ({
   buttonText: string;
   onClick: MouseEventHandler<HTMLButtonElement>;
 }) => {
-  const { identityName, identityOwnerQuery } = useClientIdentity();
-  const { address } = useChain(chainName);
-  const fetchBal = useAccountBalance(address as string).data;
+  const { getIdentityName, address } = useIdentityContext();
 
+  const fetchBal = useAccountBalance(address as string).data;
   return (
     <ConnectedWalletButton
-      identityName={
-        identityOwnerQuery.status === "loading" ||
-        identityOwnerQuery.status === "error"
-        // @ts-ignore
-          ? identityOwnerQuery.refetch() && "loading.."
-          : identityName ?? "fetching identity.."
-      }
+      identityName={getIdentityName()}
       identityBalance={fetchBal?.unstaked ?? 0}
       identityStake={fetchBal?.staked ?? 0}
       buttonText={buttonText}
@@ -67,7 +59,7 @@ export const Rejected = ({
   wordOfWarning?: string;
   onClick: MouseEventHandler<HTMLButtonElement>;
 }) => {
-  const bg = useColorModeValue("orange.200", "orange.300");
+  const bg = useColorModeValue('orange.200', 'orange.300');
 
   return (
     <Stack>
@@ -107,10 +99,10 @@ export const Error = ({
   wordOfWarning?: string;
   onClick: MouseEventHandler<HTMLButtonElement>;
 }) => {
-  const bg = useColorModeValue("orange.200", "orange.300");
+  const bg = useColorModeValue('orange.200', 'orange.300');
 
   useEffect(() => {
-    checkJMESInKeplr().then((res) => {
+    checkJMESInKeplr().then(res => {
       if (res === false) {
         addJMEStoKeplr();
       }

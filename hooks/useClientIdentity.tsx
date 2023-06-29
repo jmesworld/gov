@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import { useChain } from "@cosmos-kit/react";
+import { useState, useEffect, useCallback } from 'react';
+import { useChain } from '@cosmos-kit/react';
 import {
   CosmWasmClient,
   SigningCosmWasmClient,
-} from "@cosmjs/cosmwasm-stargate";
-import { IdentityserviceQueryClient } from "../client/Identityservice.client";
-import { useIdentityserviceGetIdentityByOwnerQuery } from "../client/Identityservice.react-query";
-import { IDENTITY_SERVICE_CONTRACT, chainName } from "../config/defaults";
+} from '@cosmjs/cosmwasm-stargate';
+import { IdentityserviceQueryClient } from '../client/Identityservice.client';
+import { useIdentityserviceGetIdentityByOwnerQuery } from '../client/Identityservice.react-query';
+import { IDENTITY_SERVICE_CONTRACT, chainName } from '../config/defaults';
 
 export interface CosmWasmClientContext {
   walletAddress: string;
@@ -24,7 +24,7 @@ export const useClientIdentity = (): CosmWasmClientContext => {
     useChain(chainName);
 
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-    null
+    null,
   );
   const [signingClient, setSigningClient] =
     useState<SigningCosmWasmClient | null>(null);
@@ -33,7 +33,7 @@ export const useClientIdentity = (): CosmWasmClientContext => {
   const [walletAddress, setWalletAddress] = useState(address as string);
   const [identityName, setIdentityName] = useState<string | null>(null);
 
-  const connectWalletClients = async () => {
+  const connectWalletClients = useCallback(async () => {
     setLoading(true);
     try {
       const cosmClient = await getCosmWasmClient();
@@ -46,13 +46,13 @@ export const useClientIdentity = (): CosmWasmClientContext => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getCosmWasmClient, getSigningCosmWasmClient]);
 
   const disconnect = () => {
     if (cosmWasmClient) {
       cosmWasmClient.disconnect();
     }
-    setWalletAddress("");
+    setWalletAddress('');
     setCosmWasmClient(null);
     setSigningClient(null);
     setLoading(false);
@@ -60,7 +60,7 @@ export const useClientIdentity = (): CosmWasmClientContext => {
 
   const identityserviceClient = new IdentityserviceQueryClient(
     cosmWasmClient as CosmWasmClient,
-    IDENTITY_SERVICE_CONTRACT
+    IDENTITY_SERVICE_CONTRACT,
   );
 
   const identityOwnerQuery = useIdentityserviceGetIdentityByOwnerQuery({
@@ -79,7 +79,7 @@ export const useClientIdentity = (): CosmWasmClientContext => {
 
   useEffect(() => {
     connectWalletClients();
-  }, []);
+  }, [connectWalletClients]);
 
   return {
     signingClient,

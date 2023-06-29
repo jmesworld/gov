@@ -1,22 +1,24 @@
 import {
   CosmWasmClient,
   SigningCosmWasmClient,
-} from "@cosmjs/cosmwasm-stargate";
+} from '@cosmjs/cosmwasm-stargate';
 import {
   IdentityserviceQueryClient,
   IdentityserviceClient,
-} from "../client/Identityservice.client";
+} from '../client/Identityservice.client';
 import {
   useIdentityserviceGetIdentityByNameQuery,
   useIdentityserviceGetIdentityByOwnerQuery,
-  useIdentityserviceRegisterUserMutation,
-} from "../client/Identityservice.react-query";
-import { IDENTITY_SERVICE_CONTRACT } from "../config/defaults";
-import { useState } from "react";
+} from '../client/Identityservice.react-query';
+import { IDENTITY_SERVICE_CONTRACT } from '../config/defaults';
 
 export interface IdentityError {
-  message: string;
-  name?: string;
+  message?: string;
+  name:
+    | 'NameTooShort'
+    | 'NameTooLong'
+    | 'NameHasUpperCase'
+    | 'InvalidCharacter';
   length?: number;
   min_length?: number;
   max_length?: number;
@@ -36,18 +38,18 @@ export const IDENTITY_HELPERS = {
     return !validationResult?.name;
   },
   isIdentityNameAvailable: (i: any) => {
-    return !!!i?.data?.identity?.name.toString();
+    return !i?.data?.identity?.name.toString();
   },
   getIdentityByOwner: async (
     client: IdentityserviceQueryClient,
-    address: string
+    address: string,
   ) => {
     const identity = await client.getIdentityByOwner({ owner: address });
     return identity;
   },
   getIdentityByName: async (
     client: IdentityserviceQueryClient,
-    name: string
+    name: string,
   ) => {
     const identity = await client.getIdentityByName({ name });
     return identity;
@@ -59,7 +61,7 @@ export const IDENTITY_HELPERS = {
   setCosmWasmClient: (cosmWasmClient: any) => {
     const client = new IdentityserviceQueryClient(
       cosmWasmClient,
-      IDENTITY_SERVICE_CONTRACT
+      IDENTITY_SERVICE_CONTRACT,
     );
     return client;
   },
@@ -68,24 +70,20 @@ export const IDENTITY_HELPERS = {
     const idClient = new IdentityserviceClient(
       signingClient as SigningCosmWasmClient,
       address as string,
-      IDENTITY_SERVICE_CONTRACT
+      IDENTITY_SERVICE_CONTRACT,
     );
     return idClient;
   },
   setIdentityNameInput: (identityNameInput: string) => {
     return identityNameInput;
   },
-  useIdentityserviceGetIdentityByNameQuery: ({
-    client,
-    args,
-    options,
-  }: any) => {
+  useIdentityserviceGetIdentityByNameQuery: ({ client, args }: any) => {
     return useIdentityserviceGetIdentityByNameQuery({
       client: IDENTITY_HELPERS.setSigningClient(client, args),
       args: { name: args },
       options: {
         onSuccess: (data: any) => {
-          if (!!!data?.identity?.name.toString()) {
+          if (!data?.identity?.name.toString()) {
             return true;
           }
         },
@@ -94,11 +92,7 @@ export const IDENTITY_HELPERS = {
     });
   },
 
-  useIdentityserviceGetIdentityByOwnerQuery: ({
-    client,
-    args,
-    options,
-  }: any) => {
+  useIdentityserviceGetIdentityByOwnerQuery: ({ client, args }: any) => {
     return useIdentityserviceGetIdentityByOwnerQuery({
       client: IDENTITY_HELPERS.setCosmWasmClient(client),
       args: { owner: args },
@@ -113,26 +107,26 @@ export const IDENTITY_HELPERS = {
   },
 };
 
-export function validateName(name: string): void | IdentityError {
+export function validateName(name: string): undefined | IdentityError {
   const length = name.length;
   if (length < MIN_NAME_LENGTH) {
     return {
-      message: "Name is too short",
-      name: "NameTooShort",
+      message: 'Name is too short',
+      name: 'NameTooShort',
       length,
       min_length: MIN_NAME_LENGTH,
     };
   } else if (length > MAX_NAME_LENGTH) {
     return {
-      message: "Name is too long",
-      name: "NameTooLong",
+      message: 'Name is too long',
+      name: 'NameTooLong',
       length,
       max_length: MAX_NAME_LENGTH,
     };
   } else if (/[A-Z]/.test(name)) {
     return {
-      message: "Name contains uppercase letter",
-      name: "NameHasUpperCase",
+      message: 'Name contains uppercase letter',
+      name: 'NameHasUpperCase',
       length,
       max_length: MAX_NAME_LENGTH,
     };
@@ -143,8 +137,8 @@ export function validateName(name: string): void | IdentityError {
     } else {
       const c = name[bytepos_invalid_char_start];
       return {
-        message: "Name contains invalid character",
-        name: "InvalidCharacter",
+        message: 'Name contains invalid character',
+        name: 'InvalidCharacter',
         c,
       };
     }
@@ -152,7 +146,7 @@ export function validateName(name: string): void | IdentityError {
 }
 
 export function countObjectsWithDuplicateNames(
-  objects: { name: string; address: string; votingPower: number }[]
+  objects: { name: string; address: string; votingPower: number }[],
 ): number {
   const nameCounts: Record<string, number> = {};
 
@@ -177,5 +171,5 @@ export function countObjectsWithDuplicateNames(
 }
 
 export function toBase64(obj: any) {
-  return Buffer.from(JSON.stringify(obj)).toString("base64");
+  return Buffer.from(JSON.stringify(obj)).toString('base64');
 }

@@ -1,4 +1,4 @@
-import { Box, Center, Flex, Spacer } from "@chakra-ui/react";
+import { Box, Center, Flex, Image } from '@chakra-ui/react';
 
 const OnboardingProgressIndicator = ({
   activeCard,
@@ -7,21 +7,14 @@ const OnboardingProgressIndicator = ({
 }) => {
   return (
     <Center>
-      <Flex width={"88px"}>
+      <Flex width={'88px'} alignItems="center">
         <OnboardingProgressIndicatorItem
-          isActive={activeCard === "add-jmes-card"}
+          checked={activeCard === 'choose-username-card'}
+          isActive={activeCard === 'add-tokens-card'}
         />
-        <Spacer />
+        <Flex width={33} height="1px" bg="green" />
         <OnboardingProgressIndicatorItem
-          isActive={activeCard === "connect-wallet-card"}
-        />
-        <Spacer />
-        <OnboardingProgressIndicatorItem
-          isActive={activeCard === "add-tokens-card"}
-        />
-        <Spacer />
-        <OnboardingProgressIndicatorItem
-          isActive={activeCard === "choose-username-card"}
+          isActive={activeCard === 'choose-username-card'}
         />
       </Flex>
     </Center>
@@ -30,18 +23,34 @@ const OnboardingProgressIndicator = ({
 
 const OnboardingProgressIndicatorItem = ({
   isActive,
+  checked,
 }: {
+  checked?: boolean;
   isActive: boolean;
 }) => {
   return (
     <Box
-      borderWidth={"1px"}
-      borderColor={"green"}
-      width={"16px"}
-      height={"16px"}
-      backgroundColor={isActive ? "green" : "transparent"}
-      borderRadius={"full"}
-    />
+      borderWidth="1px"
+      borderColor="green"
+      width="16px"
+      height="16px"
+      backgroundColor={isActive || checked ? 'green' : 'transparent'}
+      borderRadius="full"
+      position="relative"
+    >
+      {checked && (
+        <Image
+          position="absolute"
+          margin="auto"
+          top="0"
+          bottom="0"
+          right="0"
+          left="0"
+          src="/CheckFilled.svg"
+          alt="checked"
+        />
+      )}
+    </Box>
   );
 };
 
