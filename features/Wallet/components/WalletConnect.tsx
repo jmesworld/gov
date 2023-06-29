@@ -9,8 +9,8 @@ import { addJMEStoKeplr, checkJMESInKeplr } from '../../../actions/keplr';
 import { ConnectedWalletButton } from './ConnectedWalletButton';
 import { ConnectWalletButton } from './ConnectWalletButton';
 // import useClient from "../../../hooks/useClient";
-import { useAccountBalance } from '../../../hooks/useAccountBalance';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
+import { useBalanceContext } from '../../../contexts/balanceContext';
 
 export const Connected = ({
   buttonText,
@@ -19,14 +19,15 @@ export const Connected = ({
   buttonText: string;
   onClick: MouseEventHandler<HTMLButtonElement>;
 }) => {
-  const { getIdentityName, address } = useIdentityContext();
+  const { getIdentityName } = useIdentityContext();
 
-  const fetchBal = useAccountBalance(address as string).data;
+  const { balance } = useBalanceContext();
+
   return (
     <ConnectedWalletButton
       identityName={getIdentityName()}
-      identityBalance={fetchBal?.unstaked ?? 0}
-      identityStake={fetchBal?.staked ?? 0}
+      identityBalance={balance?.unstaked ?? 0}
+      identityStake={balance?.staked ?? 0}
       buttonText={buttonText}
       onClickConnectBtn={onClick}
     />

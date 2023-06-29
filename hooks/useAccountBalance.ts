@@ -6,6 +6,7 @@ const BJMES_DENOM = 'bujmes';
 export function useAccountBalance(
   address: string | undefined,
   refetchInterval = 60 * 1000,
+  enabled = true,
 ) {
   return useQuery(
     ['accountBalance', address],
@@ -34,6 +35,7 @@ export function useAccountBalance(
       onError: error => {
         console.error(error);
       },
+      enabled,
       refetchInterval,
     },
   );
