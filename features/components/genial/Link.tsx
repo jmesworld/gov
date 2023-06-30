@@ -17,7 +17,7 @@ const LinkWithActive = ({
   const router = useRouter();
   const isActive = activePattern
     ? activePattern.some(pattern => pattern.test(router.route))
-    : router.route === href;
+    : router.asPath === href;
   const matchResult = matchFunc ? matchFunc(router) : isActive;
   return (
     <LinkElem {...rest} href={href}>

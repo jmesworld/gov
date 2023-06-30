@@ -1,59 +1,50 @@
-import { Flex } from '@chakra-ui/react';
-import { useChain } from '@cosmos-kit/react';
-import { chainName } from '../../config/defaults';
+import { Box, Flex, Spinner, Text } from '@chakra-ui/react';
+
 import { NavBarItem } from '../NavBar/NavBarItem';
 import { Link } from '../components/genial/Link';
-import { useAppState } from '../../contexts/AppStateContext';
 import { useRouter } from 'next/router';
-import { useMemo } from 'react';
+import { useDAOContext } from '../../contexts/DAOContext';
+import { useIdentityContext } from '../../contexts/IdentityContext';
 
-const MyDaoList = ({
-  daos,
-  setSelectedDao,
-  setSelectedDaoName,
-}: {
-  daos: any;
-  selectedDao: string;
-  setSelectedDao: Function;
-  selectedDaoName: string;
-  setSelectedDaoName: Function;
-}) => {
+const MyDaoList = () => {
   const router = useRouter();
-  const chainContext = useChain(chainName);
-  const { selectedDao } = useAppState();
-  const { address } = chainContext;
-
-  const daosJSON = useMemo(() => {
-    try {
-      return JSON.parse(daos);
-    } catch (err) {
-      return undefined;
-    }
-  }, [daos]);
-
-  if (!daosJSON) {
-    return <></>;
+  const { daos, setSelectedDAOByName, loading, selectedDAO } = useDAOContext();
+  const { address } = useIdentityContext();
+  if (!address) {
+    return null;
+  }
+  if (loading && !daos.length) {
+    return (
+      <Box marginLeft="25px">
+        <Text
+          alignItems="center"
+          fontSize="sm"
+          size="sm"
+          display="flex"
+          color="white"
+        >
+          <Spinner color="white" size="xs" mr="2" />
+          <span>loading ...</span>
+        </Text>
+      </Box>
+    );
   }
 
-  if (!daosJSON[address as string]) {
-    return <></>;
-  } else if (Array.from(daosJSON[address as string]).length === 0) {
-    return <></>;
-  } else {
-    const daoItems = daosJSON[address as string].map(
-      (dao: { name: any; address: any }) => (
+  return (
+    <>
+      {daos?.map(dao => (
         <Link.withStatus
-          key={dao.address}
+          key={dao.name}
           matchFunc={route => {
-            return (
-              (route.pathname === '/dao/[id]' &&
-                route.query?.id === dao.address) ||
-              ((route.pathname === '/proposals/create' ||
-                router.pathname === '/dao/create') &&
-                selectedDao === dao.address)
-            );
+            if (
+              route.route === '/proposals/create' &&
+              selectedDAO?.name === dao.name
+            ) {
+              return true;
+            }
+            return route.asPath === `/dao/${dao.name}`;
           }}
-          href={`/dao/${dao.address}`}
+          href={`/dao/${dao.name}`}
         >
           {({ isActive }) => (
             <NavBarItem
@@ -64,20 +55,23 @@ const MyDaoList = ({
                 if (router.route === '/proposals/create') {
                   e.preventDefault();
                 }
-                setSelectedDao(dao.address);
-                setSelectedDaoName(dao.name);
+                setSelectedDAOByName(dao.name);
               }}
             />
           )}
         </Link.withStatus>
-      ),
-    );
-    return (
-      <>
-        <ul>{daoItems}</ul>
-        <Flex height={'20px'} />
-      </>
-    );
-  }
+      ))}
+      <Flex height={'20px'} />
+    </>
+  );
 };
-export default MyDaoList;
+
+const DAOListWrapper = () => {
+  return (
+    <Flex flexDirection="column" height={'50%'}>
+      <MyDaoList />
+    </Flex>
+  );
+};
+
+export default DAOListWrapper;

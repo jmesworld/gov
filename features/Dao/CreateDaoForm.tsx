@@ -531,7 +531,7 @@ const CreateDaoForm = ({
           width={'99px'}
           height={'42px'}
           variant={'link'}
-          onClick={() => setCreateDaoSelected(false)}
+          onClick={() => setCreateDaoSelected(null)}
         >
           <Text
             color={'darkPurple'}

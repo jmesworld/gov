@@ -27,6 +27,7 @@ type IdentityContextType = {
   loadingIdentity: boolean;
   address: string | undefined;
   disconnect: () => void;
+  identityServiceQueryClient?: IdentityserviceQueryClient;
 };
 
 const initialState: IdentityContextType = {
@@ -75,6 +76,7 @@ const IdentityContextProvider = ({ children }: Props) => {
     address,
     loadingIdentity: !!identityOwnerQuery?.isLoading,
     disconnect,
+    identityServiceQueryClient: identityserviceClient,
   };
   return (
     <IdentityContext.Provider value={value}>

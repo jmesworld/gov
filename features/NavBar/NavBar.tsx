@@ -101,13 +101,7 @@ const NavBar = ({
       {typeof window !== 'undefined' &&
       address !== 'undefined' &&
       !(localStorage.getItem('myDaosData') as string)?.includes('undefined') ? (
-        <MyDaoList
-          daos={localStorage.getItem('myDaosData') as string}
-          selectedDao={selectedDao}
-          setSelectedDao={setSelectedDao}
-          selectedDaoName={selectedDaoName}
-          setSelectedDaoName={setSelectedDaoName}
-        />
+        <MyDaoList />
       ) : (
         <></>
       )}
@@ -133,7 +127,7 @@ const NavBar = ({
           height="48px"
           text="GOV Proposal"
           disabled={
-            ['/', '/proposals/[id]'].includes(router.route) ||
+            ['/', '/proposals/[id]', '/dao/create'].includes(router.route) ||
             status !== WalletStatus.Connected ||
             !identityName
           }

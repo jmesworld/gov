@@ -1,12 +1,13 @@
 import { useRouter } from 'next/router';
-import type { NextPageWithLayout } from '../_app';
 import { useAppState } from '../../contexts/AppStateContext';
 import DaoProposal from '../../features/Dao/components/DaoProposal';
+import { useDAOContext } from '../../contexts/DAOContext';
+import { Text } from '@chakra-ui/react';
 
-const DAODetail: NextPageWithLayout = () => {
+const DAODetail = () => {
+  const { getSelectedDAOByName } = useDAOContext();
+
   const {
-    selectedDao,
-    selectedDaoName,
     setSelectedDaoProposalTitle,
     setDaoProposalDetailOpen,
     setSelectedDaoMembersList,
@@ -15,14 +16,19 @@ const DAODetail: NextPageWithLayout = () => {
   const router = useRouter();
   const id = router.query.id;
   if (!id || Array.isArray(id)) {
-    return <p> not Found </p>;
+    return <Text> DAO Not found</Text>;
+  }
+
+  const selectedDAO = getSelectedDAOByName(id);
+  if (!selectedDAO) {
+    return <Text> DAO Not found</Text>;
   }
 
   return (
     <>
       <DaoProposal
-        daoAddress={selectedDao}
-        daoName={selectedDaoName}
+        daoAddress={selectedDAO.address}
+        daoName={selectedDAO.name}
         setDaoProposalDetailOpen={setDaoProposalDetailOpen}
         setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
         setSelectedDaoMembersList={setSelectedDaoMembersList}

@@ -1,7 +1,7 @@
-import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { DaoMembersQueryClient } from "../client/DaoMembers.client";
-import { DaoMultisigQueryClient } from "../client/DaoMultisig.client";
-import { IdentityserviceQueryClient } from "../client/Identityservice.client";
+import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import { DaoMembersQueryClient } from '../client/DaoMembers.client';
+import { DaoMultisigQueryClient } from '../client/DaoMultisig.client';
+import { IdentityserviceQueryClient } from '../client/Identityservice.client';
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -12,14 +12,14 @@ const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
 
 export async function getMyDaos(
   cosmWasmClient: CosmWasmClient,
-  address: string
+  address: string,
+  identityService?: IdentityserviceQueryClient,
 ) {
-  const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
-    cosmWasmClient,
-    IDENTITY_SERVICE_CONTRACT
-  );
+  const client: IdentityserviceQueryClient =
+    identityService ??
+    new IdentityserviceQueryClient(cosmWasmClient, IDENTITY_SERVICE_CONTRACT);
 
-  let myDaos: any = "undefined";
+  let myDaos: any = 'undefined';
 
   let _data: any[] = [];
   let _startAfter = 0;
@@ -28,7 +28,7 @@ export async function getMyDaos(
     const _current_batch_data = await client.daos({
       limit: 30,
       startAfter: _startAfter,
-      order: "ascending",
+      order: 'ascending',
     });
 
     if (_current_batch_data.daos.length === 0) {
@@ -46,11 +46,11 @@ export async function getMyDaos(
 
       const daoMultisigQueryClient = new DaoMultisigQueryClient(
         cosmWasmClient,
-        daoAddrs
+        daoAddrs,
       );
       const daoMembersQueryClient = new DaoMembersQueryClient(
         cosmWasmClient,
-        daoAddrs
+        daoAddrs,
       );
 
       const voter: any = await daoMultisigQueryClient.voter({
