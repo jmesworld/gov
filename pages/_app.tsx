@@ -3,7 +3,9 @@ import type { AppProps } from 'next/app';
 import { ChainProvider } from '@cosmos-kit/react';
 import { ChakraProvider } from '@chakra-ui/react';
 import { defaultTheme } from '../config';
-import { wallets as keplrWallets } from '@cosmos-kit/keplr';
+// import { wallets as keplrWallets } from '@cosmos-kit/keplr';
+import { wallets as keplrWallets } from '@cosmos-kit/keplr-extension';
+
 import { SignerOptions } from '@cosmos-kit/core';
 import { assets } from 'chain-registry';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -51,7 +53,7 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
           <ChainProvider
             chains={chains}
             assetLists={assets}
-            wallets={[keplrWallets[0]]}
+            wallets={[...keplrWallets]}
             walletModal={undefined}
             modalViews={{
               Connected: WalletModal,
