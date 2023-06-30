@@ -16,7 +16,7 @@ import { useDaoMultisigListVotersQuery } from '../../client/DaoMultisig.react-qu
 import { IdentityserviceQueryClient } from '../../client/Identityservice.client';
 import { useIdentityserviceGetIdentityByOwnerQuery } from '../../client/Identityservice.react-query';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
-
+// FIXME: fix this
 const tooltip_text =
   'Lorem Ipsum is simply dummy text of the printing and typesetting industry.';
 
