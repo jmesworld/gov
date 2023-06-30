@@ -1,74 +1,39 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { QuestionOutlineIcon } from '@chakra-ui/icons';
 import {
   Box,
   Center,
   CircularProgress,
   CircularProgressLabel,
-  Divider,
   Flex,
   Text,
   Tooltip,
 } from '@chakra-ui/react';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { useChain } from '@cosmos-kit/react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { DaoMultisigQueryClient } from '../../client/DaoMultisig.client';
 import { useDaoMultisigListVotersQuery } from '../../client/DaoMultisig.react-query';
 import { IdentityserviceQueryClient } from '../../client/Identityservice.client';
 import { useIdentityserviceGetIdentityByOwnerQuery } from '../../client/Identityservice.react-query';
-import { chainName } from '../../config/defaults';
+import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 
 const tooltip_text =
   'Lorem Ipsum is simply dummy text of the printing and typesetting industry.';
 
-const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
-const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
-const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
-  .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
-const LCDOptions = {
-  URL: LCD_URL,
-  chainID: CHAIN_ID,
-};
 export default function DaoMembersList({
-  daoAddress,
   setSelectedDaoMembersList,
+  daoQueryClient: daoMultisigQueryClient,
 }: {
-  daoAddress: string;
+  daoQueryClient: DaoMultisigQueryClient;
   setSelectedDaoMembersList: Function;
 }) {
-  const chainContext = useChain(chainName);
-
-  const { address, getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
-
-  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-    null,
-  );
-  useEffect(() => {
-    if (address) {
-      getCosmWasmClient()
-        .then(cosmWasmClient => {
-          if (!cosmWasmClient) {
-            return;
-          }
-          setCosmWasmClient(cosmWasmClient);
-        })
-        .catch(error => console.log(error));
-    }
-  }, [address, getCosmWasmClient]);
-
-  const daoMultisigQueryClient = new DaoMultisigQueryClient(
-    cosmWasmClient as CosmWasmClient,
-    daoAddress,
-  );
-
-  const daoMembersListQuery = useDaoMultisigListVotersQuery({
+  const { data, isLoading, isFetching } = useDaoMultisigListVotersQuery({
     client: daoMultisigQueryClient,
     args: {},
   });
-
   return (
     <Box width={'265px'} marginLeft={'41px'}>
       <Flex>
@@ -100,14 +65,12 @@ export default function DaoMembersList({
           />
         </Tooltip>
       </Flex>
-      {!!daoMembersListQuery.data ? (
-        <MembersList
-          members={
-            !!daoMembersListQuery.data ? daoMembersListQuery.data?.voters : []
-          }
-          setSelectedDaoMembersList={setSelectedDaoMembersList}
-        />
-      ) : (
+      <MembersList
+        members={data ? data?.voters : []}
+        setSelectedDaoMembersList={setSelectedDaoMembersList}
+      />
+
+      {(isFetching || isLoading) && !data && (
         <Flex justifyContent="center" width="100%">
           <Text
             color="rgba(15,0,86,0.8)"
@@ -129,6 +92,7 @@ export const MembersList = ({
   members,
   setSelectedDaoMembersList,
 }: {
+  // TODO: fix ts type
   members: any;
   setSelectedDaoMembersList: Function;
 }) => {
@@ -164,24 +128,7 @@ export const DaoMembersListItem = ({
   members?: Array<any>;
   setSelectedDaoMembersList: Function;
 }) => {
-  const chainContext = useChain(chainName);
-  const { getCosmWasmClient, getSigningCosmWasmClient } = chainContext;
-
-  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-    null,
-  );
-  useEffect(() => {
-    if (address) {
-      getCosmWasmClient()
-        .then(cosmWasmClient => {
-          if (!cosmWasmClient) {
-            return;
-          }
-          setCosmWasmClient(cosmWasmClient);
-        })
-        .catch(error => console.log(error));
-    }
-  }, [address, getCosmWasmClient]);
+  const { cosmWasmClient } = useCosmWasmClientContext();
 
   const identityserviceQueryClient = new IdentityserviceQueryClient(
     cosmWasmClient as CosmWasmClient,
@@ -208,7 +155,7 @@ export const DaoMembersListItem = ({
 
       setSelectedDaoMembersList(updatedMembers);
     }
-  }, [identityQuery?.data]);
+  }, [address, identityQuery.data, members, setSelectedDaoMembersList]);
 
   return (
     <Flex
@@ -233,7 +180,7 @@ export const DaoMembersListItem = ({
           fontSize={14}
           fontFamily="DM Sans"
         >
-          {!!identityQuery.data
+          {identityQuery.data
             ? identityQuery.data?.identity?.name
             : `${address?.substring(0, 10)}...`}
         </Text>

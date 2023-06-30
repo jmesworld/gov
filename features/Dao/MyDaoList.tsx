@@ -36,15 +36,14 @@ const MyDaoList = () => {
         <Link.withStatus
           key={dao.name}
           matchFunc={route => {
-            if (
-              route.route === '/proposals/create' &&
-              selectedDAO?.name === dao.name
-            ) {
-              return true;
-            }
-            return route.asPath === `/dao/${dao.name}`;
+            return (
+              (route.pathname === '/dao/view/[id]' &&
+                route.query?.id === dao.name) ||
+              (route.pathname === '/proposals/create' &&
+                selectedDAO?.address === dao.address)
+            );
           }}
-          href={`/dao/${dao.name}`}
+          href={`/dao/view/${dao.name}`}
         >
           {({ isActive }) => (
             <NavBarItem

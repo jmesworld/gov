@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router';
-import { useAppState } from '../../contexts/AppStateContext';
-import DaoProposal from '../../features/Dao/components/DaoProposal';
-import { useDAOContext } from '../../contexts/DAOContext';
 import { Text } from '@chakra-ui/react';
+import { useAppState } from '../../../contexts/AppStateContext';
+import DaoProposal from '../../../features/Dao/components/DaoProposal';
+import { useDAOContext } from '../../../contexts/DAOContext';
 
 const DAODetail = () => {
   const { getSelectedDAOByName } = useDAOContext();
