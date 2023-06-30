@@ -8,10 +8,10 @@ import {
   Image,
   VStack,
   Divider,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 
-import GovProposalVotes from "./GovProposalVotes";
-import { ProposalProgress } from "../components/Proposal/ProposalProgress";
+import GovProposalVotes from './GovProposalVotes';
+import { ProposalProgress } from '../components/Proposal/ProposalProgress';
 
 export interface GovProposalVoting {
   target: number;

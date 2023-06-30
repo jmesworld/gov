@@ -1,4 +1,4 @@
-import { ArrowBackIcon, CloseIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, CloseIcon } from '@chakra-ui/icons';
 import {
   Box,
   Flex,
@@ -8,10 +8,10 @@ import {
   Button,
   IconButton,
   CloseButton,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { addJMEStoKeplr } from "../../../actions/keplr";
-import OnboardingProgressIndicator from "./OnboardingProgressIndicator";
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { addJMEStoKeplr } from '../../../actions/keplr';
+import OnboardingProgressIndicator from './OnboardingProgressIndicator';
 
 const AddJMESCard = ({
   radioGroup,
@@ -23,32 +23,32 @@ const AddJMESCard = ({
 }) => {
   const handleAddJmesToKeplr = () => {
     addJMEStoKeplr()
-      .then((res) => {
-        console.log("success");
+      .then(res => {
+        console.log('success');
       })
-      .catch((error) => console.log(error));
+      .catch(error => console.log(error));
 
     radioGroup[index + 1];
   };
 
   return (
     <Box
-      width={"500px"}
-      height={"590px"}
-      alignItems={"center"}
-      marginTop={"-90px"}
+      width={'500px'}
+      height={'590px'}
+      alignItems={'center'}
+      marginTop={'-90px'}
     >
       <Flex>
-        <Flex width={"100%"} justifyContent={"space-between"}>
+        <Flex width={'100%'} justifyContent={'space-between'}>
           <Image
-            marginLeft={"auto"}
-            marginRight={"auto"}
-            alignSelf={"center"}
+            marginLeft={'auto'}
+            marginRight={'auto'}
+            alignSelf={'center'}
             src="/JMES_Add.svg"
             alt="icon"
-            width={"255px"}
-            height={"311px"}
-            justifySelf={"center"}
+            width={'255px'}
+            height={'311px'}
+            justifySelf={'center'}
           />
         </Flex>
         <Spacer />
@@ -56,11 +56,11 @@ const AddJMESCard = ({
       <Flex>
         <Spacer />
         <Text
-          color={"white"}
+          color={'white'}
           fontFamily="DM Sans"
-          fontWeight={"bold"}
+          fontWeight={'bold'}
           fontSize={28}
-          py={"6px"}
+          py={'6px'}
         >
           Add JMES to Keplr Wallet
         </Text>
@@ -69,9 +69,9 @@ const AddJMESCard = ({
       <Flex>
         <Spacer />
         <Text
-          color={"white"}
+          color={'white'}
           fontFamily="DM Sans"
-          fontWeight={"normal"}
+          fontWeight={'normal'}
           fontSize={16}
         >
           Once you connect your wallet make sure you have
@@ -81,9 +81,9 @@ const AddJMESCard = ({
       <Flex>
         <Spacer />
         <Text
-          color={"white"}
+          color={'white'}
           fontFamily="DM Sans"
-          fontWeight={"normal"}
+          fontWeight={'normal'}
           fontSize={16}
         >
           JMES tokens so you can create a JMES identity
@@ -93,34 +93,34 @@ const AddJMESCard = ({
       <Flex>
         <Spacer />
         <Text
-          color={"white"}
-          fontWeight={"normal"}
+          color={'white'}
+          fontWeight={'normal'}
           fontFamily="DM Sans"
           fontSize={16}
-          paddingBottom={"6px"}
+          paddingBottom={'6px'}
         >
           and vote on Proposals.
         </Text>
         <Spacer />
       </Flex>
-      <Flex py={"25px"}>
+      <Flex py={'25px'}>
         <Spacer />
         <Button
           onClick={() => handleAddJmesToKeplr()}
-          backgroundColor={"green"}
+          backgroundColor={'green'}
           borderRadius={90}
           alignContent="end"
-          width={"200px"}
-          height={"48px"}
-          _hover={{ bg: "green" }}
-          _active={{ bg: "green" }}
-          variant={"outline"}
-          borderWidth={"1px"}
-          borderColor={"rgba(0,0,0,0.1)"}
+          width={'200px'}
+          height={'48px'}
+          _hover={{ bg: 'green' }}
+          _active={{ bg: 'green' }}
+          variant={'outline'}
+          borderWidth={'1px'}
+          borderColor={'rgba(0,0,0,0.1)'}
         >
           <Text
             color="midnight"
-            fontFamily={"DM Sans"}
+            fontFamily={'DM Sans'}
             fontWeight="medium"
             fontSize={14}
           >

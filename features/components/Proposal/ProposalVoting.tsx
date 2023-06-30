@@ -8,9 +8,9 @@ import {
   Image,
   VStack,
   Divider,
-} from "@chakra-ui/react";
-import { ProposalProgress } from "./ProposalProgress";
-import { ProposalVotes } from "./ProposalVotes";
+} from '@chakra-ui/react';
+import { ProposalProgress } from './ProposalProgress';
+import { ProposalVotes } from './ProposalVotes';
 
 export interface ProposalVoting {
   yesPercentage: number;
@@ -19,8 +19,8 @@ export interface ProposalVoting {
 }
 
 export const ProposalVoting = (props: ProposalVoting) => {
-  const yesVotes = props.votes.filter((vote) => vote.vote === "yes");
-  const noVotes = props.votes.filter((vote) => vote.vote === "no");
+  const yesVotes = props.votes.filter(vote => vote.vote === 'yes');
+  const noVotes = props.votes.filter(vote => vote.vote === 'no');
 
   return (
     <Box borderRadius="12px" background="#7453FD" padding="18px 20px">

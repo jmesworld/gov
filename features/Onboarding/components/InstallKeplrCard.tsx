@@ -1,4 +1,4 @@
-import { ArrowBackIcon, CloseIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, CloseIcon } from '@chakra-ui/icons';
 import {
   Box,
   Flex,
@@ -7,13 +7,13 @@ import {
   Text,
   Button,
   IconButton,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
 import {
   CHROME_EXTENSION_STORE,
   FIREFOX_ADDON_STORE,
   BRAVE_EXTENSION_STORE,
-} from "../../../config";
+} from '../../../config';
 
 interface CardProps {
   onClose: () => void | undefined;
@@ -46,37 +46,37 @@ const InstallKeplrCard = ({
 
   return (
     <Box
-      width={"500px"}
-      height={"590px"}
-      alignItems={"center"}
-      marginTop={"-90px"}
+      width={'500px'}
+      height={'590px'}
+      alignItems={'center'}
+      marginTop={'-90px'}
     >
       <Flex>
-        <Flex width={"100%"} justifyContent={"space-between"}>
+        <Flex width={'100%'} justifyContent={'space-between'}>
           <IconButton
             aria-label=""
-            background={"transparent"}
-            color={"transparent"}
-            icon={<ArrowBackIcon width={"24px"} height={"24px"} />}
-            marginTop={"100px"}
-            marginLeft={"8px"}
-            _hover={{ backgroundColor: "transparent" }}
+            background={'transparent'}
+            color={'transparent'}
+            icon={<ArrowBackIcon width={'24px'} height={'24px'} />}
+            marginTop={'100px'}
+            marginLeft={'8px'}
+            _hover={{ backgroundColor: 'transparent' }}
           />
           <Image
             src="/JMES_Add.svg"
             alt="icon"
-            width={"255px"}
-            height={"311px"}
-            justifySelf={"center"}
+            width={'255px'}
+            height={'311px'}
+            justifySelf={'center'}
           />
           <IconButton
             aria-label=""
-            background={"transparent"}
-            color={"white"}
-            icon={<CloseIcon height={"24px"} />}
-            marginTop={"100px"}
-            marginRight={"8px"}
-            _hover={{ backgroundColor: "transparent" }}
+            background={'transparent'}
+            color={'white'}
+            icon={<CloseIcon height={'24px'} />}
+            marginTop={'100px'}
+            marginRight={'8px'}
+            _hover={{ backgroundColor: 'transparent' }}
             onClick={() => handleCloseModal()}
           />
         </Flex>
@@ -85,11 +85,11 @@ const InstallKeplrCard = ({
       <Flex>
         <Spacer />
         <Text
-          color={"white"}
+          color={'white'}
           fontFamily="DM Sans"
-          fontWeight={"bold"}
+          fontWeight={'bold'}
           fontSize={28}
-          py={"6px"}
+          py={'6px'}
         >
           Please install the Keplr Extension to connect your JMES wallet.
         </Text>
@@ -98,9 +98,9 @@ const InstallKeplrCard = ({
       <Flex>
         <Spacer />
         <Text
-          color={"white"}
+          color={'white'}
           fontFamily="DM Sans"
-          fontWeight={"normal"}
+          fontWeight={'normal'}
           fontSize={16}
         >
           After install, please reload the page and press the connect wallet
@@ -111,9 +111,9 @@ const InstallKeplrCard = ({
       <Flex>
         <Spacer />
         <Text
-          color={"white"}
+          color={'white'}
           fontFamily="DM Sans"
-          fontWeight={"normal"}
+          fontWeight={'normal'}
           fontSize={16}
         >
           This is a 4 step process which is nullified if you refresh the page.
@@ -121,24 +121,24 @@ const InstallKeplrCard = ({
         <Spacer />
       </Flex>
 
-      <Flex py={"25px"}>
+      <Flex py={'25px'}>
         <Spacer />
         <Button
           onClick={() => handleBrowserClick(CHROME_EXTENSION_STORE)}
-          backgroundColor={"green"}
+          backgroundColor={'green'}
           borderRadius={90}
           alignContent="end"
-          width={"200px"}
-          height={"48px"}
-          _hover={{ bg: "green" }}
-          _active={{ bg: "green" }}
-          variant={"outline"}
-          borderWidth={"1px"}
-          borderColor={"rgba(0,0,0,0.1)"}
+          width={'200px'}
+          height={'48px'}
+          _hover={{ bg: 'green' }}
+          _active={{ bg: 'green' }}
+          variant={'outline'}
+          borderWidth={'1px'}
+          borderColor={'rgba(0,0,0,0.1)'}
         >
           <Text
             color="midnight"
-            fontFamily={"DM Sans"}
+            fontFamily={'DM Sans'}
             fontWeight="medium"
             fontSize={14}
           >
@@ -148,20 +148,20 @@ const InstallKeplrCard = ({
         <Spacer />
         <Button
           onClick={() => handleBrowserClick(FIREFOX_ADDON_STORE)}
-          backgroundColor={"green"}
+          backgroundColor={'green'}
           borderRadius={90}
           alignContent="end"
-          width={"200px"}
-          height={"48px"}
-          _hover={{ bg: "green" }}
-          _active={{ bg: "green" }}
-          variant={"outline"}
-          borderWidth={"1px"}
-          borderColor={"rgba(0,0,0,0.1)"}
+          width={'200px'}
+          height={'48px'}
+          _hover={{ bg: 'green' }}
+          _active={{ bg: 'green' }}
+          variant={'outline'}
+          borderWidth={'1px'}
+          borderColor={'rgba(0,0,0,0.1)'}
         >
           <Text
             color="midnight"
-            fontFamily={"DM Sans"}
+            fontFamily={'DM Sans'}
             fontWeight="medium"
             fontSize={14}
           >
@@ -171,20 +171,20 @@ const InstallKeplrCard = ({
         <Spacer />
         <Button
           onClick={() => handleBrowserClick(BRAVE_EXTENSION_STORE)}
-          backgroundColor={"green"}
+          backgroundColor={'green'}
           borderRadius={90}
           alignContent="end"
-          width={"200px"}
-          height={"48px"}
-          _hover={{ bg: "green" }}
-          _active={{ bg: "green" }}
-          variant={"outline"}
-          borderWidth={"1px"}
-          borderColor={"rgba(0,0,0,0.1)"}
+          width={'200px'}
+          height={'48px'}
+          _hover={{ bg: 'green' }}
+          _active={{ bg: 'green' }}
+          variant={'outline'}
+          borderWidth={'1px'}
+          borderColor={'rgba(0,0,0,0.1)'}
         >
           <Text
             color="midnight"
-            fontFamily={"DM Sans"}
+            fontFamily={'DM Sans'}
             fontWeight="medium"
             fontSize={14}
           >
