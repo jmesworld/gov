@@ -208,7 +208,7 @@ export const Delegate = ({ onClose }: Props) => {
                 <Box marginTop="75px">
                   <Slider
                     isDisabled={delegatingToken}
-                    defaultValue={50}
+                    defaultValue={0}
                     onChange={onChangeSlider}
                   >
                     <SliderTrack
