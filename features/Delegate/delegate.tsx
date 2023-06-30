@@ -29,6 +29,7 @@ import { DelegateUnbondingTable } from './delegate-unbonding-table';
 import { DelegateValidatorTable } from './delegate-validator-table';
 // import { validatorsData } from './mock/validator';
 import { useDelegate } from './hooks/useDelegate';
+import { UnBondValidatorTable } from './unbond-validator-table';
 
 type Props = {
   onClose: () => void;
@@ -51,6 +52,11 @@ export const Delegate = ({ onClose }: Props) => {
     isMovingNotValid,
     delegateTokens,
     delegatingToken,
+    selectedUnBonding,
+    bondedValidators,
+    isBondedValidatorsLoading,
+    validatorsError,
+    bondedValidatorsError,
   } = useDelegate();
 
   const handleTabsChange = (index: number) => {
@@ -429,8 +435,9 @@ export const Delegate = ({ onClose }: Props) => {
                       </Text>
                     </TabPanel>
                     <TabPanel padding={0}>
-                      {bonding ? (
+                      {bonding && (
                         <DelegateValidatorTable
+                          error={validatorsError as Error | undefined}
                           selectedValidator={selectedValidator}
                           loading={isValidatorsLoading}
                           validatorsData={validatorList}
@@ -441,12 +448,20 @@ export const Delegate = ({ onClose }: Props) => {
                             }));
                           }}
                         />
-                      ) : (
-                        <></>
-                        // <UnBondValidatorTable
-                        //   validatorsData={ValidatorsData?.bondedValidators}
-                        //   selectValidator={() => {}}
-                        // />
+                      )}
+                      {!bonding && (
+                        <UnBondValidatorTable
+                          error={bondedValidatorsError as Error | undefined}
+                          selectedValidator={selectedUnBonding}
+                          loading={isBondedValidatorsLoading}
+                          validatorsData={bondedValidators}
+                          onSelectValidator={id => {
+                            setBondingState(p => ({
+                              ...p,
+                              selectedUnBonding: id,
+                            }));
+                          }}
+                        />
                       )}
                     </TabPanel>
                   </TabPanels>

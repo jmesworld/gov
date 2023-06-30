@@ -1,17 +1,18 @@
-import { Text, Box, Image, Spinner } from '@chakra-ui/react';
+import { Text, Box, Image, Spinner, Alert } from '@chakra-ui/react';
 import { Core } from 'jmes';
 
 interface ValidatorProps {
   validatorsData?: Core.Validator[];
   selectedValidator: string | null;
   onSelectValidator: (id: string | null) => void;
+  error: Error | undefined;
   loading: boolean;
 }
-// TODO: FIX propety names
 export const DelegateValidatorTable = ({
   validatorsData,
   onSelectValidator,
   selectedValidator,
+  error,
   loading,
 }: ValidatorProps) => {
   return (
@@ -74,6 +75,9 @@ export const DelegateValidatorTable = ({
           Voting Power
         </Text>
       </Box>
+      {!validatorsData && error && (
+        <Alert status="error" title={error.message} />
+      )}
       {loading && <Spinner size="sm" />}
       {validatorsData?.map(validator => {
         const id = validator.consensus_pubkey.key;
