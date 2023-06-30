@@ -81,8 +81,12 @@ export const ConnectedWalletButton = ({
             fontSize={12}
             marginLeft={'5.3px'}
             fontFamily="DM Sans"
+            whiteSpace="nowrap"
+            overflow="hidden"
+            textOverflow="ellipsis"
+            maxW={'100px'}
           >
-            {identityName ? identityName : `${address?.substring(0, 11)}...`}
+            {identityName ? identityName : address}
           </Text>
           <Spacer marginLeft={'13px'} />
           <Tooltip label="JMES" hasArrow placement="bottom">
