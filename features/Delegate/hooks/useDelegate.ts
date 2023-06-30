@@ -7,10 +7,13 @@ import { useToast } from '@chakra-ui/react';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { BJMES_DENOM, JMES_DENOM } from '../../../lib/constants';
 import { useBalanceContext } from '../../../contexts/balanceContext';
+import { useSigningCosmWasmClientContext } from '../../../contexts/SigningCosmWasmClient';
 const LCD_URL = process.env.NEXT_PUBLIC_REST_URL_KEPLR as string;
 const NEXT_PUBLIC_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 
-const client = new Client({ providers: { LCDC: { chainID: NEXT_PUBLIC_CHAIN_ID, URL: LCD_URL } } });
+const client = new Client({
+  providers: { LCDC: { chainID: NEXT_PUBLIC_CHAIN_ID, URL: LCD_URL } },
+});
 
 type TransferFormType = {
   jmesValue: number;
@@ -30,6 +33,7 @@ const getUnBonds = () => {
 };
 const sliderDefaultValue = 0;
 export const useDelegate = () => {
+  const { signingCosmWasmClient } = useSigningCosmWasmClientContext();
   const { balance } = useBalanceContext();
   const totalJmes = useMemo(() => balance?.unstaked ?? 0, [balance?.unstaked]);
   const totalBondedJmes = useMemo(
@@ -42,7 +46,6 @@ export const useDelegate = () => {
   const { isValidatorsLoading, validatorList } = useValidators(client);
   const toast = useToast();
 
-  // TODO: use the new balance context
   const [transferForm, setTransferForm] = useState<TransferFormType>({
     jmesValue: totalJmes / 2,
     bJmesValue: totalBondedJmes / 2,
@@ -120,8 +123,9 @@ export const useDelegate = () => {
   const delegateTokens = useCallback(async () => {
     if (isMovingNotValid || !bondingIsValid || !address || !selectedValidator) {
       toast({
-        title: `Can't ${bonding ? 'delegate' : 'undelegate'
-          }, please fix the issues!`,
+        title: `Can't ${
+          bonding ? 'delegate' : 'undelegate'
+        }, please fix the issues!`,
         duration: 4000,
       });
       return;
@@ -133,17 +137,22 @@ export const useDelegate = () => {
     }));
     try {
       if (bonding) {
-        await account?.delegateTokens(
+        await signingCosmWasmClient?.delegateTokens(
           address,
+          selectedValidator,
           new Core.Coin(JMES_DENOM, valueToMove),
+          'auto',
         );
+
         toast({
           title: 'Delegated Token ',
         });
       } else {
-        await account?.undelegateTokens(
+        await signingCosmWasmClient?.undelegateTokens(
           address,
+          selectedValidator,
           new Core.Coin(BJMES_DENOM, valueToMove),
+          'auto',
         );
         toast({
           title: 'Delegated Token ',

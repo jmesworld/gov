@@ -27,6 +27,7 @@ import { Layout } from '../layouts/main';
 import { IdentityContextProvider } from '../contexts/IdentityContext';
 import { BalanceContextProvider } from '../contexts/balanceContext';
 import { DAOContextProvider } from '../contexts/DAOContext';
+import { SigningCosmWasmClientContextProvider } from '../contexts/SigningCosmWasmClient';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   Layout?: ({ children }: { children: ReactElement }) => ReactElement;
@@ -72,12 +73,14 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
                   <DAOContextProvider>
                     <CosmWasmProvider>
                       <AppStateProvider>
-                        <Layout>
-                          <>
-                            <Component {...pageProps} />
-                            <OnboardingModal />
-                          </>
-                        </Layout>
+                        <SigningCosmWasmClientContextProvider>
+                          <Layout>
+                            <>
+                              <Component {...pageProps} />
+                              <OnboardingModal />
+                            </>
+                          </Layout>
+                        </SigningCosmWasmClientContextProvider>
                       </AppStateProvider>
                     </CosmWasmProvider>
                   </DAOContextProvider>
