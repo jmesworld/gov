@@ -26,6 +26,7 @@ import type { NextPage } from 'next';
 import { Layout } from '../layouts/main';
 import { IdentityContextProvider } from '../contexts/IdentityContext';
 import { BalanceContextProvider } from '../contexts/balanceContext';
+import { DAOContextProvider } from '../contexts/DAOContext';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   Layout?: ({ children }: { children: ReactElement }) => ReactElement;
@@ -68,16 +69,18 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
             <CosmWasmClientContextProvider>
               <IdentityContextProvider>
                 <BalanceContextProvider>
-                  <CosmWasmProvider>
-                    <AppStateProvider>
-                      <Layout>
-                        <>
-                          <Component {...pageProps} />
-                          <OnboardingModal />
-                        </>
-                      </Layout>
-                    </AppStateProvider>
-                  </CosmWasmProvider>
+                  <DAOContextProvider>
+                    <CosmWasmProvider>
+                      <AppStateProvider>
+                        <Layout>
+                          <>
+                            <Component {...pageProps} />
+                            <OnboardingModal />
+                          </>
+                        </Layout>
+                      </AppStateProvider>
+                    </CosmWasmProvider>
+                  </DAOContextProvider>
                 </BalanceContextProvider>
                 <ReactQueryDevtools initialIsOpen={false} />
               </IdentityContextProvider>

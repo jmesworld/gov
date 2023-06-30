@@ -46,8 +46,8 @@ export default function CreateGovProposal({
   selectedDaoName,
   setCreateGovProposalSelected,
 }: {
-  selectedDao: string;
-  selectedDaoName: string;
+  selectedDao?: string;
+  selectedDaoName?: string;
   setCreateGovProposalSelected: Function;
 }) {
   const { address, getCosmWasmClient, getSigningCosmWasmClient } =
@@ -103,7 +103,7 @@ export default function CreateGovProposal({
   const daoClient: DaoMultisigClient = new DaoMultisigClient(
     signingClient as SigningCosmWasmClient,
     address as string,
-    selectedDao,
+    selectedDao ?? '',
   );
 
   // Dynamically show required sections for different proposal types
@@ -456,7 +456,7 @@ export default function CreateGovProposal({
                                 amount: '10000000',
                               },
                             ],
-                            to_address: selectedDao,
+                            to_address: selectedDao as string,
                           },
                         },
                       },

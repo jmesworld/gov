@@ -1,19 +1,21 @@
 import { useChain } from '@cosmos-kit/react';
 import CreateDaoForm from '../../features/Dao/CreateDaoForm';
 import { chainName } from '../../config/defaults';
-import { useAppState } from '../../contexts/AppStateContext';
+import { useDAOContext } from '../../contexts/DAOContext';
+import { useIdentityContext } from '../../contexts/IdentityContext';
 
 const DAOCreate = () => {
   const { address } = useChain(chainName);
-  const { identityName, setCreateDaoSelected } = useAppState();
+  const { setSelectedDAOByAddress } = useDAOContext();
+  const { getIdentityName } = useIdentityContext();
   return (
     <CreateDaoForm
       daoOwner={{
         address: address as string,
-        name: identityName as string,
+        name: getIdentityName() as string,
         votingPower: 0,
       }}
-      setCreateDaoSelected={setCreateDaoSelected}
+      setCreateDaoSelected={setSelectedDAOByAddress}
     />
   );
 };

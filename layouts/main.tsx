@@ -12,18 +12,15 @@ import { Header, NavBar } from '../features';
 import { useChain } from '@cosmos-kit/react';
 import { chainName } from '../config/defaults';
 import { useAppState } from '../contexts/AppStateContext';
+import { useIdentityContext } from '../contexts/IdentityContext';
 
 export const Layout = ({ children }: { children: ReactElement }) => {
   const isMobileView = useBreakpointValue({ base: true, md: false });
   const { address, status } = useChain(chainName);
-  const {
-    selectedDao,
-    setSelectedDao,
-    selectedDaoName,
-    setSelectedDaoName,
+  const { getIdentityName } = useIdentityContext();
 
-    identityName,
-  } = useAppState();
+  const { selectedDao, setSelectedDao, selectedDaoName, setSelectedDaoName } =
+    useAppState();
 
   if (isMobileView) {
     return <MobileViewDisabled />;
@@ -41,7 +38,7 @@ export const Layout = ({ children }: { children: ReactElement }) => {
             <NavBar
               status={status}
               address={address}
-              identityName={identityName}
+              identityName={getIdentityName()}
               setSelectedDao={val => {
                 setSelectedDao(val);
               }}
