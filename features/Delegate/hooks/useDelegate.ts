@@ -7,7 +7,11 @@ import { useToast } from '@chakra-ui/react';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { BJMES_DENOM, JMES_DENOM } from '../../../lib/constants';
 import { useBalanceContext } from '../../../contexts/balanceContext';
-const client = new Client();
+const LCD_URL = process.env.NEXT_PUBLIC_REST_URL_KEPLR as string;
+const NEXT_PUBLIC_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
+
+const client = new Client({ providers: { LCDC: { chainID: NEXT_PUBLIC_CHAIN_ID, URL: LCD_URL } } });
+
 type TransferFormType = {
   jmesValue: number;
   bJmesValue: number;
@@ -116,9 +120,8 @@ export const useDelegate = () => {
   const delegateTokens = useCallback(async () => {
     if (isMovingNotValid || !bondingIsValid || !address || !selectedValidator) {
       toast({
-        title: `Can't ${
-          bonding ? 'delegate' : 'undelegate'
-        }, please fix the issues!`,
+        title: `Can't ${bonding ? 'delegate' : 'undelegate'
+          }, please fix the issues!`,
         duration: 4000,
       });
       return;
