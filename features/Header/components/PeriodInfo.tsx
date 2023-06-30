@@ -69,7 +69,7 @@ export default function PeriodInfo({ cosmWasmClient }: Props) {
   const next_period_start =
     current_period === 'posting' ? next_posting_start : next_voting_start;
   const next_period_start_time_left = momentLeft(next_period_start).toString();
-  
+
 
   return (
     <Menu>
@@ -124,21 +124,19 @@ export default function PeriodInfo({ cosmWasmClient }: Props) {
               />
               <Flex alignItems={'center'} width={'95%'} paddingLeft={'8px'}>
                 <Text
-                  fontWeight={'bold'}
-                  fontSize={'14'}
+                  fontWeight="bold"
+                  fontSize="14px"
                   fontFamily="DM Sans"
                   color={current_period === 'posting' ? 'darkPurple' : 'green'}
-                  paddingRight={'10px'}
-                  style={{
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                  }}
+                  paddingRight="10px"
+                  whiteSpace="nowrap"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
                 >
                   Current cycle:{' '}
                   {periodInfoQuery?.data
                     ? (((current_period?.charAt(0).toUpperCase() as string) +
-                        current_period?.slice(1)) as string)
+                      current_period?.slice(1)) as string)
                     : ''}
                 </Text>
                 <Divider
@@ -150,20 +148,16 @@ export default function PeriodInfo({ cosmWasmClient }: Props) {
                   }
                 />
                 <Text
-                  fontWeight={'normal'}
-                  fontSize={'14'}
+                  fontWeight="normal"
+                  fontSize="14px"
                   fontFamily="DM Sans"
                   color={current_period === 'posting' ? 'midnight' : 'lilac'}
-                  paddingLeft={'10px'}
-                  style={{
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                  }}
+                  paddingLeft="10px"
+                  whiteSpace="nowrap"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
                 >
-                  {periodInfoQuery?.data
-                    ? `${next_period_start_time_left}`
-                    : ''}
+                  {periodInfoQuery?.data ? `${next_period_start_time_left}` : ''}
                 </Text>
               </Flex>
             </Flex>
@@ -222,7 +216,7 @@ export default function PeriodInfo({ cosmWasmClient }: Props) {
               >
                 {current_period
                   ? current_period.charAt(0).toUpperCase() +
-                    current_period.slice(1)
+                  current_period.slice(1)
                   : ''}
               </Text>
             </Flex>
