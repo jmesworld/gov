@@ -136,10 +136,13 @@ export const useDelegate = () => {
     }));
     try {
       if (bonding) {
+        console.log('delegateTokens', { address, selectedValidator, JMES_DENOM, valueToMove: valueToMove * 1000 })
+        const coin = new Core.Coin(JMES_DENOM, valueToMove * 1000);
+        console.log('coin', coin);
         await signingCosmWasmClient?.delegateTokens(
           address,
           selectedValidator,
-          new Core.Coin(JMES_DENOM, valueToMove),
+          new Core.Coin(JMES_DENOM, valueToMove * 1000),// FIXME use helper function to format amount
           'auto',
         );
 
@@ -150,7 +153,7 @@ export const useDelegate = () => {
         await signingCosmWasmClient?.undelegateTokens(
           address,
           selectedValidator,
-          new Core.Coin(BJMES_DENOM, valueToMove),
+          new Core.Coin(BJMES_DENOM, valueToMove * 1000),
           'auto',
         );
         toast({

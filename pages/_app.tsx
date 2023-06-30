@@ -28,6 +28,7 @@ import { IdentityContextProvider } from '../contexts/IdentityContext';
 import { BalanceContextProvider } from '../contexts/balanceContext';
 import { DAOContextProvider } from '../contexts/DAOContext';
 import { SigningCosmWasmClientContextProvider } from '../contexts/SigningCosmWasmClient';
+import { GasPrice } from '@cosmjs/stargate';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   Layout?: ({ children }: { children: ReactElement }) => ReactElement;
@@ -39,6 +40,12 @@ type AppPropsWithLayout = AppProps & {
 
 function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
   const signerOptions: SignerOptions = {
+    // eslint-disable-next-line   @typescript-eslint/no-unused-vars
+    signingCosmwasm: (_chain: Chain) => {
+      return {
+        gasPrice: GasPrice.fromString('0.0ujmes'),
+      };
+    },
     // stargate: (_chain: Chain) => {
     //   return getSigningCosmosClientOptions();
     // }
