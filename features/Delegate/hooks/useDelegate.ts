@@ -8,7 +8,7 @@ import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { BJMES_DENOM, JMES_DENOM } from '../../../lib/constants';
 import { useBalanceContext } from '../../../contexts/balanceContext';
 import { useSigningCosmWasmClientContext } from '../../../contexts/SigningCosmWasmClient';
-const LCD_URL = process.env.NEXT_PUBLIC_REST_URL_KEPLR as string;
+const LCD_URL = process.env.NEXT_PUBLIC_REST_URL as string;
 const NEXT_PUBLIC_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 
 const client = new Client({
@@ -123,9 +123,8 @@ export const useDelegate = () => {
   const delegateTokens = useCallback(async () => {
     if (isMovingNotValid || !bondingIsValid || !address || !selectedValidator) {
       toast({
-        title: `Can't ${
-          bonding ? 'delegate' : 'undelegate'
-        }, please fix the issues!`,
+        title: `Can't ${bonding ? 'delegate' : 'undelegate'
+          }, please fix the issues!`,
         duration: 4000,
       });
       return;
