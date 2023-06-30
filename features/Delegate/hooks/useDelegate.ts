@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Client, Mnemonic, Core } from 'jmes';
+import { Client, Core } from 'jmes';
 import { useCallback, useMemo, useState } from 'react';
 import { useValidators } from './useValidators';
 import { movingValidator } from '../lib/validateBonding';
@@ -43,12 +43,19 @@ export const useDelegate = () => {
 
   const { address } = useIdentityContext();
 
-  const { isValidatorsLoading, validatorList } = useValidators(client);
+  const {
+    isValidatorsLoading,
+    validatorsError,
+    bondedValidatorsError,
+    validatorList,
+    isBondedValidatorsLoading,
+    bondedValidators,
+  } = useValidators(client);
   const toast = useToast();
 
   const [transferForm, setTransferForm] = useState<TransferFormType>({
-    jmesValue: totalJmes / 2,
-    bJmesValue: totalBondedJmes / 2,
+    jmesValue: Number(totalJmes.toFixed(0)),
+    bJmesValue: Number(totalBondedJmes.toFixed(0)),
     sliderValue: sliderDefaultValue,
   });
   const { jmesValue, bJmesValue } = transferForm;
@@ -59,7 +66,7 @@ export const useDelegate = () => {
     selectedValidator: null,
     selectedUnBonding: null,
   });
-  const { bonding, selectedValidator } = bondingState;
+  const { bonding, selectedValidator, selectedUnBonding } = bondingState;
   const { isLoading: isUnBondingsLoading, data: unBondingsData } = useQuery(
     ['getUnBonds'],
     getUnBonds,
@@ -90,8 +97,8 @@ export const useDelegate = () => {
         : (totalBondedJmes / 100) * (100 - sliderValue);
       return {
         ...p,
-        jmesValue: Number(jmesValue.toFixed(3)),
-        bJmesValue: Number(bJmesValue.toFixed(3)),
+        jmesValue: Number(jmesValue.toFixed(0)),
+        bJmesValue: Number(bJmesValue.toFixed(0)),
         sliderValue,
       };
     });
@@ -113,36 +120,31 @@ export const useDelegate = () => {
     });
   }, [bonding, totalBondedJmes, totalJmes, bJmesValue, jmesValue, valueToMove]);
 
-  const mnemonic = useMemo(() => new Mnemonic(address), [address]);
-  const wallet = useMemo(
-    () => (address ? client.createWallet(mnemonic) : undefined),
-    [address, mnemonic],
-  );
-  const account = useMemo(() => wallet?.getAccount(), [wallet]);
-
   const delegateTokens = useCallback(async () => {
-    if (isMovingNotValid || !bondingIsValid || !address || !selectedValidator) {
+    if (isMovingNotValid || !bondingIsValid || !address) {
       toast({
-        title: `Can't ${bonding ? 'delegate' : 'undelegate'
-          }, please fix the issues!`,
+        title: `Can't ${
+          bonding ? 'delegate' : 'undelegate'
+        }, please fix the issues!`,
         duration: 4000,
       });
       return;
     }
-
     setBondingState(p => ({
       ...p,
       delegatingToken: true,
     }));
     try {
       if (bonding) {
-        console.log('delegateTokens', { address, selectedValidator, JMES_DENOM, valueToMove: valueToMove * 1000 })
-        const coin = new Core.Coin(JMES_DENOM, valueToMove * 1000);
-        console.log('coin', coin);
+        if (!selectedValidator) {
+          return;
+        }
         await signingCosmWasmClient?.delegateTokens(
           address,
           selectedValidator,
-          new Core.Coin(JMES_DENOM, valueToMove * 1000),// FIXME use helper function to format amount
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          /// @ts-ignore ( Issue with different type)
+          new Core.Coin(JMES_DENOM, valueToMove * 1000), // FIXME use helper function to format amount
           'auto',
         );
 
@@ -150,9 +152,14 @@ export const useDelegate = () => {
           title: 'Delegated Token ',
         });
       } else {
+        if (!selectedUnBonding) {
+          return;
+        }
         await signingCosmWasmClient?.undelegateTokens(
           address,
-          selectedValidator,
+          selectedUnBonding,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          /// @ts-ignore ( Issue with different type)
           new Core.Coin(BJMES_DENOM, valueToMove * 1000),
           'auto',
         );
@@ -172,14 +179,15 @@ export const useDelegate = () => {
       delegatingToken: false,
     }));
   }, [
-    account,
-    address,
+    isMovingNotValid,
     bondingIsValid,
+    address,
+    toast,
     bonding,
     selectedValidator,
-    isMovingNotValid,
-    toast,
+    signingCosmWasmClient,
     valueToMove,
+    selectedUnBonding,
   ]);
 
   return {
@@ -197,5 +205,9 @@ export const useDelegate = () => {
     valueToMove,
     isMovingNotValid,
     delegateTokens,
+    bondedValidators,
+    isBondedValidatorsLoading,
+    validatorsError,
+    bondedValidatorsError,
   };
 };

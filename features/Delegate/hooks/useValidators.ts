@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Client } from 'jmes';
 import { Validator } from '../types';
 import { useQuery } from '@tanstack/react-query';
+import { useIdentityContext } from '../../../contexts/IdentityContext';
 
 type Pagination = {
   total: number | null;
@@ -32,7 +33,21 @@ const getValidators = ({
     'pagination.reverse': 'false',
   });
 };
+
+const getBondedValidators = ({
+  queryKey,
+  client,
+}: {
+  queryKey: (string | number)[];
+  client: Client;
+}) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, address] = queryKey;
+  return client.providers.LCDC.staking.bondedValidators(address as string);
+};
+
 export const useValidators = (client: Client) => {
+  const { address } = useIdentityContext();
   const [pagination, setPagination] = useState<Pagination>({
     limit: 10,
     offset: 0,
@@ -41,14 +56,30 @@ export const useValidators = (client: Client) => {
   const [validatorList, setValidatorList] = useState<
     Record<string, Validator[]>
   >({});
-
   const {
-    isFetching,
-    isLoading,
+    isFetching: isFetchingValidators,
+    isLoading: isLoadingValidators,
+    error: validatorsError,
     data: validatorsData,
   } = useQuery({
     queryKey: ['validators', pagination.limit, pagination.offset],
     queryFn: ({ queryKey }) => getValidators({ queryKey, client }),
+    retry: 3,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+    onError(err) {
+      console.error('Error:', err);
+    },
+  });
+
+  const {
+    data: bondedValidators,
+    error: bondedValidatorsError,
+    isLoading: isLoadingBondedValidators,
+    isFetching: isFetchingBondedValidators,
+  } = useQuery({
+    queryKey: ['bondedValidators', address as string],
+    queryFn: ({ queryKey }) => getBondedValidators({ queryKey, client }),
     retry: 3,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
@@ -74,9 +105,13 @@ export const useValidators = (client: Client) => {
       });
     }
   }, [pagination.limit, pagination.offset, validatorList, validatorsData]);
-
   return {
-    isValidatorsLoading: isFetching || isLoading,
+    validatorsError,
+    bondedValidatorsError,
+    bondedValidators: bondedValidators?.[0],
+    isBondedValidatorsLoading:
+      isFetchingBondedValidators || isLoadingBondedValidators,
+    isValidatorsLoading: isFetchingValidators || isLoadingValidators,
     validatorList: Object.values(validatorList).flat(),
   };
 };

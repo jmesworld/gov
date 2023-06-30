@@ -1,113 +1,131 @@
-import { Text, Box, Image } from "@chakra-ui/react";
-import { useState } from "react";
+import { Text, Box, Image, Spinner, Alert } from '@chakra-ui/react';
+import { Core } from 'jmes';
 
 interface ValidatorProps {
-    validatorsData: validatorsData[];
-    selectValidator: Function;
+  validatorsData?: Core.Validator[];
+  selectedValidator: string | null;
+  onSelectValidator: (id: string | null) => void;
+  error: Error | undefined;
+  loading: boolean;
 }
 
-interface validatorsData {
-    name: string;
-    bJmes: string;
-    url: string;
-}
+export const UnBondValidatorTable = ({
+  validatorsData,
+  onSelectValidator,
+  selectedValidator,
+  error,
+  loading,
+}: ValidatorProps) => {
+  return (
+    <Box position="relative" height="380px" overflowY="scroll">
+      <Box
+        width="100%"
+        position="sticky"
+        top="0"
+        background="#5136C2"
+        zIndex="99"
+        padding="20px 0 10px"
+      >
+        <Text
+          color="#fff"
+          fontFamily={'DM Sans'}
+          fontWeight="500"
+          fontSize={12}
+        >
+          Select a validator to unBond from
+        </Text>
+      </Box>
+      <Box
+        display="flex"
+        justifyContent="flex-start"
+        padding="8px 0"
+        position="sticky"
+        top="48px"
+        background="#5136C2"
+        zIndex="99"
+      >
+        <Text
+          color="lilac"
+          fontFamily={'DM Sans'}
+          fontWeight="500"
+          fontSize={12}
+          lineHeight="20px"
+          width="46%"
+        >
+          Name
+        </Text>
+        <Text
+          color="lilac"
+          fontFamily={'DM Sans'}
+          fontWeight="500"
+          fontSize={12}
+          lineHeight="20px"
+          width="46%"
+        >
+          bJmes
+        </Text>
+      </Box>
+      {loading && <Spinner size="sm" />}
+      {!validatorsData && error && (
+        <Alert status="error" title={error.message} />
+      )}
+      {validatorsData?.map(validator => {
+        const id = validator.consensus_pubkey.key;
 
-export const UnBondValidatorTable = ({validatorsData, selectValidator}: ValidatorProps) => {
-    const [activeIndex, setActiveIndex] = useState<number | null>();
-
-    validatorsData  = Object.values(validatorsData);
-
-    function setSelectedValidator(idx: number){
-        if(idx == activeIndex) {
-            setActiveIndex(null);
-            selectValidator(false);
-        } else {
-            setActiveIndex(idx);
-            selectValidator(true);
-        }
-    };
-
-    return (
-        <Box position="relative" height="380px" overflowY="scroll">
-            <Box
-            width="100%"
-            position="sticky"
-            top="0"
-            background="#5136C2"
-            zIndex="99"
-            padding="20px 0 10px">
-                <Text
-                color="#fff"
-                fontFamily={"DM Sans"}
-                fontWeight="500"
-                fontSize={12}>
-                    Select a validator to unBond from
-                </Text>
-            </Box>
-            <Box display="flex" justifyContent="flex-start" padding="8px 0" position="sticky" top="48px" background="#5136C2" zIndex="99">
-                <Text
-                color="lilac"
-                fontFamily={"DM Sans"}
-                fontWeight="500"
-                fontSize={12}
-                lineHeight="20px"
-                width="46%">
-                    Name
-                </Text>
-                <Text
-                color="lilac"
-                fontFamily={"DM Sans"}
-                fontWeight="500"
-                fontSize={12}
-                lineHeight="20px"
-                width="46%">
-                    bJmes
-                </Text>
-            </Box>
-
-            {validatorsData.map((validator, i) => (
-                <Box 
-                key={validator.name.toLowerCase().replace(/\s/g, '') + '-' + i} 
-                onClick={() => setSelectedValidator(i)}
-                display="flex" 
-                justifyContent="flex-start"
-                padding={activeIndex === i ? "8px" : "8px 0"}
-                background={activeIndex === i ? "#704FF7" : ""}
-                borderRadius={activeIndex === i ? "4px" : ""}
-                cursor="pointer">
-                    <Text
-                    color="#fff"
-                    fontFamily={"DM Sans"}
-                    fontWeight="500"
-                    fontSize={12}
-                    lineHeight="20px"
-                    width="46%">
-                        {validator.name}
-                    </Text>
-                    <Text
-                    color="#fff"
-                    fontFamily={"DM Sans"}
-                    fontWeight="500"
-                    fontSize={12}
-                    lineHeight="20px"
-                    width="46%">
-                        {validator.bJmes}
-                    </Text>
-                    {validator.url && (
-                        <Box width="8%">
-                            <a href={validator.url} target="_blank">
-                                <Image
-                                    src='/link.svg'
-                                    alt="external link"
-                                    width={"12px"}
-                                    height={"12px"}
-                                    margin="3px 0"
-                                />
-                            </a>
-                        </Box>
-                    )}
-                </Box>
-            ))}
-        </Box>
-    );
+        return (
+          <Box
+            key={id}
+            onClick={() => onSelectValidator(id)}
+            display="flex"
+            justifyContent="flex-start"
+            padding={selectedValidator === id ? '8px' : '8px 0'}
+            background={selectedValidator === id ? '#704FF7' : ''}
+            borderRadius={validator.consensus_pubkey.key === id ? '4px' : ''}
+            cursor="pointer"
+          >
+            <Text
+              color="#fff"
+              fontFamily={'DM Sans'}
+              fontWeight="500"
+              fontSize={12}
+              lineHeight="20px"
+              width="46%"
+            >
+              {validator.description.moniker}
+            </Text>
+            <Text
+              color="#fff"
+              fontFamily={'DM Sans'}
+              fontWeight="500"
+              fontSize={12}
+              lineHeight="20px"
+              width="46%"
+            >
+              {validator.commission.commission_rates.rate
+                .toDecimalPlaces(2)
+                .toString()}
+              %
+            </Text>
+            {validator.description.website && (
+              <Box width="4%">
+                <a
+                  href={validator.description.website}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <Image
+                    src="/link.svg"
+                    alt="external link"
+                    width={'12px'}
+                    height={'12px'}
+                    margin="3px 0"
+                  />
+                </a>
+              </Box>
+            )}
+          </Box>
+        );
+      })}
+    </Box>
+  );
 };
