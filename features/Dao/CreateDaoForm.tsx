@@ -13,8 +13,6 @@ import {
   SliderTrack,
   Spacer,
   Text,
-  Tooltip,
-  color,
   useToast,
 } from '@chakra-ui/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -39,8 +37,6 @@ import { StdFee } from '@cosmjs/amino';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 
-const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
-const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 

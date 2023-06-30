@@ -18,7 +18,7 @@ import { WalletModal } from '../features/Wallet/components/WalletModal';
 import React, { ReactElement } from 'react';
 import { AppStateProvider } from '../contexts/AppStateContext';
 import { CosmWasmClientContextProvider } from '../contexts/CosmWasmClient';
-const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL as string;
 const chains: Chain[] = [jmesTestnet];
 
 import type { NextPage } from 'next';
@@ -69,7 +69,7 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
             signerOptions={signerOptions}
             endpointOptions={{
               [chainName]: {
-                rpc: [LCD_URL],
+                rpc: [RPC_URL],
               },
             }}
           >

@@ -11,7 +11,7 @@ export async function getMyDaos(
 
   let myDaos: any = 'undefined';
 
-  let _data: any[] = [];
+  const _data: any[] = [];
   let _startAfter = 0;
   let _isDataComplete = false;
   while (!_isDataComplete) {

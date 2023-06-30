@@ -27,7 +27,7 @@ import { IdentityserviceQueryClient } from '../../../client/Identityservice.clie
 import { useIdentityserviceGetIdentityByNameQuery } from '../../../client/Identityservice.react-query';
 import { chainName } from '../../../config/defaults';
 
-const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -91,7 +91,7 @@ export default function IdentityInputSection() {
   const [isIdentityNameAvailable, setIsIdentityNameAvailable] = useState(false);
 
   const LCDOptions = {
-    URL: LCD_URL,
+    URL: RPC_URL,
     chainID: CHAIN_ID,
   };
 
