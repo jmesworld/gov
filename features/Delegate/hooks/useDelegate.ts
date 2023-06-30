@@ -8,11 +8,11 @@ import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { BJMES_DENOM, JMES_DENOM } from '../../../lib/constants';
 import { useBalanceContext } from '../../../contexts/balanceContext';
 import { useSigningCosmWasmClientContext } from '../../../contexts/SigningCosmWasmClient';
-const LCD_URL = process.env.NEXT_PUBLIC_REST_URL as string;
+const RPC_URL = process.env.NEXT_PUBLIC_REST_URL as string;
 const NEXT_PUBLIC_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 
 const client = new Client({
-  providers: { LCDC: { chainID: NEXT_PUBLIC_CHAIN_ID, URL: LCD_URL } },
+  providers: { LCDC: { chainID: NEXT_PUBLIC_CHAIN_ID, URL: RPC_URL } },
 });
 
 type TransferFormType = {

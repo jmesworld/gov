@@ -21,7 +21,7 @@ import { chainName } from "../../config/defaults";
 const tooltip_text =
   "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
 
-const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -29,7 +29,7 @@ const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
 const LCDOptions = {
-  URL: LCD_URL,
+  URL: RPC_URL,
   chainID: CHAIN_ID,
 };
 export default function DaoMembersList({

@@ -3,7 +3,7 @@ import { DaoMembersQueryClient } from '../client/DaoMembers.client';
 import { DaoMultisigQueryClient } from '../client/DaoMultisig.client';
 import { IdentityserviceQueryClient } from '../client/Identityservice.client';
 
-const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;

@@ -37,7 +37,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useIdentityserviceRegisterDaoMutation } from '../../client/Identityservice.react-query';
 import { StdFee } from '@cosmjs/amino';
 
-const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
