@@ -6,9 +6,7 @@ const OnboardingProgressIndicator = dynamic(
 );
 const AddJMESCard = dynamic(() => import('./components/AddJMESCard'));
 const AddTokensCard = dynamic(() => import('./components/AddTokensCard'));
-const ChooseUsernameCard = dynamic(
-  () => import('./ChooseUsernameModal'),
-);
+const ChooseUsernameCard = dynamic(() => import('./ChooseUsernameModal'));
 const ConnectWalletCard = dynamic(
   () => import('./components/ConnectWalletCard'),
 );

@@ -1,4 +1,4 @@
-import { Box, Text, VStack } from "@chakra-ui/react";
+import { Box, Text, VStack } from '@chakra-ui/react';
 
 export interface GovProposalVotes {
   type: string;
@@ -8,9 +8,9 @@ export interface GovProposalVotes {
 
 const GovProposalVotes = (props: GovProposalVotes) => {
   const textColor =
-    props.type == "yes" ? "rgba(161, 240, 196, 1)" : "rgba(255, 88, 118, 1)";
-  const votesText = props.votes !== 1 ? " votes" : " vote";
-  const percentageText = props.percentage.toFixed(2) + "%";
+    props.type == 'yes' ? 'rgba(161, 240, 196, 1)' : 'rgba(255, 88, 118, 1)';
+  const votesText = props.votes !== 1 ? ' votes' : ' vote';
+  const percentageText = props.percentage.toFixed(2) + '%';
 
   return (
     <VStack spacing="15px" flexGrow={1}>

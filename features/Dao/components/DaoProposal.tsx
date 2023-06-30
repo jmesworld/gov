@@ -1,19 +1,22 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
-import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { useChain } from "@cosmos-kit/react";
-import { useEffect, useState } from "react";
+import { Box, Flex, Text } from '@chakra-ui/react';
+import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import { useChain } from '@cosmos-kit/react';
+import { useEffect, useState } from 'react';
 
-import { GovernanceQueryClient } from "../../../client/Governance.client";
-import { useGovernancePeriodInfoQuery } from "../../../client/Governance.react-query";
-import { IdentityserviceQueryClient } from "../../../client/Identityservice.client";
-import { useIdentityserviceGetIdentityByOwnerQuery } from "../../../client/Identityservice.react-query";
-import DaoMembersList from "../DaoMemberList";
+import { GovernanceQueryClient } from '../../../client/Governance.client';
+import { useGovernancePeriodInfoQuery } from '../../../client/Governance.react-query';
+import { IdentityserviceQueryClient } from '../../../client/Identityservice.client';
+import { useIdentityserviceGetIdentityByOwnerQuery } from '../../../client/Identityservice.react-query';
+import DaoMembersList from '../DaoMemberList';
 
-import { chainName } from "../../../config/defaults";
-import { DaoMultisigQueryClient } from "../../../client/DaoMultisig.client";
-import { useDaoMultisigListProposalsQuery } from "../../../client/DaoMultisig.react-query";
+import { chainName } from '../../../config/defaults';
+import { DaoMultisigQueryClient } from '../../../client/DaoMultisig.client';
+import { useDaoMultisigListProposalsQuery } from '../../../client/DaoMultisig.react-query';
 
-import { ProposalHeader, ProposalList } from "../../components/Proposal/ProposalList";
+import {
+  ProposalHeader,
+  ProposalList,
+} from '../../components/Proposal/ProposalList';
 
 const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -41,18 +44,18 @@ export default function DaoProposal({
   const { address, getCosmWasmClient } = chainContext;
 
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-    null
+    null,
   );
   useEffect(() => {
     if (address) {
       getCosmWasmClient()
-        .then((cosmWasmClient) => {
+        .then(cosmWasmClient => {
           if (!cosmWasmClient) {
             return;
           }
           setCosmWasmClient(cosmWasmClient);
         })
-        .catch((error) => console.log(error));
+        .catch(error => console.log(error));
     }
   }, [address, getCosmWasmClient]);
 
@@ -62,13 +65,13 @@ export default function DaoProposal({
   };
   const governanceQueryClient = new GovernanceQueryClient(
     cosmWasmClient as CosmWasmClient,
-    NEXT_PUBLIC_GOVERNANCE_CONTRACT
+    NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   );
 
-  const args = { owner: address ? address : "" };
+  const args = { owner: address ? address : '' };
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     cosmWasmClient as CosmWasmClient,
-    IDENTITY_SERVICE_CONTRACT
+    IDENTITY_SERVICE_CONTRACT,
   );
 
   const identityOwnerQuery = useIdentityserviceGetIdentityByOwnerQuery({
@@ -85,7 +88,7 @@ export default function DaoProposal({
 
   const daoQueryClient = new DaoMultisigQueryClient(
     cosmWasmClient as CosmWasmClient,
-    daoAddress as string
+    daoAddress as string,
   );
   const proposalsQuery = useDaoMultisigListProposalsQuery({
     client: daoQueryClient,
@@ -97,20 +100,20 @@ export default function DaoProposal({
 
   return (
     <>
-      <Flex height={"47px"} />
+      <Flex height={'47px'} />
       <Text
-        color={"darkPurple"}
+        color={'darkPurple'}
         fontWeight="bold"
         fontSize={28}
         fontFamily="DM Sans"
       >
         {daoName}
       </Text>
-      <Flex height={"46px"} />
+      <Flex height={'46px'} />
       <Flex>
         <Box flexGrow={1}>
-        <ProposalHeader isGov={false} />
-          <Flex height={"10px"} />
+          <ProposalHeader isGov={false} />
+          <Flex height={'10px'} />
           {!!proposalsQuery.data ? (
             <ProposalList
               proposals={proposalsQuery?.data?.proposals}
@@ -126,11 +129,11 @@ export default function DaoProposal({
             <Flex justifyContent="center" width="100%">
               <Text
                 color="rgba(15,0,86,0.8)"
-                fontFamily={"DM Sans"}
+                fontFamily={'DM Sans'}
                 fontWeight="normal"
-                fontStyle={"italic"}
+                fontStyle={'italic'}
                 fontSize={14}
-                marginTop={"24px"}
+                marginTop={'24px'}
               >
                 Loading DAO proposals...
               </Text>

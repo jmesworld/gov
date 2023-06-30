@@ -5,23 +5,23 @@ import {
   Button,
   useToast,
   CircularProgress,
-} from "@chakra-ui/react";
-import { useChain } from "@cosmos-kit/react";
+} from '@chakra-ui/react';
+import { useChain } from '@cosmos-kit/react';
 
-import { useEffect, useState } from "react";
-import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { useEffect, useState } from 'react';
+import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 
-import { StdFee } from "@cosmjs/amino";
-import { DaoMultisigClient } from "../../../client/DaoMultisig.client";
+import { StdFee } from '@cosmjs/amino';
+import { DaoMultisigClient } from '../../../client/DaoMultisig.client';
 import {
   useDaoMultisigVoteMutation,
   useDaoMultisigExecuteMutation,
-} from "../../../client/DaoMultisig.react-query";
-import { chainName } from "../../../config/defaults";
+} from '../../../client/DaoMultisig.react-query';
+import { chainName } from '../../../config/defaults';
 
 const fee: StdFee = {
-  amount: [{ amount: "30000", denom: "ujmes" }],
-  gas: "10000000",
+  amount: [{ amount: '30000', denom: 'ujmes' }],
+  gas: '10000000',
 };
 
 export interface ProposalMyVote {
@@ -44,20 +44,20 @@ export const ProposalMyVote = (props: ProposalMyVote) => {
   useEffect(() => {
     if (address) {
       getSigningCosmWasmClient()
-        .then((signingClient) => {
+        .then(signingClient => {
           if (!signingClient) {
             return;
           }
           setSigningClient(signingClient);
         })
-        .catch((error) => console.log(error));
+        .catch(error => console.log(error));
     }
   }, [address, getSigningCosmWasmClient]);
 
   const daoMultisigClient = new DaoMultisigClient(
     signingClient as SigningCosmWasmClient,
     address as string,
-    props.dao
+    props.dao,
   );
 
   const voteMutation = useDaoMultisigVoteMutation();
@@ -109,32 +109,32 @@ export const ProposalMyVote = (props: ProposalMyVote) => {
                 client: daoMultisigClient,
                 msg: {
                   proposalId: props.proposalId,
-                  vote: "yes",
+                  vote: 'yes',
                 },
                 args: { fee },
               })
-              .then((result) => {
+              .then(result => {
                 toast({
-                  title: "Vote submitted.",
+                  title: 'Vote submitted.',
                   description: "We've submitted your Vote.",
-                  status: "success",
+                  status: 'success',
                   duration: 9000,
                   isClosable: true,
                   containerStyle: {
-                    backgroundColor: "darkPurple",
+                    backgroundColor: 'darkPurple',
                     borderRadius: 12,
                   },
                 });
               })
-              .catch((error) => {
+              .catch(error => {
                 toast({
-                  title: "Vote creation error",
+                  title: 'Vote creation error',
                   description: error.toString(),
-                  status: "error",
+                  status: 'error',
                   duration: 9000,
                   isClosable: true,
                   containerStyle: {
-                    backgroundColor: "red",
+                    backgroundColor: 'red',
                     borderRadius: 12,
                   },
                 });
@@ -145,14 +145,14 @@ export const ProposalMyVote = (props: ProposalMyVote) => {
           {!isSubmittingYesVote ? (
             <Text
               color="midnight"
-              fontFamily={"DM Sans"}
+              fontFamily={'DM Sans'}
               fontWeight="medium"
               fontSize={14}
             >
               Yes
             </Text>
           ) : (
-            <CircularProgress isIndeterminate size={"24px"} color="midnight" />
+            <CircularProgress isIndeterminate size={'24px'} color="midnight" />
           )}
         </Button>
         <Button
@@ -175,32 +175,32 @@ export const ProposalMyVote = (props: ProposalMyVote) => {
                 client: daoMultisigClient,
                 msg: {
                   proposalId: props.proposalId,
-                  vote: "no",
+                  vote: 'no',
                 },
                 args: { fee },
               })
-              .then((result) => {
+              .then(result => {
                 toast({
-                  title: "Vote submitted.",
+                  title: 'Vote submitted.',
                   description: "We've submitted your Vote.",
-                  status: "success",
+                  status: 'success',
                   duration: 9000,
                   isClosable: true,
                   containerStyle: {
-                    backgroundColor: "darkPurple",
+                    backgroundColor: 'darkPurple',
                     borderRadius: 12,
                   },
                 });
               })
-              .catch((error) => {
+              .catch(error => {
                 toast({
-                  title: "Vote creation error",
+                  title: 'Vote creation error',
                   description: error.toString(),
-                  status: "error",
+                  status: 'error',
                   duration: 9000,
                   isClosable: true,
                   containerStyle: {
-                    backgroundColor: "red",
+                    backgroundColor: 'red',
                     borderRadius: 12,
                   },
                 });
@@ -211,14 +211,14 @@ export const ProposalMyVote = (props: ProposalMyVote) => {
           {!isSubmittingNoVote ? (
             <Text
               color="midnight"
-              fontFamily={"DM Sans"}
+              fontFamily={'DM Sans'}
               fontWeight="medium"
               fontSize={14}
             >
               No
             </Text>
           ) : (
-            <CircularProgress isIndeterminate size={"24px"} color="midnight" />
+            <CircularProgress isIndeterminate size={'24px'} color="midnight" />
           )}
         </Button>
       </ButtonGroup>
@@ -251,28 +251,28 @@ export const ProposalMyVote = (props: ProposalMyVote) => {
                 },
                 args: { fee },
               })
-              .then((result) => {
+              .then(result => {
                 toast({
-                  title: "Proposal executed.",
-                  description: "Proposal executed successfully.",
-                  status: "success",
+                  title: 'Proposal executed.',
+                  description: 'Proposal executed successfully.',
+                  status: 'success',
                   duration: 9000,
                   isClosable: true,
                   containerStyle: {
-                    backgroundColor: "darkPurple",
+                    backgroundColor: 'darkPurple',
                     borderRadius: 12,
                   },
                 });
               })
-              .catch((error) => {
+              .catch(error => {
                 toast({
-                  title: "Proposal execution error",
+                  title: 'Proposal execution error',
                   description: error.toString(),
-                  status: "error",
+                  status: 'error',
                   duration: 9000,
                   isClosable: true,
                   containerStyle: {
-                    backgroundColor: "red",
+                    backgroundColor: 'red',
                     borderRadius: 12,
                   },
                 });

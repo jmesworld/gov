@@ -1,12 +1,12 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import {
   CosmWasmClientContext,
   useClientIdentity,
-} from "../hooks/useClientIdentity";
+} from '../hooks/useClientIdentity';
 
 let CosmWasmContext: any;
 let { Provider } = (CosmWasmContext = createContext<CosmWasmClientContext>({
-  walletAddress: "",
+  walletAddress: '',
   cosmWasmClient: null,
   signingClient: null,
   loading: false,
