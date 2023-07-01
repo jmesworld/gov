@@ -23,7 +23,7 @@ import {
   TabIndicator,
   Spinner,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { DelegateUnbondingTable } from './delegate-unbonding-table';
 import { DelegateValidatorTable } from './delegate-validator-table';
@@ -57,8 +57,21 @@ export const Delegate = ({ onClose }: Props) => {
     isBondedValidatorsLoading,
     validatorsError,
     bondedValidatorsError,
+    unBondingsData,
+    unBondingsError,
+    isLoadingUnBondings,
   } = useDelegate();
 
+  const delegateButtonEnabled = useMemo(() => {
+    const selected = bonding ? selectedValidator : selectedUnBonding;
+    return selected && !isMovingNotValid && !delegatingToken;
+  }, [
+    bonding,
+    delegatingToken,
+    isMovingNotValid,
+    selectedUnBonding,
+    selectedValidator,
+  ]);
   const handleTabsChange = (index: number) => {
     setTabIndex(index);
   };
@@ -316,11 +329,7 @@ export const Delegate = ({ onClose }: Props) => {
                   marginTop="30px"
                   marginBottom="40px"
                   marginX="auto"
-                  disabled={
-                    !selectedValidator ||
-                    !!isMovingNotValid ||
-                    !!delegatingToken
-                  }
+                  disabled={!delegateButtonEnabled}
                 >
                   {delegatingToken && (
                     <Spinner mr={4} size="sm" color="white" />
@@ -416,7 +425,11 @@ export const Delegate = ({ onClose }: Props) => {
                   />
                   <TabPanels>
                     <TabPanel padding={0} marginTop="30px">
-                      <DelegateUnbondingTable />
+                      <DelegateUnbondingTable
+                        unBondingsData={unBondingsData}
+                        isLoadingUnBondings={isLoadingUnBondings}
+                        unBondingsError={unBondingsError as Error | undefined}
+                      />
                       <Text
                         color="lilac"
                         fontFamily={'DM Sans'}

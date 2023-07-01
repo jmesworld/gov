@@ -65,6 +65,7 @@ export const UnBondValidatorTable = ({
           bJmes
         </Text>
       </Box>
+
       {loading && <Spinner size="sm" />}
       {!validatorsData && error && (
         <Alert status="error" title={error.message} />
@@ -101,10 +102,7 @@ export const UnBondValidatorTable = ({
               lineHeight="20px"
               width="46%"
             >
-              {validator.commission.commission_rates.rate
-                .toDecimalPlaces(2)
-                .toString()}
-              %
+              {validator.tokens.toString()}
             </Text>
             {validator.description.website && (
               <Box width="4%">

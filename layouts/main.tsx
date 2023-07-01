@@ -37,7 +37,7 @@ export const Layout = ({ children }: { children: ReactElement }) => {
           <Flex padding={0} width={'100vw'} height={'100vh'}>
             <NavBar
               status={status}
-              address={address}
+              address={address as string}
               identityName={getIdentityName()}
               setSelectedDao={val => {
                 setSelectedDao(val);

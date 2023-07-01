@@ -12,14 +12,15 @@ import {
   Tooltip,
   MenuButton,
   useMenu,
+  Box,
 } from '@chakra-ui/react';
 
 import { ConnectedWalletType } from '../../types';
 import { formatBalance } from '../../../hooks/useAccountBalance';
-import { Link } from '../../components/genial/Link';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { RefObject } from 'react';
 import { CopyAddressButton } from './CopyAddressButton';
+import { useDelegateContext } from '../../../contexts/DelegateContext';
 
 export const ConnectedWalletButton = ({
   identityName,
@@ -29,6 +30,7 @@ export const ConnectedWalletButton = ({
   isDisabled,
 }: ConnectedWalletType) => {
   const { address, disconnect } = useIdentityContext();
+  const { openDelegate } = useDelegateContext();
   const { isOpen, onToggle, buttonRef } = useMenu({
     defaultIsOpen: false,
   });
@@ -162,12 +164,15 @@ export const ConnectedWalletButton = ({
           padding="2"
           _hover={{ bg: 'white' }}
           borderRadius={'8px'}
-          onClick={() => {}}
           bg="bg"
         >
           <CopyAddressButton address={address} />
         </MenuItem>
-        <Link href="/?modal=delegate">
+        <Box
+          onClick={() => {
+            openDelegate();
+          }}
+        >
           <MenuItem
             padding="2"
             backgroundColor="white"
@@ -202,7 +207,7 @@ export const ConnectedWalletButton = ({
               <Spacer />
             </Flex>
           </MenuItem>
-        </Link>
+        </Box>
         <MenuItem
           backgroundColor="white"
           padding="2"
