@@ -58,8 +58,10 @@ const getLabel = (type: string) => {
       return 'Improvement';
     case 'spend-funds':
       return 'spend-funds';
+    case 'feature-request':
+      return 'Feature Request';
     default:
-      return '';
+      return type;
   }
 };
 
@@ -75,6 +77,8 @@ const getImgSrc = (type: string) => {
       return '/Improvement_Type.svg';
     case 'spend-funds':
       return '/Spend_key.svg';
+    case 'feature-request':
+      return '/feature_request.svg';
     default:
       return '';
   }
