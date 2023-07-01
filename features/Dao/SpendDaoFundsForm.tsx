@@ -70,7 +70,7 @@ const SpendDaoFundsForm = ({
   const [daoMembers, setDaoMembers] = useState([daoOwner]);
   const [threshold, setThreshold] = useState(50);
   const [isIdentityNamesValid, setIdentityNamesValid] = useState(false);
-  const [focusedCosignerIndex, setFocusedCosignerIndex] = useState(Infinity);
+  const [focusedDirectorIndex, setFocusedDirectorIndex] = useState(Infinity);
   const [isCreatingDao, setIsCreatingDao] = useState(false);
   const [doubleCounts, setDoubleCounts] = useState(0);
 
@@ -326,7 +326,7 @@ const SpendDaoFundsForm = ({
               }}
               onBlur={() => idsByNamesQuery.refetch()}
               onFocus={() => {
-                setFocusedCosignerIndex(index);
+                setFocusedDirectorIndex(index);
               }}
             />
             <InputRightElement
@@ -344,7 +344,7 @@ const SpendDaoFundsForm = ({
                   ? !validateName(daoMember?.name)?.name
                     ? !idsByNamesQuery.isFetching
                       ? idsByNamesQuery?.data?.at(index)
-                      : index === focusedCosignerIndex
+                      : index === focusedDirectorIndex
                       ? 'Checking...'
                       : idsByNamesQuery?.data?.at(index)
                     : ''

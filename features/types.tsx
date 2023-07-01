@@ -36,7 +36,7 @@ export interface NavBarProps {
   selectedDao: string;
   selectedDaoName: string;
 }
-export interface DAOCosigner {
+export interface DAODirector {
   name: string;
   weight: number;
   id: number;
