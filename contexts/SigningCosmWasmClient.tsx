@@ -28,7 +28,6 @@ const SigningCosmWasmClientContextProvider = ({ children }: Props) => {
   const { getSigningCosmWasmClient } = useChain(chainName);
   const [signingCosmWasmClient, setSigningCosmWasmClient] =
     useState<SigningCosmWasmClient | null>(null);
-
   useEffect(() => {
     if (!getSigningCosmWasmClient) {
       return;
@@ -42,7 +41,8 @@ const SigningCosmWasmClientContextProvider = ({ children }: Props) => {
       }
     }
     assignSigningCosmWasmClient();
-  }, [getSigningCosmWasmClient]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const value = {
     signingCosmWasmClient,

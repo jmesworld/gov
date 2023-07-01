@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  CloseButton,
   Flex,
   Input,
   InputGroup,
@@ -13,15 +12,10 @@ import {
   SliderTrack,
   Spacer,
   Text,
-  Tooltip,
-  color,
   useToast,
 } from '@chakra-ui/react';
-import { useEffect, useMemo, useState } from 'react';
-import {
-  countObjectsWithDuplicateNames,
-  validateName,
-} from '../../utils/identity';
+import { useEffect, useMemo, useState, useReducer, useCallback } from 'react';
+
 import { AddIcon, QuestionOutlineIcon } from '@chakra-ui/icons';
 import {
   IdentityserviceClient,
@@ -33,14 +27,15 @@ import {
   CosmWasmClient,
   SigningCosmWasmClient,
 } from '@cosmjs/cosmwasm-stargate';
-import { useQuery } from '@tanstack/react-query';
 import { useIdentityserviceRegisterDaoMutation } from '../../client/Identityservice.react-query';
 import { StdFee } from '@cosmjs/amino';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
+import { Reducer } from './createDAOReducer';
+import { v4 as uuid } from 'uuid';
+import { Member } from './components/DaoMember';
+import { z } from 'zod';
 
-const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
-const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 
@@ -51,79 +46,66 @@ const fee: StdFee = {
 
 const DEFAULT_DAO_THRESHOLD = 100; // 100% threshold by default
 
-const CreateDaoForm = ({
+const CreateDaoNewForm = ({
   setCreateDaoSelected,
   daoOwner,
 }: {
-  setCreateDaoSelected: Function;
+  setCreateDaoSelected: (address: string) => void;
   daoOwner: { name: string; address: string; votingPower: number };
 }) => {
-  const { address } = useChain(chainName);
-
-  const toast = useToast();
-
-  const [daoName, setDaoName] = useState('');
-  const [daoMembers, setDaoMembers] = useState([daoOwner]);
-  const [threshold, setThreshold] = useState(DEFAULT_DAO_THRESHOLD);
-  const [isIdentityNamesValid, setIdentityNamesValid] = useState(false);
-  const [focusedDirectorIndex, setFocusedDirectorIndex] = useState(Infinity);
-  const [isCreatingDao, setIsCreatingDao] = useState(false);
-  const [doubleCounts, setDoubleCounts] = useState(0);
-
-  const { cosmWasmClient } = useCosmWasmClientContext();
   const { signingCosmWasmClient: signingClient } =
     useSigningCosmWasmClientContext();
+  const { address } = useChain(chainName);
+  const { cosmWasmClient } = useCosmWasmClientContext();
+  const toast = useToast();
+  const [{ daoName, threshold, ownerId, members, daoNameError }, dispatch] =
+    useReducer(Reducer, {
+      members: {},
+      ownerId: '',
+      daoName: '',
+      threshold: 0,
+    });
+  const membersArr = useMemo(() => Object.values(members), [members]);
+  useEffect(() => {
+    if (Object.keys(members).length !== 0) {
+      return;
+    }
+    const id = uuid();
+    dispatch({
+      type: 'SET_OWNER_ID',
+      payload: id,
+    });
+    dispatch({
+      type: 'ADD_MEMBER',
+      payload: {
+        id,
+        name: daoOwner.name,
+        address: daoOwner.address,
+        votingPower: 0,
+      },
+    });
+  }, [daoOwner, members]);
 
-  const totalVotingPower = useMemo(
-    () =>
-      daoMembers.reduce(
-        (sum, member) => sum + (member?.votingPower ? member?.votingPower : 0),
-        0,
-      ),
-    [daoMembers],
-  );
-  const validationResult = useMemo(() => validateName(daoName), [daoName]);
-  const DAONameValidationMessage = useMemo(
-    () => validationResult?.message,
-    [validationResult],
-  );
-
-  const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
-    cosmWasmClient as CosmWasmClient,
-    IDENTITY_SERVICE_CONTRACT,
-  );
-
-  async function getIdentitiesByNames() {
-    const identityAddrs = [];
-
-    for (let j = 0; j < daoMembers.length; j++) {
-      const name = daoMembers[j].name;
-      const identityRes = await client.getIdentityByName({ name: name });
-      if (identityRes.identity?.name === name) {
-        identityAddrs[j] = identityRes.identity?.owner;
-        daoMembers[j].address = identityRes.identity?.owner;
-        setDaoMembers(daoMembers);
-      } else {
-        identityAddrs[j] = 'Invalid identity';
+  const [isCreatingDao, setIsCreatingDao] = useState(false);
+  const totalVotingPower = useMemo(() => {
+    let votingPowers = 0;
+    membersArr.forEach(el => {
+      if (!el.votingPower) {
+        return;
       }
-    }
+      votingPowers += el.votingPower;
+    });
+    return votingPowers;
+  }, [membersArr]);
 
-    if (identityAddrs.includes('Invalid identity')) {
-      setIdentityNamesValid(false);
-    } else {
-      setIdentityNamesValid(true);
-    }
-    return identityAddrs;
-  }
-
-  const idsByNamesQuery = useQuery(['identities'], getIdentitiesByNames);
-
-  const isFormValid =
-    totalVotingPower === 100 &&
-    DAONameValidationMessage &&
-    threshold > 0 &&
-    (isIdentityNamesValid || daoMembers.length === 1) &&
-    doubleCounts === 0;
+  const client: IdentityserviceQueryClient = useMemo(
+    () =>
+      new IdentityserviceQueryClient(
+        cosmWasmClient as CosmWasmClient,
+        IDENTITY_SERVICE_CONTRACT,
+      ),
+    [cosmWasmClient],
+  );
 
   const idClient: IdentityserviceClient = new IdentityserviceClient(
     signingClient as SigningCosmWasmClient,
@@ -131,18 +113,109 @@ const CreateDaoForm = ({
     IDENTITY_SERVICE_CONTRACT,
   );
 
-  const members = daoMembers.map(member => ({
-    addr: member.address,
-    weight: member.votingPower,
-  }));
-
   const registerDaoMutation = useIdentityserviceRegisterDaoMutation();
 
-  useEffect(() => {
-    const dups = countObjectsWithDuplicateNames(daoMembers);
-    setDoubleCounts(dups);
-  }, [daoMembers]);
+  const duplicateNames = useMemo(() => {
+    const originalLength = membersArr.length;
+    const memberSet = new Set(Object.keys(membersArr));
+    return originalLength !== memberSet.size;
+  }, [membersArr]);
 
+  const onVotingPowerChange = useCallback(
+    (id: string, value: number) => {
+      dispatch({
+        type: 'SET_VALUE',
+        payload: {
+          id,
+          votingPower: value,
+        },
+      });
+    },
+    [dispatch],
+  );
+  const onNameChange = useCallback(
+    (id: string, value: string) => {
+      // CHECK if error exist or same name exist
+      const nameInArr = membersArr.find(el => el.name === value);
+      dispatch({
+        type: 'SET_VALUE',
+        payload: {
+          id,
+          name: value,
+          error: nameInArr ? 'Name already exists' : undefined,
+        },
+      });
+    },
+    [membersArr],
+  );
+  const onAddress = useCallback(
+    (id: string, value?: string | null) => {
+      const member = membersArr.find(el => el.id === id);
+      const addressInArr = membersArr.find(
+        el => el.address === value && el.id !== id,
+      );
+
+      dispatch({
+        type: 'SET_VALUE',
+        payload: {
+          id,
+          address: value,
+          error:
+            addressInArr &&
+            member?.name === addressInArr.name &&
+            addressInArr.error === undefined
+              ? 'Address already exists'
+              : undefined,
+        },
+      });
+    },
+    [membersArr],
+  );
+  const onErrorChange = useCallback(
+    (id: string, error?: string) => {
+      dispatch({
+        type: 'SET_VALUE',
+        payload: {
+          id,
+          error: error,
+        },
+      });
+    },
+    [dispatch],
+  );
+  const onRemove = useCallback(
+    (id: string) => {
+      dispatch({
+        type: 'REMOVE_MEMBER',
+        payload: id,
+      });
+    },
+    [dispatch],
+  );
+
+  const formHasErrors = useMemo(() => {
+    if (duplicateNames) {
+      return true;
+    }
+    if (daoNameError) {
+      return true;
+    }
+    let thereIsError = false;
+    membersArr.forEach(member => {
+      if (thereIsError) {
+        return;
+      }
+      if (
+        !member.address ||
+        !member.name ||
+        !member.votingPower ||
+        member.error
+      ) {
+        thereIsError = true;
+      }
+    });
+    return thereIsError || totalVotingPower < 100 || totalVotingPower > 100;
+  }, [daoNameError, duplicateNames, membersArr, totalVotingPower]);
   return (
     <Box marginTop={'35px'}>
       <Text
@@ -173,9 +246,30 @@ const CreateDaoForm = ({
         focusBorderColor="darkPurple"
         borderRadius={12}
         color={'purple'}
-        onChange={e => setDaoName(e.target.value)}
+        onChange={e => {
+          const value = e.target.value;
+          const name = z
+            .string()
+            .min(2, {
+              message: 'Name must have at least 1 character',
+            })
+            .max(20, {
+              message: 'Name must have at most is 20 character',
+            })
+            .safeParse(value);
+          dispatch({
+            type: 'SET_DAO_NAME',
+            payload: {
+              value,
+              error: name.success
+                ? undefined
+                : name.error.format()._errors.join('\n'),
+            },
+          });
+        }}
       />
       <Text
+        height="10px"
         color="red"
         marginBottom={'8px'}
         fontFamily={'DM Sans'}
@@ -184,7 +278,7 @@ const CreateDaoForm = ({
         marginLeft={'18px'}
         marginTop={'8px'}
       >
-        {daoName.length > 0 && DAONameValidationMessage}
+        {daoNameError}
       </Text>
       <Flex width={'798px'} marginTop={'38px'} marginBottom={'19px'}>
         <Button
@@ -193,10 +287,14 @@ const CreateDaoForm = ({
           width={'126px'}
           height={'48px'}
           onClick={() => {
-            setDaoMembers([
-              ...daoMembers,
-              { name: '', address: '', votingPower: 0 },
-            ]);
+            dispatch({
+              type: 'ADD_MEMBER',
+              payload: {
+                id: uuid(),
+                name: '',
+                votingPower: 0,
+              },
+            });
           }}
           borderRadius={50}
           backgroundColor={'transparent'}
@@ -223,9 +321,16 @@ const CreateDaoForm = ({
           width={'126px'}
           height={'48px'}
           onClick={() => {
-            const power = 100 / daoMembers.length;
-            daoMembers.forEach(member => (member.votingPower = power));
-            setDaoMembers(daoMembers);
+            const power = 100 / Object.keys(members).length;
+            membersArr.forEach(member => {
+              dispatch({
+                type: 'SET_VALUE',
+                payload: {
+                  id: member.id,
+                  votingPower: power,
+                },
+              });
+            });
           }}
           borderRadius={50}
           backgroundColor={'transparent'}
@@ -254,114 +359,22 @@ const CreateDaoForm = ({
           SHARE OF VOTES
         </Text>
       </Flex>
-      {daoMembers.map((daoMember, index) => (
-        <Flex key={index} marginBottom={'16px'}>
-          <InputGroup width={'650px'} height={'48px'}>
-            <Input
-              spellCheck="false"
-              isReadOnly={index === 0}
-              variant={'outline'}
-              borderColor={'primary.500'}
-              background={'primary.100'}
-              focusBorderColor="darkPurple"
-              borderRadius={12}
-              marginRight={'16px'}
-              color={'darkPurple'}
-              height={'100%'}
-              defaultValue={daoMember?.name}
-              fontWeight={'normal'}
-              onChange={e => {
-                daoMembers[index].name = e.target.value.trim();
-                setDaoMembers(daoMembers);
-                setIdentityNamesValid(false);
-              }}
-              onBlur={() => idsByNamesQuery.refetch()}
-              onKeyDown={() => idsByNamesQuery.refetch()}
-              onFocus={() => {
-                setFocusedDirectorIndex(index);
-              }}
-            />
-            <InputRightElement
-              width="65%"
-              justifyContent={'start'}
-              height={'100%'}
-            >
-              <Text
-                color={'purple'}
-                fontFamily="DM Sans"
-                fontSize={16}
-                fontWeight="normal"
-              >
-                {index > 0
-                  ? !validateName(daoMember?.name)?.name
-                    ? !idsByNamesQuery.isFetching ||
-                      idsByNamesQuery.isRefetching
-                      ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        /// @ts-ignore
-                        idsByNamesQuery?.data?.at(index)?.length > 43
-                        ? idsByNamesQuery?.data?.at(index)?.slice(0, 43) + '...'
-                        : idsByNamesQuery?.data?.at(index)
-                      : index === focusedDirectorIndex
-                      ? 'Checking...'
-                      : idsByNamesQuery?.data?.at(index)
-                    : ''
-                  : daoMember.address}
-              </Text>
-            </InputRightElement>
-          </InputGroup>
-          <InputGroup width={'102px'} height={'48px'} marginRight={'16px'}>
-            <Input
-              variant={'outline'}
-              width={'102px'}
-              height={'100%'}
-              borderColor={'primary.500'}
-              background={'primary.100'}
-              focusBorderColor="darkPurple"
-              borderRadius={12}
-              color={'purple'}
-              fontWeight={'normal'}
-              value={daoMember?.votingPower}
-              type={'number'}
-              onChange={e => {
-                const updatedDaoMembers = daoMembers.map((daoMember, i) => {
-                  if (i === index) {
-                    return {
-                      ...daoMember,
-                      votingPower: parseInt(e.target.value),
-                    };
-                  } else {
-                    return daoMember;
-                  }
-                });
-                setDaoMembers(updatedDaoMembers);
-              }}
-            />
-
-            <InputRightElement height={'100%'}>
-              <Text
-                color={'purple'}
-                fontFamily="DM Sans"
-                fontSize={16}
-                fontWeight="normal"
-              >
-                %
-              </Text>
-            </InputRightElement>
-          </InputGroup>
-          {index > 0 ? (
-            <CloseButton
-              size={'24px'}
-              _hover={{ backgroundColor: 'transparent' }}
-              color={'rgba(15,0,86,0.3)'}
-              onClick={() => {
-                daoMembers.splice(index, 1);
-                setDaoMembers(daoMembers);
-              }}
-            />
-          ) : (
-            <></>
-          )}
-        </Flex>
+      {membersArr.map(daoMember => (
+        <Member
+          isReadOnly={daoMember.id === ownerId}
+          key={daoMember.id}
+          id={daoMember.id}
+          name={daoMember.name}
+          address={daoMember.address}
+          error={daoMember.error}
+          votingPower={daoMember.votingPower}
+          client={client}
+          onVotingPowerChange={onVotingPowerChange}
+          onNameChange={onNameChange}
+          onAddress={onAddress}
+          onErrorChange={onErrorChange}
+          onRemove={onRemove}
+        />
       ))}
       <Flex
         marginTop={'16px'}
@@ -419,9 +432,8 @@ const CreateDaoForm = ({
         marginLeft={'12px'}
         marginTop={'8px'}
       >
-        {doubleCounts > 0
-          ? 'Single member identity entered more than once!'
-          : ''}
+        {/** TODO: more details here */}
+        {duplicateNames && 'Single member identity entered more than once!'}
       </Text>
       <Text
         marginTop={'93px'}
@@ -437,7 +449,12 @@ const CreateDaoForm = ({
         aria-label="dao-proposal-threshold"
         defaultValue={DEFAULT_DAO_THRESHOLD}
         width={'722px'}
-        onChange={val => setThreshold(val)}
+        onChange={val =>
+          dispatch({
+            type: 'SET_THRESHOLD',
+            payload: val,
+          })
+        }
         min={1}
         max={100}
         step={1}
@@ -513,7 +530,7 @@ const CreateDaoForm = ({
           width={'99px'}
           height={'42px'}
           variant={'link'}
-          onClick={() => setCreateDaoSelected(null)}
+          onClick={() => setCreateDaoSelected('')}
         >
           <Text
             color={'darkPurple'}
@@ -527,7 +544,7 @@ const CreateDaoForm = ({
         </Button>
         <Box width={'12px'} />
         <Button
-          disabled={!isFormValid}
+          disabled={formHasErrors}
           onClick={() => {
             setIsCreatingDao(true);
             registerDaoMutation
@@ -538,7 +555,10 @@ const CreateDaoForm = ({
                   maxVotingPeriod: {
                     time: 2419200, //28 days
                   },
-                  members: members,
+                  members: membersArr.map(el => ({
+                    addr: el.address as string,
+                    weight: el.votingPower as number,
+                  })),
                   thresholdPercentage: threshold,
                 },
                 args: { fee },
@@ -601,4 +621,4 @@ const CreateDaoForm = ({
   );
 };
 
-export default CreateDaoForm;
+export default CreateDaoNewForm;
