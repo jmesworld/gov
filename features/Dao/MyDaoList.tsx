@@ -36,12 +36,16 @@ const MyDaoList = () => {
         <Link.withStatus
           key={dao.name}
           matchFunc={route => {
-            return (
-              (route.pathname === '/dao/view/[id]' &&
-                route.query?.id === dao.name) ||
-              (route.pathname === '/proposals/create' &&
-                selectedDAO?.address === dao.address)
-            );
+            if (route.pathname === '/dao/view/[id]') {
+              return route.query?.id === dao.name;
+            }
+            if (route.pathname === '/proposals/create') {
+              return selectedDAO?.address === dao.address;
+            }
+            if (router.pathname === '/dao/proposal') {
+              return selectedDAO?.address === dao.address;
+            }
+            return false;
           }}
           href={`/dao/view/${dao.name}`}
         >
@@ -52,6 +56,9 @@ const MyDaoList = () => {
               isSelected={isActive}
               onClick={e => {
                 if (router.route === '/proposals/create') {
+                  e.preventDefault();
+                }
+                if (router.route === '/dao/proposal') {
                   e.preventDefault();
                 }
                 setSelectedDAOByName(dao.name);

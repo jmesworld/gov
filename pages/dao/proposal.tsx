@@ -1,17 +1,17 @@
 import { useAppState } from '../../contexts/AppStateContext';
+import { useDAOContext } from '../../contexts/DAOContext';
 import DaoProposalDetail from '../../features/Dao/components/DaoProposalDetail';
 
 const DAOProposal = () => {
-  const {
-    selectedDao,
-    selectedDaoName,
-    selectedDaoProposalTitle,
-    selectedProposalId,
-  } = useAppState();
+  const { selectedDAO } = useDAOContext();
+  const { selectedDaoProposalTitle, selectedProposalId } = useAppState();
+  if (!selectedDAO) {
+    return 'no DAO selected';
+  }
   return (
     <DaoProposalDetail
-      selectedDao={selectedDao}
-      selectedDaoName={selectedDaoName}
+      selectedDao={selectedDAO?.address}
+      selectedDaoName={selectedDAO?.name}
       selectedDaoProposalTitle={selectedDaoProposalTitle}
       selectedDaoProposalId={selectedProposalId}
     />
