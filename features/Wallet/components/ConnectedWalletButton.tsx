@@ -19,6 +19,7 @@ import { formatBalance } from '../../../hooks/useAccountBalance';
 import { Link } from '../../components/genial/Link';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { RefObject } from 'react';
+import { CopyAddressButton } from './CopyAddressButton';
 
 export const ConnectedWalletButton = ({
   identityName,
@@ -156,6 +157,16 @@ export const ConnectedWalletButton = ({
         minW={'271px'}
         maxW={'400px'}
       >
+        <MenuItem
+          backgroundColor="white"
+          padding="2"
+          _hover={{ bg: 'white' }}
+          borderRadius={'8px'}
+          onClick={() => {}}
+          bg="bg"
+        >
+          <CopyAddressButton address={address} />
+        </MenuItem>
         <Link href="/?modal=delegate">
           <MenuItem
             padding="2"
