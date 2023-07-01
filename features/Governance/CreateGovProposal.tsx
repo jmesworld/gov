@@ -14,21 +14,19 @@ import {
   Textarea,
   useToast,
 } from '@chakra-ui/react';
-import {
-  CosmWasmClient,
-  SigningCosmWasmClient,
-} from '@cosmjs/cosmwasm-stargate';
-import { useChain } from '@cosmos-kit/react';
-import { useEffect, useState } from 'react';
+import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import { useState } from 'react';
 import { StdFee } from '@cosmjs/amino';
 import { DaoMultisigClient } from '../../client/DaoMultisig.client';
 import { useDaoMultisigProposeMutation } from '../../client/DaoMultisig.react-query';
 
 import { ProposalType } from '../components/Proposal/ProposalType';
-import { chainName } from '../../config/defaults';
 import { toBase64 } from '../../utils/identity';
 import * as Governance from '../../client/Governance.types';
+import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
+import { useIdentityContext } from '../../contexts/IdentityContext';
 
+// TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
@@ -38,8 +36,19 @@ const fee: StdFee = {
 };
 
 const default_funding_duration = (3 * 30 * 86400) / 5; // convert 3 months to number of blocks
-
-const proposalTypes = ['text', 'core-slot', 'revoke-proposal', 'improvement'];
+export type ProposalTypes =
+  | 'text'
+  | 'core-slot'
+  | 'revoke-proposal'
+  | 'improvement'
+  | 'feature-request';
+const allowedProposalTypes: ProposalTypes[] = [
+  'text',
+  'core-slot',
+  'revoke-proposal',
+  'improvement',
+  'feature-request',
+];
 
 export default function CreateGovProposal({
   selectedDao,
@@ -48,15 +57,14 @@ export default function CreateGovProposal({
 }: {
   selectedDao?: string;
   selectedDaoName?: string;
+  // eslint-disable-next-line @typescript-eslint/ban-types
   setCreateGovProposalSelected: Function;
 }) {
-  const { address, getCosmWasmClient, getSigningCosmWasmClient } =
-    useChain(chainName);
+  const { address } = useIdentityContext();
 
   const toast = useToast();
-  const [selectedProposalType, setSelectedProposalType] = useState(
-    proposalTypes[0],
-  );
+  const [selectedProposalType, setSelectedProposalType] =
+    useState<ProposalTypes>(allowedProposalTypes[0]);
   const [proposalTitle, setProposalTitle] = useState('');
   const [proposalDescription, setProposalDescription] = useState('');
   const [slotType, setSlotType] = useState('brand');
@@ -66,39 +74,9 @@ export default function CreateGovProposal({
   const [isCreatingGovProposal, setCreatingGovProposal] = useState(false);
   const [revokeProposalId, setRevokeId] = useState(-1);
 
-  const [viewDimension, setViewDimension] = useState(Array());
-
-  useEffect(() => {
-    const { innerHeight, innerWidth } = window;
-    setViewDimension([innerWidth, innerHeight]);
-  }, []);
-
-  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-    null,
-  );
-  const [signingClient, setSigningClient] =
-    useState<SigningCosmWasmClient | null>(null);
-  useEffect(() => {
-    if (address) {
-      getCosmWasmClient()
-        .then(cosmWasmClient => {
-          if (!cosmWasmClient) {
-            return;
-          }
-          setCosmWasmClient(cosmWasmClient);
-        })
-        .catch(error => console.log(error));
-
-      getSigningCosmWasmClient()
-        .then(signingClient => {
-          if (!signingClient) {
-            return;
-          }
-          setSigningClient(signingClient);
-        })
-        .catch(error => console.log(error));
-    }
-  }, [address, getCosmWasmClient]);
+  const [numberOfNFTToMint, setNumberOfNFTToMint] = useState(0);
+  const { signingCosmWasmClient: signingClient } =
+    useSigningCosmWasmClientContext();
 
   const daoClient: DaoMultisigClient = new DaoMultisigClient(
     signingClient as SigningCosmWasmClient,
@@ -108,8 +86,11 @@ export default function CreateGovProposal({
 
   // Dynamically show required sections for different proposal types
   const isSlotTypeRequired = selectedProposalType === 'core-slot';
+  const isFeatureRequestRequired = selectedProposalType === 'feature-request';
   const isFundigRequired =
-    selectedProposalType === 'text' || selectedProposalType === 'core-slot';
+    selectedProposalType === 'text' ||
+    selectedProposalType === 'core-slot' ||
+    selectedProposalType === 'feature-request';
   const isImproventRequired = selectedProposalType === 'improvement';
 
   const createGovProposalMutation = useDaoMultisigProposeMutation();
@@ -159,7 +140,7 @@ export default function CreateGovProposal({
           >
             SELECT PROPOSAL TYPE
           </Text>
-          {proposalTypes.map(proposalType => (
+          {allowedProposalTypes.map(proposalType => (
             <ProposalType
               key={proposalType}
               type={proposalType}
@@ -258,7 +239,66 @@ export default function CreateGovProposal({
           ) : (
             ''
           )}
-          {isSlotTypeRequired ? (
+          {isFeatureRequestRequired && (
+            <Box marginTop={'25px'} width={'872px'}>
+              <Flex marginBottom={'17px'} alignItems="center">
+                <Text
+                  color={'darkPurple'}
+                  fontWeight="normal"
+                  fontSize={16}
+                  fontFamily="DM Sans"
+                  marginRight={'52px'}
+                >
+                  Select feature type::
+                </Text>
+                <RadioGroup value="art-dealer" textColor={'darkPurple'}>
+                  <Stack direction="row" spacing={'35px'}>
+                    <Radio value="art-dealer">Art Dealer</Radio>
+                  </Stack>
+                </RadioGroup>
+                <Flex marginLeft={'28px'} alignItems="center" height={'41px'}>
+                  <Text
+                    color={'darkPurple'}
+                    fontWeight="normal"
+                    fontSize={16}
+                    fontFamily="DM Sans"
+                  >
+                    Number of NFT’s to Mint
+                  </Text>
+                  <Input
+                    width={'106px'}
+                    height={'41px'}
+                    borderColor={'primary.500'}
+                    background={'transparent'}
+                    type="number"
+                    color={'purple'}
+                    onChange={e =>
+                      setNumberOfNFTToMint(parseInt(e.target.value))
+                    }
+                    border="none"
+                    borderBottom="1px solid"
+                    borderRadius="0"
+                    px="0px"
+                    mx="10px"
+                    textAlign={'center'}
+                    _focus={{
+                      boxShadow: 'none',
+                      borderBottom: '1px solid',
+                    }}
+                  />
+                </Flex>
+              </Flex>
+              <Divider
+                width={'872px'}
+                color={'red'}
+                orientation="horizontal"
+                height={'2px'}
+                p={0}
+                borderColor={'lilac'}
+              />
+            </Box>
+          )}
+          {isSlotTypeRequired && (
             <Box marginTop={'25px'} width={'872px'}>
               <Flex marginBottom={'17px'}>
                 <Text
@@ -291,8 +331,6 @@ export default function CreateGovProposal({
                 borderColor={'lilac'}
               />
             </Box>
-          ) : (
-            ''
           )}
           {isFundigRequired ? (
             <Box width={'872px'}>
@@ -439,6 +477,8 @@ export default function CreateGovProposal({
                 const proposalMsg = {
                   propose: getProposalExecuteMsg({
                     type: selectedProposalType,
+                    featureApproved: numberOfNFTToMint,
+
                     isFundingRequired: isFundingNeeded,
                     amount: fundingAmount,
                     duration: fundingPeriod * 30 * 24 * 60 * 60, // months to seconds
@@ -463,7 +503,6 @@ export default function CreateGovProposal({
                     ],
                   }),
                 };
-                console.log(proposalMsg);
                 setCreatingGovProposal(true);
                 const wasmMsg: Governance.WasmMsg = {
                   execute: {
@@ -563,11 +602,11 @@ const getProposalExecuteMsg = ({
   slot,
   revoke_proposal_id,
   msgs,
-  isFundingRequired,
   amount,
   duration,
+  featureApproved,
 }: {
-  type: string;
+  type: ProposalTypes;
   title: string;
   description: string;
   slot?: Governance.CoreSlot;
@@ -576,6 +615,7 @@ const getProposalExecuteMsg = ({
   isFundingRequired?: boolean;
   amount?: number;
   duration?: number;
+  featureApproved: number;
 }) => {
   // "text", "core-slot", "revoke-core-slot", "improvement"
   let msg: Governance.ProposalMsg;
@@ -620,6 +660,23 @@ const getProposalExecuteMsg = ({
           description: description,
           title: title,
           msgs: msgs as Governance.CosmosMsgForEmpty[],
+        },
+      };
+      return msg;
+    case 'feature-request':
+      msg = {
+        request_feature: {
+          feature: {
+            art_dealer: {
+              approved: featureApproved,
+            },
+          },
+          description: description,
+          title: title,
+          funding: {
+            amount: amount?.toString() as string,
+            duration_in_blocks: duration as number,
+          },
         },
       };
       return msg;
