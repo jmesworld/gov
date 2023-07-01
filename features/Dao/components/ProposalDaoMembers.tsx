@@ -1,8 +1,8 @@
-import { Text, VStack, HStack, Tooltip, Image } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { Text, VStack, HStack, Tooltip, Image } from '@chakra-ui/react';
+import { useEffect } from 'react';
 
-import ProposalDaoMember from "./ProposalDaoMember";
-import { m } from "framer-motion";
+import ProposalDaoMember from './ProposalDaoMember';
+import { m } from 'framer-motion';
 
 const ProposalDaoMembers = ({
   selectedDaoMembersList,
@@ -11,14 +11,14 @@ const ProposalDaoMembers = ({
 }) => {
   useEffect(() => {
     const init = async () => {
-      const percentCircle = document.querySelector(".percentCircle");
-      const percent = percentCircle?.getAttribute("data-percent");
-      const percentCircleLine = percentCircle?.querySelector(".fill");
+      const percentCircle = document.querySelector('.percentCircle');
+      const percent = percentCircle?.getAttribute('data-percent');
+      const percentCircleLine = percentCircle?.querySelector('.fill');
 
       if (percentCircleLine && percent) {
         percentCircleLine.setAttribute(
-          "style",
-          "stroke-dashoffset: " + ((100 - parseInt(percent)) / 100) * 229
+          'style',
+          'stroke-dashoffset: ' + ((100 - parseInt(percent)) / 100) * 229,
         );
       }
     };
@@ -41,13 +41,13 @@ const ProposalDaoMembers = ({
           <Image
             src="/tooltip.svg"
             alt="Info"
-            width={"13.33px"}
-            height={"13.33px"}
+            width={'13.33px'}
+            height={'13.33px'}
           ></Image>
         </Tooltip>
       </HStack>
 
-      {selectedDaoMembersList.map((member) => (
+      {selectedDaoMembersList.map(member => (
         <ProposalDaoMember
           key={member?.name}
           name={member?.name}

@@ -6,12 +6,12 @@ import {
   Text,
   Button,
   IconButton,
-} from "@chakra-ui/react";
-import OnboardingProgressIndicator from "./OnboardingProgressIndicator";
-import { useChain } from "@cosmos-kit/react";
-import { chainName } from "../../../config/defaults";
-import { connectKeplrWallet } from "../../../actions/keplr";
-import { ArrowBackIcon, CloseIcon } from "@chakra-ui/icons";
+} from '@chakra-ui/react';
+import OnboardingProgressIndicator from './OnboardingProgressIndicator';
+import { useChain } from '@cosmos-kit/react';
+import { chainName } from '../../../config/defaults';
+import { connectKeplrWallet } from '../../../actions/keplr';
+import { ArrowBackIcon, CloseIcon } from '@chakra-ui/icons';
 
 const ConnectWalletCard = ({
   radioGroup,
@@ -31,46 +31,46 @@ const ConnectWalletCard = ({
 
   const handleConnectWallet = () => {
     connectKeplrWallet(walletRepo)
-      .then((res) => {
-        console.log("success");
+      .then(res => {
+        console.log('success');
       })
-      .catch((error) => console.log(error));
+      .catch(error => console.log(error));
     handleUpdateCard(radioGroup.indexOf(currentCard));
   };
 
   return (
     <Box
-      width={"500px"}
-      height={"590px"}
-      alignItems={"center"}
-      marginTop={"-50px"}
+      width={'500px'}
+      height={'590px'}
+      alignItems={'center'}
+      marginTop={'-50px'}
     >
       <Flex>
-        <Flex width={"100%"} justifyContent={"space-between"}>
+        <Flex width={'100%'} justifyContent={'space-between'}>
           <IconButton
             aria-label=""
-            background={"transparent"}
-            color={"transparent"}
-            icon={<ArrowBackIcon width={"24px"} height={"24px"} />}
-            marginTop={"60px"}
-            marginLeft={"8px"}
-            _hover={{ backgroundColor: "transparent" }}
+            background={'transparent'}
+            color={'transparent'}
+            icon={<ArrowBackIcon width={'24px'} height={'24px'} />}
+            marginTop={'60px'}
+            marginLeft={'8px'}
+            _hover={{ backgroundColor: 'transparent' }}
           />
           <Image
             src="/Connect_Wallet.svg"
             alt="icon"
-            width={"275.46px"}
-            height={"248px"}
-            justifySelf={"center"}
+            width={'275.46px'}
+            height={'248px'}
+            justifySelf={'center'}
           />
           <IconButton
             aria-label=""
-            background={"transparent"}
-            color={"white"}
-            icon={<CloseIcon height={"24px"} />}
-            marginTop={"60px"}
-            marginRight={"8px"}
-            _hover={{ backgroundColor: "transparent" }}
+            background={'transparent'}
+            color={'white'}
+            icon={<CloseIcon height={'24px'} />}
+            marginTop={'60px'}
+            marginRight={'8px'}
+            _hover={{ backgroundColor: 'transparent' }}
             onClick={() => handleUpdateCard(Infinity)}
           />
         </Flex>
@@ -79,11 +79,11 @@ const ConnectWalletCard = ({
       <Flex>
         <Spacer />
         <Text
-          color={"white"}
-          fontWeight={"bold"}
+          color={'white'}
+          fontWeight={'bold'}
           fontSize={28}
-          paddingBottom={"6px"}
-          paddingTop={"29px"}
+          paddingBottom={'6px'}
+          paddingTop={'29px'}
           fontFamily="DM Sans"
         >
           Connect your JMES wallet
@@ -93,8 +93,8 @@ const ConnectWalletCard = ({
       <Flex>
         <Spacer />
         <Text
-          color={"white"}
-          fontWeight={"normal"}
+          color={'white'}
+          fontWeight={'normal'}
           fontSize={16}
           fontFamily="DM Sans"
         >
@@ -105,8 +105,8 @@ const ConnectWalletCard = ({
       <Flex>
         <Spacer />
         <Text
-          color={"white"}
-          fontWeight={"normal"}
+          color={'white'}
+          fontWeight={'normal'}
           fontSize={16}
           fontFamily="DM Sans"
         >
@@ -117,36 +117,36 @@ const ConnectWalletCard = ({
       <Flex>
         <Spacer />
         <Text
-          color={"white"}
-          fontWeight={"normal"}
+          color={'white'}
+          fontWeight={'normal'}
           fontSize={16}
-          paddingBottom={"6px"}
+          paddingBottom={'6px'}
           fontFamily="DM Sans"
         >
           and vote on Proposals.
         </Text>
         <Spacer />
       </Flex>
-      <Flex py={"25px"}>
+      <Flex py={'25px'}>
         <Spacer />
         <Button
           onClick={() => {
             handleConnectWallet();
           }}
-          backgroundColor={"green"}
+          backgroundColor={'green'}
           borderRadius={90}
           alignContent="end"
-          width={"200px"}
-          height={"48px"}
-          _hover={{ bg: "green" }}
-          _active={{ bg: "green" }}
-          variant={"outline"}
-          borderWidth={"1px"}
-          borderColor={"rgba(0,0,0,0.1)"}
+          width={'200px'}
+          height={'48px'}
+          _hover={{ bg: 'green' }}
+          _active={{ bg: 'green' }}
+          variant={'outline'}
+          borderWidth={'1px'}
+          borderColor={'rgba(0,0,0,0.1)'}
         >
           <Text
             color="midnight"
-            fontFamily={"DM Sans"}
+            fontFamily={'DM Sans'}
             fontWeight="medium"
             fontSize={14}
           >
