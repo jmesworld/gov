@@ -63,7 +63,7 @@ const CreateDaoForm = ({
   const [daoMembers, setDaoMembers] = useState([daoOwner]);
   const [threshold, setThreshold] = useState(DEFAULT_DAO_THRESHOLD);
   const [isIdentityNamesValid, setIdentityNamesValid] = useState(false);
-  const [focusedCosignerIndex, setFocusedCosignerIndex] = useState(Infinity);
+  const [focusedDirectorIndex, setFocusedDirectorIndex] = useState(Infinity);
   const [isCreatingDao, setIsCreatingDao] = useState(false);
   const [doubleCounts, setDoubleCounts] = useState(0);
 
@@ -232,7 +232,7 @@ const CreateDaoForm = ({
               marginLeft={'10px'}
               fontFamily="DM Sans"
             >
-              Cosigner
+              Director
             </Text>
           </Flex>
         </Button>
@@ -298,7 +298,7 @@ const CreateDaoForm = ({
               onBlur={() => idsByNamesQuery.refetch()}
               onKeyDown={() => idsByNamesQuery.refetch()}
               onFocus={() => {
-                setFocusedCosignerIndex(index);
+                setFocusedDirectorIndex(index);
               }}
             />
             <InputRightElement
@@ -319,7 +319,7 @@ const CreateDaoForm = ({
                       ? idsByNamesQuery?.data?.at(index)?.length > 43
                         ? idsByNamesQuery?.data?.at(index)?.slice(0, 43) + '...'
                         : idsByNamesQuery?.data?.at(index)
-                      : index === focusedCosignerIndex
+                      : index === focusedDirectorIndex
                       ? 'Checking...'
                       : idsByNamesQuery?.data?.at(index)
                     : ''
