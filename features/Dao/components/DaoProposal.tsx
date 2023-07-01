@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Box, Flex, Text } from '@chakra-ui/react';
+import { Box, Flex, Image, Spinner, Text } from '@chakra-ui/react';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import DaoMembersList from '../DaoMemberList';
 
@@ -11,6 +11,8 @@ import {
   ProposalList,
 } from '../../components/Proposal/ProposalList';
 import { useCosmWasmClientContext } from '../../../contexts/CosmWasmClient';
+
+import { useAccountBalance } from '../../../hooks/useAccountBalance';
 
 export default function DaoProposal({
   daoAddress,
@@ -29,13 +31,22 @@ export default function DaoProposal({
   setSelectedProposalId: Function;
 }) {
   const { cosmWasmClient } = useCosmWasmClientContext();
+  const {
+    data: balance,
+    isLoading,
+    isFetching,
+  } = useAccountBalance(daoAddress, 1 * 1000);
 
   const daoQueryClient = new DaoMultisigQueryClient(
     cosmWasmClient as CosmWasmClient,
     daoAddress as string,
   );
 
-  const { data, isFetching, isLoading } = useDaoMultisigListProposalsQuery({
+  const {
+    data,
+    isFetching: fetchingBalance,
+    isLoading: loadingBalance,
+  } = useDaoMultisigListProposalsQuery({
     client: daoQueryClient,
     args: { limit: 10000 },
     options: {
@@ -55,7 +66,51 @@ export default function DaoProposal({
       >
         {daoName}
       </Text>
-      <Flex height={'46px'} />
+      {(fetchingBalance || loadingBalance) && !balance && (
+        <Flex>
+          <Text fontSize="sm"> Loading Balance ...</Text>
+          <Spinner size="sm" />
+        </Flex>
+      )}
+      {balance && (
+        <Flex>
+          <Flex
+            borderWidth={1}
+            borderStyle="solid"
+            borderColor="purple"
+            px={3}
+            alignItems="center"
+          >
+            <Text mr={3}>JMES</Text>
+            <Image
+              src="/JMES_Icon.svg"
+              alt="JMES Icon"
+              width={4}
+              mr={1}
+              height={4}
+            />
+            <Text> {balance?.unstaked}</Text>
+          </Flex>
+          <Flex
+            borderWidth={1}
+            borderStyle="solid"
+            borderColor="purple"
+            px={3}
+            alignItems="center"
+          >
+            <Text mr={3}>bJMES</Text>
+            <Image
+              src="/JMES_bonded_icon.svg"
+              alt="JMES Icon"
+              width={4}
+              mr={1}
+              height={4}
+            />
+            <Text> {balance?.staked}</Text>
+          </Flex>
+        </Flex>
+      )}
+      <Flex height={'16px'} />
       <Flex>
         <Box flexGrow={1}>
           <ProposalHeader isGov={false} />
