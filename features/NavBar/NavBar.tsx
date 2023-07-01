@@ -10,7 +10,7 @@ const MyDaoList = dynamic(() => import('../Dao/MyDaoList'));
 
 interface NavBarProps {
   status: WalletStatus;
-  address: any;
+  address: string;
   identityName: string | undefined;
   setSelectedDao: Dispatch<SetStateAction<string>>;
   setSelectedDaoName: Dispatch<SetStateAction<string>>;
@@ -25,8 +25,6 @@ const NavBar = ({
 
   setSelectedDao,
   setSelectedDaoName,
-  selectedDao,
-  selectedDaoName,
 }: NavBarProps) => {
   const router = useRouter();
   return (

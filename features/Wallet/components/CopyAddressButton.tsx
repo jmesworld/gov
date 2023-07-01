@@ -27,16 +27,14 @@ function handleChangeColorModeValue(
 
 function stringTruncateFromCenter(str: string, maxLength: number) {
   const midChar = '…'; // character to insert into the center of the result
-  let left: number;
-  let right: number;
 
   if (str.length <= maxLength) return str;
 
   // length of beginning part
-  left = Math.ceil(maxLength / 2);
+  const left = Math.ceil(maxLength / 2);
 
   // start index of ending part
-  right = str.length - Math.floor(maxLength / 2) + 1;
+  const right = str.length - Math.floor(maxLength / 2) + 1;
 
   return str.substring(0, left) + midChar + str.substring(right);
 }
@@ -57,7 +55,7 @@ export const CopyAddressButton = ({
       setDisplayAddress(stringTruncateFromCenter(address, maxDisplayLength));
     if (address && !maxDisplayLength)
       setDisplayAddress(stringTruncateFromCenter(address, 24));
-  }, [address]);
+  }, [address, maxDisplayLength]);
   return (
     <Button
       title={address}
@@ -101,7 +99,11 @@ export const CopyAddressButton = ({
           outline: 'none',
         },
       }}
-      onClick={onCopy}
+      onClick={e => {
+        e.stopPropagation();
+        e.preventDefault();
+        onCopy();
+      }}
     >
       <Text
         fontSize="sm"

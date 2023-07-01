@@ -29,6 +29,7 @@ import { BalanceContextProvider } from '../contexts/balanceContext';
 import { DAOContextProvider } from '../contexts/DAOContext';
 import { SigningCosmWasmClientContextProvider } from '../contexts/SigningCosmWasmClient';
 import { GasPrice } from '@cosmjs/stargate';
+import { DelegateContextProvider } from '../contexts/DelegateContext';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   Layout?: ({ children }: { children: ReactElement }) => ReactElement;
@@ -50,9 +51,7 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
     //   return getSigningCosmosClientOptions();
     // }
   };
-  // const Layout = ({ children }: { children: ReactElement }) =>
-  // eslint-disable-next-line react/no-children-prop
-  // Component.Layout ? <Component.Layout children={children} /> : children;
+
   const queryClient = new QueryClient();
 
   return (
@@ -81,12 +80,14 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
                     <CosmWasmProvider>
                       <AppStateProvider>
                         <SigningCosmWasmClientContextProvider>
-                          <Layout>
-                            <>
-                              <Component {...pageProps} />
-                              <OnboardingModal />
-                            </>
-                          </Layout>
+                          <DelegateContextProvider>
+                            <Layout>
+                              <>
+                                <Component {...pageProps} />
+                                <OnboardingModal />
+                              </>
+                            </Layout>
+                          </DelegateContextProvider>
                         </SigningCosmWasmClientContextProvider>
                       </AppStateProvider>
                     </CosmWasmProvider>

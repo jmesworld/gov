@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
 import { Client, Core } from 'jmes';
 import { useCallback, useMemo, useState } from 'react';
 import { useValidators } from './useValidators';
@@ -28,16 +27,16 @@ type BoundingState = {
   selectedUnBonding: string | null;
 };
 
-const getUnBonds = () => {
-  throw new Error('not implemented');
-};
 const sliderDefaultValue = 0;
 export const useDelegate = () => {
   const { signingCosmWasmClient } = useSigningCosmWasmClientContext();
   const { balance } = useBalanceContext();
-  const totalJmes = useMemo(() => balance?.unstaked ?? 0, [balance?.unstaked]);
+  const totalJmes = useMemo(
+    () => Number(balance?.unstaked.toFixed(0) ?? 0),
+    [balance?.unstaked],
+  );
   const totalBondedJmes = useMemo(
-    () => balance?.staked ?? 0,
+    () => Number(balance?.staked.toFixed(0) ?? 0),
     [balance?.staked],
   );
 
@@ -50,6 +49,9 @@ export const useDelegate = () => {
     validatorList,
     isBondedValidatorsLoading,
     bondedValidators,
+    unBondingsData,
+    unBondingsError,
+    isLoadingUnBondings,
   } = useValidators(client);
   const toast = useToast();
 
@@ -67,18 +69,6 @@ export const useDelegate = () => {
     selectedUnBonding: null,
   });
   const { bonding, selectedValidator, selectedUnBonding } = bondingState;
-  const { isLoading: isUnBondingsLoading, data: unBondingsData } = useQuery(
-    ['getUnBonds'],
-    getUnBonds,
-    {
-      cacheTime: 2 * 60 * 100,
-      staleTime: 2 * 60 * 1000,
-      retry: 3,
-      onError(err) {
-        console.error('Error:', err);
-      },
-    },
-  );
 
   const toggleBonding = () => {
     setBondingState(p => ({
@@ -170,6 +160,7 @@ export const useDelegate = () => {
     } catch (err) {
       if (err instanceof Error)
         toast({
+          status: 'error',
           title: err.message,
         });
     }
@@ -198,8 +189,6 @@ export const useDelegate = () => {
     setTransferForm,
     isValidatorsLoading,
     validatorList,
-    isUnBondingsLoading,
-    unBondingsData,
     toggleBonding,
     onChangeSlider,
     valueToMove,
@@ -209,5 +198,8 @@ export const useDelegate = () => {
     isBondedValidatorsLoading,
     validatorsError,
     bondedValidatorsError,
+    unBondingsData,
+    unBondingsError,
+    isLoadingUnBondings,
   };
 };
