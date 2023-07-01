@@ -6,6 +6,8 @@ import { NavBarItem } from './NavBarItem';
 import { NavBarButton } from './NavBarButton';
 import { Link } from '../components/genial/Link';
 import { useRouter } from 'next/router';
+import { useAppState } from '../../contexts/AppStateContext';
+import { useDAOContext } from '../../contexts/DAOContext';
 const MyDaoList = dynamic(() => import('../Dao/MyDaoList'));
 
 interface NavBarProps {
@@ -19,7 +21,6 @@ interface NavBarProps {
 }
 
 const NavBar = ({
-  address,
   status,
   identityName,
 
@@ -27,6 +28,8 @@ const NavBar = ({
   setSelectedDaoName,
 }: NavBarProps) => {
   const router = useRouter();
+  const { selectedDAO } = useDAOContext();
+  const { selectedDaoProposalTitle } = useAppState();
   return (
     <VStack
       width={'200px'}
@@ -96,13 +99,8 @@ const NavBar = ({
           MY DAOS
         </Text>
       </Flex>
-      {typeof window !== 'undefined' &&
-      address !== 'undefined' &&
-      !(localStorage.getItem('myDaosData') as string)?.includes('undefined') ? (
-        <MyDaoList />
-      ) : (
-        <></>
-      )}
+      <MyDaoList />
+
       <Link href="/dao/create">
         <NavBarButton
           width="180px"
@@ -112,13 +110,19 @@ const NavBar = ({
         />
       </Link>
       <Spacer />
-      <NavBarButton
-        width="180px"
-        height="48px"
-        text="DAO Proposal"
-        // disabled={status !== WalletStatus.Connected}
-        disabled={true} // TODO: remove later
-      />
+      <Link href="/dao/proposal">
+        <NavBarButton
+          width="180px"
+          height="48px"
+          text="DAO Proposal"
+          disabled={
+            status !== WalletStatus.Connected ||
+            !identityName ||
+            !selectedDaoProposalTitle ||
+            !selectedDAO
+          }
+        />
+      </Link>
       <Link href="/proposals/create">
         <NavBarButton
           width="180px"

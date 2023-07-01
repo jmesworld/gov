@@ -51,10 +51,9 @@ export default function DaoProposalDetail({
       proposalId: selectedDaoProposalId,
     },
     options: {
-      refetchInterval: 10,
+      refetchInterval: 1000,
     },
   });
-
   const votesQuery = useDaoMultisigListVotesQuery({
     client: daoMultisigQueryClient,
     args: { proposalId: selectedDaoProposalId },
@@ -103,7 +102,18 @@ export default function DaoProposalDetail({
         proposalTitle={selectedDaoProposalTitle}
         proposalExpiry={expiryDateTimestamp}
       />
-      {proposalDetailQuery.data ? (
+      {proposalDetailQuery.isLoading ||
+      (proposalDetailQuery.isFetching && !proposalDetailQuery?.data) ? (
+        <Center marginTop={'80px'}>
+          <CircularProgress isIndeterminate color="darkPurple" />
+        </Center>
+      ) : (
+        <Text mt={4} fontSize="lg">
+          No data
+        </Text>
+      )}
+
+      {proposalDetailQuery.data && (
         <HStack spacing="54px" align="flex-start">
           <Box flexGrow={1}>
             <ProposalVoting
@@ -142,10 +152,6 @@ export default function DaoProposalDetail({
             /> */}
           </VStack>
         </HStack>
-      ) : (
-        <Center marginTop={'80px'}>
-          <CircularProgress isIndeterminate color="darkPurple" />
-        </Center>
       )}
     </>
   );
