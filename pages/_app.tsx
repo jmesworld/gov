@@ -44,12 +44,11 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
     // eslint-disable-next-line   @typescript-eslint/no-unused-vars
     signingCosmwasm: (_chain: Chain) => {
       return {
-        gasPrice: GasPrice.fromString('0.0ujmes'),
+        gasPrice: GasPrice.fromString('0ujmes'),
       };
     },
-    // stargate: (_chain: Chain) => {
-    //   return getSigningCosmosClientOptions();
-    // }
+
+    preferredSignType: () => 'direct',
   };
 
   const queryClient = new QueryClient();
