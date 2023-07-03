@@ -1,4 +1,4 @@
-import { Client, Core } from 'jmes';
+import { Client } from 'jmes';
 import { useCallback, useMemo, useState } from 'react';
 import { useValidators } from './useValidators';
 import { movingValidator } from '../lib/validateBonding';
@@ -7,6 +7,8 @@ import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { BJMES_DENOM, JMES_DENOM } from '../../../lib/constants';
 import { useBalanceContext } from '../../../contexts/balanceContext';
 import { useSigningCosmWasmClientContext } from '../../../contexts/SigningCosmWasmClient';
+import { coin } from '@cosmjs/amino';
+
 const LCD_URL = process.env.NEXT_PUBLIC_REST_URL as string;
 const NEXT_PUBLIC_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 
@@ -113,9 +115,8 @@ export const useDelegate = () => {
   const delegateTokens = useCallback(async () => {
     if (isMovingNotValid || !bondingIsValid || !address) {
       toast({
-        title: `Can't ${
-          bonding ? 'delegate' : 'undelegate'
-        }, please fix the issues!`,
+        title: `Can't ${bonding ? 'delegate' : 'undelegate'
+          }, please fix the issues!`,
         duration: 4000,
       });
       return;
@@ -132,9 +133,9 @@ export const useDelegate = () => {
         await signingCosmWasmClient?.delegateTokens(
           address,
           selectedValidator,
+          coin(valueToMove * 1e6, JMES_DENOM),
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           /// @ts-ignore ( Issue with different type)
-          new Core.Coin(JMES_DENOM, valueToMove * 1000), // FIXME use helper function to format amount
           'auto',
         );
 
@@ -148,9 +149,9 @@ export const useDelegate = () => {
         await signingCosmWasmClient?.undelegateTokens(
           address,
           selectedUnBonding,
+          coin(valueToMove * 1e6, BJMES_DENOM),
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           /// @ts-ignore ( Issue with different type)
-          new Core.Coin(BJMES_DENOM, valueToMove * 1000),
           'auto',
         );
         toast({

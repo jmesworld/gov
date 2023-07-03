@@ -80,7 +80,7 @@ export const DelegateValidatorTable = ({
       )}
       {loading && <Spinner size="sm" />}
       {validatorsData?.map(validator => {
-        const id = validator.consensus_pubkey.key;
+        const id = validator.operator_address;
         return (
           <Box
             key={id}
@@ -89,7 +89,7 @@ export const DelegateValidatorTable = ({
             justifyContent="flex-start"
             padding={selectedValidator === id ? '8px' : '8px 0'}
             background={selectedValidator === id ? '#704FF7' : ''}
-            borderRadius={validator.consensus_pubkey.key === id ? '4px' : ''}
+            borderRadius={validator.operator_address === id ? '4px' : ''}
             cursor="pointer"
           >
             <Text
