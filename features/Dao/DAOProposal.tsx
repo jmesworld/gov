@@ -2,110 +2,72 @@ import {
   Box,
   Button,
   CircularProgress,
-  CloseButton,
   Flex,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Slider,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderTrack,
   Spacer,
   Text,
-  Textarea,
-  Tooltip,
-  color,
   useToast,
 } from '@chakra-ui/react';
-import { useEffect, useReducer, useState } from 'react';
-
-import {
-  countObjectsWithDuplicateNames,
-  validateName,
-} from '../../utils/identity';
-import { AddIcon, QuestionOutlineIcon } from '@chakra-ui/icons';
-import {
-  IdentityserviceClient,
-  IdentityserviceQueryClient,
-} from '../../client/Identityservice.client';
-import { useChain } from '@cosmos-kit/react';
-import { chainName } from '../../config/defaults';
+import { useMemo, useReducer, useState } from 'react';
+import { IdentityserviceQueryClient } from '../../client/Identityservice.client';
 import {
   CosmWasmClient,
   SigningCosmWasmClient,
 } from '@cosmjs/cosmwasm-stargate';
-import { useQuery } from '@tanstack/react-query';
-import { useIdentityserviceRegisterDaoMutation } from '../../client/Identityservice.react-query';
-import { StdFee } from '@cosmjs/amino';
 
-import { useAccountBalance } from '../../hooks/useAccountBalance';
 import { ProposalType } from '../components/Proposal/ProposalType';
 import { DAOProposalReducer } from './DaoProposalReducer';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 import { useIdentityContext } from '../../contexts/IdentityContext';
-import { z } from 'zod';
-import { v4 as uuid } from 'uuid';
+import { BalanceDisplay } from './components/Balance';
+import { BasicForm } from './Proposal/Components/BasicForm';
+import { UpdateDirectories } from './Proposal/Components/UpdateDirectories';
+import {
+  DaoMultisigClient,
+  DaoMultisigQueryClient,
+} from '../../client/DaoMultisig.client';
+import { SpendDaoFunds } from './Proposal/Components/SpendDaoFunds';
+
+import { DaoMembersClient } from '../../client/DaoMembers.client';
+import { validateForm } from './Proposal/libs/checkIfFormValid';
+import { getRequest } from './Proposal/libs/getRequest';
+import { useDaoMultisigProposeMutation } from '../../client/DaoMultisig.react-query';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 
-const nameSchema = z
-  .string()
-  .min(2, {
-    message: 'Name must have at least 1 character',
-  })
-  .max(20, {
-    message: 'Name must have at most is 20 character',
-  });
-
-const descriptionSchema = z
-  .string()
-  .min(2, {
-    message: 'Name must have at least 1 character',
-  })
-  .max(200, {
-    message: 'Name must have at most is 20 character',
-  });
-const fee: StdFee = {
-  amount: [{ amount: '30000', denom: 'ujmes' }],
-  gas: '10000000',
-};
-
-type ProposalTypes = 'text' | 'update-directories' | 'spend-dao-funds';
-const proposalTypes: Record<ProposalTypes, string> = {
+export type ProposalTypes = 'text' | 'update-directories' | 'spend-dao-funds';
+export const proposalTypes: Record<ProposalTypes, string> = {
   text: 'Text',
-  'update-directories': 'Update Directories',
+  'update-directories': 'Update  Directors',
   'spend-dao-funds': 'Spend DAO Funds',
 };
 const proposalTypesArr = Object.entries(proposalTypes) as [
   ProposalTypes,
   string,
 ][];
-const DAOProposal = ({
+export const DAOProposalPage = ({
   daoOwner,
   setCreateDaoSelected,
-  identityName,
   selectedDao,
   selectedDaoName,
 }: {
   daoOwner: { name: string; address: string; votingPower: number };
+  // eslint-disable-next-line @typescript-eslint/ban-types
   setCreateDaoSelected: Function;
   identityName: string;
   selectedDao: string;
   selectedDaoName: string;
 }) => {
   const { address } = useIdentityContext();
+  const [err, setErr] = useState<string[] | undefined>([]);
+  const [creatingProposal, setIsCreatingProposal] = useState(false);
   const toast = useToast();
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { signingCosmWasmClient: signingClient } =
     useSigningCosmWasmClientContext();
   const [activeTab, setActiveTab] = useState<ProposalTypes>('text');
-  const [
-    { title, description, threshold, members, spends, balance },
-    dispatch,
-  ] = useReducer(DAOProposalReducer, {
+  const [state, dispatch] = useReducer(DAOProposalReducer, {
     ownerId: '',
     title: {
       value: '',
@@ -116,7 +78,7 @@ const DAOProposal = ({
       error: '',
     },
     threshold: {
-      value: '',
+      value: '0',
       error: '',
     },
     members: {},
@@ -125,427 +87,118 @@ const DAOProposal = ({
       jmes: '',
     },
   });
-
-  //   const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
-  //     useChain(chainName);ƒ
-  //   const [daoName, setDaoName] = useState('');
-  //   const [daoMembers, setDaoMembers] = useState([daoOwner]);
-  //   const [threshold, setThreshold] = useState(50);
-  //   const [isIdentityNamesValid, setIdentityNamesValid] = useState(false);
-  //   const [focusedDirectorIndex, setFocusedDirectorIndex] = useState(Infinity);
-  //   const [isCreatingDao, setIsCreatingDao] = useState(false);
-  //   const [doubleCounts, setDoubleCounts] = useState(0);
-
-  //   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-  //     null,
-  //   );
-  //   const [signingClient, setSigningClient] =
-  //     useState<SigningCosmWasmClient | null>(null);
-  //   const balance = useAccountBalance(address as string);
-  //   const [bal, setBal] = useState(0);
-  //   const [totalAmount, setTotalAmount] = useState(0);
-  //   const proposalTypes = ['spend-funds'];
-  //   const [selectedProposalType, setSelectedProposalType] = useState(
-  //     proposalTypes[0],
-  //   );
-  //   const [proposalTitle, setProposalTitle] = useState('');
-  //   const [proposalDescription, setProposalDescription] = useState('');
-
-  //   useEffect(() => {
-  //     if (address) {
-  //       console.log('update');
-  //       getCosmWasmClient()
-  //         .then(cosmWasmClient => {
-  //           if (!cosmWasmClient) {
-  //             return;
-  //           }
-  //           setCosmWasmClient(cosmWasmClient);
-  //         })
-  //         .catch(error => console.log(error));
-  //     }
-  //   }, [address, getCosmWasmClient]);
-
-  //   const validationResult = validateName(daoName);
-  //   const isDaoNameValid = !validationResult?.name;
+  const { title, description } = state;
 
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     cosmWasmClient as CosmWasmClient,
     IDENTITY_SERVICE_CONTRACT,
   );
 
-  //   async function getIdentitiesByNames() {
-  //     let identityAddrs = new Array();
+  const daoMultisigQueryClient = useMemo(
+    () =>
+      new DaoMultisigQueryClient(
+        cosmWasmClient as CosmWasmClient,
+        selectedDao as string,
+      ),
+    [cosmWasmClient, selectedDao],
+  );
 
-  //     for (let j = 0; j < daoMembers.length; j++) {
-  //       const name = daoMembers[j].name;
-  //       const identityRes = await client.getIdentityByName({ name: name });
-  //       if (identityRes.identity?.name === name) {
-  //         identityAddrs[j] = identityRes.identity?.owner;
-  //         daoMembers[j].address = identityRes.identity?.owner;
-  //         setDaoMembers(daoMembers);
-  //       } else {
-  //         identityAddrs[j] = 'Invalid identity';
-  //       }
-  //     }
-
-  //     if (identityAddrs.includes('Invalid identity')) {
-  //       setIdentityNamesValid(false);
-  //     } else {
-  //       setIdentityNamesValid(true);
-  //     }
-  //     return identityAddrs;
-  //   }
-
-  //   const idsByNamesQuery = useQuery(['identities'], getIdentitiesByNames);
-
-  //   const isFormValid =
-  //     totalAmount === 100 &&
-  //     isDaoNameValid &&
-  //     threshold > 0 &&
-  //     (isIdentityNamesValid || daoMembers.length === 1) &&
-  //     doubleCounts === 0;
-
-  const idClient: IdentityserviceClient = new IdentityserviceClient(
+  const daoMember = new DaoMembersClient(
     signingClient as SigningCosmWasmClient,
     address as string,
     IDENTITY_SERVICE_CONTRACT,
   );
 
-  //   const members = daoMembers.map(member => ({
-  //     addr: member.address,
-  //     weight: member.votingPower,
-  //   }));
-
-  const registerDaoMutation = useIdentityserviceRegisterDaoMutation();
-
-  //   useEffect(() => {
-  //     const dups = countObjectsWithDuplicateNames(daoMembers);
-  //     setDoubleCounts(dups);
-  //   });
-
-  const TabSelect = (
-    <Box marginRight={'44px'}>
-      <Text
-        color={'rgba(15,0,86,0.8)'}
-        fontWeight="medium"
-        fontSize={12}
-        fontFamily="DM Sans"
-        marginBottom={'17px'}
-      >
-        SELECT PROPOSAL TYPE
-      </Text>
-      {proposalTypesArr.map(([key, value]) => (
-        <ProposalType
-          key={key}
-          type={value}
-          isActive={key === activeTab}
-          onClick={() => setActiveTab(key)}
-        />
-      ))}
-    </Box>
+  const daoClient = new DaoMultisigClient(
+    signingClient as SigningCosmWasmClient,
+    address as string,
+    IDENTITY_SERVICE_CONTRACT,
   );
-  const DetailSection = (
-    <Box>
-      <Text
-        color={'rgba(15,0,86,0.8)'}
-        fontWeight="medium"
-        fontSize={12}
-        fontFamily="DM Sans"
-        marginBottom={'17px'}
-      >
-        DETAILS
-      </Text>
-      <Input
-        variant={'outline'}
-        height={'48px'}
-        borderColor={'primary.500'}
-        background={'primary.100'}
-        focusBorderColor="darkPurple"
-        borderRadius={12}
-        color={'purple'}
-        onChange={e => {
-          const name = nameSchema.safeParse(e.target.value);
-          dispatch({
-            type: 'SET_INPUT_VALUE',
-            payload: {
-              type: 'title',
-              value: e.target.value,
-              error: name.success
-                ? undefined
-                : name.error.format()._errors.join('\n'),
-            },
-          });
-        }}
-        placeholder={'Title'}
-      />
-      <Box height={'12px'} />
-      <Textarea
-        variant={'outline'}
-        width={'874px'}
-        height={'320px'}
-        borderColor={'primary.500'}
-        background={'primary.100'}
-        focusBorderColor="darkPurple"
-        borderRadius={12}
-        color={'purple'}
-        onChange={e => {
-          const name = descriptionSchema.safeParse(e.target.value);
-          dispatch({
-            type: 'SET_INPUT_VALUE',
-            payload: {
-              type: 'description',
-              value: e.target.value,
-              error: name.success
-                ? undefined
-                : name.error.format()._errors.join('\n'),
-            },
-          });
-        }}
-        placeholder={'Description'}
-      />
-    </Box>
-  );
-  const AmountSection = (
-    <Box>
-      <Text
-        marginBottom={'8px'}
-        color={'rgba(0,0,0,0.7)'}
-        fontFamily={'DM Sans'}
-        fontWeight="normal"
-        fontSize={12}
-        marginLeft={'18px'}
-        marginTop={'8px'}
-      >
-        {!title.error && title.value}
-        {title.error}
-      </Text>
-      <Flex marginTop={'27px'} marginLeft={'270px'} marginRight={'52px'}>
-        <Button
-          variant={'outline'}
-          borderColor={'purple'}
-          width={'209px'}
-          height={'48px'}
-          marginBottom="30px"
-          onClick={() => {
-            dispatch({
-              type: 'ADD_MEMBER',
-              payload: {
-                id: uuid(),
-                name: '',
-                votingPower: 0,
-              },
-            });
-          }}
-          borderRadius={50}
-          backgroundColor={'transparent'}
-          _hover={{ bg: 'transparent' }}
-          justifyContent={'start'}
-        >
-          <Flex alignItems={'center'}>
-            <AddIcon boxSize={'10px'} color="purple" />
-            <Text
-              color="purple"
-              fontWeight="medium"
-              fontSize={14}
-              marginLeft={'10px'}
-              fontFamily="DM Sans"
-            >
-              Add Receiver address
-            </Text>
-          </Flex>
-        </Button>
 
-        <Text
-          color={'rgba(15,0,86,0.8)'}
-          fontFamily="DM Sans"
-          fontSize={12}
-          fontWeight="medium"
-          alignSelf={'end'}
-          marginLeft={'auto'}
-          marginRight={'15%'}
-          marginBottom={'9px'}
-        >
-          AMOUNT
-        </Text>
-      </Flex>
-      {daoMembers.map((daoMember, index) => (
-        <Flex marginLeft={'270px'} key={index} marginBottom={'16px'}>
-          <InputGroup height={'48px'}>
-            <Input
-              isReadOnly={index === 0}
-              variant={'outline'}
-              borderColor={'primary.500'}
-              background={'primary.100'}
-              focusBorderColor="darkPurple"
-              borderRadius={12}
-              marginRight={'16px'}
-              color={'darkPurple'}
-              height={'100%'}
-              defaultValue={daoMember?.name}
-              fontWeight={'normal'}
-              onChange={e => {
-                daoMembers[index].name = e.target.value.trim();
-                setDaoMembers(daoMembers);
-                setIdentityNamesValid(false);
-              }}
-              onBlur={() => idsByNamesQuery.refetch()}
-              onFocus={() => {
-                setFocusedDirectorIndex(index);
-              }}
-            />
-            <InputRightElement
-              width="75%"
-              justifyContent={'start'}
-              height={'100%'}
-            >
-              <Text
-                color={'purple'}
-                fontFamily="DM Sans"
-                fontSize={16}
-                fontWeight="normal"
-              >
-                {index > 0
-                  ? !validateName(daoMember?.name)?.name
-                    ? !idsByNamesQuery.isFetching
-                      ? idsByNamesQuery?.data?.at(index)
-                      : index === focusedDirectorIndex
-                      ? 'Checking...'
-                      : idsByNamesQuery?.data?.at(index)
-                    : ''
-                  : daoMember.address}
-              </Text>
-            </InputRightElement>
-          </InputGroup>
-          <InputGroup width={'235px'} height={'48px'}>
-            <Input
-              variant={'outline'}
-              width={'235px'}
-              height={'100%'}
-              borderColor={'primary.500'}
-              background={'primary.100'}
-              focusBorderColor="darkPurple"
-              borderRadius={12}
-              color={'purple'}
-              fontWeight={'normal'}
-              value={daoMember?.votingPower}
-              type={'number'}
-              onChange={e => {
-                const updatedDaoMembers = daoMembers.map((daoMember, i) => {
-                  if (i === index) {
-                    return {
-                      ...daoMember,
-                      votingPower: parseInt(e.target.value),
-                    };
-                  } else {
-                    return daoMember;
-                  }
-                });
-                setDaoMembers(updatedDaoMembers);
-              }}
-            />
-          </InputGroup>
-          {index > 0 ? (
-            <CloseButton
-              size={'24px'}
-              _hover={{ backgroundColor: 'transparent' }}
-              color={'rgba(15,0,86,0.3)'}
-              onClick={() => {
-                daoMembers.splice(index, 1);
-                setDaoMembers(daoMembers);
-              }}
-            />
-          ) : (
-            <></>
-          )}
-        </Flex>
-      ))}
-      <Flex height={'48px'} marginTop={'40px'} flexDirection={'column'}>
-        <Text
-          color={'rgba(15,0,86,0.8)'}
-          fontFamily="DM Sans"
-          fontSize={12}
-          fontWeight="medium"
-          alignSelf={'flex-end'}
-          marginRight={'17%'}
-        >
-          TOTAL
-        </Text>
-        <InputGroup width={'235px'} height={'48px'} marginLeft={'auto'}>
-          <Input
-            variant={'outline'}
-            width={'235px'}
-            height={'48px'}
-            borderColor={'primary.500'}
-            background={totalAmount > bal ? 'red' : 'purple'}
-            focusBorderColor="darkPurple"
-            borderRadius={12}
-            color={'white'}
-            fontWeight={'normal'}
-            value={totalAmount}
-          />
-        </InputGroup>
-      </Flex>
-    </Box>
-  );
+  const createGovProposalMutation = useDaoMultisigProposeMutation();
+
   return (
     <Box>
-      <Flex>
-        {TabSelect}
-        {DetailSection}
-      </Flex>
-      {AmountSection}
-      <Text
-        marginBottom={'8px'}
-        color={'red'}
-        fontFamily={'DM Sans'}
-        fontWeight="normal"
-        fontSize={18}
-        marginLeft={'12px'}
-        marginTop={'8px'}
-      >
-        {doubleCounts > 0
-          ? 'Single member identity entered more than once!'
-          : ''}
-      </Text>
-      <Box marginLeft={'270px'}>
+      <Flex mb={'26px'}>
         <Text
-          marginTop={'93px'}
-          color={'rgba(15,0,86,0.8)'}
+          color={'darkPurple'}
+          fontWeight="bold"
+          fontSize={30}
           fontFamily="DM Sans"
-          fontSize={12}
-          fontWeight="medium"
-          marginBottom={'8px'}
+          style={{ textDecoration: 'underline' }}
         >
-          % TO PASS
+          {selectedDaoName}
         </Text>
-        <Slider
-          aria-label="dao-proposal-threshold"
-          defaultValue={50}
-          width={'722px'}
-          onChange={val => setThreshold(val)}
+        <Box
+          width={'6px'}
+          height={'6px'}
+          backgroundColor={'darkPurple'}
+          mx={'18px'}
+          alignSelf={'center'}
+          borderRadius={100}
+        />
+        <Text
+          color={'darkPurple'}
+          fontWeight="normal"
+          fontSize={28}
+          fontFamily="DM Sans"
         >
-          <SliderTrack
-            height={'16px'}
-            borderRadius={'10px'}
-            backgroundColor={'primary.100'}
-            borderColor={'primary.500'}
-            borderWidth={'1px'}
+          Create Governance Proposal
+        </Text>
+      </Flex>
+      <BalanceDisplay address={selectedDao ?? ''} />
+      <Flex flexGrow={1} width={'full'} height={'26px'} />
+      <Flex flexGrow={1} width="full">
+        <Box marginRight="44px">
+          <Text
+            color={'rgba(15,0,86,0.8)'}
+            fontWeight="medium"
+            fontSize={12}
+            fontFamily="DM Sans"
+            marginBottom={'17px'}
           >
-            <SliderFilledTrack backgroundColor={'green'} />
-          </SliderTrack>
-          <Tooltip
-            isOpen
-            hasArrow={true}
-            label={`${threshold} %`}
-            bg={'purple'}
-            color={'white'}
-            direction={'rtl'}
-            placement={'top'}
-            borderRadius={'10px'}
-          >
-            <SliderThumb height={'32px'} />
-          </Tooltip>
-        </Slider>
+            SELECT PROPOSAL TYPE
+          </Text>
+          {proposalTypesArr.map(([key, value]) => (
+            <ProposalType
+              label={value}
+              key={key}
+              type={key}
+              isActive={key === activeTab}
+              onClick={() => setActiveTab(key)}
+            />
+          ))}
+        </Box>
+        <Flex direction="column" width="full">
+          <BasicForm
+            titleError={title.error}
+            title={title.value}
+            description={description.value}
+            descriptionError={description.error}
+            dispatch={dispatch}
+          />
+          {activeTab === 'update-directories' && (
+            <UpdateDirectories
+              daoMultisigQueryClient={daoMultisigQueryClient}
+              ownerAddress={daoOwner.address}
+              client={client}
+              state={state}
+              dispatch={dispatch}
+            />
+          )}
+          {activeTab === 'spend-dao-funds' && (
+            <SpendDaoFunds client={client} state={state} dispatch={dispatch} />
+          )}
+        </Flex>
+      </Flex>
+      <Flex flexDir="column">
+        {err?.map(el => (
+          <Text color="red" key={el}>
+            {el}
+          </Text>
+        ))}
+      </Flex>
+      <Box marginLeft={'270px'}>
         <Flex
           marginTop={'12px'}
           marginBottom={'93px'}
@@ -553,12 +206,6 @@ const DAOProposal = ({
           alignItems={'center'}
           width={'100%'}
         >
-          <QuestionOutlineIcon
-            width={'16px'}
-            height={'16px'}
-            color={'rgba(0,0,0,0.4)'}
-          />
-
           <Spacer />
           <Button
             width={'99px'}
@@ -578,50 +225,45 @@ const DAOProposal = ({
           </Button>
           <Box width={'12px'} />
           <Button
-            disabled={!isFormValid}
-            onClick={() => {
-              setIsCreatingDao(true);
-              registerDaoMutation
-                .mutateAsync({
-                  client: idClient,
-                  msg: {
-                    daoName: daoName.trim(),
-                    maxVotingPeriod: {
-                      height: 1180000,
-                    },
-                    members: members,
-                    thresholdPercentage: threshold,
-                  },
-                  args: { fee },
-                })
-                .then(result => {
-                  toast({
-                    title: 'Dao created.',
-                    description:
-                      "We've created your Dao for you. You'll be able to access it shortly.",
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    containerStyle: {
-                      backgroundColor: 'darkPurple',
-                      borderRadius: 12,
+            disabled={creatingProposal}
+            onClick={async () => {
+              try {
+                const error = validateForm(state, activeTab);
+                if (error.length) {
+                  setErr(error);
+                  return;
+                }
+                setErr([]);
+                setIsCreatingProposal(true);
+                const msg = getRequest(state, activeTab);
+                if (msg && 'propose' in msg) {
+                  await daoClient.propose(msg.propose);
+                }
+                if (msg && 'update_members' in msg) {
+                  await daoMember.updateMembers(msg.update_members);
+                }
+                if (!msg) {
+                  await createGovProposalMutation.mutateAsync({
+                    client: daoClient,
+                    msg: {
+                      title: state.title.value,
+                      description: state.description.value,
+                      msgs: [],
                     },
                   });
-                })
-                .catch(error => {
+                }
+                toast({
+                  title: 'Created Dao Proposal',
+                });
+              } catch (err) {
+                if (err instanceof Error) {
                   toast({
-                    title: 'Dao creation error',
-                    description: error.toString(),
                     status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    containerStyle: {
-                      backgroundColor: 'red',
-                      borderRadius: 12,
-                    },
+                    title: err.message,
                   });
-                })
-                .finally(() => setIsCreatingDao(false));
+                }
+              }
+              setIsCreatingProposal(false);
             }}
             backgroundColor={'green'}
             borderRadius={90}
@@ -634,7 +276,7 @@ const DAOProposal = ({
             borderWidth={'1px'}
             borderColor={'rgba(0,0,0,0.1)'}
           >
-            {!isCreatingDao ? (
+            {!creatingProposal ? (
               <Text
                 color="midnight"
                 fontFamily={'DM Sans'}
@@ -656,5 +298,3 @@ const DAOProposal = ({
     </Box>
   );
 };
-
-export default DAOProposal;

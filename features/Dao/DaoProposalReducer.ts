@@ -1,23 +1,27 @@
-import { PartialExcept } from '../../utils/ts';
-import type { Member } from './createDAOReducer';
+import type { Member as MemberBasic } from './createDAOReducer';
+export type Member = MemberBasic & {
+  og?: boolean;
+  isRemoved?: boolean;
+};
 type Spend = {
   id: string;
   name: string;
-  address?: string;
+  address?: string | null;
   error?: string;
   amount: number;
 };
 
-type Balance = {
+// TODO: remove this
+export type Balance = {
   jmes: string;
 };
 
-type Input = {
+export type Input = {
   value: string;
   error?: string;
 };
 
-type State = {
+export type State = {
   ownerId: string;
   title: Input;
   description: Input;
@@ -27,14 +31,18 @@ type State = {
   threshold: Input;
 };
 
-type Actions =
+export type Actions =
   | {
       type: 'ADD_MEMBER';
       payload: Member;
     }
   | {
+      type: 'ADD_MEMBERS';
+      payload: Member[];
+    }
+  | {
       type: 'SET_MEMBER_VALUE';
-      payload: PartialExcept<Member, 'id'>;
+      payload: Partial<Member>;
     }
   | {
       type: 'REMOVE_MEMBER';
@@ -54,7 +62,7 @@ type Actions =
     }
   | {
       type: 'SET_SPEND_VALUE';
-      payload: PartialExcept<Spend, 'id'>;
+      payload: Partial<Spend>;
     }
   | {
       type: 'REMOVE_SPEND';
@@ -63,6 +71,25 @@ type Actions =
 
 export function DAOProposalReducer(state: State, action: Actions): State {
   switch (action.type) {
+    case 'ADD_MEMBERS': {
+      const memberArr = Object.values(state.members);
+      const membersRecord = action.payload.reduce((acc, curr) => {
+        const index = memberArr.findIndex(el => el.address === curr.address);
+        if (index !== -1) {
+          return acc;
+        }
+
+        acc[curr.id] = curr;
+        return acc;
+      }, {} as Record<string, Member>);
+      return {
+        ...state,
+        members: {
+          ...state.members,
+          ...membersRecord,
+        },
+      };
+    }
     case 'ADD_MEMBER':
       return {
         ...state,
@@ -74,11 +101,15 @@ export function DAOProposalReducer(state: State, action: Actions): State {
 
     case 'REMOVE_MEMBER': {
       const members = { ...state.members };
-      delete members[action.payload];
+      const member = members[action.payload];
       return {
         ...state,
         members: {
           ...members,
+          [action.payload]: {
+            ...member,
+            isRemoved: true,
+          },
         },
       };
     }

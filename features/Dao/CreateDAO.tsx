@@ -447,7 +447,7 @@ const CreateDaoNewForm = ({
       </Text>
       <Slider
         aria-label="dao-proposal-threshold"
-        defaultValue={DEFAULT_DAO_THRESHOLD}
+        defaultValue={threshold}
         width={'722px'}
         onChange={val =>
           dispatch({
