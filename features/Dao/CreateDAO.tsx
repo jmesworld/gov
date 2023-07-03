@@ -150,6 +150,7 @@ const CreateDaoNewForm = ({
   );
   const onAddress = useCallback(
     (id: string, value?: string | null) => {
+      // TODO: move this to reducer
       const member = membersArr.find(el => el.id === id);
       const addressInArr = membersArr.find(
         el => el.address === value && el.id !== id,
@@ -194,6 +195,9 @@ const CreateDaoNewForm = ({
   );
 
   const formHasErrors = useMemo(() => {
+    if (!threshold) {
+      return true;
+    }
     if (duplicateNames) {
       return true;
     }
@@ -215,7 +219,7 @@ const CreateDaoNewForm = ({
       }
     });
     return thereIsError || totalVotingPower < 100 || totalVotingPower > 100;
-  }, [daoNameError, duplicateNames, membersArr, totalVotingPower]);
+  }, [daoNameError, duplicateNames, membersArr, threshold, totalVotingPower]);
   return (
     <Box marginTop={'35px'}>
       <Text
@@ -432,7 +436,6 @@ const CreateDaoNewForm = ({
         marginLeft={'12px'}
         marginTop={'8px'}
       >
-        {/** TODO: more details here */}
         {duplicateNames && 'Single member identity entered more than once!'}
       </Text>
       <Text

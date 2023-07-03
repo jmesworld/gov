@@ -41,8 +41,7 @@ const SigningCosmWasmClientContextProvider = ({ children }: Props) => {
       }
     }
     assignSigningCosmWasmClient();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [getSigningCosmWasmClient]);
 
   const value = {
     signingCosmWasmClient,
