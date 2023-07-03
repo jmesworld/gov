@@ -1,18 +1,15 @@
-import { useAppState } from '../../contexts/AppStateContext';
 import { useDAOContext } from '../../contexts/DAOContext';
 import { useIdentityContext } from '../../contexts/IdentityContext';
-import SpendDaoFundsForm from '../../features/Dao/SpendDaoFundsForm';
-import DaoProposalDetail from '../../features/Dao/components/DaoProposalDetail';
+import { DAOProposalPage } from '../../features/Dao/DAOProposal';
 
 const DAOProposal = () => {
   const { selectedDAO, setSelectedDAOByAddress } = useDAOContext();
-  const { getIdentityName , address } = useIdentityContext(); 
-  const { selectedDaoProposalTitle, selectedProposalId } = useAppState();
+  const { getIdentityName, address } = useIdentityContext();
   if (!selectedDAO) {
     return 'no DAO selected';
   }
   return (
-    <SpendDaoFundsForm
+    <DAOProposalPage
       identityName={getIdentityName() as string}
       selectedDao={selectedDAO?.address}
       selectedDaoName={selectedDAO?.name}

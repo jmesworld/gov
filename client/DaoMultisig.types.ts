@@ -46,7 +46,7 @@ export type ExecuteMsg =
   | {
       propose: {
         description: string;
-        latest?: Expiration | null;
+        latest?: Expiration ;
         msgs: CosmosMsgForEmpty[];
         title: string;
       };

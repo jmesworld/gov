@@ -50,13 +50,19 @@ export const Layout = ({ children }: { children: ReactElement }) => {
               width={'100%'}
               height={'100%'}
               paddingLeft={'54px'}
-              paddingTop={'25px'}
               paddingBottom={'25px'}
               paddingRight={'54px'}
               overflowY="scroll"
               position={'relative'}
             >
-              <Flex width={'100%'} top={0} position="sticky" bg="bg">
+              <Flex
+                paddingTop={'25px'}
+                width={'100%'}
+                top={0}
+                zIndex={999}
+                position="sticky"
+                bg="bg"
+              >
                 <Spacer />
                 <Header />
               </Flex>

@@ -29,7 +29,6 @@ const NavBar = ({
 }: NavBarProps) => {
   const router = useRouter();
   const { selectedDAO } = useDAOContext();
-  const { selectedDaoProposalTitle } = useAppState();
   return (
     <VStack
       width={'200px'}
@@ -116,10 +115,7 @@ const NavBar = ({
           height="48px"
           text="DAO Proposal"
           disabled={
-            status !== WalletStatus.Connected ||
-            !identityName ||
-            !selectedDaoProposalTitle ||
-            !selectedDAO
+            status !== WalletStatus.Connected || !identityName || !selectedDAO
           }
         />
       </Link>

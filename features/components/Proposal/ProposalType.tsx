@@ -6,7 +6,9 @@ export const ProposalType = ({
   type,
   isActive,
   onClick,
+  label,
 }: {
+  label?: string;
   type: string;
   isActive: boolean;
   onClick: MouseEventHandler<HTMLDivElement>;
@@ -38,7 +40,7 @@ export const ProposalType = ({
         fontFamily="DM Sans"
         marginLeft={'10px'}
       >
-        {getLabel(type)}
+        {label || getLabel(type)}
       </Text>
       <Spacer />
       {isActive ? <CheckIcon color={'green'} /> : ''}
@@ -69,13 +71,15 @@ const getImgSrc = (type: string) => {
   switch (type) {
     case 'text':
       return '/Text_Type.svg';
+    case 'update-directories':
+      return '/update-directories.svg';
     case 'core-slot':
       return '/CoreSlot_Type.svg';
     case 'revoke-proposal':
       return '/RevokeCoreSlot_Type.svg';
     case 'improvement':
       return '/Improvement_Type.svg';
-    case 'spend-funds':
+    case 'spend-dao-funds':
       return '/Spend_key.svg';
     case 'feature-request':
       return '/feature_request.svg';
