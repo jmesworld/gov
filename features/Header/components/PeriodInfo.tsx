@@ -10,45 +10,23 @@ import {
   Spacer,
   Text,
 } from '@chakra-ui/react';
-import { useMemo } from 'react';
-import { GovernanceQueryClient } from '../../../client/Governance.client';
-import { useGovernancePeriodInfoQuery } from '../../../client/Governance.react-query';
+
 import {
   formatDuration,
   momentLeft,
   timestampToDateTime,
 } from '../../../utils/time';
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import { useVotingPeriodContext } from '../../../contexts/VotingPeriodContext';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT =
   process.env.NEXT_PUBLIC_GOVERNANCE_CONTRACT;
-type Props = {
-  cosmWasmClient: CosmWasmClient;
-};
-export default function PeriodInfo({ cosmWasmClient }: Props) {
+
+export default function PeriodInfo() {
+  const { data } = useVotingPeriodContext();
   if (!NEXT_PUBLIC_GOVERNANCE_CONTRACT) {
     throw new Error('Public Governance Contract not found!');
   }
 
-  const governanceQueryClient = useMemo(
-    () =>
-      new GovernanceQueryClient(
-        cosmWasmClient,
-        NEXT_PUBLIC_GOVERNANCE_CONTRACT,
-      ),
-    [cosmWasmClient],
-  );
-  const periodInfoQuery = useGovernancePeriodInfoQuery({
-    client: governanceQueryClient,
-    options: {
-      enabled: governanceQueryClient !== null, // The query will only run when governanceQueryClient is not null
-      refetchInterval: 5000,
-      cacheTime: 5000,
-      staleTime: 5000,
-    },
-  });
-
-  const { data } = periodInfoQuery;
   const current_period = data?.current_period;
   const next_voting_start = data?.next_voting_start;
   const next_posting_start = data?.next_posting_start;
@@ -69,7 +47,6 @@ export default function PeriodInfo({ cosmWasmClient }: Props) {
   const next_period_start =
     current_period === 'posting' ? next_posting_start : next_voting_start;
   const next_period_start_time_left = momentLeft(next_period_start).toString();
-
 
   return (
     <Menu>
@@ -134,9 +111,9 @@ export default function PeriodInfo({ cosmWasmClient }: Props) {
                   textOverflow="ellipsis"
                 >
                   Current cycle:{' '}
-                  {periodInfoQuery?.data
+                  {data
                     ? (((current_period?.charAt(0).toUpperCase() as string) +
-                      current_period?.slice(1)) as string)
+                        current_period?.slice(1)) as string)
                     : ''}
                 </Text>
                 <Divider
@@ -157,7 +134,7 @@ export default function PeriodInfo({ cosmWasmClient }: Props) {
                   overflow="hidden"
                   textOverflow="ellipsis"
                 >
-                  {periodInfoQuery?.data ? `${next_period_start_time_left}` : ''}
+                  {data ? `${next_period_start_time_left}` : ''}
                 </Text>
               </Flex>
             </Flex>
@@ -216,7 +193,7 @@ export default function PeriodInfo({ cosmWasmClient }: Props) {
               >
                 {current_period
                   ? current_period.charAt(0).toUpperCase() +
-                  current_period.slice(1)
+                    current_period.slice(1)
                   : ''}
               </Text>
             </Flex>

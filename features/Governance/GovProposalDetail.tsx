@@ -21,6 +21,7 @@ import { ProposalHeader } from '../components/Proposal/ProposalHeader';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { calculateVotes } from '../../lib/calculateVotes';
 import { useCoinSupplyContext } from '../../contexts/CoinSupply';
+import { useVotingPeriodContext } from '../../contexts/VotingPeriodContext';
 
 const GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -32,6 +33,7 @@ export default function GovProposalDetail({
 }) {
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { supply } = useCoinSupplyContext();
+  const { isPostingPeriod, nextPeriodTimeLeft } = useVotingPeriodContext();
   const { address } = useChain(chainName);
 
   const govQueryClient = new GovernanceQueryClient(
@@ -114,8 +116,33 @@ export default function GovProposalDetail({
               </Text>
             </Box>
           </Box>
-          <VStack width="330px" spacing="30px" align="flex-start">
-            <GovProposalMyVote voted={voted} proposalId={proposalId} />
+          <VStack
+            width="330px"
+            pos="relative"
+            height="full"
+            spacing="30px"
+            align="flex-start"
+          >
+            <GovProposalMyVote voted={voted} proposalId={proposalId}>
+              {isPostingPeriod && (
+                <Box
+                  backdropFilter="auto"
+                  backdropBlur="3px"
+                  p="4"
+                  width="full"
+                  h="full"
+                  m="auto"
+                  zIndex="3"
+                  bg="rgba(255,255,255,.5)"
+                  pos="absolute"
+                >
+                  <Text fontSize="xl" textAlign="center">
+                    Please wait until the posting period concludes.
+                  </Text>
+                  <Text textAlign="center">{nextPeriodTimeLeft}</Text>
+                </Box>
+              )}
+            </GovProposalMyVote>
             {/* <ProposalDaoMembers
               selectedDaoMembersList={daoMembers}
             /> */}
