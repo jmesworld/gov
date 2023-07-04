@@ -22,6 +22,7 @@ import { ProposalHeader } from '../../components/Proposal/ProposalHeader';
 import { ProposalMyVote } from '../../components/Proposal/ProposalMyVote';
 import { ProposalVoting } from '../../components/Proposal/ProposalVoting';
 import { useCosmWasmClientContext } from '../../../contexts/CosmWasmClient';
+import { useRouter } from 'next/router';
 
 type Props = {
   selectedDao: string;
@@ -37,7 +38,7 @@ export default function DaoProposalDetail({
   selectedDaoProposalId,
 }: Props) {
   const { address } = useChain(chainName);
-
+  const router = useRouter();
   const { cosmWasmClient } = useCosmWasmClientContext();
 
   const daoMultisigQueryClient = new DaoMultisigQueryClient(
@@ -115,7 +116,13 @@ export default function DaoProposalDetail({
 
       {proposalDetailQuery.data && (
         <HStack spacing="54px" align="flex-start">
-          <Box flexGrow={1}>
+          <Box
+            flexGrow={1}
+            cursor="pointer"
+            onClick={() => {
+              router.push(`/proposals/${selectedDaoProposalId}`);
+            }}
+          >
             <ProposalVoting
               yesPercentage={yesPercentage}
               target={target * 100}
