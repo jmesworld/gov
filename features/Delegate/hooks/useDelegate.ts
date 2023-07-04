@@ -22,7 +22,7 @@ type TransferFormType = {
   sliderValue: number;
 };
 
-type BoundingState = {
+type BondingState = {
   bonding: boolean;
   delegatingToken?: boolean;
   selectedValidator: string | null;
@@ -64,7 +64,7 @@ export const useDelegate = () => {
   });
   const { jmesValue, bJmesValue } = transferForm;
 
-  const [bondingState, setBondingState] = useState<BoundingState>({
+  const [bondingState, setBondingState] = useState<BondingState>({
     bonding: true,
     delegatingToken: undefined,
     selectedValidator: null,
@@ -105,18 +105,22 @@ export const useDelegate = () => {
   }, [totalJmes, jmesValue]);
 
   const isMovingNotValid = useMemo(() => {
-    return movingValidator({
-      total: bonding ? totalJmes : totalBondedJmes,
-      current: bonding ? jmesValue : bJmesValue,
-      transfer: valueToMove,
-    });
+    return movingValidator(
+      {
+        total: bonding ? totalJmes : totalBondedJmes,
+        current: bonding ? jmesValue : bJmesValue,
+        transfer: valueToMove,
+      },
+      bonding,
+    );
   }, [bonding, totalBondedJmes, totalJmes, bJmesValue, jmesValue, valueToMove]);
 
   const delegateTokens = useCallback(async () => {
     if (isMovingNotValid || !bondingIsValid || !address) {
       toast({
-        title: `Can't ${bonding ? 'delegate' : 'undelegate'
-          }, please fix the issues!`,
+        title: `Can't ${
+          bonding ? 'delegate' : 'undelegate'
+        }, please fix the issues!`,
         duration: 4000,
       });
       return;
