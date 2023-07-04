@@ -1,5 +1,5 @@
-import { Box, Text, VStack } from "@chakra-ui/react";
-import { ProposalVoter } from "./ProposalVoter";
+import { Box, Text, VStack } from '@chakra-ui/react';
+import { ProposalVoter } from './ProposalVoter';
 
 export interface ProposalVotes {
   type: string;
@@ -14,11 +14,11 @@ export interface Vote {
 
 export const ProposalVotes = (props: ProposalVotes) => {
   const textColor =
-    props.type == "yes" ? "rgba(161, 240, 196, 1)" : "rgba(255, 88, 118, 1)";
+    props.type == 'yes' ? 'rgba(161, 240, 196, 1)' : 'rgba(255, 88, 118, 1)';
   const votesText =
     props.votes.length +
-    (props.votes.length == 0 || props.votes.length > 1 ? " votes" : " vote");
-  const percentageText = props.percentage.toFixed(2) + "%";
+    (props.votes.length == 0 || props.votes.length > 1 ? ' votes' : ' vote');
+  const percentageText = props.percentage.toFixed(2) + '%';
 
   return (
     <VStack spacing="15px" flexGrow={1}>
@@ -64,11 +64,11 @@ export const ProposalVotes = (props: ProposalVotes) => {
           fontWeight="medium"
           fontFamily="DM Sans"
         >
-          {props.votes.length} Address{props.votes.length != 1 ? "es" : ""}
+          {props.votes.length} Address{props.votes.length != 1 ? 'es' : ''}
         </Text>
         <Box flexGrow={1} overflowY="scroll" width="100%">
           <VStack spacing="10px" align="flex-start">
-            {props.votes.map((vote) => (
+            {props.votes.map(vote => (
               <ProposalVoter
                 key={vote.voter}
                 wallet={vote.voter}

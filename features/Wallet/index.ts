@@ -1,5 +1,5 @@
-import dynamic from "next/dynamic";
+import dynamic from 'next/dynamic';
 
-const Wallet = dynamic(() => import("./Wallet"));
+const Wallet = dynamic(() => import('./Wallet'));
 
 export { Wallet };

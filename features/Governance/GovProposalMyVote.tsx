@@ -5,23 +5,23 @@ import {
   Button,
   useToast,
   CircularProgress,
-} from "@chakra-ui/react";
-import { useChain } from "@cosmos-kit/react";
-import { chainName } from "../../config/defaults";
-import { useEffect, useState } from "react";
-import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { DaoMultisigClient } from "../../client/DaoMultisig.client";
+} from '@chakra-ui/react';
+import { useChain } from '@cosmos-kit/react';
+import { chainName } from '../../config/defaults';
+import { useEffect, useState } from 'react';
+import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import { DaoMultisigClient } from '../../client/DaoMultisig.client';
 import {
   useDaoMultisigExecuteMutation,
   useDaoMultisigVoteMutation,
-} from "../../client/DaoMultisig.react-query";
-import { StdFee } from "@cosmjs/amino";
-import { GovernanceClient } from "../../client/Governance.client";
-import { useGovernanceVoteMutation } from "../../client/Governance.react-query";
+} from '../../client/DaoMultisig.react-query';
+import { StdFee } from '@cosmjs/amino';
+import { GovernanceClient } from '../../client/Governance.client';
+import { useGovernanceVoteMutation } from '../../client/Governance.react-query';
 
 const fee: StdFee = {
-  amount: [{ amount: "30000", denom: "ujmes" }],
-  gas: "10000000",
+  amount: [{ amount: '30000', denom: 'ujmes' }],
+  gas: '10000000',
 };
 
 const GOVERNANCE_CONTRACT = process.env
@@ -44,20 +44,20 @@ const GovProposalMyVote = (props: GovProposalMyVote) => {
   useEffect(() => {
     if (address) {
       getSigningCosmWasmClient()
-        .then((signingClient) => {
+        .then(signingClient => {
           if (!signingClient) {
             return;
           }
           setSigningClient(signingClient);
         })
-        .catch((error) => console.log(error));
+        .catch(error => console.log(error));
     }
   }, [address, getSigningCosmWasmClient]);
 
   const daoMultisigClient = new GovernanceClient(
     signingClient as SigningCosmWasmClient,
     address as string,
-    GOVERNANCE_CONTRACT
+    GOVERNANCE_CONTRACT,
   );
 
   const voteMutation = useGovernanceVoteMutation();
@@ -98,32 +98,32 @@ const GovProposalMyVote = (props: GovProposalMyVote) => {
                 client: daoMultisigClient,
                 msg: {
                   id: props.proposalId,
-                  vote: "yes",
+                  vote: 'yes',
                 },
                 args: { fee },
               })
-              .then((result) => {
+              .then(result => {
                 toast({
-                  title: "Vote submitted.",
+                  title: 'Vote submitted.',
                   description: "We've submitted your Vote.",
-                  status: "success",
+                  status: 'success',
                   duration: 9000,
                   isClosable: true,
                   containerStyle: {
-                    backgroundColor: "darkPurple",
+                    backgroundColor: 'darkPurple',
                     borderRadius: 12,
                   },
                 });
               })
-              .catch((error) => {
+              .catch(error => {
                 toast({
-                  title: "Vote creation error",
+                  title: 'Vote creation error',
                   description: error.toString(),
-                  status: "error",
+                  status: 'error',
                   duration: 9000,
                   isClosable: true,
                   containerStyle: {
-                    backgroundColor: "red",
+                    backgroundColor: 'red',
                     borderRadius: 12,
                   },
                 });
@@ -134,14 +134,14 @@ const GovProposalMyVote = (props: GovProposalMyVote) => {
           {!isSubmittingYesVote ? (
             <Text
               color="midnight"
-              fontFamily={"DM Sans"}
+              fontFamily={'DM Sans'}
               fontWeight="medium"
               fontSize={14}
             >
               Yes
             </Text>
           ) : (
-            <CircularProgress isIndeterminate size={"24px"} color="midnight" />
+            <CircularProgress isIndeterminate size={'24px'} color="midnight" />
           )}
         </Button>
         <Button
@@ -164,32 +164,32 @@ const GovProposalMyVote = (props: GovProposalMyVote) => {
                 client: daoMultisigClient,
                 msg: {
                   id: props.proposalId,
-                  vote: "no",
+                  vote: 'no',
                 },
                 args: { fee },
               })
-              .then((result) => {
+              .then(result => {
                 toast({
-                  title: "Vote submitted.",
+                  title: 'Vote submitted.',
                   description: "We've submitted your Vote.",
-                  status: "success",
+                  status: 'success',
                   duration: 9000,
                   isClosable: true,
                   containerStyle: {
-                    backgroundColor: "darkPurple",
+                    backgroundColor: 'darkPurple',
                     borderRadius: 12,
                   },
                 });
               })
-              .catch((error) => {
+              .catch(error => {
                 toast({
-                  title: "Vote creation error",
+                  title: 'Vote creation error',
                   description: error.toString(),
-                  status: "error",
+                  status: 'error',
                   duration: 9000,
                   isClosable: true,
                   containerStyle: {
-                    backgroundColor: "red",
+                    backgroundColor: 'red',
                     borderRadius: 12,
                   },
                 });
@@ -200,14 +200,14 @@ const GovProposalMyVote = (props: GovProposalMyVote) => {
           {!isSubmittingNoVote ? (
             <Text
               color="midnight"
-              fontFamily={"DM Sans"}
+              fontFamily={'DM Sans'}
               fontWeight="medium"
               fontSize={14}
             >
               No
             </Text>
           ) : (
-            <CircularProgress isIndeterminate size={"24px"} color="midnight" />
+            <CircularProgress isIndeterminate size={'24px'} color="midnight" />
           )}
         </Button>
       </ButtonGroup>

@@ -36,15 +36,18 @@ const MyDaoList = () => {
         <Link.withStatus
           key={dao.name}
           matchFunc={route => {
-            if (
-              route.route === '/proposals/create' &&
-              selectedDAO?.name === dao.name
-            ) {
-              return true;
+            if (route.pathname === '/dao/view/[id]') {
+              return route.query?.id === dao.name;
             }
-            return route.asPath === `/dao/${dao.name}`;
+            if (route.pathname === '/proposals/create') {
+              return selectedDAO?.address === dao.address;
+            }
+            if (router.pathname === '/dao/proposal') {
+              return selectedDAO?.address === dao.address;
+            }
+            return false;
           }}
-          href={`/dao/${dao.name}`}
+          href={`/dao/view/${dao.name}`}
         >
           {({ isActive }) => (
             <NavBarItem
@@ -53,6 +56,9 @@ const MyDaoList = () => {
               isSelected={isActive}
               onClick={e => {
                 if (router.route === '/proposals/create') {
+                  e.preventDefault();
+                }
+                if (router.route === '/dao/proposal') {
                   e.preventDefault();
                 }
                 setSelectedDAOByName(dao.name);

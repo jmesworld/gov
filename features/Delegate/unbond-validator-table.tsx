@@ -65,12 +65,13 @@ export const UnBondValidatorTable = ({
           bJmes
         </Text>
       </Box>
+
       {loading && <Spinner size="sm" />}
       {!validatorsData && error && (
         <Alert status="error" title={error.message} />
       )}
       {validatorsData?.map(validator => {
-        const id = validator.consensus_pubkey.key;
+        const id = validator.operator_address;
 
         return (
           <Box
@@ -80,7 +81,7 @@ export const UnBondValidatorTable = ({
             justifyContent="flex-start"
             padding={selectedValidator === id ? '8px' : '8px 0'}
             background={selectedValidator === id ? '#704FF7' : ''}
-            borderRadius={validator.consensus_pubkey.key === id ? '4px' : ''}
+            borderRadius={validator.operator_address === id ? '4px' : ''}
             cursor="pointer"
           >
             <Text
@@ -101,10 +102,7 @@ export const UnBondValidatorTable = ({
               lineHeight="20px"
               width="46%"
             >
-              {validator.commission.commission_rates.rate
-                .toDecimalPlaces(2)
-                .toString()}
-              %
+              {validator.tokens.toString()}
             </Text>
             {validator.description.website && (
               <Box width="4%">

@@ -1,8 +1,8 @@
-import { Dispatch, SetStateAction } from "react";
-import { chainName, chainId, rest_keplr, rpc_keplr } from "../config/defaults";
+import { Dispatch, SetStateAction } from 'react';
+import { chainName, chainId, rest_keplr, rpc_keplr } from '../config/defaults';
 
 export const checkForKeplrInstalled = async () => {
-  if (typeof window !== "undefined" && !window.keplr) {
+  if (typeof window !== 'undefined' && !window.keplr) {
     return false;
   } else {
     return true;
@@ -17,32 +17,32 @@ export const addJMEStoKeplr = async () => {
     chainId: chainId,
     chainName: chainName,
     stakeCurrency: {
-      coinDenom: "JMES",
-      coinMinimalDenom: "ujmes",
+      coinDenom: 'JMES',
+      coinMinimalDenom: 'ujmes',
       coinDecimals: 6,
     },
     bech32Config: {
-      bech32PrefixAccAddr: "jmes",
-      bech32PrefixAccPub: "jmespub",
-      bech32PrefixValAddr: "jmesvaloper",
-      bech32PrefixValPub: "jmesvaloperpub",
-      bech32PrefixConsAddr: "jmesvalcons",
-      bech32PrefixConsPub: "jmesvalconspub",
+      bech32PrefixAccAddr: 'jmes',
+      bech32PrefixAccPub: 'jmespub',
+      bech32PrefixValAddr: 'jmesvaloper',
+      bech32PrefixValPub: 'jmesvaloperpub',
+      bech32PrefixConsAddr: 'jmesvalcons',
+      bech32PrefixConsPub: 'jmesvalconspub',
     },
     bip44: {
       coinType: 6280,
     },
     currencies: [
       {
-        coinDenom: "JMES",
-        coinMinimalDenom: "ujmes",
+        coinDenom: 'JMES',
+        coinMinimalDenom: 'ujmes',
         coinDecimals: 6,
       },
     ],
     feeCurrencies: [
       {
-        coinDenom: "JMES",
-        coinMinimalDenom: "ujmes",
+        coinDenom: 'JMES',
+        coinMinimalDenom: 'ujmes',
         coinDecimals: 6,
       },
     ],
@@ -51,7 +51,7 @@ export const addJMEStoKeplr = async () => {
       average: 0.2,
       high: 0.4,
     },
-    features: ["stargate", "no-legacy-stdTx", "ibc-transfer"],
+    features: ['stargate', 'no-legacy-stdTx', 'ibc-transfer'],
   });
 };
 

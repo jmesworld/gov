@@ -21,13 +21,14 @@
     "@cosmjs/stargate": "0.29.5",
     "@cosmos-kit/core": "1.3.0",
     "@cosmos-kit/cosmostation": "0.14.18",
-    "@cosmos-kit/keplr": "0.33.13",
+    "@cosmos-kit/keplr": "0.33.41",
     "@cosmos-kit/leap": "0.13.18",
     "@cosmos-kit/react": "1.3.11",
     "@emotion/react": "11.10.5",
     "@emotion/styled": "11.10.5",
     "@tanstack/react-query": "^4.13.0",
     "@tanstack/react-query-devtools": "^4.29.12",
+    "@types/uuid": "^9.0.2",
     "chain-registry": "1.6.0",
     "chakra-react-select": "^4.4.3",
     "cosmjs-utils": "^0.1.0",
@@ -41,7 +42,9 @@
     "react-dom": "18.2.0",
     "react-icons": "4.6.0",
     "react-transition-group": "^4.4.5",
-    "ts-loader": "^9.4.1"
+    "ts-loader": "^9.4.1",
+    "uuid": "^9.0.0",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@keplr-wallet/types": "^0.11.40",

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useBreakpointValue, Box, Text } from "@chakra-ui/react";
+import { useState, useEffect } from 'react';
+import { useBreakpointValue, Box, Text } from '@chakra-ui/react';
 
 const MobileViewDisabled = () => {
   const [isReady, setIsReady] = useState(false);

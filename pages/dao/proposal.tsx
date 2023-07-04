@@ -1,21 +1,24 @@
-import { useAppState } from '../../contexts/AppStateContext';
-import DaoProposalDetail from '../../features/Dao/components/DaoProposalDetail';
+import { useDAOContext } from '../../contexts/DAOContext';
+import { useIdentityContext } from '../../contexts/IdentityContext';
+import { DAOProposalPage } from '../../features/Dao/DAOProposal';
 
 const DAOProposal = () => {
-  const {
-    selectedDao,
-    selectedDaoName,
-    selectedDaoProposalTitle,
-    selectedDaoMembersList,
-    selectedProposalId,
-  } = useAppState();
+  const { selectedDAO, setSelectedDAOByAddress } = useDAOContext();
+  const { getIdentityName, address } = useIdentityContext();
+  if (!selectedDAO) {
+    return 'no DAO selected';
+  }
   return (
-    <DaoProposalDetail
-      selectedDao={selectedDao}
-      selectedDaoName={selectedDaoName}
-      selectedDaoProposalTitle={selectedDaoProposalTitle}
-      selectedDaoMembersList={selectedDaoMembersList}
-      selectedDaoProposalId={selectedProposalId}
+    <DAOProposalPage
+      identityName={getIdentityName() as string}
+      selectedDao={selectedDAO?.address}
+      selectedDaoName={selectedDAO?.name}
+      daoOwner={{
+        address: address as string,
+        name: getIdentityName() as string,
+        votingPower: 0,
+      }}
+      setCreateDaoSelected={setSelectedDAOByAddress}
     />
   );
 };

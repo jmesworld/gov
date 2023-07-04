@@ -1,17 +1,16 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
-import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { useChain } from "@cosmos-kit/react";
-import { useEffect, useState } from "react";
+/* eslint-disable @typescript-eslint/ban-types */
+import { Box, Flex, Text } from '@chakra-ui/react';
+import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import DaoMembersList from '../DaoMemberList';
 
-import { GovernanceQueryClient } from "../../../client/Governance.client";
-import { useGovernancePeriodInfoQuery } from "../../../client/Governance.react-query";
-import { IdentityserviceQueryClient } from "../../../client/Identityservice.client";
-import { useIdentityserviceGetIdentityByOwnerQuery } from "../../../client/Identityservice.react-query";
-import DaoMembersList from "../DaoMemberList";
+import { DaoMultisigQueryClient } from '../../../client/DaoMultisig.client';
+import { useDaoMultisigListProposalsQuery } from '../../../client/DaoMultisig.react-query';
 
-import { chainName } from "../../../config/defaults";
-import { DaoMultisigQueryClient } from "../../../client/DaoMultisig.client";
-import { useDaoMultisigListProposalsQuery } from "../../../client/DaoMultisig.react-query";
+import {
+  ProposalHeader,
+  ProposalList,
+} from '../../components/Proposal/ProposalList';
+import { useCosmWasmClientContext } from '../../../contexts/CosmWasmClient';
 
 import { ProposalHeader, ProposalList } from "../../components/Proposal/ProposalList";
 
@@ -32,6 +31,7 @@ export default function DaoProposal({
 }: {
   daoAddress: string;
   daoName: string;
+  // TODO: update ts types
   setDaoProposalDetailOpen: Function;
   setSelectedDaoProposalTitle: Function;
   setSelectedDaoMembersList: Function;
@@ -85,35 +85,38 @@ export default function DaoProposal({
 
   const daoQueryClient = new DaoMultisigQueryClient(
     cosmWasmClient as CosmWasmClient,
-    daoAddress as string
+    daoAddress as string,
   );
-  const proposalsQuery = useDaoMultisigListProposalsQuery({
+
+  const { data, isFetching, isLoading } = useDaoMultisigListProposalsQuery({
     client: daoQueryClient,
     args: { limit: 10000 },
     options: {
+      queryKey: ['daoDetail', daoAddress],
       refetchInterval: 10000,
     },
   });
 
   return (
     <>
-      <Flex height={"47px"} />
+      <Flex height={'47px'} />
       <Text
-        color={"darkPurple"}
+        color={'darkPurple'}
         fontWeight="bold"
         fontSize={28}
         fontFamily="DM Sans"
       >
         {daoName}
       </Text>
-      <Flex height={"46px"} />
+      <BalanceDisplay address={daoAddress} />
+      <Flex height={'16px'} />
       <Flex>
         <Box flexGrow={1}>
-        <ProposalHeader isGov={false} />
-          <Flex height={"10px"} />
-          {!!proposalsQuery.data ? (
+          <ProposalHeader isGov={false} />
+          <Flex height={'10px'} />
+          {data && (
             <ProposalList
-              proposals={proposalsQuery?.data?.proposals}
+              proposals={data?.proposals}
               isGov={false}
               daoAddress={daoAddress}
               onClickListItem={() => {
@@ -122,23 +125,26 @@ export default function DaoProposal({
               setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
               setSelectedProposalId={setSelectedProposalId}
             />
-          ) : (
-            <Flex justifyContent="center" width="100%">
-              <Text
-                color="rgba(15,0,86,0.8)"
-                fontFamily={"DM Sans"}
-                fontWeight="normal"
-                fontStyle={"italic"}
-                fontSize={14}
-                marginTop={"24px"}
-              >
-                Loading DAO proposals...
-              </Text>
-            </Flex>
           )}
+
+          {isLoading ||
+            (isFetching && !data && (
+              <Flex justifyContent="center" width="100%">
+                <Text
+                  color="rgba(15,0,86,0.8)"
+                  fontFamily={'DM Sans'}
+                  fontWeight="normal"
+                  fontStyle={'italic'}
+                  fontSize={14}
+                  marginTop={'24px'}
+                >
+                  Loading DAO proposals...
+                </Text>
+              </Flex>
+            ))}
         </Box>
         <DaoMembersList
-          daoAddress={daoAddress}
+          daoQueryClient={daoQueryClient}
           setSelectedDaoMembersList={setSelectedDaoMembersList}
         />
       </Flex>

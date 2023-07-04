@@ -28,7 +28,6 @@ const SigningCosmWasmClientContextProvider = ({ children }: Props) => {
   const { getSigningCosmWasmClient } = useChain(chainName);
   const [signingCosmWasmClient, setSigningCosmWasmClient] =
     useState<SigningCosmWasmClient | null>(null);
-
   useEffect(() => {
     if (!getSigningCosmWasmClient) {
       return;

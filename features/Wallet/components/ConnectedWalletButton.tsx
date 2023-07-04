@@ -12,13 +12,15 @@ import {
   Tooltip,
   MenuButton,
   useMenu,
+  Box,
 } from '@chakra-ui/react';
 
 import { ConnectedWalletType } from '../../types';
 import { formatBalance } from '../../../hooks/useAccountBalance';
-import { Link } from '../../components/genial/Link';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { RefObject } from 'react';
+import { CopyAddressButton } from './CopyAddressButton';
+import { useDelegateContext } from '../../../contexts/DelegateContext';
 
 export const ConnectedWalletButton = ({
   identityName,
@@ -28,6 +30,7 @@ export const ConnectedWalletButton = ({
   isDisabled,
 }: ConnectedWalletType) => {
   const { address, disconnect } = useIdentityContext();
+  const { openDelegate } = useDelegateContext();
   const { isOpen, onToggle, buttonRef } = useMenu({
     defaultIsOpen: false,
   });
@@ -81,8 +84,12 @@ export const ConnectedWalletButton = ({
             fontSize={12}
             marginLeft={'5.3px'}
             fontFamily="DM Sans"
+            whiteSpace="nowrap"
+            overflow="hidden"
+            textOverflow="ellipsis"
+            maxW={'100px'}
           >
-            {identityName ? identityName : `${address?.substring(0, 11)}...`}
+            {identityName ? identityName : address}
           </Text>
           <Spacer marginLeft={'13px'} />
           <Tooltip label="JMES" hasArrow placement="bottom">
@@ -152,7 +159,20 @@ export const ConnectedWalletButton = ({
         minW={'271px'}
         maxW={'400px'}
       >
-        <Link href="/?modal=delegate">
+        <MenuItem
+          backgroundColor="white"
+          padding="2"
+          _hover={{ bg: 'white' }}
+          borderRadius={'8px'}
+          bg="bg"
+        >
+          <CopyAddressButton address={address} />
+        </MenuItem>
+        <Box
+          onClick={() => {
+            openDelegate();
+          }}
+        >
           <MenuItem
             padding="2"
             backgroundColor="white"
@@ -187,7 +207,7 @@ export const ConnectedWalletButton = ({
               <Spacer />
             </Flex>
           </MenuItem>
-        </Link>
+        </Box>
         <MenuItem
           backgroundColor="white"
           padding="2"

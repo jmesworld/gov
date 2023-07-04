@@ -1,5 +1,5 @@
-import { Box, Text } from "@chakra-ui/react";
-import { useEffect, useRef } from "react";
+import { Box, Text } from '@chakra-ui/react';
+import { useEffect, useRef } from 'react';
 
 interface ProposalDaoMember {
   name: string;
@@ -12,13 +12,13 @@ const ProposalDaoMember = (props: ProposalDaoMember) => {
   useEffect(() => {
     const init = async () => {
       const percentCircle = percentageRef.current;
-      const percent = percentCircle?.getAttribute("data-percent");
-      const percentCircleLine = percentCircle?.querySelector(".fill");
+      const percent = percentCircle?.getAttribute('data-percent');
+      const percentCircleLine = percentCircle?.querySelector('.fill');
 
       if (percentCircleLine && percent) {
         percentCircleLine.setAttribute(
-          "style",
-          "stroke-dashoffset: " + ((100 - parseInt(percent)) / 100) * 229
+          'style',
+          'stroke-dashoffset: ' + ((100 - parseInt(percent)) / 100) * 229,
         );
       }
     };

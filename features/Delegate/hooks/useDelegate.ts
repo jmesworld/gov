@@ -1,5 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
-import { Client, Core } from 'jmes';
+import { Client } from 'jmes';
 import { useCallback, useMemo, useState } from 'react';
 import { useValidators } from './useValidators';
 import { movingValidator } from '../lib/validateBonding';
@@ -9,6 +8,7 @@ import { BJMES_DENOM, JMES_DENOM } from '../../../lib/constants';
 import { useBalanceContext } from '../../../contexts/balanceContext';
 import { useSigningCosmWasmClientContext } from '../../../contexts/SigningCosmWasmClient';
 const RPC_URL = process.env.NEXT_PUBLIC_REST_URL as string;
+
 const NEXT_PUBLIC_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
 
 const client = new Client({
@@ -28,16 +28,16 @@ type BoundingState = {
   selectedUnBonding: string | null;
 };
 
-const getUnBonds = () => {
-  throw new Error('not implemented');
-};
 const sliderDefaultValue = 0;
 export const useDelegate = () => {
   const { signingCosmWasmClient } = useSigningCosmWasmClientContext();
   const { balance } = useBalanceContext();
-  const totalJmes = useMemo(() => balance?.unstaked ?? 0, [balance?.unstaked]);
+  const totalJmes = useMemo(
+    () => Number(balance?.unstaked.toFixed(0) ?? 0),
+    [balance?.unstaked],
+  );
   const totalBondedJmes = useMemo(
-    () => balance?.staked ?? 0,
+    () => Number(balance?.staked.toFixed(0) ?? 0),
     [balance?.staked],
   );
 
@@ -50,6 +50,9 @@ export const useDelegate = () => {
     validatorList,
     isBondedValidatorsLoading,
     bondedValidators,
+    unBondingsData,
+    unBondingsError,
+    isLoadingUnBondings,
   } = useValidators(client);
   const toast = useToast();
 
@@ -67,18 +70,6 @@ export const useDelegate = () => {
     selectedUnBonding: null,
   });
   const { bonding, selectedValidator, selectedUnBonding } = bondingState;
-  const { isLoading: isUnBondingsLoading, data: unBondingsData } = useQuery(
-    ['getUnBonds'],
-    getUnBonds,
-    {
-      cacheTime: 2 * 60 * 100,
-      staleTime: 2 * 60 * 1000,
-      retry: 3,
-      onError(err) {
-        console.error('Error:', err);
-      },
-    },
-  );
 
   const toggleBonding = () => {
     setBondingState(p => ({
@@ -123,9 +114,8 @@ export const useDelegate = () => {
   const delegateTokens = useCallback(async () => {
     if (isMovingNotValid || !bondingIsValid || !address) {
       toast({
-        title: `Can't ${
-          bonding ? 'delegate' : 'undelegate'
-        }, please fix the issues!`,
+        title: `Can't ${bonding ? 'delegate' : 'undelegate'
+          }, please fix the issues!`,
         duration: 4000,
       });
       return;
@@ -142,9 +132,9 @@ export const useDelegate = () => {
         await signingCosmWasmClient?.delegateTokens(
           address,
           selectedValidator,
+          coin(valueToMove * 1e6, JMES_DENOM),
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           /// @ts-ignore ( Issue with different type)
-          new Core.Coin(JMES_DENOM, valueToMove * 1000), // FIXME use helper function to format amount
           'auto',
         );
 
@@ -158,9 +148,9 @@ export const useDelegate = () => {
         await signingCosmWasmClient?.undelegateTokens(
           address,
           selectedUnBonding,
+          coin(valueToMove * 1e6, BJMES_DENOM),
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           /// @ts-ignore ( Issue with different type)
-          new Core.Coin(BJMES_DENOM, valueToMove * 1000),
           'auto',
         );
         toast({
@@ -170,6 +160,7 @@ export const useDelegate = () => {
     } catch (err) {
       if (err instanceof Error)
         toast({
+          status: 'error',
           title: err.message,
         });
     }
@@ -198,8 +189,6 @@ export const useDelegate = () => {
     setTransferForm,
     isValidatorsLoading,
     validatorList,
-    isUnBondingsLoading,
-    unBondingsData,
     toggleBonding,
     onChangeSlider,
     valueToMove,
@@ -209,5 +198,8 @@ export const useDelegate = () => {
     isBondedValidatorsLoading,
     validatorsError,
     bondedValidatorsError,
+    unBondingsData,
+    unBondingsError,
+    isLoadingUnBondings,
   };
 };

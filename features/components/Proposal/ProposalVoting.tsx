@@ -1,26 +1,20 @@
-import {
-  Flex,
-  HStack,
-  Box,
-  Link,
-  Text,
-  Tooltip,
-  Image,
-  VStack,
-  Divider,
-} from "@chakra-ui/react";
-import { ProposalProgress } from "./ProposalProgress";
-import { ProposalVotes } from "./ProposalVotes";
+import { HStack, Box, Text, VStack, Divider } from '@chakra-ui/react';
+import { ProposalProgress } from './ProposalProgress';
+import { ProposalVotes } from './ProposalVotes';
 
-export interface ProposalVoting {
+export interface Props {
   yesPercentage: number;
   target: number;
-  votes: Array<any>;
+  votes: Array<{
+    vote: string;
+    voter: string;
+    weight: number;
+  }>;
 }
 
-export const ProposalVoting = (props: ProposalVoting) => {
-  const yesVotes = props.votes.filter((vote) => vote.vote === "yes");
-  const noVotes = props.votes.filter((vote) => vote.vote === "no");
+export const ProposalVoting = (props: Props) => {
+  const yesVotes = props.votes.filter(vote => vote.vote === 'yes');
+  const noVotes = props.votes.filter(vote => vote.vote === 'no');
 
   return (
     <Box borderRadius="12px" background="#7453FD" padding="18px 20px">
@@ -34,7 +28,8 @@ export const ProposalVoting = (props: ProposalVoting) => {
           To Pass
         </Text>
         <ProposalProgress
-          progress={props.yesPercentage}
+          yesPercent={props.yesPercentage}
+          noPercent={100 - props.yesPercentage}
           target={props.target}
         />
         <Divider borderColor="rgba(81, 54, 194, 0.3)" />

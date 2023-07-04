@@ -17,7 +17,7 @@ import {
   color,
   useToast,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   countObjectsWithDuplicateNames,
   validateName,
@@ -36,6 +36,8 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useIdentityserviceRegisterDaoMutation } from '../../client/Identityservice.react-query';
 import { StdFee } from '@cosmjs/amino';
+import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
+import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 
 const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL as string;
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
@@ -56,53 +58,35 @@ const CreateDaoForm = ({
   setCreateDaoSelected: Function;
   daoOwner: { name: string; address: string; votingPower: number };
 }) => {
-  const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
-    useChain(chainName);
+  const { address } = useChain(chainName);
+
+  const toast = useToast();
 
   const [daoName, setDaoName] = useState('');
   const [daoMembers, setDaoMembers] = useState([daoOwner]);
   const [threshold, setThreshold] = useState(DEFAULT_DAO_THRESHOLD);
   const [isIdentityNamesValid, setIdentityNamesValid] = useState(false);
-  const [focusedCosignerIndex, setFocusedCosignerIndex] = useState(Infinity);
+  const [focusedDirectorIndex, setFocusedDirectorIndex] = useState(Infinity);
   const [isCreatingDao, setIsCreatingDao] = useState(false);
   const [doubleCounts, setDoubleCounts] = useState(0);
 
-  const toast = useToast();
-  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-    null,
+  const { cosmWasmClient } = useCosmWasmClientContext();
+  const { signingCosmWasmClient: signingClient } =
+    useSigningCosmWasmClientContext();
+
+  const totalVotingPower = useMemo(
+    () =>
+      daoMembers.reduce(
+        (sum, member) => sum + (member?.votingPower ? member?.votingPower : 0),
+        0,
+      ),
+    [daoMembers],
   );
-  const [signingClient, setSigningClient] =
-    useState<SigningCosmWasmClient | null>(null);
-  useEffect(() => {
-    if (address) {
-      getCosmWasmClient()
-        .then(cosmWasmClient => {
-          if (!cosmWasmClient) {
-            return;
-          }
-          setCosmWasmClient(cosmWasmClient);
-        })
-        .catch(error => console.log(error));
-
-      getSigningCosmWasmClient()
-        .then(signingClient => {
-          if (!cosmWasmClient) {
-            return;
-          }
-          setSigningClient(signingClient);
-        })
-        .catch(error => console.log(error));
-    }
-  }, [address, getCosmWasmClient, getSigningCosmWasmClient]);
-
-  useEffect(() => {});
-
-  const totalVotingPower = daoMembers.reduce(
-    (sum, member) => sum + (!!member?.votingPower ? member?.votingPower : 0),
-    0,
+  const validationResult = useMemo(() => validateName(daoName), [daoName]);
+  const DAONameValidationMessage = useMemo(
+    () => validationResult?.message,
+    [validationResult],
   );
-  const validationResult = validateName(daoName);
-  const isDaoNameValid = !validationResult?.name;
 
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     cosmWasmClient as CosmWasmClient,
@@ -110,7 +94,7 @@ const CreateDaoForm = ({
   );
 
   async function getIdentitiesByNames() {
-    let identityAddrs = new Array();
+    const identityAddrs = [];
 
     for (let j = 0; j < daoMembers.length; j++) {
       const name = daoMembers[j].name;
@@ -136,7 +120,7 @@ const CreateDaoForm = ({
 
   const isFormValid =
     totalVotingPower === 100 &&
-    isDaoNameValid &&
+    DAONameValidationMessage &&
     threshold > 0 &&
     (isIdentityNamesValid || daoMembers.length === 1) &&
     doubleCounts === 0;
@@ -192,19 +176,15 @@ const CreateDaoForm = ({
         onChange={e => setDaoName(e.target.value)}
       />
       <Text
+        color="red"
         marginBottom={'8px'}
-        color={'gray.700'}
         fontFamily={'DM Sans'}
         fontWeight="normal"
         fontSize={12}
         marginLeft={'18px'}
         marginTop={'8px'}
       >
-        {daoName.length > 0
-          ? isDaoNameValid
-            ? ''
-            : validationResult.message
-          : ''}
+        {daoName.length > 0 && DAONameValidationMessage}
       </Text>
       <Flex width={'798px'} marginTop={'38px'} marginBottom={'19px'}>
         <Button
@@ -232,7 +212,7 @@ const CreateDaoForm = ({
               marginLeft={'10px'}
               fontFamily="DM Sans"
             >
-              Cosigner
+              Director
             </Text>
           </Flex>
         </Button>
@@ -298,7 +278,7 @@ const CreateDaoForm = ({
               onBlur={() => idsByNamesQuery.refetch()}
               onKeyDown={() => idsByNamesQuery.refetch()}
               onFocus={() => {
-                setFocusedCosignerIndex(index);
+                setFocusedDirectorIndex(index);
               }}
             />
             <InputRightElement
@@ -316,10 +296,12 @@ const CreateDaoForm = ({
                   ? !validateName(daoMember?.name)?.name
                     ? !idsByNamesQuery.isFetching ||
                       idsByNamesQuery.isRefetching
-                      ? idsByNamesQuery?.data?.at(index)?.length > 43
+                      ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        /// @ts-ignore
+                        idsByNamesQuery?.data?.at(index)?.length > 43
                         ? idsByNamesQuery?.data?.at(index)?.slice(0, 43) + '...'
                         : idsByNamesQuery?.data?.at(index)
-                      : index === focusedCosignerIndex
+                      : index === focusedDirectorIndex
                       ? 'Checking...'
                       : idsByNamesQuery?.data?.at(index)
                     : ''
@@ -561,7 +543,7 @@ const CreateDaoForm = ({
                 },
                 args: { fee },
               })
-              .then(result => {
+              .then(() => {
                 toast({
                   title: 'Dao created.',
                   description:

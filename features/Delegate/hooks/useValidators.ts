@@ -46,6 +46,19 @@ const getBondedValidators = ({
   return client.providers.LCDC.staking.bondedValidators(address as string);
 };
 
+const getUnBondings = ({
+  queryKey,
+  client,
+}: {
+  client: Client;
+  queryKey: (string | number)[];
+}) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, address] = queryKey;
+
+  return client.providers.LCDC.staking.unbondingDelegations(address as string);
+};
+
 export const useValidators = (client: Client) => {
   const { address } = useIdentityContext();
   const [pagination, setPagination] = useState<Pagination>({
@@ -56,6 +69,23 @@ export const useValidators = (client: Client) => {
   const [validatorList, setValidatorList] = useState<
     Record<string, Validator[]>
   >({});
+
+  const {
+    isFetching: isFetchingUnBondings,
+    isLoading: isLoadingUnBondings,
+    error: unBondingsError,
+    data: unBondingsData,
+  } = useQuery({
+    queryKey: ['unBondings', address as string],
+    queryFn: ({ queryKey }) => getUnBondings({ queryKey, client }),
+    retry: 3,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+    onError(err) {
+      console.error('Error:', err);
+    },
+  });
+
   const {
     isFetching: isFetchingValidators,
     isLoading: isLoadingValidators,
@@ -87,6 +117,7 @@ export const useValidators = (client: Client) => {
       console.error('Error:', err);
     },
   });
+
   useEffect(() => {
     if (validatorsData?.[0]) {
       setValidatorList(p => ({
@@ -105,7 +136,11 @@ export const useValidators = (client: Client) => {
       });
     }
   }, [pagination.limit, pagination.offset, validatorList, validatorsData]);
+
   return {
+    unBondingsData: unBondingsData?.[0],
+    unBondingsError,
+    isLoadingUnBondings: isFetchingUnBondings || isLoadingUnBondings,
     validatorsError,
     bondedValidatorsError,
     bondedValidators: bondedValidators?.[0],

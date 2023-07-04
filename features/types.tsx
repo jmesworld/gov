@@ -1,5 +1,5 @@
-import { MouseEventHandler, ReactNode } from "react";
-import { IconType } from "react-icons";
+import { MouseEventHandler, ReactNode } from 'react';
+import { IconType } from 'react-icons';
 
 export interface ChooseChainInfo {
   chainName: string;
@@ -11,16 +11,16 @@ export interface ChooseChainInfo {
 }
 
 export enum WalletStatus {
-  Init = "Init",
-  Connecting = "Connecting",
-  Connected = "Connected",
-  ConnectFailed = "ConnectFailed",
-  Disconnected = "Disconnected",
-  NotInit = "NotInit",
-  Loading = "Loading",
-  Loaded = "Loaded",
-  NotExist = "NotExist",
-  Rejected = "Rejected",
+  Init = 'Init',
+  Connecting = 'Connecting',
+  Connected = 'Connected',
+  ConnectFailed = 'ConnectFailed',
+  Disconnected = 'Disconnected',
+  NotInit = 'NotInit',
+  Loading = 'Loading',
+  Loaded = 'Loaded',
+  NotExist = 'NotExist',
+  Rejected = 'Rejected',
 }
 export interface DAOItemProps {
   name: string | null | undefined;
@@ -36,7 +36,7 @@ export interface NavBarProps {
   selectedDao: string;
   selectedDaoName: string;
 }
-export interface DAOCosigner {
+export interface DAODirector {
   name: string;
   weight: number;
   id: number;
