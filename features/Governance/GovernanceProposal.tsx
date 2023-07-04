@@ -8,6 +8,7 @@ import GovHeader from './GovHeader';
 import { ProposalHeader } from '../components/Proposal/ProposalList';
 import { ProposalList } from '../components/Proposal/ProposalList';
 import { useAppState } from '../../contexts/AppStateContext';
+import { useCoinSupplyContext } from '../../contexts/CoinSupply';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -20,6 +21,7 @@ export default function GovernanceProposal({
   cosmWasmClient,
 }: Props) {
   const { setSelectedDaoProposalTitle } = useAppState();
+  const { supply } = useCoinSupplyContext();
   const governanceQueryClient = new GovernanceQueryClient(
     cosmWasmClient as CosmWasmClient,
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
@@ -42,6 +44,7 @@ export default function GovernanceProposal({
       <Flex height={'10px'} />
 
       <ProposalList
+        totalSupply={supply as number}
         proposals={governanceProposalQuery?.data?.proposals}
         isGov={true}
         setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
