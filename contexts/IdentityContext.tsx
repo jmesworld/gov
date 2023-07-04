@@ -59,6 +59,7 @@ const IdentityContextProvider = ({ children }: Props) => {
     args: { owner: address as string },
     options: {
       refetchOnMount: true,
+      refetchOnWindowFocus: false,
     },
   });
 
@@ -74,7 +75,8 @@ const IdentityContextProvider = ({ children }: Props) => {
     identity: identityOwnerQuery?.data?.identity ?? null,
     getIdentityName,
     address,
-    loadingIdentity: !!identityOwnerQuery?.isLoading,
+    loadingIdentity:
+      identityOwnerQuery?.isLoading || identityOwnerQuery?.isFetching,
     disconnect,
     identityServiceQueryClient: identityserviceClient,
   };

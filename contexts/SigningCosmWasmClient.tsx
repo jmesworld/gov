@@ -25,11 +25,11 @@ const SigningCosmWasmClientContext =
   createContext<SigningCosmWasmClientContextType>(initialState);
 
 const SigningCosmWasmClientContextProvider = ({ children }: Props) => {
-  const { getSigningCosmWasmClient } = useChain(chainName);
+  const { getSigningCosmWasmClient, address } = useChain(chainName);
   const [signingCosmWasmClient, setSigningCosmWasmClient] =
     useState<SigningCosmWasmClient | null>(null);
   useEffect(() => {
-    if (!getSigningCosmWasmClient) {
+    if (!getSigningCosmWasmClient || !address) {
       return;
     }
     async function assignSigningCosmWasmClient() {
@@ -41,7 +41,7 @@ const SigningCosmWasmClientContextProvider = ({ children }: Props) => {
       }
     }
     assignSigningCosmWasmClient();
-  }, [getSigningCosmWasmClient]);
+  }, [address, getSigningCosmWasmClient]);
 
   const value = {
     signingCosmWasmClient,
