@@ -15,7 +15,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { StdFee } from '@cosmjs/amino';
 import { DaoMultisigClient } from '../../client/DaoMultisig.client';
 import { useDaoMultisigProposeMutation } from '../../client/DaoMultisig.react-query';
@@ -25,6 +25,8 @@ import { toBase64 } from '../../utils/identity';
 import * as Governance from '../../client/Governance.types';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 import { useIdentityContext } from '../../contexts/IdentityContext';
+import { useLeaveConfirm } from '../../hooks/useLeaveConfirm';
+import { isDirty } from 'zod';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -83,6 +85,32 @@ export default function CreateGovProposal({
     address as string,
     selectedDao ?? '',
   );
+
+  const isDirty = useMemo(() => {
+    return (
+      proposalTitle ||
+      proposalDescription ||
+      slotType !== 'brand' ||
+      isFundingNeeded ||
+      fundingAmount ||
+      fundingPeriod !== default_funding_duration ||
+      isCreatingGovProposal ||
+      revokeProposalId !== -1
+    );
+  }, [
+    fundingAmount,
+    fundingPeriod,
+    isCreatingGovProposal,
+    isFundingNeeded,
+    proposalDescription,
+    proposalTitle,
+    revokeProposalId,
+    slotType,
+  ]);
+
+  useLeaveConfirm({
+    preventNavigatingAway: !!isDirty,
+  });
 
   // Dynamically show required sections for different proposal types
   const isSlotTypeRequired = selectedProposalType === 'core-slot';

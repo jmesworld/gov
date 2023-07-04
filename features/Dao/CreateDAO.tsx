@@ -35,6 +35,7 @@ import { Reducer } from './createDAOReducer';
 import { v4 as uuid } from 'uuid';
 import { Member } from './components/DaoMember';
 import { z } from 'zod';
+import { useLeaveConfirm } from '../../hooks/useLeaveConfirm';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -65,7 +66,19 @@ const CreateDaoNewForm = ({
       daoName: '',
       threshold: 0,
     });
+
+  const isDirty = useMemo(() => {
+    return (
+      daoName !== '' || threshold !== 0 || Object.values(members).length > 1
+    );
+  }, [daoName, members, threshold]);
+
+  useLeaveConfirm({
+    preventNavigatingAway: isDirty,
+  });
+
   const membersArr = useMemo(() => Object.values(members), [members]);
+
   useEffect(() => {
     if (Object.keys(members).length !== 0) {
       return;
@@ -133,6 +146,7 @@ const CreateDaoNewForm = ({
     },
     [dispatch],
   );
+
   const onNameChange = useCallback(
     (id: string, value: string) => {
       // CHECK if error exist or same name exist

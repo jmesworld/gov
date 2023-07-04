@@ -30,6 +30,7 @@ import { DAOContextProvider } from '../contexts/DAOContext';
 import { SigningCosmWasmClientContextProvider } from '../contexts/SigningCosmWasmClient';
 import { GasPrice } from '@cosmjs/stargate';
 import { DelegateContextProvider } from '../contexts/DelegateContext';
+import { ErrorBoundary } from '../error/errorBondary';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   Layout?: ({ children }: { children: ReactElement }) => ReactElement;
@@ -81,10 +82,10 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
                         <SigningCosmWasmClientContextProvider>
                           <DelegateContextProvider>
                             <Layout>
-                              <>
+                              <ErrorBoundary>
                                 <Component {...pageProps} />
                                 <OnboardingModal />
-                              </>
+                              </ErrorBoundary>
                             </Layout>
                           </DelegateContextProvider>
                         </SigningCosmWasmClientContextProvider>
