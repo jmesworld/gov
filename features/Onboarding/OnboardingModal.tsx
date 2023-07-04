@@ -17,22 +17,24 @@ import { useMemo } from 'react';
 export default function OnboardingModal() {
   const { loadingIdentity, getIdentityName, disconnect, address } =
     useIdentityContext();
-  const identityName = getIdentityName();
+
   const { balance } = useBalanceContext();
 
   const isOpen = useMemo(() => {
-    if (loadingIdentity || !address) {
+    if (loadingIdentity || !address || !balance) {
       return false;
     }
-    if (!identityName) {
+    if (!getIdentityName()) {
       return true;
     }
     if (!balance?.unstaked) {
       return true;
     }
-    return false;
-  }, [address, balance?.unstaked, identityName, loadingIdentity]);
 
+    return false;
+  }, [address, balance, getIdentityName, loadingIdentity]);
+
+   if (!isOpen) return null;
   return (
     <>
       <Modal
@@ -66,9 +68,13 @@ export default function OnboardingModal() {
                 >
                   {balance?.unstaked === 0 ? (
                     <AddTokensCard />
-                  ) : balance?.unstaked && !identityName ? (
-                    <ChooseUsernameCard identityName={identityName ?? ''} />
-                  ) : balance && identityName ? null : (
+                  ) : balance?.unstaked &&
+                    !getIdentityName() &&
+                    !loadingIdentity ? (
+                    <ChooseUsernameCard
+                      identityName={getIdentityName() ?? ''}
+                    />
+                  ) : balance && getIdentityName() ? null : (
                     <CircularProgress isIndeterminate color="white" />
                   )}
                 </span>

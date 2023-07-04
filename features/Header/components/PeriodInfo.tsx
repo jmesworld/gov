@@ -11,18 +11,14 @@ import {
   Text,
 } from '@chakra-ui/react';
 
-import {
-  formatDuration,
-  momentLeft,
-  timestampToDateTime,
-} from '../../../utils/time';
+import { formatDuration, timestampToDateTime } from '../../../utils/time';
 import { useVotingPeriodContext } from '../../../contexts/VotingPeriodContext';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT =
   process.env.NEXT_PUBLIC_GOVERNANCE_CONTRACT;
 
 export default function PeriodInfo() {
-  const { data } = useVotingPeriodContext();
+  const { data, nextPeriodTimeLeft } = useVotingPeriodContext();
   if (!NEXT_PUBLIC_GOVERNANCE_CONTRACT) {
     throw new Error('Public Governance Contract not found!');
   }
@@ -44,9 +40,6 @@ export default function PeriodInfo() {
   const voting_period_length = formatDuration(
     data?.voting_period_length as number,
   );
-  const next_period_start =
-    current_period === 'posting' ? next_posting_start : next_voting_start;
-  const next_period_start_time_left = momentLeft(next_period_start).toString();
 
   return (
     <Menu>
@@ -134,7 +127,7 @@ export default function PeriodInfo() {
                   overflow="hidden"
                   textOverflow="ellipsis"
                 >
-                  {data ? `${next_period_start_time_left}` : ''}
+                  {data ? `${nextPeriodTimeLeft}` : ''}
                 </Text>
               </Flex>
             </Flex>

@@ -37,6 +37,7 @@ const VotingPeriodContextProvider = ({ children }: Props) => {
   const { cosmWasmClient } = useCosmWasmClientContext();
   const governanceQueryClient = useMemo(
     () =>
+      cosmWasmClient &&
       new GovernanceQueryClient(
         cosmWasmClient as CosmWasmClient,
         NEXT_PUBLIC_GOVERNANCE_CONTRACT,
@@ -44,7 +45,7 @@ const VotingPeriodContextProvider = ({ children }: Props) => {
     [cosmWasmClient],
   );
   const { data } = useGovernancePeriodInfoQuery({
-    client: governanceQueryClient,
+    client: governanceQueryClient ?? undefined,
     options: {
       enabled: governanceQueryClient !== null, // The query will only run when governanceQueryClient is not null
       refetchInterval: 5000,
