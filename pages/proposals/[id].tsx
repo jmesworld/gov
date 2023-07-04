@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import type { NextPageWithLayout } from '../_app';
 import GovProposalDetail from '../../features/Governance/GovProposalDetail';
+import { CoinSupplyContextProvider } from '../../contexts/CoinSupply';
 
 const ProposalDetail: NextPageWithLayout = () => {
   const router = useRouter();
@@ -9,7 +10,11 @@ const ProposalDetail: NextPageWithLayout = () => {
     return <p> not Found </p>;
   }
 
-  return <GovProposalDetail proposalId={Number(id)} />;
+  return (
+    <CoinSupplyContextProvider>
+      <GovProposalDetail proposalId={Number(id)} />;
+    </CoinSupplyContextProvider>
+  );
 };
 
 export default ProposalDetail;

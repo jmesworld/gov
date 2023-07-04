@@ -7,13 +7,10 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useChain } from '@cosmos-kit/react';
 
-import {
-  CosmWasmClient,
-  SigningCosmWasmClient,
-} from '@cosmjs/cosmwasm-stargate';
+import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { GovernanceQueryClient } from '../../client/Governance.client';
 import { useGovernanceProposalQuery } from '../../client/Governance.react-query';
 
@@ -22,9 +19,9 @@ import GovProposalMyVote from './GovProposalMyVote';
 import GovProposalVoting from './GovProposalVoting';
 import { ProposalHeader } from '../components/Proposal/ProposalHeader';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
+import { calculateVotes } from '../../lib/calculateVotes';
+import { useCoinSupplyContext } from '../../contexts/CoinSupply';
 
-const IDENTITY_SERVICE_CONTRACT = process.env
-  .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 const GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
@@ -34,7 +31,7 @@ export default function GovProposalDetail({
   proposalId: number;
 }) {
   const { cosmWasmClient } = useCosmWasmClientContext();
-
+  const { supply } = useCoinSupplyContext();
   const { address } = useChain(chainName);
 
   const govQueryClient = new GovernanceQueryClient(
@@ -42,7 +39,7 @@ export default function GovProposalDetail({
     GOVERNANCE_CONTRACT,
   );
 
-  const proposalDetailQuery = useGovernanceProposalQuery({
+  const { data } = useGovernanceProposalQuery({
     client: govQueryClient,
     args: {
       id: proposalId,
@@ -52,33 +49,30 @@ export default function GovProposalDetail({
     },
   });
 
-  const proposalDescription = proposalDetailQuery?.data?.description ?? '';
-  const expiryDate = proposalDetailQuery?.data?.voting_end ?? 0;
-  const expiryDateTimestamp = proposalDetailQuery?.data
-    ? expiryDate * 1000
-    : -1;
+  const proposalDescription = data?.description ?? '';
+  const expiryDate = data?.voting_end ?? 0;
+  const expiryDateTimestamp = data ? expiryDate * 1000 : -1;
 
-  console.log(expiryDate);
-  const threshold = '10.00'; //TODO: confirm threshold for Governance proposals
-  const target = proposalDetailQuery?.data ? parseFloat(threshold) : 0;
-
-  const yesVotesCount = proposalDetailQuery?.data?.yes_voters.length ?? 0;
-  const noVotesCount = proposalDetailQuery?.data?.no_voters.length ?? 0;
-  const total =
-    parseInt(proposalDetailQuery?.data?.coins_yes as string) +
-      parseInt(proposalDetailQuery?.data?.coins_no as string) ?? 100;
-  const yesVotesPercentage =
-    (total > 0
-      ? parseInt(proposalDetailQuery?.data?.coins_yes as string) / total
-      : 0) * 100;
-  const noVotesPercentage =
-    (total > 0
-      ? parseInt(proposalDetailQuery?.data?.coins_no as string) / total
-      : 0) * 100;
+  const {
+    coinYes,
+    coinNo,
+    threshold,
+    thresholdPercent,
+    yesPercentage,
+    noPercentage,
+  } = useMemo(
+    () =>
+      calculateVotes({
+        coin_Yes: data?.coins_yes,
+        coin_no: data?.coins_no,
+        totalSupply: supply as number,
+      }),
+    [data?.coins_no, data?.coins_yes, supply],
+  );
 
   const voted =
-    (proposalDetailQuery?.data?.yes_voters?.includes(address as string) ||
-      proposalDetailQuery?.data?.no_voters?.includes(address as string)) ??
+    (data?.yes_voters?.includes(address as string) ||
+      data?.no_voters?.includes(address as string)) ??
     false;
 
   return (
@@ -86,18 +80,21 @@ export default function GovProposalDetail({
       <Flex height={'47px'} />
       <ProposalHeader
         daoName={'Governance Proposal'}
-        proposalTitle={proposalDetailQuery?.data?.title ?? ''}
+        proposalTitle={data?.title ?? ''}
         proposalExpiry={expiryDateTimestamp}
       />
-      {proposalDetailQuery.data ? (
+      {data ? (
         <HStack spacing="54px" align="flex-start">
           <Box flexGrow={1}>
             <GovProposalVoting
-              target={target}
-              yesVotesCount={yesVotesCount}
-              noVotesCount={noVotesCount}
-              yesVotesPercentage={yesVotesPercentage}
-              noVotesPercentage={noVotesPercentage}
+              yesCount={coinYes}
+              noCount={coinNo}
+              yesPercent={yesPercentage}
+              noPercent={noPercentage}
+              targetPercentage={thresholdPercent}
+              target={threshold}
+              yesVotesPercentage={yesPercentage}
+              noVotesPercentage={noPercentage}
             />
             <Box
               background="rgba(112, 79, 247, 0.1)"

@@ -13,6 +13,7 @@ import {
 import { useCosmWasmClientContext } from '../../../contexts/CosmWasmClient';
 
 import { BalanceDisplay } from './Balance';
+import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
 
 export default function DaoProposal({
   daoAddress,
@@ -31,7 +32,7 @@ export default function DaoProposal({
   setSelectedProposalId: Function;
 }) {
   const { cosmWasmClient } = useCosmWasmClientContext();
-
+  const { supply } = useCoinSupplyContext();
   const daoQueryClient = new DaoMultisigQueryClient(
     cosmWasmClient as CosmWasmClient,
     daoAddress as string,
@@ -65,6 +66,7 @@ export default function DaoProposal({
           <Flex height={'10px'} />
           {data && (
             <ProposalList
+              totalSupply={supply as number}
               proposals={data?.proposals}
               isGov={false}
               daoAddress={daoAddress}

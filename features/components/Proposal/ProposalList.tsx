@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { Box, Flex, Progress, Text } from '@chakra-ui/react';
 import { MouseEventHandler } from 'react';
+import { calculateVotes } from '../../../lib/calculateVotes';
+import { ProposalProgress } from './ProposalProgress';
 
 export const ProposalList = ({
   proposals,
@@ -9,7 +11,9 @@ export const ProposalList = ({
   onClickListItem,
   setSelectedDaoProposalTitle,
   setSelectedProposalId,
+  totalSupply,
 }: {
+  totalSupply: number;
   proposals: any;
   isGov: boolean;
   daoAddress?: string;
@@ -36,9 +40,18 @@ export const ProposalList = ({
     );
   } else {
     const proposalItems = proposals.map((proposal: any) => {
-      const yesVoters = proposal?.yes_voters?.length;
-      const noVoters = proposal?.no_voters?.length;
-      const totalVoters = isGov ? yesVoters + noVoters : 0;
+      const {
+        coinYes,
+        coinNo,
+        threshold,
+        noPercentage,
+        yesPercentage,
+        thresholdPercent,
+      } = calculateVotes({
+        coin_no: proposal.coins_no,
+        coin_Yes: proposal.coins_yes,
+        totalSupply,
+      });
 
       const propType = isGov
         ? JSON.stringify(proposal.prop_type).split(':')[0].slice(2)
@@ -50,10 +63,13 @@ export const ProposalList = ({
         <ProposalListItem
           key={proposal.id + proposal.description}
           title={proposal.title}
-          yesCount={yesVoters}
-          noCount={noVoters}
-          totalCount={totalVoters}
-          threshold={proposal.threshold?.absolute_percentage?.percentage}
+          yesCount={coinYes}
+          thresholdPercent={thresholdPercent}
+          noCount={coinNo}
+          yesPercent={yesPercentage}
+          noPercent={noPercentage}
+          totalCount={totalSupply}
+          threshold={threshold}
           type={type}
           pass={
             proposal.status === 'passed' ||
@@ -153,7 +169,12 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
 
 export const ProposalListItem = ({
   title,
-
+  yesCount,
+  noCount,
+  yesPercent,
+  noPercent,
+  threshold,
+  thresholdPercent,
   type,
   isGov,
   proposalId,
@@ -162,11 +183,14 @@ export const ProposalListItem = ({
   setSelectedDaoProposalId,
 }: {
   title: string;
-  threshold: number | undefined;
+  threshold: number;
   pass: string;
   type: string;
   yesCount: number;
+  yesPercent: number;
+  thresholdPercent: number;
   noCount: number;
+  noPercent: number;
   totalCount: number;
   isGov: boolean;
   daoAddress?: string;
@@ -220,11 +244,14 @@ export const ProposalListItem = ({
             alignItems={'center'}
             justifyContent={'space-around'}
           >
-            <ProgressBar
-              noPercent={40}
-              yesPercent={60}
-              threshold={50}
-              isGov={isGov}
+            <ProposalProgress
+              width={430}
+              targetPercentage={thresholdPercent}
+              yesCount={yesCount}
+              noCount={noCount}
+              noPercent={noPercent}
+              yesPercent={yesPercent}
+              target={threshold}
             />
           </Flex>
         </Flex>
@@ -261,9 +288,15 @@ export const ProposalListItem = ({
 export const ProgressBar = ({
   yesPercent,
   threshold,
+  thresholdPercent,
   noPercent,
+  noCount,
+  yesCount,
 }: {
+  noCount: number;
+  yesCount: number;
   noPercent: number;
+  thresholdPercent: number;
   yesPercent: number;
   threshold: number;
   isGov: boolean;
@@ -292,7 +325,7 @@ export const ProgressBar = ({
           width={'48px'}
           textAlign={'right'}
         >
-          No {noPercent}
+          No {noCount}
         </Text>
         <Progress
           value={noPercent}
@@ -318,7 +351,7 @@ export const ProgressBar = ({
           width={'48px'}
           textAlign={'right'}
         >
-          Yes {yesPercent}
+          Yes {yesCount}
         </Text>
         <Progress
           value={yesPercent}
@@ -338,7 +371,7 @@ export const ProgressBar = ({
       >
         <Box
           position={'absolute'}
-          left={'calc(' + threshold + '% - 13px)'}
+          left={'calc(' + thresholdPercent + '% - 13px)'}
           top={0}
           bottom={0}
           width={'26px'}

@@ -2,6 +2,7 @@ import { Governance } from '../features';
 import { useCosmWasmClientContext } from '../contexts/CosmWasmClient';
 import { NextPageWithLayout } from './_app';
 import { useRouter } from 'next/router';
+import { CoinSupplyContextProvider } from '../contexts/CoinSupply';
 
 const { GovernanceProposal } = Governance;
 
@@ -10,7 +11,7 @@ const Home: NextPageWithLayout = () => {
   const router = useRouter();
 
   return (
-    <>
+    <CoinSupplyContextProvider>
       {!cosmWasmClient && 'loading ...'}
       {cosmWasmClient && (
         <GovernanceProposal
@@ -20,7 +21,7 @@ const Home: NextPageWithLayout = () => {
           }}
         />
       )}
-    </>
+    </CoinSupplyContextProvider>
   );
 };
 export default Home;

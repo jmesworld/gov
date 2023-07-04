@@ -1,17 +1,30 @@
 import { Box, Flex, Progress, Text } from '@chakra-ui/react';
+import { formatBalance } from '../../../hooks/useAccountBalance';
 
 interface ProposalProgressType {
   yesPercent: number;
+  yesCount: number;
+  noCount: number;
   noPercent: number;
   target: number;
+  targetPercentage: number;
+  width?: number;
 }
 
-export const ProposalProgress = (props: ProposalProgressType) => {
+export const ProposalProgress = ({
+  yesCount,
+  yesPercent,
+  noCount,
+  noPercent,
+  target,
+  targetPercentage,
+  width,
+}: ProposalProgressType) => {
   return (
     <Box
       height={'60px'}
       borderRadius={'30px'}
-      width={'100%'}
+      width={width ? `${width}px` : '100%'}
       backgroundColor={'rgba(81, 54, 194, 1)'}
       padding={'10px 20px'}
       position={'relative'}
@@ -27,14 +40,14 @@ export const ProposalProgress = (props: ProposalProgressType) => {
           fontSize={14}
           fontFamily="DM Sans"
           textTransform="uppercase"
-          opacity={props.yesPercent > props.noPercent ? '0.5' : '1'}
-          width={'48px'}
-          textAlign={'right'}
+          opacity={yesPercent > noPercent ? '0.5' : '1'}
+          width={'58px'}
+          textAlign={'left'}
         >
-          No {props.noPercent}
+          No {formatBalance(noCount)}
         </Text>
         <Progress
-          value={props.noPercent}
+          value={noPercent}
           backgroundColor={'#5136C2'}
           width={'calc(100% - 56px)'}
           height={'10px'}
@@ -53,14 +66,14 @@ export const ProposalProgress = (props: ProposalProgressType) => {
           fontSize={14}
           fontFamily="DM Sans"
           textTransform="uppercase"
-          opacity={props.yesPercent > props.noPercent ? '1' : '0.5'}
-          width={'48px'}
-          textAlign={'right'}
+          opacity={yesPercent > noPercent ? '1' : '0.5'}
+          width={'58px'}
+          textAlign={'left'}
         >
-          Yes {props.yesPercent}
+          Yes {formatBalance(yesCount)}
         </Text>
         <Progress
-          value={props.yesPercent}
+          value={yesPercent}
           backgroundColor={'#5136C2'}
           width={'calc(100% - 56px)'}
           height={'10px'}
@@ -77,7 +90,7 @@ export const ProposalProgress = (props: ProposalProgressType) => {
       >
         <Box
           position={'absolute'}
-          left={'calc(' + props.target + '% - 13px)'}
+          left={'calc(' + targetPercentage + '% - 13px)'}
           top={0}
           bottom={0}
           width={'26px'}
@@ -100,7 +113,7 @@ export const ProposalProgress = (props: ProposalProgressType) => {
               letterSpacing={'-0.05em'}
               textAlign={'center'}
             >
-              {props.target}
+              {formatBalance(target)}
             </Text>
           </Box>
           <Flex
