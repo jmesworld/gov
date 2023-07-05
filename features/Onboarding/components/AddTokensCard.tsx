@@ -14,14 +14,14 @@ import {
 } from '@chakra-ui/react';
 import OnboardingProgressIndicator from './OnboardingProgressIndicator';
 import { useAccountBalance } from '../../../hooks/useAccountBalance';
-import { useCosmWasmClient } from '../../../contexts/ClientContext';
 import { useChain } from '@cosmos-kit/react';
 import { chainName } from '../../../config/defaults';
+import { useIdentityContext } from '../../../contexts/IdentityContext';
 
 const AddTokensCard = () => {
   const toast = useToast();
   const { address } = useChain(chainName);
-  const { identityName, walletAddress, disconnect } = useCosmWasmClient();
+  const { disconnect } = useIdentityContext();
   const identityBalanceQuery = useAccountBalance(address as string);
   const balance: any = identityBalanceQuery.data ?? 0;
 

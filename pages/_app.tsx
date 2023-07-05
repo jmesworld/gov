@@ -15,7 +15,6 @@ import { chainName } from '../config/defaults';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import OnboardingModal from '../features/Onboarding/OnboardingModal';
 import { WalletModal } from '../features/Wallet/components/WalletModal';
-import { CosmWasmProvider } from '../contexts/ClientContext';
 import React, { ReactElement } from 'react';
 import { AppStateProvider } from '../contexts/AppStateContext';
 import { CosmWasmClientContextProvider } from '../contexts/CosmWasmClient';
@@ -78,22 +77,20 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
               <IdentityContextProvider>
                 <BalanceContextProvider>
                   <DAOContextProvider>
-                    <CosmWasmProvider>
-                      <AppStateProvider>
-                        <SigningCosmWasmClientContextProvider>
-                          <DelegateContextProvider>
-                            <VotingPeriodContextProvider>
-                              <Layout>
-                                <ErrorBoundary>
-                                  <Component {...pageProps} />
-                                  <OnboardingModal />
-                                </ErrorBoundary>
-                              </Layout>
-                            </VotingPeriodContextProvider>
-                          </DelegateContextProvider>
-                        </SigningCosmWasmClientContextProvider>
-                      </AppStateProvider>
-                    </CosmWasmProvider>
+                    <AppStateProvider>
+                      <SigningCosmWasmClientContextProvider>
+                        <DelegateContextProvider>
+                          <VotingPeriodContextProvider>
+                            <Layout>
+                              <ErrorBoundary>
+                                <Component {...pageProps} />
+                                <OnboardingModal />
+                              </ErrorBoundary>
+                            </Layout>
+                          </VotingPeriodContextProvider>
+                        </DelegateContextProvider>
+                      </SigningCosmWasmClientContextProvider>
+                    </AppStateProvider>
                   </DAOContextProvider>
                 </BalanceContextProvider>
                 <ReactQueryDevtools initialIsOpen={false} />
