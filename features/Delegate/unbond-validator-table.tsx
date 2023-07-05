@@ -1,8 +1,8 @@
-import { Text, Box, Image, Spinner, Alert } from '@chakra-ui/react';
+import { Text, Box, Spinner, Alert } from '@chakra-ui/react';
 import { Core } from 'jmes';
 
 interface ValidatorProps {
-  validatorsData?: Core.Validator[];
+  validatorsData?: Core.Delegation[];
   selectedValidator: string | null;
   onSelectValidator: (id: string | null) => void;
   error: Error | undefined;
@@ -71,7 +71,7 @@ export const UnBondValidatorTable = ({
         <Alert status="error" title={error.message} />
       )}
       {validatorsData?.map(validator => {
-        const id = validator.operator_address;
+        const id = validator.validator_address;
 
         return (
           <Box
@@ -81,7 +81,7 @@ export const UnBondValidatorTable = ({
             justifyContent="flex-start"
             padding={selectedValidator === id ? '8px' : '8px 0'}
             background={selectedValidator === id ? '#704FF7' : ''}
-            borderRadius={validator.operator_address === id ? '4px' : ''}
+            borderRadius={validator.validator_address === id ? '4px' : ''}
             cursor="pointer"
           >
             <Text

@@ -1,5 +1,5 @@
 import { Client } from 'jmes';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useValidators } from './useValidators';
 import { movingValidator } from '../lib/validateBonding';
 import { useToast } from '@chakra-ui/react';
@@ -20,6 +20,7 @@ type TransferFormType = {
   jmesValue: number;
   bJmesValue: number;
   sliderValue: number;
+  valueToMove: number;
 };
 
 type BondingState = {
@@ -32,7 +33,7 @@ type BondingState = {
 const sliderDefaultValue = 0;
 export const useDelegate = () => {
   const { signingCosmWasmClient } = useSigningCosmWasmClientContext();
-  const { balance } = useBalanceContext();
+  const { balance, refresh } = useBalanceContext();
   const totalJmes = useMemo(
     () => Number(balance?.unstaked.toFixed(0) ?? 0),
     [balance?.unstaked],
@@ -60,9 +61,10 @@ export const useDelegate = () => {
   const [transferForm, setTransferForm] = useState<TransferFormType>({
     jmesValue: Number(totalJmes.toFixed(0)),
     bJmesValue: Number(totalBondedJmes.toFixed(0)),
+    valueToMove: 0,
     sliderValue: sliderDefaultValue,
   });
-  const { jmesValue, bJmesValue } = transferForm;
+  const { jmesValue, bJmesValue, valueToMove } = transferForm;
 
   const [bondingState, setBondingState] = useState<BondingState>({
     bonding: true,
@@ -79,6 +81,28 @@ export const useDelegate = () => {
     }));
   };
 
+  useEffect(() => {
+    setTransferForm(p => {
+      const { sliderValue } = p;
+      const jmesValue = bonding
+        ? (totalJmes / 100) * (100 - sliderValue)
+        : totalJmes + (totalBondedJmes / 100) * sliderValue;
+      const bJmesValue = bonding
+        ? (totalJmes / 100) * sliderValue + totalBondedJmes
+        : (totalBondedJmes / 100) * (100 - sliderValue);
+      const value = bonding
+        ? bJmesValue - totalBondedJmes
+        : jmesValue - totalJmes;
+      return {
+        ...p,
+        jmesValue: Number(jmesValue.toFixed(0)),
+        bJmesValue: Number(bJmesValue.toFixed(0)),
+        valueToMove: Number(value.toFixed(0)),
+        sliderValue,
+      };
+    });
+  }, [bonding, totalBondedJmes, totalJmes]);
+
   const onChangeSlider = (sliderValue: number) => {
     setTransferForm(p => {
       const jmesValue = bonding
@@ -87,18 +111,39 @@ export const useDelegate = () => {
       const bJmesValue = bonding
         ? (totalJmes / 100) * sliderValue + totalBondedJmes
         : (totalBondedJmes / 100) * (100 - sliderValue);
+      const value = bonding
+        ? bJmesValue - totalBondedJmes
+        : jmesValue - totalJmes;
       return {
         ...p,
         jmesValue: Number(jmesValue.toFixed(0)),
         bJmesValue: Number(bJmesValue.toFixed(0)),
+        valueToMove: Number(value.toFixed(0)),
         sliderValue,
       };
     });
   };
 
-  const valueToMove = useMemo(() => {
-    return bonding ? bJmesValue - totalBondedJmes : jmesValue - totalBondedJmes;
-  }, [bonding, totalBondedJmes, bJmesValue, jmesValue]);
+  const onValueChange = useCallback(
+    (val: string) => {
+      const value = Number(val);
+      if (isNaN(value)) return;
+      setTransferForm(p => {
+        return {
+          ...p,
+          jmesValue: bonding ? totalJmes - value : totalJmes + value,
+          bJmesValue: !bonding
+            ? totalBondedJmes - value
+            : totalBondedJmes + value,
+          sliderValue: bonding
+            ? Number((value / (totalJmes / 100)).toFixed(0))
+            : Number((value / (totalBondedJmes / 100)).toFixed(0)),
+          valueToMove: value,
+        };
+      });
+    },
+    [bonding, totalBondedJmes, totalJmes],
+  );
 
   const bondingIsValid = useMemo(() => {
     return jmesValue > 0 && totalJmes > 0;
@@ -159,9 +204,10 @@ export const useDelegate = () => {
           'auto',
         );
         toast({
-          title: 'Delegated Token ',
+          title: 'UnDelegated Token ',
         });
       }
+      await refresh();
     } catch (err) {
       if (err instanceof Error)
         toast({
@@ -169,7 +215,13 @@ export const useDelegate = () => {
           title: err.message,
         });
     }
-
+    setTransferForm(p => ({
+      ...p,
+      jmesValue: Number(totalJmes.toFixed(0)),
+      bJmesValue: Number(totalBondedJmes.toFixed(0)),
+      valueToMove: 0,
+      sliderValue: sliderDefaultValue,
+    }));
     setBondingState(p => ({
       ...p,
       delegatingToken: false,
@@ -184,11 +236,16 @@ export const useDelegate = () => {
     signingCosmWasmClient,
     valueToMove,
     selectedUnBonding,
+    refresh,
+    totalJmes,
+    totalBondedJmes,
   ]);
 
   return {
     ...transferForm,
     ...bondingState,
+    totalJmes,
+    totalBondedJmes,
     setBondingState,
     bondingIsValid,
     setTransferForm,
@@ -206,5 +263,6 @@ export const useDelegate = () => {
     unBondingsData,
     unBondingsError,
     isLoadingUnBondings,
+    onValueChange,
   };
 };
