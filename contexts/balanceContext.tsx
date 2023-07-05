@@ -17,12 +17,17 @@ type Balance = {
   unstaked: number;
   staked: number;
 };
+const emptyFN = () => {
+  throw new Error('Forgot to wrap your component with BalanceContextProvider');
+};
 type BalanceContextType = {
   balance: Balance | undefined;
+  refresh: () => void;
 };
 
 const initialState: BalanceContextType = {
   balance: undefined,
+  refresh: emptyFN,
 };
 
 const BalanceContext = createContext<BalanceContextType>(initialState);
@@ -61,8 +66,9 @@ const BalanceContextProvider = ({ children }: Props) => {
     setBalance(currBalance.data);
   }, [balance?.staked, balance?.unstaked, currBalance]);
 
-  const value = {
+  const value: BalanceContextType = {
     balance,
+    refresh: currBalance.refetch,
   };
   return (
     <BalanceContext.Provider value={value}>{children}</BalanceContext.Provider>
