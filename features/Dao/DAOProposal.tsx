@@ -49,14 +49,14 @@ const proposalTypesArr = Object.entries(proposalTypes) as [
 export const DAOProposalPage = ({
   daoOwner,
   setCreateDaoSelected,
-  selectedDao,
+  daoAddress,
   selectedDaoName,
 }: {
   daoOwner: { name: string; address: string; votingPower: number };
   // eslint-disable-next-line @typescript-eslint/ban-types
   setCreateDaoSelected: Function;
   identityName: string;
-  selectedDao: string;
+  daoAddress: string;
   selectedDaoName: string;
 }) => {
   const { address } = useIdentityContext();
@@ -98,9 +98,9 @@ export const DAOProposalPage = ({
     () =>
       new DaoMultisigQueryClient(
         cosmWasmClient as CosmWasmClient,
-        selectedDao as string,
+        daoAddress as string,
       ),
-    [cosmWasmClient, selectedDao],
+    [cosmWasmClient, daoAddress],
   );
 
   const daoMember = new DaoMembersClient(
@@ -143,10 +143,10 @@ export const DAOProposalPage = ({
           fontSize={28}
           fontFamily="DM Sans"
         >
-          Create Governance Proposal
+          Create DAO Proposal
         </Text>
       </Flex>
-      <BalanceDisplay address={selectedDao ?? ''} />
+      <BalanceDisplay address={daoAddress ?? ''} />
       <Flex flexGrow={1} width={'full'} height={'26px'} />
       <Flex flexGrow={1} width="full">
         <Box marginRight="44px">

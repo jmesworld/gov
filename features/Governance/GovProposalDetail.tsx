@@ -79,7 +79,7 @@ export default function GovProposalDetail({
     <>
       <Flex height={'47px'} />
       <ProposalHeader
-        daoName={'Governance Proposal'}
+        title="Governance Proposal"
         proposalTitle={data?.title ?? ''}
         proposalExpiry={expiryDateTimestamp}
       />

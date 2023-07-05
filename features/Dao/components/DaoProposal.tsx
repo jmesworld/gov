@@ -66,6 +66,7 @@ export default function DaoProposal({
           <Flex height={'10px'} />
           {data && (
             <ProposalList
+              daoName={daoName}
               totalSupply={supply as number}
               proposals={data?.proposals}
               isGov={false}

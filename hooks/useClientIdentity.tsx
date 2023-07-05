@@ -42,7 +42,6 @@ export const useClientIdentity = (): CosmWasmClientContext => {
       setSigningClient(signingCosmClient);
     } catch (error) {
       setError(error);
-      console.log({ error });
     } finally {
       setLoading(false);
     }

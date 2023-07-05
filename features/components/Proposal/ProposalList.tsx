@@ -3,24 +3,47 @@ import { Box, Flex, Progress, Text } from '@chakra-ui/react';
 import { MouseEventHandler } from 'react';
 import { calculateVotes } from '../../../lib/calculateVotes';
 import { ProposalProgress } from './ProposalProgress';
+import { useRouter } from 'next/router';
+
+type BaseProps = {
+  totalSupply: number;
+  proposals: any;
+  onClickListItem?: MouseEventHandler<HTMLDivElement>;
+  setSelectedDaoProposalTitle: Function;
+  setSelectedProposalId: Function;
+};
+type Props =
+  | (BaseProps & {
+      isGov: false;
+      daoAddress: string;
+      daoName: string;
+    })
+  | (BaseProps & {
+      isGov: true;
+      daoAddress?: undefined;
+      daoName?: undefined;
+    });
 
 export const ProposalList = ({
   proposals,
+  daoName,
   isGov,
-  daoAddress,
   onClickListItem,
   setSelectedDaoProposalTitle,
   setSelectedProposalId,
   totalSupply,
-}: {
-  totalSupply: number;
-  proposals: any;
-  isGov: boolean;
-  daoAddress?: string;
-  onClickListItem?: MouseEventHandler<HTMLDivElement>;
-  setSelectedDaoProposalTitle: Function;
-  setSelectedProposalId: Function;
-}) => {
+  ...rest
+}: Props) => {
+  const router = useRouter();
+
+  const navigateToProposal = (proposalId: string) => {
+    if (isGov) {
+      router.push(`/proposals/${proposalId}`);
+      return;
+    }
+    router.push(`/dao/view/${daoName}/proposals/${proposalId}`);
+  };
+
   if (!proposals || Array.from(proposals).length === 0) {
     return (
       <Flex justifyContent="center" width="100%">
@@ -71,6 +94,7 @@ export const ProposalList = ({
           totalCount={totalSupply}
           threshold={threshold}
           type={type}
+          navigateToProposal={navigateToProposal}
           pass={
             proposal.status === 'passed' ||
             proposal.status === 'success' ||
@@ -80,7 +104,7 @@ export const ProposalList = ({
               : 'No'
           }
           isGov={isGov}
-          daoAddress={daoAddress}
+          daoAddress={isGov ? undefined : rest.daoAddress}
           proposalId={proposal.id}
           onClickListItem={onClickListItem}
           setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
@@ -181,6 +205,7 @@ export const ProposalListItem = ({
   onClickListItem,
   setSelectedDaoProposalTitle,
   setSelectedDaoProposalId,
+  navigateToProposal,
 }: {
   title: string;
   threshold: number;
@@ -198,6 +223,7 @@ export const ProposalListItem = ({
   onClickListItem?: MouseEventHandler<HTMLDivElement>;
   setSelectedDaoProposalTitle: Function;
   setSelectedDaoProposalId: Function;
+  navigateToProposal: (proposalId: string) => void;
 }) => {
   return (
     <>
@@ -212,6 +238,7 @@ export const ProposalListItem = ({
           onClickListItem && onClickListItem(e);
           setSelectedDaoProposalTitle(title);
           setSelectedDaoProposalId(proposalId);
+          navigateToProposal(proposalId as string);
         }}
         cursor={'pointer'}
       >

@@ -595,7 +595,6 @@ const CreateDaoNewForm = ({
                 });
               })
               .catch(error => {
-                console.log('Err', error)
                 toast({
                   title: 'Dao creation error',
                   description: error.toString(),
