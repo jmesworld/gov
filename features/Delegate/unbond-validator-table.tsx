@@ -92,7 +92,8 @@ export const UnBondValidatorTable = ({
               lineHeight="20px"
               width="46%"
             >
-              {validator.description.moniker}
+              {/* {validator.description.moniker} */}
+              {validator.validator_address}
             </Text>
             <Text
               color="#fff"
@@ -102,12 +103,12 @@ export const UnBondValidatorTable = ({
               lineHeight="20px"
               width="46%"
             >
-              {validator.tokens.toString()}
+              {validator.balance.toString()}
             </Text>
-            {validator.description.website && (
+            {/* {validator.description.website && (
               <Box width="4%">
                 <a
-                  href={validator.description.website}
+                  // href={validator.description.website}
                   rel="noreferrer"
                   target="_blank"
                 >
@@ -120,7 +121,7 @@ export const UnBondValidatorTable = ({
                   />
                 </a>
               </Box>
-            )}
+            )} */}
           </Box>
         );
       })}
