@@ -47,7 +47,7 @@ const VotingPeriodContextProvider = ({ children }: Props) => {
   const { data } = useGovernancePeriodInfoQuery({
     client: governanceQueryClient ?? undefined,
     options: {
-      enabled: governanceQueryClient !== null, // The query will only run when governanceQueryClient is not null
+      enabled: false ||governanceQueryClient !== null, // The query will only run when governanceQueryClient is not null
       refetchInterval: 5000,
       cacheTime: 5000,
       staleTime: 5000,

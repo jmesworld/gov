@@ -9,7 +9,7 @@ const Header = () => {
   return (
     <Flex width={'100%'}>
       {!cosmWasmClient && <Spinner size="sm" />}
-      {cosmWasmClient && <PeriodInfo cosmWasmClient={cosmWasmClient} />}
+      {cosmWasmClient && <PeriodInfo />}
       <Spacer />
       <Wallet />
     </Flex>
