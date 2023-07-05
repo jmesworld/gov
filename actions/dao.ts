@@ -1,23 +1,13 @@
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { DaoMembersQueryClient } from '../client/DaoMembers.client';
 import { DaoMultisigQueryClient } from '../client/DaoMultisig.client';
 import { IdentityserviceQueryClient } from '../client/Identityservice.client';
-
-const LCD_URL = process.env.NEXT_PUBLIC_LCD_URL as string;
-const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
-const IDENTITY_SERVICE_CONTRACT = process.env
-  .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
-const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
-  .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 
 export async function getMyDaos(
   cosmWasmClient: CosmWasmClient,
   address: string,
-  identityService?: IdentityserviceQueryClient,
+  identityService: IdentityserviceQueryClient,
 ) {
-  const client: IdentityserviceQueryClient =
-    identityService ??
-    new IdentityserviceQueryClient(cosmWasmClient, IDENTITY_SERVICE_CONTRACT);
+  const client: IdentityserviceQueryClient = identityService;
 
   let myDaos: any = 'undefined';
 
@@ -45,10 +35,6 @@ export async function getMyDaos(
       const daoAddrs = _data[i][1];
 
       const daoMultisigQueryClient = new DaoMultisigQueryClient(
-        cosmWasmClient,
-        daoAddrs,
-      );
-      const daoMembersQueryClient = new DaoMembersQueryClient(
         cosmWasmClient,
         daoAddrs,
       );

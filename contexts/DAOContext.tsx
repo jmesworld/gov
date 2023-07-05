@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getMyDaos } from '../actions/dao';
 import { useIdentityContext } from './IdentityContext';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import { IdentityserviceQueryClient } from '../client/Identityservice.client';
 
 type Props = {
   children?: ReactNode;
@@ -47,12 +48,19 @@ const DAOContextProvider = ({ children }: Props) => {
     isLoading,
     isFetching,
   } = useQuery(
-    ['myDAOs'],
-    () =>
+    ['myDAOs', { address, identityServiceQueryClient, cosmWasmClient }] as [
+      string,
+      {
+        address: string;
+        identityServiceQueryClient: IdentityserviceQueryClient;
+        cosmWasmClient: CosmWasmClient;
+      },
+    ],
+    ({ queryKey }) =>
       getMyDaos(
-        cosmWasmClient as CosmWasmClient,
-        address as string,
-        identityServiceQueryClient,
+        queryKey[1].cosmWasmClient,
+        queryKey[1].address,
+        queryKey[1].identityServiceQueryClient,
       ) as Promise<DAO[] | undefined>,
     {
       refetchInterval: 5000,

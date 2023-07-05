@@ -29,9 +29,6 @@ const SigningCosmWasmClientContextProvider = ({ children }: Props) => {
   const [signingCosmWasmClient, setSigningCosmWasmClient] =
     useState<SigningCosmWasmClient | null>(null);
   useEffect(() => {
-    if (!getSigningCosmWasmClient || !address) {
-      return;
-    }
     async function assignSigningCosmWasmClient() {
       try {
         const client = await getSigningCosmWasmClient();
@@ -40,8 +37,10 @@ const SigningCosmWasmClientContextProvider = ({ children }: Props) => {
         console.error(err);
       }
     }
-    assignSigningCosmWasmClient();
-  }, [address, getSigningCosmWasmClient]);
+    if (address) assignSigningCosmWasmClient();
+    // getSigningCosmWasmClient is a function that changes on every render so we can see changes by address only
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address]);
 
   const value = {
     signingCosmWasmClient,
