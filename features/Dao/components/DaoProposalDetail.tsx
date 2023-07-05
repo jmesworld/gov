@@ -22,7 +22,6 @@ import { ProposalHeader } from '../../components/Proposal/ProposalHeader';
 import { ProposalMyVote } from '../../components/Proposal/ProposalMyVote';
 import { ProposalVoting } from '../../components/Proposal/ProposalVoting';
 import { useCosmWasmClientContext } from '../../../contexts/CosmWasmClient';
-import { useRouter } from 'next/router';
 
 type Props = {
   selectedDao: string;
@@ -38,7 +37,6 @@ export default function DaoProposalDetail({
   selectedDaoProposalId,
 }: Props) {
   const { address } = useChain(chainName);
-  const router = useRouter();
   const { cosmWasmClient } = useCosmWasmClientContext();
 
   const daoMultisigQueryClient = new DaoMultisigQueryClient(
@@ -99,30 +97,21 @@ export default function DaoProposalDetail({
     <>
       <Flex height={'47px'} />
       <ProposalHeader
+        title={selectedDaoName}
         daoName={selectedDaoName}
-        proposalTitle={selectedDaoProposalTitle}
+        proposalTitle={proposalDetailQuery?.data?.title ?? ''}
         proposalExpiry={expiryDateTimestamp}
       />
       {proposalDetailQuery.isLoading ||
-      (proposalDetailQuery.isFetching && !proposalDetailQuery?.data) ? (
-        <Center marginTop={'80px'}>
-          <CircularProgress isIndeterminate color="darkPurple" />
-        </Center>
-      ) : (
-        <Text mt={4} fontSize="lg">
-          No data
-        </Text>
-      )}
+        (proposalDetailQuery.isFetching && !proposalDetailQuery?.data && (
+          <Center marginTop={'80px'}>
+            <CircularProgress isIndeterminate color="darkPurple" />
+          </Center>
+        ))}
 
       {proposalDetailQuery.data && (
         <HStack spacing="54px" align="flex-start">
-          <Box
-            flexGrow={1}
-            cursor="pointer"
-            onClick={() => {
-              router.push(`/proposals/${selectedDaoProposalId}`);
-            }}
-          >
+          <Box flexGrow={1} cursor="pointer">
             <ProposalVoting
               yesPercentage={yesPercentage}
               target={target * 100}

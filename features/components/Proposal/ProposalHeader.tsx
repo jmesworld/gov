@@ -2,11 +2,13 @@ import { Flex, HStack, Text, Tooltip, Image, Box } from '@chakra-ui/react';
 import { Link } from '../genial/Link';
 
 export const ProposalHeader = ({
+  title,
   daoName,
   proposalTitle,
   proposalExpiry,
 }: {
-  daoName: string;
+  title?: string;
+  daoName?: string;
   proposalTitle: string;
   proposalExpiry: number;
 }) => {
@@ -18,9 +20,9 @@ export const ProposalHeader = ({
         fontWeight="medium"
         fontSize={28}
       >
-        <Link href="/">
+        <Link href={daoName ? `/dao/view/${daoName}` : '/'}>
           <Text decoration="underline" display="inline-block" cursor="pointer">
-            {daoName}
+            {title}
           </Text>
         </Link>
         &nbsp;&#x2022;&nbsp;

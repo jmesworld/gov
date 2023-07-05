@@ -11,8 +11,8 @@ const DAOProposal = () => {
   return (
     <DAOProposalPage
       identityName={getIdentityName() as string}
-      selectedDao={selectedDAO?.address}
-      selectedDaoName={selectedDAO?.name}
+      daoAddress={selectedDAO.address}
+      selectedDaoName={selectedDAO.name}
       daoOwner={{
         address: address as string,
         name: getIdentityName() as string,

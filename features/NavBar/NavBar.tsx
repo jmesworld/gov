@@ -6,7 +6,6 @@ import { NavBarItem } from './NavBarItem';
 import { NavBarButton } from './NavBarButton';
 import { Link } from '../components/genial/Link';
 import { useRouter } from 'next/router';
-import { useAppState } from '../../contexts/AppStateContext';
 import { useDAOContext } from '../../contexts/DAOContext';
 const MyDaoList = dynamic(() => import('../Dao/MyDaoList'));
 
@@ -109,7 +108,7 @@ const NavBar = ({
         />
       </Link>
       <Spacer />
-      <Link href="/dao/proposal">
+      <Link href="/dao/proposals">
         <NavBarButton
           width="180px"
           height="48px"
