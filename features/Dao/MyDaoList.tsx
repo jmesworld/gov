@@ -75,7 +75,7 @@ const MyDaoList = () => {
 
 const DAOListWrapper = () => {
   return (
-    <Flex flexDirection="column" height={'50%'}>
+    <Flex flexDirection="column" maxH={'50%'} overflowY="auto">
       <MyDaoList />
     </Flex>
   );
