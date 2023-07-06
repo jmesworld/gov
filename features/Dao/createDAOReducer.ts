@@ -6,7 +6,7 @@ export type Member = {
   votingPower?: number;
 };
 
-type State = {
+export type State = {
   ownerId: string;
   members: Record<string, Member>;
   daoNameError?: string;
@@ -41,6 +41,10 @@ type Actions =
   | {
       type: 'SET_OWNER_ID';
       payload: string;
+    }
+  | {
+      type: 'RESET';
+      payload: State;
     };
 
 export function Reducer(state: State, action: Actions): State {
@@ -95,6 +99,8 @@ export function Reducer(state: State, action: Actions): State {
         ...state,
         ownerId: action.payload,
       };
+    case 'RESET':
+      return action.payload;
     default:
       throw new Error('Action not found');
   }
