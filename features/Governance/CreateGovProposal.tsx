@@ -26,7 +26,6 @@ import * as Governance from '../../client/Governance.types';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 import { useIdentityContext } from '../../contexts/IdentityContext';
 import { useLeaveConfirm } from '../../hooks/useLeaveConfirm';
-import { isDirty } from 'zod';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -65,6 +64,7 @@ export default function CreateGovProposal({
   const { address } = useIdentityContext();
 
   const toast = useToast();
+
   const [selectedProposalType, setSelectedProposalType] =
     useState<ProposalTypes>(allowedProposalTypes[0]);
   const [proposalTitle, setProposalTitle] = useState('');
@@ -95,7 +95,8 @@ export default function CreateGovProposal({
       fundingAmount ||
       fundingPeriod !== default_funding_duration ||
       isCreatingGovProposal ||
-      revokeProposalId !== -1
+      revokeProposalId !== -1 ||
+      numberOfNFTToMint !== 0
     );
   }, [
     fundingAmount,
@@ -106,7 +107,20 @@ export default function CreateGovProposal({
     proposalTitle,
     revokeProposalId,
     slotType,
+    numberOfNFTToMint,
   ]);
+
+  const restForm = () => {
+    setProposalTitle('');
+    setProposalDescription('');
+    setSlotType('brand');
+    setFundingNeeded(false);
+    setFundingAmount(0);
+    setFundingPeriod(default_funding_duration);
+    setCreatingGovProposal(false);
+    setRevokeId(-1);
+    setNumberOfNFTToMint(0);
+  };
 
   useLeaveConfirm({
     preventNavigatingAway: !!isDirty,
@@ -119,7 +133,7 @@ export default function CreateGovProposal({
     selectedProposalType === 'text' ||
     selectedProposalType === 'core-slot' ||
     selectedProposalType === 'feature-request';
-  const isImproventRequired = selectedProposalType === 'improvement';
+  const isImprovementRequired = selectedProposalType === 'improvement';
 
   const createGovProposalMutation = useDaoMultisigProposeMutation();
 
@@ -240,7 +254,7 @@ export default function CreateGovProposal({
           ) : (
             ''
           )}
-          {isImproventRequired ? (
+          {isImprovementRequired ? (
             <Box marginTop={'10px'} width={'872px'}>
               <Divider
                 width={'872px'}
@@ -570,6 +584,7 @@ export default function CreateGovProposal({
                       },
                     });
                     setCreateGovProposalSelected(false);
+                    restForm();
                   })
                   .catch(error => {
                     toast({

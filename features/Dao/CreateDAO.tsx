@@ -31,7 +31,7 @@ import { useIdentityserviceRegisterDaoMutation } from '../../client/Identityserv
 import { StdFee } from '@cosmjs/amino';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
-import { Reducer } from './createDAOReducer';
+import { Reducer, State } from './createDAOReducer';
 import { v4 as uuid } from 'uuid';
 import { Member } from './components/DaoMember';
 import { z } from 'zod';
@@ -45,7 +45,12 @@ const fee: StdFee = {
   gas: '10000000',
 };
 
-const DEFAULT_DAO_THRESHOLD = 100; // 100% threshold by default
+const initialState: State = {
+  members: {},
+  ownerId: '',
+  daoName: '',
+  threshold: 0,
+};
 
 const CreateDaoNewForm = ({
   setCreateDaoSelected,
@@ -60,12 +65,7 @@ const CreateDaoNewForm = ({
   const { cosmWasmClient } = useCosmWasmClientContext();
   const toast = useToast();
   const [{ daoName, threshold, ownerId, members, daoNameError }, dispatch] =
-    useReducer(Reducer, {
-      members: {},
-      ownerId: '',
-      daoName: '',
-      threshold: 0,
-    });
+    useReducer(Reducer, initialState);
 
   const isDirty = useMemo(() => {
     return (
@@ -593,6 +593,10 @@ const CreateDaoNewForm = ({
                     borderRadius: 12,
                   },
                 });
+                dispatch({
+                  type: 'RESET',
+                  payload: initialState,
+                });
               })
               .catch(error => {
                 toast({
@@ -607,7 +611,9 @@ const CreateDaoNewForm = ({
                   },
                 });
               })
-              .finally(() => setIsCreatingDao(false));
+              .finally(() => {
+                setIsCreatingDao(false);
+              });
           }}
           backgroundColor={'green'}
           borderRadius={90}

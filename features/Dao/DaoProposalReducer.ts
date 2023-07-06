@@ -67,6 +67,10 @@ export type Actions =
   | {
       type: 'REMOVE_SPEND';
       payload: string;
+    }
+  | {
+      type: 'RESET';
+      payload: State;
     };
 
 export function DAOProposalReducer(state: State, action: Actions): State {
@@ -184,6 +188,8 @@ export function DAOProposalReducer(state: State, action: Actions): State {
         },
       };
     }
+    case 'RESET':
+      return action.payload;
     default:
       throw new Error('Action not found');
   }

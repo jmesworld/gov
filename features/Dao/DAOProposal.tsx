@@ -32,6 +32,7 @@ import { DaoMembersClient } from '../../client/DaoMembers.client';
 import { validateForm } from './Proposal/libs/checkIfFormValid';
 import { getRequest } from './Proposal/libs/getRequest';
 import { useDaoMultisigProposeMutation } from '../../client/DaoMultisig.react-query';
+import { useLeaveConfirm } from '../../hooks/useLeaveConfirm';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -46,6 +47,28 @@ const proposalTypesArr = Object.entries(proposalTypes) as [
   ProposalTypes,
   string,
 ][];
+
+const initialState = {
+  ownerId: '',
+  title: {
+    value: '',
+    error: '',
+  },
+  description: {
+    value: '',
+    error: '',
+  },
+  threshold: {
+    value: '0',
+    error: '',
+  },
+  members: {},
+  spends: {},
+  balance: {
+    jmes: '',
+  },
+};
+
 export const DAOProposalPage = ({
   daoOwner,
   setCreateDaoSelected,
@@ -67,32 +90,33 @@ export const DAOProposalPage = ({
   const { signingCosmWasmClient: signingClient } =
     useSigningCosmWasmClientContext();
   const [activeTab, setActiveTab] = useState<ProposalTypes>('text');
-  const [state, dispatch] = useReducer(DAOProposalReducer, {
-    ownerId: '',
-    title: {
-      value: '',
-      error: '',
-    },
-    description: {
-      value: '',
-      error: '',
-    },
-    threshold: {
-      value: '0',
-      error: '',
-    },
-    members: {},
-    spends: {},
-    balance: {
-      jmes: '',
-    },
-  });
+  const [state, dispatch] = useReducer(DAOProposalReducer, initialState);
   const { title, description } = state;
 
   const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
     cosmWasmClient as CosmWasmClient,
     IDENTITY_SERVICE_CONTRACT,
   );
+
+  const isDirty = useMemo(() => {
+    const { title, description, members, spends } = state;
+    if (title.value || description.value) {
+      return true;
+    }
+    if (Object.values(members).some(el => el.isRemoved || !el.og)) {
+      return true;
+    }
+    if (
+      Object.values(spends).length <= 1 &&
+      Object.values(spends).some(el => el.amount || el.address)
+    ) {
+      return true;
+    }
+  }, [state]);
+
+  useLeaveConfirm({
+    preventNavigatingAway: !!isDirty,
+  });
 
   const daoMultisigQueryClient = useMemo(
     () =>
@@ -254,6 +278,10 @@ export const DAOProposalPage = ({
                 }
                 toast({
                   title: 'Created Dao Proposal',
+                });
+                dispatch({
+                  type: 'RESET',
+                  payload: initialState,
                 });
               } catch (err) {
                 if (err instanceof Error) {
