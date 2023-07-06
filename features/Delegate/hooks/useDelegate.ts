@@ -198,7 +198,7 @@ export const useDelegate = () => {
         await signingCosmWasmClient?.undelegateTokens(
           address,
           selectedUnBonding,
-          coin(valueToMove * 1e6, BJMES_DENOM),
+          coin(valueToMove * 1e6, JMES_DENOM),
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           /// @ts-ignore ( Issue with different type)
           'auto',
