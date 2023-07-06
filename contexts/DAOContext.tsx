@@ -1,4 +1,11 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useCosmWasmClientContext } from './CosmWasmClient';
 import { useQuery } from '@tanstack/react-query';
 import { getMyDaos } from '../actions/dao';
@@ -14,6 +21,7 @@ const emptyFN = () => {
   throw new Error('Forgot to wrap your component with IdentityContextProvider');
 };
 
+type AfterCreateType = 'afterCreate' | 'loadedAfterCreate' | '';
 type DAO = {
   address: string;
   name: string;
@@ -25,6 +33,10 @@ type DAOContextType = {
   getSelectedDAOByName: (name: string | null) => DAO | undefined;
   setSelectedDAOByAddress: (address: string) => void;
   loading: boolean;
+  refetch: () => void;
+  afterCreate: AfterCreateType;
+  setAfterCreate: (type: AfterCreateType) => void;
+  firstLoad: boolean;
 };
 
 const initialState: DAOContextType = {
@@ -34,11 +46,17 @@ const initialState: DAOContextType = {
   setSelectedDAOByAddress: emptyFN,
   loading: false,
   getSelectedDAOByName: emptyFN,
+  refetch: emptyFN,
+  setAfterCreate: emptyFN,
+  afterCreate: '',
+  firstLoad: true,
 };
 
 const DAOContext = createContext<DAOContextType>(initialState);
 
 const DAOContextProvider = ({ children }: Props) => {
+  const [firstLoad, setFirstLoad] = useState(true);
+  const [afterCreate, setAfterCreate] = useState<AfterCreateType>('');
   const [selectedDAO, setSelectedDAO] = useState<DAO | null>(null);
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { address, identityServiceQueryClient } = useIdentityContext();
@@ -47,6 +65,7 @@ const DAOContextProvider = ({ children }: Props) => {
     data: DAOs,
     isLoading,
     isFetching,
+    refetch,
   } = useQuery(
     ['myDAOs', { address, identityServiceQueryClient, cosmWasmClient }] as [
       string,
@@ -67,6 +86,23 @@ const DAOContextProvider = ({ children }: Props) => {
       enabled: !!(cosmWasmClient && address),
     },
   );
+  const loading = useMemo(
+    () => isFetching || isLoading,
+    [isFetching, isLoading],
+  );
+  useEffect(() => {
+    if (afterCreate === 'afterCreate' && !loading) {
+      setAfterCreate('loadedAfterCreate');
+      refetch();
+    }
+    if (afterCreate === 'loadedAfterCreate' && !loading) {
+      setAfterCreate('');
+    }
+  }, [afterCreate, loading, refetch]);
+
+  useEffect(() => {
+    if (DAOs !== undefined && firstLoad) setFirstLoad(false);
+  }, [DAOs]);
 
   const setSelectedDAOByName = (name: string | null) => {
     if (name === null) {
@@ -95,12 +131,16 @@ const DAOContextProvider = ({ children }: Props) => {
   };
 
   const value = {
+    firstLoad,
     daos: DAOs ?? [],
     selectedDAO,
     setSelectedDAOByAddress,
     setSelectedDAOByName,
-    loading: isLoading || isFetching,
+    loading,
     getSelectedDAOByName,
+    refetch,
+    afterCreate,
+    setAfterCreate,
   };
   return <DAOContext.Provider value={value}>{children}</DAOContext.Provider>;
 };

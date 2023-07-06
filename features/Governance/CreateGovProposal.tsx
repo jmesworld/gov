@@ -26,6 +26,7 @@ import * as Governance from '../../client/Governance.types';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 import { useIdentityContext } from '../../contexts/IdentityContext';
 import { useLeaveConfirm } from '../../hooks/useLeaveConfirm';
+import { useRouter } from 'next/router';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -62,7 +63,7 @@ export default function CreateGovProposal({
   setCreateGovProposalSelected: Function;
 }) {
   const { address } = useIdentityContext();
-
+  const router = useRouter();
   const toast = useToast();
 
   const [selectedProposalType, setSelectedProposalType] =
@@ -94,7 +95,7 @@ export default function CreateGovProposal({
       isFundingNeeded ||
       fundingAmount ||
       fundingPeriod !== default_funding_duration ||
-      isCreatingGovProposal ||
+      !isCreatingGovProposal ||
       revokeProposalId !== -1 ||
       numberOfNFTToMint !== 0
     );
@@ -123,7 +124,7 @@ export default function CreateGovProposal({
   };
 
   useLeaveConfirm({
-    preventNavigatingAway: !!isDirty,
+    preventNavigatingAway: !isDirty,
   });
 
   // Dynamically show required sections for different proposal types
@@ -571,7 +572,13 @@ export default function CreateGovProposal({
                       funds: [{ amount: '10000000', denom: 'ujmes' }],
                     },
                   })
-                  .then(() => {
+                  .then(result => {
+                    const id = result.events
+                      .find(e => e.type === 'wasm')
+                      ?.attributes.find(el => el.key === 'proposal_id')?.value;
+                    if (!id) {
+                      throw new Error('Proposal id not found');
+                    }
                     toast({
                       title: 'Proposal created.',
                       description: "We've created your Proposal.",
@@ -583,8 +590,8 @@ export default function CreateGovProposal({
                         borderRadius: 12,
                       },
                     });
-                    setCreateGovProposalSelected(false);
                     restForm();
+                    router.push(`/dao/view/${selectedDaoName}/proposals/${id}`);
                   })
                   .catch(error => {
                     toast({

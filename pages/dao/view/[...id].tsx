@@ -1,12 +1,13 @@
 import { useRouter } from 'next/router';
-import { Text } from '@chakra-ui/react';
+import { Flex, Spinner, Text } from '@chakra-ui/react';
 import { useAppState } from '../../../contexts/AppStateContext';
 import DaoProposal from '../../../features/Dao/components/DaoProposal';
 import { useDAOContext } from '../../../contexts/DAOContext';
 import DaoProposalDetail from '../../../features/Dao/components/DaoProposalDetail';
 
 const DAODetail = () => {
-  const { getSelectedDAOByName, selectedDAO } = useDAOContext();
+  const { getSelectedDAOByName, afterCreate, selectedDAO, firstLoad } =
+    useDAOContext();
 
   const {
     setSelectedDaoProposalTitle,
@@ -16,13 +17,14 @@ const DAODetail = () => {
   } = useAppState();
   const router = useRouter();
   const id = router.query.id;
+  const daoName = id?.[0];
+  const proposalKey = id?.[1];
+  const proposalId = id?.[2];
+
   if (!id) {
     return <Text> DAO Not found</Text>;
   }
   if (Array.isArray(id) && id.length > 2) {
-    const daoName = id[0];
-    const proposalKey = id[1];
-    const proposalId = id[2];
     if (proposalKey === 'proposals' && selectedDAO && daoName && proposalId) {
       return (
         <DaoProposalDetail
@@ -36,10 +38,17 @@ const DAODetail = () => {
   }
 
   if (Array.isArray(id) && id.length === 1) {
-    const doaName = id[0];
-    const selectedDAO = getSelectedDAOByName(doaName);
+    const selectedDAO = getSelectedDAOByName(daoName ?? null);
+    if ((afterCreate !== '' && !selectedDAO) || firstLoad) {
+      return (
+        <Flex alignItems="center">
+          <Spinner size="sm" mr="2" />
+          <Text>Loading DAO ...</Text>
+        </Flex>
+      );
+    }
     if (!selectedDAO) {
-      return <Text> DAO Not found</Text>;
+      return <Text> DAO Not Found !</Text>;
     }
 
     return (
