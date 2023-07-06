@@ -43,7 +43,7 @@ const getBondedValidators = ({
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, address] = queryKey;
-  return client.providers.LCDC.staking.delegations(address as string);
+  return client.providers.LCDC.staking.bondedValidators(address as string);
 };
 
 const getUnBondings = ({
@@ -109,12 +109,7 @@ export const useValidators = (client: Client) => {
     isFetching: isFetchingBondedValidators,
   } = useQuery({
     queryKey: ['bondedValidators', address as string],
-    queryFn: ({ queryKey }) =>
-      getBondedValidators({ queryKey, client }).then(r => {
-        console.log('getBondedValidators : r>> ', r);
-        console.log('getBondedValidators tokens : r>> ', r[0].status);
-        return r;
-      }),
+    queryFn: ({ queryKey }) => getBondedValidators({ queryKey, client }),
     retry: 3,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
