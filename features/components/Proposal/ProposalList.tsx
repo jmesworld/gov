@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { Box, Flex, Progress, Text } from '@chakra-ui/react';
 import { MouseEventHandler } from 'react';
-import { calculateVotes } from '../../../lib/calculateVotes';
 import { ProposalProgress } from './ProposalProgress';
 import { useRouter } from 'next/router';
 
@@ -63,18 +62,10 @@ export const ProposalList = ({
     );
   } else {
     const proposalItems = proposals.map((proposal: any) => {
-      const {
-        coinYes,
-        coinNo,
-        threshold,
-        noPercentage,
-        yesPercentage,
-        thresholdPercent,
-      } = calculateVotes({
-        coin_no: proposal.coins_no,
-        coin_Yes: proposal.coins_yes,
-        totalSupply,
-      });
+      const threshold = proposal.threshold.absolute_count;
+      const target = threshold ? threshold.weight : 0;
+      const yesPercentage = threshold ? threshold.total_weight : 0;
+      const noPercentage = 100 - yesPercentage;
 
       const propType = isGov
         ? JSON.stringify(proposal.prop_type).split(':')[0].slice(2)
@@ -86,13 +77,13 @@ export const ProposalList = ({
         <ProposalListItem
           key={proposal.id + proposal.description}
           title={proposal.title}
-          yesCount={coinYes}
-          thresholdPercent={thresholdPercent}
-          noCount={coinNo}
+          yesCount={yesPercentage}
+          thresholdPercent={target}
+          noCount={noPercentage}
           yesPercent={yesPercentage}
           noPercent={noPercentage}
           totalCount={totalSupply}
-          threshold={threshold}
+          threshold={target}
           type={type}
           navigateToProposal={navigateToProposal}
           pass={

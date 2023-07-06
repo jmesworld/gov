@@ -2,6 +2,7 @@ import { Text, Box, Spinner, Alert } from '@chakra-ui/react';
 import { Core } from 'jmes';
 
 interface ValidatorProps {
+  validatorsMap: Map<string, Core.Validator> | null;
   validatorsData?: Core.Delegation[];
   selectedValidator: string | null;
   onSelectValidator: (id: string | null) => void;
@@ -11,6 +12,7 @@ interface ValidatorProps {
 
 export const UnBondValidatorTable = ({
   validatorsData,
+  validatorsMap,
   onSelectValidator,
   selectedValidator,
   error,
@@ -93,7 +95,8 @@ export const UnBondValidatorTable = ({
               width="46%"
             >
               {/* {validator.description.moniker} */}
-              {validator.validator_address}
+              {validatorsMap?.get(validator.validator_address)?.description
+                ?.moniker ?? validator.validator_address}
             </Text>
             <Text
               color="#fff"

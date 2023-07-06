@@ -44,7 +44,7 @@ const CoinSupplyContextProvider = ({ children }: Props) => {
           return;
         }
         const totalSupply = amount - 100000000000000;
-        setCoinSupply(totalSupply);
+        setCoinSupply(totalSupply / Math.pow(10, 6));
       })
       .catch(err => {
         console.error(err);

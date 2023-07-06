@@ -41,6 +41,7 @@ export const Delegate = ({ onClose }: Props) => {
   const {
     toggleBonding,
     onChangeSlider,
+    validatorsMap,
     sliderValue,
     bonding,
     totalBondedJmes,
@@ -286,6 +287,7 @@ export const Delegate = ({ onClose }: Props) => {
                 </Flex>
                 <Box marginTop="75px">
                   <Slider
+                    focusThumbOnChange={false}
                     value={sliderValue}
                     isDisabled={delegatingToken}
                     defaultValue={sliderValue}
@@ -525,6 +527,7 @@ export const Delegate = ({ onClose }: Props) => {
                       )}
                       {!bonding && (
                         <UnBondValidatorTable
+                          validatorsMap={validatorsMap}
                           error={bondedValidatorsError as Error | undefined}
                           selectedValidator={selectedUnBonding}
                           loading={isBondedValidatorsLoading}

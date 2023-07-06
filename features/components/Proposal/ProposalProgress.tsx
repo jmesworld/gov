@@ -40,32 +40,6 @@ export const ProposalProgress = ({
           fontSize={14}
           fontFamily="DM Sans"
           textTransform="uppercase"
-          opacity={yesPercent > noPercent ? '0.5' : '1'}
-          width={'58px'}
-          textAlign={'left'}
-        >
-          No {formatBalance(noCount)}
-        </Text>
-        <Progress
-          value={noPercent}
-          backgroundColor={'#5136C2'}
-          width={'calc(100% - 56px)'}
-          height={'10px'}
-          borderRadius={'10px'}
-          variant={'red'}
-        />
-      </Flex>
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Text
-          color="white"
-          fontWeight="normal"
-          fontSize={14}
-          fontFamily="DM Sans"
-          textTransform="uppercase"
           opacity={yesPercent > noPercent ? '1' : '0.5'}
           width={'58px'}
           textAlign={'left'}
@@ -79,6 +53,32 @@ export const ProposalProgress = ({
           height={'10px'}
           borderRadius={'10px'}
           variant={'green'}
+        />
+      </Flex>
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
+        <Text
+          color="white"
+          fontWeight="normal"
+          fontSize={14}
+          fontFamily="DM Sans"
+          textTransform="uppercase"
+          opacity={yesPercent > noPercent ? '0.5' : '1'}
+          width={'58px'}
+          textAlign={'left'}
+        >
+          No {formatBalance(noCount)}
+        </Text>
+        <Progress
+          value={noPercent}
+          backgroundColor={'#5136C2'}
+          width={'calc(100% - 56px)'}
+          height={'10px'}
+          borderRadius={'10px'}
+          variant={'red'}
         />
       </Flex>
       <Box

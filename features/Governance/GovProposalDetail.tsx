@@ -137,7 +137,7 @@ export default function GovProposalDetail({
                   pos="absolute"
                 >
                   <Text fontSize="xl" textAlign="center">
-                    Please wait until the posting period concludes.
+                    Please wait until the voting starts.
                   </Text>
                   <Text textAlign="center">{nextPeriodTimeLeft}</Text>
                 </Box>

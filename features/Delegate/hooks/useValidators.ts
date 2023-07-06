@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Client } from 'jmes';
 import { Validator } from '../types';
 import { useQuery } from '@tanstack/react-query';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
-
+import { client } from '../../../contexts/validatorsContext';
 type Pagination = {
   total: number | null;
   limit: number;
@@ -17,9 +17,8 @@ const getUniquePage = (limit: number, offest: number) => {
   });
 };
 
-const getValidators = ({
+const getBondValidators = ({
   queryKey,
-  client,
 }: {
   queryKey: (string | number)[];
   client: Client;
@@ -34,25 +33,17 @@ const getValidators = ({
   });
 };
 
-const getBondedValidators = ({
+const getUnBondValidators = ({
   queryKey,
-  client,
 }: {
   queryKey: (string | number)[];
-  client: Client;
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, address] = queryKey;
   return client.providers.LCDC.staking.delegations(address as string);
 };
 
-const getUnBondings = ({
-  queryKey,
-  client,
-}: {
-  client: Client;
-  queryKey: (string | number)[];
-}) => {
+const getMyUnBondings = ({ queryKey }: { queryKey: (string | number)[] }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, address] = queryKey;
 
@@ -66,18 +57,18 @@ export const useValidators = (client: Client) => {
     offset: 0,
     total: null,
   });
-  const [validatorList, setValidatorList] = useState<
+  const [bondValidatorList, setBondValidatorList] = useState<
     Record<string, Validator[]>
   >({});
 
   const {
-    isFetching: isFetchingUnBondings,
-    isLoading: isLoadingUnBondings,
-    error: unBondingsError,
-    data: unBondingsData,
+    isFetching: isFetchingMyUnBondings,
+    isLoading: isLoadingMyUnBondings,
+    error: myUnBondingsError,
+    data: myUnBondingsData,
   } = useQuery({
-    queryKey: ['unBondings', address as string],
-    queryFn: ({ queryKey }) => getUnBondings({ queryKey, client }),
+    queryKey: ['myUnBondings', address as string],
+    queryFn: ({ queryKey }) => getMyUnBondings({ queryKey }),
     retry: 3,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
@@ -85,15 +76,14 @@ export const useValidators = (client: Client) => {
       console.error('Error:', err);
     },
   });
-
   const {
-    isFetching: isFetchingValidators,
-    isLoading: isLoadingValidators,
-    error: validatorsError,
-    data: validatorsData,
+    isFetching: isFetchingBondValidators,
+    isLoading: isLoadingBondValidators,
+    error: bondValidatorsError,
+    data: bondValidatorsData,
   } = useQuery({
-    queryKey: ['validators', pagination.limit, pagination.offset],
-    queryFn: ({ queryKey }) => getValidators({ queryKey, client }),
+    queryKey: ['bondingValidators', pagination.limit, pagination.offset],
+    queryFn: ({ queryKey }) => getBondValidators({ queryKey, client }),
     retry: 3,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
@@ -101,16 +91,15 @@ export const useValidators = (client: Client) => {
       console.error('Error:', err);
     },
   });
-
   const {
-    data: bondedValidators,
-    error: bondedValidatorsError,
-    isLoading: isLoadingBondedValidators,
-    isFetching: isFetchingBondedValidators,
+    data: unBondValidators,
+    error: unBondedValidatorsError,
+    isLoading: isLoadingUnBondValidators,
+    isFetching: isFetchingUnBondValidators,
   } = useQuery({
-    queryKey: ['bondedValidators', address as string],
+    queryKey: ['unBondValidators', address as string],
     queryFn: ({ queryKey }) =>
-      getBondedValidators({ queryKey, client }).then(r => {
+      getUnBondValidators({ queryKey }).then(r => {
         return r;
       }),
     retry: 3,
@@ -120,17 +109,17 @@ export const useValidators = (client: Client) => {
       console.error('Error:', err);
     },
   });
-
   useEffect(() => {
-    if (validatorsData?.[0]) {
-      setValidatorList(p => ({
+    if (bondValidatorsData?.[0]) {
+      setBondValidatorList(p => ({
         ...p,
-        [getUniquePage(pagination.limit, pagination.offset)]: validatorsData[0],
+        [getUniquePage(pagination.limit, pagination.offset)]:
+          bondValidatorsData[0],
       }));
     }
-    if (validatorsData?.[1]) {
+    if (bondValidatorsData?.[1]) {
       setPagination(p => {
-        const total = validatorsData[1].total ?? p.total;
+        const total = bondValidatorsData[1].total ?? p.total;
         return {
           ...p,
           total,
@@ -138,18 +127,22 @@ export const useValidators = (client: Client) => {
         };
       });
     }
-  }, [pagination.limit, pagination.offset, validatorList, validatorsData]);
+  }, [pagination.limit, pagination.offset, bondValidatorsData]);
 
+  const bondList = useMemo(() => {
+    return Object.values(bondValidatorList).flat();
+  }, [bondValidatorList]);
   return {
-    unBondingsData: unBondingsData?.[0],
-    unBondingsError,
-    isLoadingUnBondings: isFetchingUnBondings || isLoadingUnBondings,
-    validatorsError,
-    bondedValidatorsError,
-    bondedValidators: bondedValidators?.[0],
-    isBondedValidatorsLoading:
-      isFetchingBondedValidators || isLoadingBondedValidators,
-    isValidatorsLoading: isFetchingValidators || isLoadingValidators,
-    validatorList: Object.values(validatorList).flat(),
+    myUnBondings: myUnBondingsData?.[0],
+    myUnBondingsError,
+    isLoadingMyUnBondings: isFetchingMyUnBondings || isLoadingMyUnBondings,
+    bondValidatorsError,
+    unBondedValidatorsError,
+    unBondValidators: unBondValidators?.[0],
+    isLoadingUnBondValidators:
+      isFetchingUnBondValidators || isLoadingUnBondValidators,
+    isLoadingBondValidators:
+      isFetchingBondValidators || isLoadingBondValidators,
+    bondValidators: bondList,
   };
 };

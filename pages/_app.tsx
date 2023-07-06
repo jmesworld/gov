@@ -31,6 +31,7 @@ import { GasPrice } from '@cosmjs/stargate';
 import { DelegateContextProvider } from '../contexts/DelegateContext';
 import { ErrorBoundary } from '../error/errorBondary';
 import { VotingPeriodContextProvider } from '../contexts/VotingPeriodContext';
+import { ValidatorContextProvider } from '../contexts/validatorsContext';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   Layout?: ({ children }: { children: ReactElement }) => ReactElement;
@@ -79,16 +80,18 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
                   <DAOContextProvider>
                     <AppStateProvider>
                       <SigningCosmWasmClientContextProvider>
-                        <DelegateContextProvider>
-                          <VotingPeriodContextProvider>
-                            <Layout>
-                              <ErrorBoundary>
-                                <Component {...pageProps} />
-                                <OnboardingModal />
-                              </ErrorBoundary>
-                            </Layout>
-                          </VotingPeriodContextProvider>
-                        </DelegateContextProvider>
+                        <ValidatorContextProvider>
+                          <DelegateContextProvider>
+                            <VotingPeriodContextProvider>
+                              <Layout>
+                                <ErrorBoundary>
+                                  <Component {...pageProps} />
+                                  <OnboardingModal />
+                                </ErrorBoundary>
+                              </Layout>
+                            </VotingPeriodContextProvider>
+                          </DelegateContextProvider>
+                        </ValidatorContextProvider>
                       </SigningCosmWasmClientContextProvider>
                     </AppStateProvider>
                   </DAOContextProvider>

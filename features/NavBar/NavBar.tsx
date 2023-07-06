@@ -36,7 +36,6 @@ const NavBar = ({
 }: NavBarProps) => {
   const router = useRouter();
   const { selectedDAO, afterCreate } = useDAOContext();
-  console.log('after craet', afterCreate);
   return (
     <VStack
       width={'200px'}
