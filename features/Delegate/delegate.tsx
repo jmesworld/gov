@@ -22,7 +22,6 @@ import {
   TabPanel,
   TabIndicator,
   Spinner,
-  Input,
 } from '@chakra-ui/react';
 import { useMemo, useState } from 'react';
 
@@ -43,8 +42,7 @@ export const Delegate = ({ onClose }: Props) => {
     onChangeSlider,
     sliderValue,
     bonding,
-    totalBondedJmes,
-    totalJmes,
+    bJmesValue,
     jmesValue,
     selectedValidator,
     validatorList,
@@ -62,7 +60,6 @@ export const Delegate = ({ onClose }: Props) => {
     unBondingsData,
     unBondingsError,
     isLoadingUnBondings,
-    onValueChange,
   } = useDelegate();
 
   const delegateButtonEnabled = useMemo(() => {
@@ -110,12 +107,12 @@ export const Delegate = ({ onClose }: Props) => {
                   fontSize={28}
                   lineHeight="39.2px"
                   marginTop="29px"
-                  marginBottom="29px"
+                  marginBottom="44px"
                   textAlign="center"
                 >
                   Delegation
                 </Text>
-                <Flex alignItems="flex-start" justifyContent="space-between">
+                <Flex alignItems="center" justifyContent="space-between">
                   <Box>
                     <Text
                       color="lilac"
@@ -134,12 +131,6 @@ export const Delegate = ({ onClose }: Props) => {
                       borderRadius={12}
                       background="darkPurple"
                       paddingTop="9px"
-                      mx="auto"
-                      pb="2"
-                      display="flex"
-                      flexDir="column"
-                      justifyContent="center"
-                      alignContent="center"
                     >
                       <Text
                         color="white"
@@ -151,23 +142,19 @@ export const Delegate = ({ onClose }: Props) => {
                       >
                         JMES balance
                       </Text>
-                      <Input
-                        readOnly
-                        bg="transparent"
+                      <Text
                         color="white"
-                        value={jmesValue}
                         fontFamily={'DM Sans'}
                         fontWeight="700"
                         fontSize={28}
-                        mx="auto"
-                        width={'90%'}
-                        border={0}
                         lineHeight="39.2px"
                         textAlign="center"
-                      />
+                      >
+                        {jmesValue}
+                      </Text>
                     </Box>
                   </Box>
-                  <Box marginTop="44px">
+                  <Box marginTop="34px">
                     <Tooltip
                       label={
                         'Click to change to ' + (bonding ? 'unBond' : 'Bond')
@@ -207,18 +194,12 @@ export const Delegate = ({ onClose }: Props) => {
                     >
                       {bonding ? 'To' : 'From'}
                     </Text>
-
                     <Box
                       width="200px"
                       height="72px"
                       borderRadius={12}
                       background="darkPurple"
-                      paddingY="9px"
-                      flexDir="column"
-                      pb="2"
-                      display="flex"
-                      justifyContent="center"
-                      alignContent="center"
+                      paddingTop="9px"
                     >
                       <Text
                         color="white"
@@ -228,67 +209,25 @@ export const Delegate = ({ onClose }: Props) => {
                         lineHeight="20px"
                         textAlign="center"
                       >
-                        {bonding ? 'JMES to Bond' : 'bJMES to UnBond'}
+                        bJMES balance
                       </Text>
-
-                      <Input
-                        isInvalid={
-                          bonding
-                            ? valueToMove > totalJmes || valueToMove < 1
-                            : valueToMove > totalBondedJmes || valueToMove < 1
-                        }
-                        errorBorderColor="red"
-                        type="number"
-                        onChange={e => onValueChange(e.target.value)}
-                        bg="transparent"
+                      <Text
                         color="white"
-                        value={valueToMove}
                         fontFamily={'DM Sans'}
                         fontWeight="700"
                         fontSize={28}
-                        mx="auto"
-                        width="90%"
-                        border={0}
                         lineHeight="39.2px"
                         textAlign="center"
-                      />
-                    </Box>
-                    <Text
-                      color="lilac"
-                      fontFamily={'DM Sans'}
-                      fontWeight="500"
-                      fontSize={12}
-                      lineHeight="20px"
-                      mt={1}
-                      textAlign="center"
-                      marginBottom="12px"
-                    >
-                      {bonding && `Total JMES: ${totalJmes}`}
-                      {!bonding && `Total bJMES: ${totalBondedJmes}`}
-                      <Button
-                        size="xs"
-                        ml="1"
-                        color="purple"
-                        onClick={e => {
-                          if (bonding) {
-                            onValueChange(String(totalJmes));
-                            return;
-                          }
-                          onValueChange(String(totalBondedJmes));
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}
                       >
-                        Max
-                      </Button>
-                    </Text>
+                        {bJmesValue}
+                      </Text>
+                    </Box>
                   </Box>
                 </Flex>
                 <Box marginTop="75px">
                   <Slider
-                    value={sliderValue}
                     isDisabled={delegatingToken}
-                    defaultValue={sliderValue}
+                    defaultValue={0}
                     onChange={onChangeSlider}
                   >
                     <SliderTrack

@@ -111,6 +111,8 @@ export const useValidators = (client: Client) => {
     queryKey: ['bondedValidators', address as string],
     queryFn: ({ queryKey }) =>
       getBondedValidators({ queryKey, client }).then(r => {
+        console.log('getBondedValidators : r>> ', r);
+        console.log('getBondedValidators tokens : r>> ', r[0].status);
         return r;
       }),
     retry: 3,
