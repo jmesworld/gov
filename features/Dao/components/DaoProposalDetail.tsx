@@ -92,7 +92,6 @@ export default function DaoProposalDetail({
     votesQuery?.data?.votes.filter(
       vote => vote.voter === (address as string),
     ) ?? [];
-
   return (
     <>
       <Flex height={'47px'} />
@@ -114,7 +113,7 @@ export default function DaoProposalDetail({
           <Box flexGrow={1} cursor="pointer">
             <ProposalVoting
               yesPercentage={yesPercentage}
-              target={target * 100}
+              target={target}
               votes={votes}
             />
             <Box

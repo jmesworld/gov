@@ -1,20 +1,12 @@
-import { Client } from 'jmes';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useValidators } from './useValidators';
 import { movingValidator } from '../lib/validateBonding';
 import { useToast } from '@chakra-ui/react';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
-import { BJMES_DENOM, JMES_DENOM } from '../../../lib/constants';
+import { JMES_DENOM } from '../../../lib/constants';
 import { useBalanceContext } from '../../../contexts/balanceContext';
 import { useSigningCosmWasmClientContext } from '../../../contexts/SigningCosmWasmClient';
 import { coin } from '@cosmjs/amino';
-
- const RPC_URL = process.env.NEXT_PUBLIC_REST_URL as string;
-const NEXT_PUBLIC_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID as string;
-
-const client = new Client({
-  providers: { LCDC: { chainID: NEXT_PUBLIC_CHAIN_ID, URL: RPC_URL } },
-});
+import { useValidatorContext } from '../../../contexts/validatorsContext';
 
 type TransferFormType = {
   jmesValue: number;
@@ -44,18 +36,32 @@ export const useDelegate = () => {
   );
 
   const { address } = useIdentityContext();
-
   const {
-    isValidatorsLoading,
-    validatorsError,
-    bondedValidatorsError,
-    validatorList,
-    isBondedValidatorsLoading,
-    bondedValidators,
-    unBondingsData,
-    unBondingsError,
-    isLoadingUnBondings,
-  } = useValidators(client);
+    bondValidatorsLoading,
+    unBondValidatorsLoading,
+    myUnBondingsLoading,
+
+    bondValidatorsError,
+    unBondValidatorsError,
+    myUnBondingError,
+
+    bondValidators: validatorsMap,
+    unBondValidators: unBondMap,
+    myUnBondings: myUnBondingMap,
+  } = useValidatorContext();
+
+  const bondValidators = useMemo(() => {
+    return Array.from(validatorsMap?.values() ?? []);
+  }, [validatorsMap]);
+
+  const unBondValidators = useMemo(() => {
+    return Array.from(unBondMap?.values() ?? []);
+  }, [unBondMap]);
+
+  const myUnBondings = useMemo(() => {
+    return Array.from(myUnBondingMap?.values() ?? []);
+  }, [myUnBondingMap]);
+
   const toast = useToast();
 
   const [transferForm, setTransferForm] = useState<TransferFormType>({
@@ -157,8 +163,22 @@ export const useDelegate = () => {
         transfer: valueToMove,
       },
       bonding,
+      !bonding
+        ? unBondValidators?.find(
+            el => el.validator_address === selectedUnBonding,
+          )
+        : undefined,
     );
-  }, [bonding, totalBondedJmes, totalJmes, bJmesValue, jmesValue, valueToMove]);
+  }, [
+    bonding,
+    totalJmes,
+    totalBondedJmes,
+    jmesValue,
+    bJmesValue,
+    valueToMove,
+    unBondValidators,
+    selectedUnBonding,
+  ]);
 
   const delegateTokens = useCallback(async () => {
     if (isMovingNotValid || !bondingIsValid || !address) {
@@ -245,24 +265,25 @@ export const useDelegate = () => {
     ...transferForm,
     ...bondingState,
     totalJmes,
+    validatorsMap,
     totalBondedJmes,
     setBondingState,
     bondingIsValid,
     setTransferForm,
-    isValidatorsLoading,
-    validatorList,
+    isValidatorsLoading: bondValidatorsLoading,
+    validatorList: bondValidators,
     toggleBonding,
     onChangeSlider,
     valueToMove,
     isMovingNotValid,
     delegateTokens,
-    bondedValidators,
-    isBondedValidatorsLoading,
-    validatorsError,
-    bondedValidatorsError,
-    unBondingsData,
-    unBondingsError,
-    isLoadingUnBondings,
+    bondedValidators: unBondValidators,
+    isBondedValidatorsLoading: unBondValidatorsLoading,
+    validatorsError: bondValidatorsError,
+    bondedValidatorsError: unBondValidatorsError,
+    unBondingsData: myUnBondings,
+    unBondingsError: myUnBondingError,
+    isLoadingUnBondings: myUnBondingsLoading,
     onValueChange,
   };
 };
