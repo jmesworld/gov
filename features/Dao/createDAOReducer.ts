@@ -100,7 +100,7 @@ export function Reducer(state: State, action: Actions): State {
         ownerId: action.payload,
       };
     case 'RESET':
-      return action.payload;
+      return { ...action.payload };
     default:
       throw new Error('Action not found');
   }

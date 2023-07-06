@@ -1,4 +1,12 @@
-import { VStack, Box, Flex, Text, Spacer, Image } from '@chakra-ui/react';
+import {
+  VStack,
+  Box,
+  Flex,
+  Text,
+  Spacer,
+  Image,
+  Spinner,
+} from '@chakra-ui/react';
 import { Dispatch, SetStateAction } from 'react';
 import { WalletStatus } from '@cosmos-kit/core';
 import dynamic from 'next/dynamic';
@@ -27,7 +35,8 @@ const NavBar = ({
   setSelectedDaoName,
 }: NavBarProps) => {
   const router = useRouter();
-  const { selectedDAO } = useDAOContext();
+  const { selectedDAO, afterCreate } = useDAOContext();
+  console.log('after craet', afterCreate);
   return (
     <VStack
       width={'200px'}
@@ -97,6 +106,12 @@ const NavBar = ({
           MY DAOS
         </Text>
       </Flex>
+      {afterCreate !== '' && (
+        <Flex alignItems="center" px="4">
+          <Spinner mr="2" size="xs" />
+          <Text>Loading ...</Text>
+        </Flex>
+      )}
       <MyDaoList />
 
       <Link href="/dao/create">

@@ -33,6 +33,7 @@ import { validateForm } from './Proposal/libs/checkIfFormValid';
 import { getRequest } from './Proposal/libs/getRequest';
 import { useDaoMultisigProposeMutation } from '../../client/DaoMultisig.react-query';
 import { useLeaveConfirm } from '../../hooks/useLeaveConfirm';
+import { useRouter } from 'next/router';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -86,6 +87,7 @@ export const DAOProposalPage = ({
   const [err, setErr] = useState<string[] | undefined>([]);
   const [creatingProposal, setIsCreatingProposal] = useState(false);
   const toast = useToast();
+  const router = useRouter();
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { signingCosmWasmClient: signingClient } =
     useSigningCosmWasmClientContext();
@@ -251,6 +253,7 @@ export const DAOProposalPage = ({
           <Button
             disabled={creatingProposal}
             onClick={async () => {
+              let result = null;
               try {
                 const error = validateForm(state, activeTab);
                 if (error.length) {
@@ -261,13 +264,13 @@ export const DAOProposalPage = ({
                 setIsCreatingProposal(true);
                 const msg = getRequest(state, activeTab);
                 if (msg && 'propose' in msg) {
-                  await daoClient.propose(msg.propose);
+                  result = await daoClient.propose(msg.propose);
                 }
                 if (msg && 'update_members' in msg) {
-                  await daoMember.updateMembers(msg.update_members);
+                  result = await daoMember.updateMembers(msg.update_members);
                 }
                 if (!msg) {
-                  await createGovProposalMutation.mutateAsync({
+                  result = await createGovProposalMutation.mutateAsync({
                     client: daoClient,
                     msg: {
                       title: state.title.value,
@@ -276,6 +279,14 @@ export const DAOProposalPage = ({
                     },
                   });
                 }
+                if (!result) {
+                  throw new Error('Something went wrong');
+                }
+                const id =
+                  result.events
+                    .find(el => el.type === 'wasm')
+                    ?.attributes.find(el => el.key === 'proposal_id')?.value ??
+                  null;
                 toast({
                   title: 'Created Dao Proposal',
                 });
@@ -283,6 +294,7 @@ export const DAOProposalPage = ({
                   type: 'RESET',
                   payload: initialState,
                 });
+                router.push(`/dao/view/${selectedDaoName}/proposals/${id}`);
               } catch (err) {
                 if (err instanceof Error) {
                   toast({

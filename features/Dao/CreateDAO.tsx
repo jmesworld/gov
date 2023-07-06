@@ -36,6 +36,7 @@ import { v4 as uuid } from 'uuid';
 import { Member } from './components/DaoMember';
 import { z } from 'zod';
 import { useLeaveConfirm } from '../../hooks/useLeaveConfirm';
+import { useDAOContext } from '../../contexts/DAOContext';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -46,8 +47,8 @@ const fee: StdFee = {
 };
 
 const initialState: State = {
-  members: {},
   ownerId: '',
+  members: {},
   daoName: '',
   threshold: 0,
 };
@@ -59,8 +60,10 @@ const CreateDaoNewForm = ({
   setCreateDaoSelected: (address: string) => void;
   daoOwner: { name: string; address: string; votingPower: number };
 }) => {
+  const { setAfterCreate } = useDAOContext();
   const { signingCosmWasmClient: signingClient } =
     useSigningCosmWasmClientContext();
+  const [isCreatingDao, setIsCreatingDao] = useState(false);
   const { address } = useChain(chainName);
   const { cosmWasmClient } = useCosmWasmClientContext();
   const toast = useToast();
@@ -73,8 +76,8 @@ const CreateDaoNewForm = ({
     );
   }, [daoName, members, threshold]);
 
-  useLeaveConfirm({
-    preventNavigatingAway: isDirty,
+  const [setRouterCheck, navigate] = useLeaveConfirm({
+    preventNavigatingAway: isDirty && !isCreatingDao,
   });
 
   const membersArr = useMemo(() => Object.values(members), [members]);
@@ -99,7 +102,6 @@ const CreateDaoNewForm = ({
     });
   }, [daoOwner, members]);
 
-  const [isCreatingDao, setIsCreatingDao] = useState(false);
   const totalVotingPower = useMemo(() => {
     let votingPowers = 0;
     membersArr.forEach(el => {
@@ -262,6 +264,7 @@ const CreateDaoNewForm = ({
         borderColor={'primary.500'}
         background={'primary.100'}
         focusBorderColor="darkPurple"
+        value={daoName}
         borderRadius={12}
         color={'purple'}
         onChange={e => {
@@ -465,6 +468,7 @@ const CreateDaoNewForm = ({
       <Slider
         aria-label="dao-proposal-threshold"
         defaultValue={threshold}
+        value={threshold}
         width={'722px'}
         onChange={val =>
           dispatch({
@@ -581,6 +585,25 @@ const CreateDaoNewForm = ({
                 args: { fee },
               })
               .then(() => {
+                const ownerMember: State['members'] = {
+                  [ownerId]: {
+                    id: ownerId,
+                    name: daoOwner.name,
+                    address: daoOwner.address,
+                    votingPower: 0,
+                  },
+                };
+                setRouterCheck(false);
+                dispatch({
+                  type: 'RESET',
+                  payload: {
+                    ...initialState,
+                    members: ownerMember,
+                    ownerId,
+                  },
+                });
+              })
+              .then(() => {
                 toast({
                   title: 'Dao created.',
                   description:
@@ -593,10 +616,8 @@ const CreateDaoNewForm = ({
                     borderRadius: 12,
                   },
                 });
-                dispatch({
-                  type: 'RESET',
-                  payload: initialState,
-                });
+                setAfterCreate('afterCreate');
+                navigate(`/dao/view/${daoName.trim()}`);
               })
               .catch(error => {
                 toast({

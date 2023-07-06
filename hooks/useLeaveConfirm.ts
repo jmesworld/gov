@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 type Props = {
@@ -11,25 +11,38 @@ const defaultMessage = 'Are you sure to leave without save?';
 export function useLeaveConfirm({
   preventNavigatingAway,
   message = defaultMessage,
-}: Props) {
+}: Props): [(check: false) => void, (route: string) => void] {
+  const [check, setCheck] = useState(true);
   const Router = useRouter();
 
-  const onRouteChangeStart = React.useCallback(() => {
-    if (preventNavigatingAway) {
+  const onRouteChangeStart = useCallback(() => {
+    if (check && preventNavigatingAway) {
       if (window.confirm(message)) {
         return true;
       }
       throw "Abort route change by user's confirmation.";
     }
-  }, [message, preventNavigatingAway]);
+    return true;
+  }, [check, message, preventNavigatingAway]);
 
-  React.useEffect(() => {
-    Router.events.on('routeChangeStart', onRouteChangeStart);
-
+  useEffect(() => {
+    if (check) Router.events.on('routeChangeStart', onRouteChangeStart);
+    else Router.events.off('routeChangeStart', onRouteChangeStart);
     return () => {
       Router.events.off('routeChangeStart', onRouteChangeStart);
     };
-  }, [Router.events, onRouteChangeStart]);
+  }, [Router.events, check, onRouteChangeStart]);
 
-  return;
+  const setRouterCheck = useCallback((check: boolean) => {
+    setCheck(check);
+  }, []);
+
+  const navigate = useCallback(
+    (route: string) => {
+      Router.push(route);
+    },
+    [Router],
+  );
+
+  return [setRouterCheck, navigate];
 }
