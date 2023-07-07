@@ -5,13 +5,20 @@ export const NavBarItem = ({
   text,
   isSelected,
   onClick,
+  inActive,
 }: {
+  inActive?: boolean;
   text: string;
   isSelected: boolean;
   onClick: MouseEventHandler<HTMLDivElement>;
 }) => {
   return (
-    <Flex width={'200px'} onClick={onClick} cursor={'pointer'}>
+    <Flex
+      opacity={inActive ? 0.5 : 1}
+      width={'200px'}
+      onClick={onClick}
+      cursor={'pointer'}
+    >
       <Flex
         py="8px"
         width={'100%'}

@@ -51,7 +51,6 @@ export const Layout = ({ children }: { children: ReactElement }) => {
           width={'100%'}
           height={'100%'}
           paddingLeft={'54px'}
-          paddingBottom={'25px'}
           paddingRight={'54px'}
           overflowY="scroll"
           position={'relative'}
@@ -64,10 +63,9 @@ export const Layout = ({ children }: { children: ReactElement }) => {
             position="sticky"
             bg="bg"
           >
-            <Spacer />
             <Header />
           </Flex>
-          <Box as="main" display={'block'} overflowY={'auto'}>
+          <Box as="main" display={'block'} overflow={'visible'}>
             {children}
           </Box>
         </Box>

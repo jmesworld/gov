@@ -118,7 +118,11 @@ const NavBar = ({
           width="180px"
           height="48px"
           text={'New DAO'}
-          disabled={status !== WalletStatus.Connected || !identityName}
+          disabled={
+            status !== WalletStatus.Connected ||
+            !identityName ||
+            router.asPath === '/dao/create'
+          }
         />
       </Link>
       <Spacer />
@@ -128,7 +132,10 @@ const NavBar = ({
           height="48px"
           text="DAO Proposal"
           disabled={
-            status !== WalletStatus.Connected || !identityName || !selectedDAO
+            ['/', '/proposals/[id]', '/dao/create'].includes(router.route) ||
+            status !== WalletStatus.Connected ||
+            !identityName ||
+            !selectedDAO
           }
         />
       </Link>

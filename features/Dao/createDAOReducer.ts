@@ -9,12 +9,12 @@ export type Member = {
 export type State = {
   ownerId: string;
   members: Record<string, Member>;
-  daoNameError?: string;
+  daoNameError?: string | null;
   daoName: string;
   threshold: number;
 };
 
-type Actions =
+export type Actions =
   | {
       type: 'ADD_MEMBER';
       payload: Member;
@@ -31,7 +31,7 @@ type Actions =
       type: 'SET_DAO_NAME';
       payload: {
         value: string;
-        error?: string;
+        error?: string | null;
       };
     }
   | {

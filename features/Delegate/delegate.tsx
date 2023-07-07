@@ -306,7 +306,7 @@ export const Delegate = ({ onClose }: Props) => {
                       width="20px"
                       height="33px"
                       background="lilac"
-                      border="2px solid"
+                      border="1px solid"
                       borderColor="purple"
                       boxShadow="0px 1px 1px rgba(0, 0, 0, 0.25)"
                       position="relative"
@@ -347,7 +347,7 @@ export const Delegate = ({ onClose }: Props) => {
                         boxShadow="0px 3.5px 5.5px rgba(0, 0, 0, 0.02)"
                         _after={{
                           content: '""',
-                          borderTop: '15px solid purple',
+                          borderTop: '15px solid var(--chakra-colors-purple)',
                           borderLeft: '7.5px solid transparent',
                           borderRight: '7.5px solid transparent',
                           position: 'absolute',
