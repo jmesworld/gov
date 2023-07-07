@@ -50,9 +50,9 @@ export const Layout = ({ children }: { children: ReactElement }) => {
         <Box
           width={'100%'}
           height={'100%'}
-          paddingLeft={'54px'}
+          paddingLeft={'50px'}
           paddingBottom={'25px'}
-          paddingRight={'54px'}
+          paddingRight={'50px'}
           overflowY="scroll"
           position={'relative'}
         >

@@ -59,7 +59,8 @@ const DAOContextProvider = ({ children }: Props) => {
   const [afterCreate, setAfterCreate] = useState<AfterCreateType>('');
   const [selectedDAO, setSelectedDAO] = useState<DAO | null>(null);
   const { cosmWasmClient } = useCosmWasmClientContext();
-  const { address, identityServiceQueryClient } = useIdentityContext();
+  const { address, identityServiceQueryClient, getIdentityName } =
+    useIdentityContext();
 
   const {
     data: DAOs,
@@ -83,7 +84,7 @@ const DAOContextProvider = ({ children }: Props) => {
       ) as Promise<DAO[] | undefined>,
     {
       refetchInterval: 5000,
-      enabled: !!(cosmWasmClient && address),
+      enabled: !!(cosmWasmClient && address && getIdentityName()),
     },
   );
   const loading = useMemo(
@@ -102,7 +103,7 @@ const DAOContextProvider = ({ children }: Props) => {
 
   useEffect(() => {
     if (DAOs !== undefined && firstLoad) setFirstLoad(false);
-  }, [DAOs]);
+  }, [DAOs, firstLoad]);
 
   const setSelectedDAOByName = (name: string | null) => {
     if (name === null) {
@@ -121,6 +122,12 @@ const DAOContextProvider = ({ children }: Props) => {
     }
     return DAOs?.find(el => el.name === name);
   };
+
+  useEffect(() => {
+    if (address && getIdentityName()) {
+      setFirstLoad(true);
+    }
+  }, [address, getIdentityName]);
 
   const setSelectedDAOByAddress = (address: string) => {
     const DAO = DAOs?.find(el => el.address === address);
