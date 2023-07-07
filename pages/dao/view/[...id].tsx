@@ -4,11 +4,11 @@ import { useAppState } from '../../../contexts/AppStateContext';
 import DaoProposal from '../../../features/Dao/components/DaoProposal';
 import { useDAOContext } from '../../../contexts/DAOContext';
 import DaoProposalDetail from '../../../features/Dao/components/DaoProposalDetail';
+import { useRedirectToHomeForNoWalletConnected } from '../../../hooks/Redirect';
 
 const DAODetail = () => {
   const { getSelectedDAOByName, afterCreate, selectedDAO, firstLoad } =
     useDAOContext();
-
   const {
     setSelectedDaoProposalTitle,
     setDaoProposalDetailOpen,
@@ -16,6 +16,10 @@ const DAODetail = () => {
     setSelectedProposalId,
   } = useAppState();
   const router = useRouter();
+
+  const [Redirect] = useRedirectToHomeForNoWalletConnected();
+  if (Redirect) return Redirect;
+
   const id = router.query.id;
   const daoName = id?.[0];
   const proposalKey = id?.[1];
