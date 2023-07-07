@@ -16,7 +16,7 @@ export const NavBarButton = ({
   height: string;
 }) => {
   return (
-    <Flex width={'100%'} paddingLeft={'10px'}>
+    <Flex justifyContent="center" width={'100%'} px={'10px'}>
       <Button
         disabled={disabled ?? false}
         variant={'outline'}

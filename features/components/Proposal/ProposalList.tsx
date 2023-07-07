@@ -164,13 +164,9 @@ export const ProposalList = ({
     });
 
     return (
-      <ul
-        style={{
-          display: 'grid',
-        }}
-      >
+      <Flex display="grid" gap="3">
         {proposalItems}
-      </ul>
+      </Flex>
     );
   }
 };
@@ -178,71 +174,41 @@ export const ProposalList = ({
 export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
   return (
     <Flex flex={1} width={isGov ? '100%' : '100%'}>
-      <Flex flexGrow={1} width={'100%'}>
-        <Box flexGrow={1}>
+      <Flex>
+        <Box width={isGov ? '227px' : '151px'}>
           <Text
             color="rgba(15,0,86,0.8)"
             fontWeight="medium"
             fontFamily="DM Sans"
             fontSize={12}
-            width={isGov ? '227px' : '151px'}
           >
-            {isGov ? 'GOVERNANCE PROPOSALS' : 'DAO PROPOSALS'}
+            {isGov ? ' PROPOSALS' : 'DAO PROPOSALS'}
           </Text>
         </Box>
-        <Box flexGrow={1}>
-          <Text
-            color="rgba(15,0,86,0.8)"
-            fontFamily={'DM Sans'}
-            fontWeight="medium"
-            fontSize={12}
-            marginLeft={isGov ? '200px' : '170px'}
-            width={'32px'}
-          >
-            YES
-          </Text>
-        </Box>
-        <Box flexGrow={1}>
-          <Text
-            color="rgba(15,0,86,0.8)"
-            fontFamily={'DM Sans'}
-            fontWeight="medium"
-            fontSize={12}
-            marginLeft={isGov ? '125px' : '125px'}
-            marginRight={isGov ? '100px' : '100px'}
-            width={'32px'}
-          >
-            NO
-          </Text>
-        </Box>
-        <Box flexGrow={1}>
-          <Text
-            color="rgba(15,0,86,0.8)"
-            fontFamily={'DM Sans'}
-            fontWeight="medium"
-            fontSize={12}
-            marginLeft={isGov ? '80px' : '90px'}
-            width={'121px'}
-          >
-            FUNDING PER MONTH
-          </Text>
-        </Box>
-        <Flex
-          flexGrow={1}
-          marginLeft={isGov ? '60px' : '35px'}
-          marginRight={isGov ? '84px' : '35px'}
+        <Box width={isGov ? '500px' : '440px'}></Box>
+      </Flex>
+      <Box>
+        <Text
+          color="rgba(15,0,86,0.8)"
+          fontFamily={'DM Sans'}
+          fontWeight="medium"
+          fontSize={12}
+          width={'155px'}
         >
-          <Text
-            color="rgba(15,0,86,0.8)"
-            fontFamily={'DM Sans'}
-            fontWeight="medium"
-            fontSize={12}
-            textAlign={'center'}
-            width={'124px'}
-          >
-            FUNDING DURATION
-          </Text>
-        </Flex>
+          FUNDING PER MONTH
+        </Text>
+      </Box>
+      <Flex width={'155px'}>
+        <Text
+          color="rgba(15,0,86,0.8)"
+          fontFamily={'DM Sans'}
+          fontWeight="medium"
+          fontSize={12}
+          textAlign={'left'}
+          width={'124px'}
+        >
+          FUNDING DURATION
+        </Text>
       </Flex>
     </Flex>
   );
@@ -301,8 +267,12 @@ export const ProposalListItem = ({
         }}
         cursor={'pointer'}
       >
-        <Flex flexGrow={1}>
-          <Flex flexDirection={'column'} justifyContent={'center'}>
+        <Flex>
+          <Flex
+            width={isGov ? '227px' : '151px'}
+            flexDirection={'column'}
+            justifyContent={'center'}
+          >
             <Text
               width={isGov ? '281px' : '268px'}
               color="white"
@@ -326,7 +296,8 @@ export const ProposalListItem = ({
             </Text>
           </Flex>
           <Flex
-            flexGrow={1}
+            // flexGrow={1}
+            width={isGov ? '500px' : '440px'}
             alignItems={'center'}
             justifyContent={'space-around'}
           >
@@ -342,8 +313,8 @@ export const ProposalListItem = ({
           </Flex>
         </Flex>
         <Box
-          mr="14"
-          marginLeft={isGov ? '90px' : '49px'}
+          width="155px"
+          // marginLeft={isGov ? '90px' : '90px'}
           justifyContent={'center'}
         >
           <Text
@@ -356,9 +327,9 @@ export const ProposalListItem = ({
           </Text>
         </Box>
         <Box
-          marginLeft={isGov ? '60px' : '49px'}
-          marginRight={'90px'}
-          width="100px"
+          // marginLeft={isGov ? '60px' : '49px'}
+          // marginRight={'90px'}
+          width="155px"
           justifyContent={'center'}
         >
           <Text
@@ -371,7 +342,6 @@ export const ProposalListItem = ({
           </Text>
         </Box>
       </Flex>
-      <Box flexGrow={1} height={'7px'} />
     </>
   );
 };
