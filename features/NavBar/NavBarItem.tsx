@@ -1,18 +1,17 @@
 import { Flex, Text } from '@chakra-ui/react';
 import { MouseEventHandler } from 'react';
-
 type Props = {
-  isActive?: boolean;
+  inActive?: boolean;
   text: string;
   isSelected: boolean;
   onClick: MouseEventHandler<HTMLDivElement>;
 };
 
-export const NavBarItem = ({ text, isSelected, onClick, isActive }: Props) => {
+export const NavBarItem = ({ text, isSelected, onClick, inActive }: Props) => {
   return (
     <Flex
-      opacity={isActive ? 0.5 : 1}
-      width={'full'}
+      opacity={inActive ? 0.5 : 1}
+      width="full"
       onClick={onClick}
       cursor={'pointer'}
     >

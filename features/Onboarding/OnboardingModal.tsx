@@ -34,7 +34,7 @@ export default function OnboardingModal() {
     return false;
   }, [address, balance, getIdentityName, loadingIdentity]);
 
-   if (!isOpen) return null;
+  if (!isOpen) return null;
   return (
     <>
       <Modal
