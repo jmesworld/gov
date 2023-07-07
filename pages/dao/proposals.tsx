@@ -1,10 +1,14 @@
 import { useDAOContext } from '../../contexts/DAOContext';
 import { useIdentityContext } from '../../contexts/IdentityContext';
 import { DAOProposalPage } from '../../features/Dao/DAOProposal';
+import { useRedirectToHomeForNoWalletConnected } from '../../hooks/Redirect';
 
 const DAOProposal = () => {
   const { selectedDAO, setSelectedDAOByAddress } = useDAOContext();
   const { getIdentityName, address } = useIdentityContext();
+
+  const [Redirect] = useRedirectToHomeForNoWalletConnected();
+  if (Redirect) return Redirect;
   if (!selectedDAO) {
     return 'no DAO selected';
   }
