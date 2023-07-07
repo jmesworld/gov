@@ -57,8 +57,7 @@ const Wallet = () => {
       px={4}
     >
       <Box>{connectWalletButton}</Box>
-
-      <GridItem>
+      <GridItem mt={'0px !important'}>
         <ConnectStatusWarn
           walletStatus={status}
           rejected={

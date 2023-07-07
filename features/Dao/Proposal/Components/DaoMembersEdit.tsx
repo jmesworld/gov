@@ -3,7 +3,7 @@ import { useDebounce } from '../../../../hooks/useDebounce';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
 import { useQuery } from '@tanstack/react-query';
 import {
-  CloseButton,
+  Button,
   Flex,
   Image,
   Input,
@@ -84,8 +84,8 @@ export const MemberUpdate = memo(
     }, [err, id, onErrorChange]);
 
     return (
-      <Flex key={id} marginBottom={'16px'}>
-        <InputGroup width={'100%'} height={'48px'}>
+      <Flex key={id} w="full" marginBottom={'16px'}>
+        <InputGroup width={'85%'} height={'48px'}>
           <Input
             spellCheck="false"
             isReadOnly={isReadOnly}
@@ -95,7 +95,6 @@ export const MemberUpdate = memo(
             background={'primary.100'}
             focusBorderColor="darkPurple"
             borderRadius={12}
-            marginRight={'16px'}
             color={'darkPurple'}
             height={'100%'}
             defaultValue={value}
@@ -115,7 +114,7 @@ export const MemberUpdate = memo(
             justifyContent="flex-start"
             height={'80%'}
             my="auto"
-            top="3px"
+            top="5px"
           >
             <Flex
               width="2px"
@@ -153,19 +152,16 @@ export const MemberUpdate = memo(
             </Flex>
           </InputRightElement>
         </InputGroup>
-        <InputGroup
-          width={'102px'}
-          height={'48px'}
-          marginRight={isReadOnly ? '34px' : '16px'}
-        >
+        <InputGroup pl="10px" width={'13%'} height={'48px'}>
           <Input
             variant={'outline'}
-            width={'102px'}
+            width={'100%'}
             height={'100%'}
             borderColor={'primary.500'}
             background={'primary.100'}
             focusBorderColor="darkPurple"
             borderRadius={12}
+            textAlign="center"
             color={'purple'}
             fontWeight={'normal'}
             value={votingPower}
@@ -176,8 +172,10 @@ export const MemberUpdate = memo(
             }}
           />
 
-          <InputRightElement height={'100%'}>
+          <InputRightElement width="30%" height={'100%'}>
             <Text
+              mr="20px"
+              textAlign="left"
               color={'purple'}
               fontFamily="DM Sans"
               fontSize={16}
@@ -187,16 +185,29 @@ export const MemberUpdate = memo(
             </Text>
           </InputRightElement>
         </InputGroup>
-        {!isReadOnly && (
-          <CloseButton
-            size={'24px'}
-            _hover={{ backgroundColor: 'transparent' }}
-            color={'rgba(15,0,86,0.3)'}
-            onClick={() => {
-              onRemove(id);
-            }}
-          />
-        )}
+
+        <Button
+          p="0"
+          ml="5px"
+          width={'24px'}
+          size="24px"
+          bg="transparent"
+          _focus={{ backgroundColor: 'transparent' }}
+          _hover={{ backgroundColor: 'transparent' }}
+          color={'rgba(15,0,86,0.3)'}
+          onClick={() => {
+            onRemove(id);
+          }}
+        >
+          {!isReadOnly && (
+            <Image
+              src="/CloseFilled.svg"
+              width="24px"
+              height="24px"
+              alt="close"
+            />
+          )}
+        </Button>
       </Flex>
     );
   },

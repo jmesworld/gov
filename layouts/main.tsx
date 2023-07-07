@@ -1,11 +1,5 @@
 import { ReactElement } from 'react';
-import {
-  Box,
-  Container,
-  Flex,
-  Spacer,
-  useBreakpointValue,
-} from '@chakra-ui/react';
+import { Box, Container, Flex, useBreakpointValue } from '@chakra-ui/react';
 import MobileViewDisabled from '../features/Onboarding/components/MobileViewDisabled';
 import Head from 'next/head';
 import { Header, NavBar } from '../features';
@@ -64,10 +58,9 @@ export const Layout = ({ children }: { children: ReactElement }) => {
             position="sticky"
             bg="bg"
           >
-            <Spacer />
             <Header />
           </Flex>
-          <Box as="main" display={'block'} overflowY={'auto'}>
+          <Box as="main" display={'block'} overflow={'visible'}>
             {children}
           </Box>
         </Box>
