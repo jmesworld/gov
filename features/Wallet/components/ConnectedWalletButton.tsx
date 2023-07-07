@@ -37,6 +37,8 @@ export const ConnectedWalletButton = ({
   const handleDisconnect = () => {
     disconnect?.();
   };
+  const identityBalanceInt = parseInt(identityBalance as string);
+  const identityStakeInt = parseInt(identityStake as string);
   return (
     <Menu isOpen={isOpen}>
       <Flex
@@ -92,7 +94,11 @@ export const ConnectedWalletButton = ({
             {identityName ? identityName : address}
           </Text>
           <Spacer marginLeft={'13px'} />
-          <Tooltip label="JMES" hasArrow placement="bottom">
+          <Tooltip
+            label={`JMES ${identityBalanceInt} `}
+            hasArrow
+            placement="bottom"
+          >
             <Flex>
               <Image
                 src="/JMES_Icon.svg"
@@ -122,7 +128,11 @@ export const ConnectedWalletButton = ({
             marginLeft={'5px'}
             marginRight={'9px'}
           />
-          <Tooltip label="bJMES" hasArrow placement="bottom">
+          <Tooltip
+            label={`bJMES ${identityStakeInt}`}
+            hasArrow
+            placement="bottom"
+          >
             <Flex>
               <Image
                 src="/JMES_bonded_icon.svg"
@@ -144,7 +154,13 @@ export const ConnectedWalletButton = ({
           </Tooltip>
         </Flex>
       </Flex>
-      <MenuButton height={'0px'} />
+      <MenuButton
+        height={'1px'}
+        mt="0px!important"
+        display="block"
+        pos="relative"
+        top="0"
+      />
       <MenuList
         backgroundColor="white"
         _hover={{ bg: 'white' }}
@@ -155,7 +171,7 @@ export const ConnectedWalletButton = ({
         borderRadius={'8px'}
         padding={0}
         right={0}
-        top={-3}
+        top={0}
         minW={'271px'}
         maxW={'400px'}
       >

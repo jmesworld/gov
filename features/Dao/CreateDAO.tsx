@@ -33,10 +33,12 @@ import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 import { Reducer, State } from './createDAOReducer';
 import { v4 as uuid } from 'uuid';
-import { Member } from './components/DaoMember';
-import { z } from 'zod';
 import { useLeaveConfirm } from '../../hooks/useLeaveConfirm';
 import { useDAOContext } from '../../contexts/DAOContext';
+import { MemberUpdate } from './Proposal/Components/DaoMembersEdit';
+import { useBalanceContext } from '../../contexts/balanceContext';
+import { AutoDistributeAsInt } from '../../utils/autoDistribute';
+import { DaoName } from '../Dao/components/DaoName';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -50,7 +52,7 @@ const initialState: State = {
   ownerId: '',
   members: {},
   daoName: '',
-  threshold: 0,
+  threshold: 1,
 };
 
 const CreateDaoNewForm = ({
@@ -60,6 +62,7 @@ const CreateDaoNewForm = ({
   setCreateDaoSelected: (address: string) => void;
   daoOwner: { name: string; address: string; votingPower: number };
 }) => {
+  const { refresh } = useBalanceContext();
   const { setAfterCreate } = useDAOContext();
   const { signingCosmWasmClient: signingClient } =
     useSigningCosmWasmClientContext();
@@ -210,6 +213,19 @@ const CreateDaoNewForm = ({
     [dispatch],
   );
 
+  const individualGreeterThanThreshold = useMemo(() => {
+    let thereIsError = false;
+    membersArr.forEach(member => {
+      if (thereIsError) {
+        return;
+      }
+      if (member?.votingPower && member.votingPower > threshold) {
+        thereIsError = true;
+      }
+    });
+    return thereIsError;
+  }, [membersArr, threshold]);
+
   const formHasErrors = useMemo(() => {
     if (!threshold) {
       return true;
@@ -237,297 +253,316 @@ const CreateDaoNewForm = ({
     return thereIsError || totalVotingPower < 100 || totalVotingPower > 100;
   }, [daoNameError, duplicateNames, membersArr, threshold, totalVotingPower]);
   return (
-    <Box marginTop={'35px'}>
-      <Text
-        color={'purple'}
-        fontWeight="normal"
-        fontFamily="DM Sans"
-        fontSize={28}
-        marginBottom={'60px'}
-      >
-        Create DAO
-      </Text>
-      <Text
-        color={'rgba(15,0,86,0.8)'}
-        fontFamily="DM Sans"
-        fontSize={12}
-        fontWeight="medium"
-        marginBottom={'17px'}
-      >
-        DAO NAME
-      </Text>
-      <Input
-        spellCheck="false"
-        variant={'outline'}
-        width={'798px'}
-        height={'48px'}
-        borderColor={'primary.500'}
-        background={'primary.100'}
-        focusBorderColor="darkPurple"
-        value={daoName}
-        borderRadius={12}
-        color={'purple'}
-        onChange={e => {
-          const value = e.target.value;
-          const name = z
-            .string()
-            .min(2, {
-              message: 'Name must have at least 1 character',
-            })
-            .max(20, {
-              message: 'Name must have at most is 20 character',
-            })
-            .safeParse(value);
-          dispatch({
-            type: 'SET_DAO_NAME',
-            payload: {
-              value,
-              error: name.success
-                ? undefined
-                : name.error.format()._errors.join('\n'),
-            },
-          });
-        }}
-      />
-      <Text
-        height="10px"
-        color="red"
-        marginBottom={'8px'}
-        fontFamily={'DM Sans'}
-        fontWeight="normal"
-        fontSize={12}
-        marginLeft={'18px'}
-        marginTop={'8px'}
-      >
-        {daoNameError}
-      </Text>
-      <Flex width={'798px'} marginTop={'38px'} marginBottom={'19px'}>
-        <Button
-          variant={'outline'}
-          borderColor={'purple'}
-          width={'126px'}
-          height={'48px'}
-          onClick={() => {
-            dispatch({
-              type: 'ADD_MEMBER',
-              payload: {
-                id: uuid(),
-                name: '',
-                votingPower: 0,
-              },
-            });
-          }}
-          borderRadius={50}
-          backgroundColor={'transparent'}
-          _hover={{ bg: 'transparent' }}
-          justifyContent={'start'}
-        >
-          <Flex marginLeft={'0px'} alignItems={'center'}>
-            <AddIcon boxSize={'10px'} color="#7453FD" />
-            <Text
-              color="purple"
-              fontWeight="medium"
-              fontSize={14}
-              marginLeft={'10px'}
-              fontFamily="DM Sans"
+    <Box width={'100%'}>
+      <Box width="70%">
+        <Box marginTop={'35px'}>
+          <Text
+            color={'purple'}
+            fontWeight="normal"
+            fontFamily="DM Sans"
+            fontSize={28}
+            marginBottom={'40px'}
+          >
+            Create DAO
+          </Text>
+          <Text
+            color={'rgba(15,0,86,0.8)'}
+            fontFamily="DM Sans"
+            fontSize={12}
+            fontWeight="medium"
+            marginBottom={'17px'}
+          >
+            DAO NAME
+          </Text>
+          <DaoName
+            daoName={daoName}
+            daoNameError={daoNameError}
+            dispatch={dispatch}
+            client={client}
+          />
+          <Text
+            height="10px"
+            color="red"
+            marginBottom={'8px'}
+            fontFamily={'DM Sans'}
+            fontWeight="normal"
+            fontSize={12}
+            marginLeft={'18px'}
+            marginTop={'8px'}
+          >
+            {daoNameError}
+          </Text>
+          <Flex width="100%" marginTop={'40px'} marginBottom={'23px'}>
+            <Button
+              variant={'outline'}
+              borderColor={'purple'}
+              width={'126px'}
+              height={'48px'}
+              onClick={() => {
+                dispatch({
+                  type: 'ADD_MEMBER',
+                  payload: {
+                    id: uuid(),
+                    name: '',
+                    votingPower: 0,
+                  },
+                });
+              }}
+              borderRadius={50}
+              backgroundColor={'transparent'}
+              _hover={{ bg: 'transparent' }}
+              justifyContent={'start'}
             >
-              Director
+              <Flex marginLeft={'0px'} alignItems={'center'}>
+                <AddIcon boxSize={'10px'} color="#7453FD" />
+                <Text
+                  color="purple"
+                  fontWeight="medium"
+                  fontSize={14}
+                  marginLeft={'10px'}
+                  fontFamily="DM Sans"
+                >
+                  Director
+                </Text>
+              </Flex>
+            </Button>
+            <Box width={'8px'} />
+            <Button
+              variant={'outline'}
+              borderColor={'purple'}
+              width={'126px'}
+              height={'48px'}
+              onClick={() => {
+                const power = AutoDistributeAsInt(100, membersArr.length);
+                membersArr.forEach((member, i) => {
+                  dispatch({
+                    type: 'SET_VALUE',
+                    payload: {
+                      id: member.id,
+                      votingPower: power[i] ?? 0,
+                    },
+                  });
+                });
+              }}
+              borderRadius={50}
+              backgroundColor={'transparent'}
+              _hover={{ bg: 'transparent' }}
+              justifyContent={'center'}
+            >
+              <Text
+                color="purple"
+                fontWeight="medium"
+                fontSize={14}
+                fontFamily="DM Sans"
+              >
+                Auto Distribute
+              </Text>
+            </Button>
+            <Spacer />
+            <Text
+              color={'rgba(15,0,86,0.8)'}
+              fontFamily="DM Sans"
+              fontSize={12}
+              fontWeight="medium"
+              marginBottom={'17px'}
+              marginRight={'21px'}
+              alignSelf={'center'}
+            >
+              SHARE OF VOTES
             </Text>
           </Flex>
-        </Button>
-        <Box width={'8px'} />
-        <Button
-          variant={'outline'}
-          borderColor={'purple'}
-          width={'126px'}
-          height={'48px'}
-          onClick={() => {
-            const power = 100 / Object.keys(members).length;
-            membersArr.forEach(member => {
-              dispatch({
-                type: 'SET_VALUE',
-                payload: {
-                  id: member.id,
-                  votingPower: power,
-                },
-              });
-            });
-          }}
-          borderRadius={50}
-          backgroundColor={'transparent'}
-          _hover={{ bg: 'transparent' }}
-          justifyContent={'center'}
-        >
-          <Text
-            color="purple"
-            fontWeight="medium"
-            fontSize={14}
-            fontFamily="DM Sans"
+          {membersArr.map(daoMember => (
+            <MemberUpdate
+              isReadOnly={daoMember.id === ownerId}
+              key={daoMember.id}
+              id={daoMember.id}
+              name={daoMember.name}
+              address={daoMember.address}
+              error={daoMember.error}
+              votingPower={daoMember.votingPower}
+              client={client}
+              onVotingPowerChange={onVotingPowerChange}
+              onNameChange={onNameChange}
+              onAddress={onAddress}
+              onErrorChange={onErrorChange}
+              onRemove={onRemove}
+            />
+          ))}
+          <Flex
+            marginTop={'16px'}
+            height={'48px'}
+            alignItems={'center'}
+            width={'100%%'}
+            justifyContent="space-between"
           >
-            Auto Distribute
-          </Text>
-        </Button>
-        <Spacer />
-        <Text
-          color={'rgba(15,0,86,0.8)'}
-          fontFamily="DM Sans"
-          fontSize={12}
-          fontWeight="medium"
-          marginBottom={'17px'}
-          marginRight={'50px'}
-          alignSelf={'center'}
-        >
-          SHARE OF VOTES
-        </Text>
-      </Flex>
-      {membersArr.map(daoMember => (
-        <Member
-          isReadOnly={daoMember.id === ownerId}
-          key={daoMember.id}
-          id={daoMember.id}
-          name={daoMember.name}
-          address={daoMember.address}
-          error={daoMember.error}
-          votingPower={daoMember.votingPower}
-          client={client}
-          onVotingPowerChange={onVotingPowerChange}
-          onNameChange={onNameChange}
-          onAddress={onAddress}
-          onErrorChange={onErrorChange}
-          onRemove={onRemove}
-        />
-      ))}
-      <Flex
-        marginTop={'16px'}
-        height={'48px'}
-        alignItems={'center'}
-        width={'798px'}
-      >
-        <QuestionOutlineIcon
-          width={'16px'}
-          height={'16px'}
-          color={'rgba(0,0,0,0.4)'}
-        />
-        <Text
-          color={'rgba(0,0,0,0.7)'}
-          fontFamily="DM Sans"
-          fontSize={14}
-          fontWeight="normal"
-          marginLeft={'12px'}
-        >
-          Total Share of Votes must equal 100%
-        </Text>
-        <Spacer />
-        <InputGroup width={'102px'} height={'48px'} marginRight={'44px'}>
-          <Input
-            variant={'outline'}
-            width={'102px'}
-            height={'100%'}
-            borderColor={'primary.500'}
-            background={totalVotingPower === 100 ? 'purple' : 'red'}
-            focusBorderColor="darkPurple"
-            borderRadius={12}
-            color={'white'}
-            fontWeight={'normal'}
-            value={totalVotingPower}
-          />
+            <Flex width="85%">
+              <QuestionOutlineIcon
+                width={'16px'}
+                height={'16px'}
+                color={'rgba(0,0,0,0.4)'}
+              />
+              <Text
+                color={totalVotingPower > 100 ? 'red' : 'rgba(0,0,0,0.7)'}
+                fontFamily="DM Sans"
+                fontSize={14}
+                fontWeight="normal"
+                marginLeft={'12px'}
+              >
+                Total Share of Votes must equal 100%
+              </Text>
+            </Flex>
 
-          <InputRightElement height={'100%'}>
-            <Text
-              color={'white'}
-              fontFamily="DM Sans"
-              fontSize={16}
-              fontWeight="normal"
-            >
-              %
-            </Text>
-          </InputRightElement>
-        </InputGroup>
-      </Flex>
-      <Text
-        marginBottom={'8px'}
-        color={'red'}
-        fontFamily={'DM Sans'}
-        fontWeight="normal"
-        fontSize={18}
-        marginLeft={'12px'}
-        marginTop={'8px'}
-      >
-        {duplicateNames && 'Single member identity entered more than once!'}
-      </Text>
-      <Text
-        marginTop={'93px'}
-        color={'rgba(15,0,86,0.8)'}
-        fontFamily="DM Sans"
-        fontSize={12}
-        fontWeight="medium"
-        marginBottom={'8px'}
-      >
-        % TO PASS
-      </Text>
-      <Slider
-        aria-label="dao-proposal-threshold"
-        defaultValue={threshold}
-        value={threshold}
-        width={'722px'}
-        onChange={val =>
-          dispatch({
-            type: 'SET_THRESHOLD',
-            payload: val,
-          })
-        }
-        min={1}
-        max={100}
-        step={1}
-      >
-        <SliderTrack
-          height={'16px'}
-          borderRadius={'10px'}
-          backgroundColor={'primary.100'}
-          borderColor={'primary.500'}
-          borderWidth={'1px'}
-        >
-          <SliderFilledTrack backgroundColor={'green'} />
-        </SliderTrack>
-        <SliderThumb height={'32px'} position={'relative'}>
-          <Box
-            height="30px"
-            width="55px"
-            background="#7453FD"
-            position="absolute"
-            bottom="calc(100% + 15px)"
-            left="50%"
-            transform="translateX(-50%)"
-            borderRadius={12}
-            boxShadow="0px 3.5px 5.5px rgba(0, 0, 0, 0.02)"
-            _after={{
-              content: '""',
-              borderTop: '13px solid #7453FD',
-              borderLeft: '7.5px solid transparent',
-              borderRight: '7.5px solid transparent',
-              position: 'absolute',
-              top: 'calc(100% - 1px)',
-              left: '50%',
-              transform: 'translateX(-50%)',
-            }}
+            <InputGroup pl="10PX" width={'13%'} height={'48px'}>
+              <Input
+                variant={'outline'}
+                width={'100%'}
+                height={'100%'}
+                textAlign="center"
+                borderColor={'primary.500'}
+                background={totalVotingPower === 100 ? 'purple' : 'red'}
+                focusBorderColor="darkPurple"
+                borderRadius={12}
+                color={'white'}
+                fontWeight={'normal'}
+                value={totalVotingPower}
+              />
+
+              <InputRightElement width="30%" height={'100%'}>
+                <Text
+                  mr="20px"
+                  textAlign="left"
+                  color={'purple'}
+                  fontFamily="DM Sans"
+                  fontSize={16}
+                  fontWeight="normal"
+                  textColor="white"
+                >
+                  %
+                </Text>
+              </InputRightElement>
+            </InputGroup>
+            <Flex width="29px" />
+          </Flex>
+          <Text
+            marginBottom={'8px'}
+            color={'red'}
+            fontFamily={'DM Sans'}
+            fontWeight="normal"
+            fontSize={18}
+            marginLeft={'12px'}
+            marginTop={'8px'}
           >
+            {duplicateNames && 'Single member identity entered more than once!'}
+          </Text>
+          <Flex width="96%" flexDir="column">
             <Text
-              color="#FFFFFF"
-              fontFamily={'DM Sans'}
-              fontWeight="400"
-              fontSize={14}
-              lineHeight="12px"
-              textAlign="center"
-              marginTop="9px"
+              marginTop={'93px'}
+              color={'rgba(15,0,86,0.8)'}
+              fontFamily="DM Sans"
+              fontSize={12}
+              fontWeight="medium"
+              marginBottom={'8px'}
             >
-              {`${threshold} %`}
+              % TO PASS
             </Text>
-          </Box>
-        </SliderThumb>
-      </Slider>
+            <Slider
+              aria-label="dao-proposal-threshold"
+              defaultValue={threshold}
+              value={threshold}
+              width={'100%'}
+              onChange={val =>
+                dispatch({
+                  type: 'SET_THRESHOLD',
+                  payload: val,
+                })
+              }
+              min={1}
+              max={100}
+              step={1}
+            >
+              <SliderTrack
+                height={'16px'}
+                borderRadius={'10px'}
+                backgroundColor={'primary.100'}
+                borderColor={'primary.500'}
+                borderWidth={'1px'}
+              >
+                <SliderFilledTrack backgroundColor={'green'} />
+              </SliderTrack>
+              <SliderThumb
+                width="20px"
+                height="33px"
+                background="lilac"
+                border="1px solid"
+                borderColor="purple"
+                boxShadow="0px 1px 1px rgba(0, 0, 0, 0.25)"
+                position="relative"
+                borderRadius="4px"
+              >
+                <Box
+                  width="16px"
+                  height="1px"
+                  background="purple"
+                  transform="rotate(90deg)"
+                  position="relative"
+                  _before={{
+                    content: '""',
+                    position: 'absolute',
+                    top: '-4px',
+                    background: 'purple',
+                    width: '16px',
+                    height: '1px',
+                  }}
+                  _after={{
+                    content: '""',
+                    position: 'absolute',
+                    bottom: '-4px',
+                    background: 'purple',
+                    width: '16px',
+                    height: '1px',
+                  }}
+                ></Box>
+                <Box
+                  height="30px"
+                  width="55px"
+                  background="purple"
+                  position="absolute"
+                  bottom="calc(100% + 15px)"
+                  left="50%"
+                  transform="translateX(-50%)"
+                  borderRadius={12}
+                  boxShadow="0px 3.5px 5.5px rgba(0, 0, 0, 0.02)"
+                  _after={{
+                    content: '""',
+                    borderTop: '15px solid var(--chakra-colors-purple)',
+                    borderLeft: '7.5px solid transparent',
+                    borderRight: '7.5px solid transparent',
+                    position: 'absolute',
+                    top: '100%',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                  }}
+                >
+                  <Text
+                    color="white"
+                    fontFamily={'DM Sans'}
+                    fontWeight="500"
+                    fontSize={16}
+                    lineHeight="15px"
+                    textAlign="center"
+                    marginTop="8px"
+                  >
+                    {threshold}%
+                  </Text>
+                </Box>
+              </SliderThumb>
+            </Slider>
+          </Flex>
+        </Box>
+      </Box>
       <Flex
         marginTop={'12px'}
-        marginBottom={'93px'}
+        marginBottom={'43px'}
         height={'48px'}
         alignItems={'center'}
         width={'100%'}
@@ -538,7 +573,7 @@ const CreateDaoNewForm = ({
           color={'rgba(0,0,0,0.4)'}
         />
         <Text
-          color={'rgba(0,0,0,0.7)'}
+          color={individualGreeterThanThreshold ? 'red' : 'rgba(0,0,0,0.7)'}
           fontFamily="DM Sans"
           fontSize={14}
           fontWeight="normal"
@@ -604,6 +639,7 @@ const CreateDaoNewForm = ({
                 });
               })
               .then(() => {
+                refresh();
                 toast({
                   title: 'Dao created.',
                   description:
@@ -616,6 +652,7 @@ const CreateDaoNewForm = ({
                     borderRadius: 12,
                   },
                 });
+
                 setAfterCreate('afterCreate');
                 navigate(`/dao/view/${daoName.trim()}`);
               })

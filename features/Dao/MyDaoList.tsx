@@ -65,8 +65,12 @@ const MyDaoList = () => {
               <NavBarItem
                 key={dao.name}
                 text={dao.name}
+                isActive={router.route === '/dao/create'}
                 isSelected={isActive}
                 onClick={e => {
+                  if (router.route === '/dao/create') {
+                    e.preventDefault();
+                  }
                   if (router.route === '/proposals/create') {
                     e.preventDefault();
                   }

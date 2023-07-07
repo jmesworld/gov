@@ -118,34 +118,39 @@ const NavBar = ({
           width="180px"
           height="48px"
           text={'New DAO'}
-          disabled={status !== WalletStatus.Connected || !identityName}
+          disabled={
+            status !== WalletStatus.Connected ||
+            !identityName ||
+            router.asPath === '/dao/create'
+          }
         />
       </Link>
       <Spacer />
-      <Flex flexDir="column" flexWrap="wrap" w="full" gap="3">
-        <Link href="/dao/proposals">
-          <NavBarButton
-            width="180px"
-            height="48px"
-            text="DAO Proposal"
-            disabled={
-              status !== WalletStatus.Connected || !identityName || !selectedDAO
-            }
-          />
-        </Link>
-        <Link href="/proposals/create">
-          <NavBarButton
-            width="180px"
-            height="48px"
-            text="GOV Proposal"
-            disabled={
-              ['/', '/proposals/[id]', '/dao/create'].includes(router.route) ||
-              status !== WalletStatus.Connected ||
-              !identityName
-            }
-          />
-        </Link>
-      </Flex>
+      <Link href="/dao/proposals">
+        <NavBarButton
+          width="180px"
+          height="48px"
+          text="DAO Proposal"
+          disabled={
+            ['/', '/proposals/[id]', '/dao/create'].includes(router.route) ||
+            status !== WalletStatus.Connected ||
+            !identityName ||
+            !selectedDAO
+          }
+        />
+      </Link>
+      <Link href="/proposals/create">
+        <NavBarButton
+          width="180px"
+          height="48px"
+          text="GOV Proposal"
+          disabled={
+            ['/', '/proposals/[id]', '/dao/create'].includes(router.route) ||
+            status !== WalletStatus.Connected ||
+            !identityName
+          }
+        />
+      </Link>
       <Flex height={'10px'} />
     </VStack>
   );
