@@ -7,7 +7,7 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { useMemo, useReducer, useState } from 'react';
+import { useEffect, useMemo, useReducer, useState } from 'react';
 import { IdentityserviceQueryClient } from '../../client/Identityservice.client';
 import {
   CosmWasmClient,
@@ -15,7 +15,7 @@ import {
 } from '@cosmjs/cosmwasm-stargate';
 
 import { ProposalType } from '../components/Proposal/ProposalType';
-import { DAOProposalReducer } from './DaoProposalReducer';
+import { DAOProposalReducer, Member, State } from './DaoProposalReducer';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 import { useIdentityContext } from '../../contexts/IdentityContext';
@@ -34,6 +34,8 @@ import { getRequest } from './Proposal/libs/getRequest';
 import { useDaoMultisigProposeMutation } from '../../client/DaoMultisig.react-query';
 import { useLeaveConfirm } from '../../hooks/useLeaveConfirm';
 import { useRouter } from 'next/router';
+import { useDaoMultisigListVotersQuery } from '../../client/DaoMultisig.react-query';
+import { v4 as uuid } from 'uuid';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -49,7 +51,8 @@ const proposalTypesArr = Object.entries(proposalTypes) as [
   string,
 ][];
 
-const initialState = {
+const initId = uuid();
+const initialState: State = {
   ownerId: '',
   title: {
     value: '',
@@ -64,14 +67,19 @@ const initialState = {
     error: '',
   },
   members: {},
-  spends: {},
+  spends: {
+    [initId]: {
+      id: initId,
+      amount: 0,
+      name: '',
+    },
+  },
   balance: {
     jmes: '',
   },
 };
 
 export const DAOProposalPage = ({
-  daoOwner,
   setCreateDaoSelected,
   daoAddress,
   selectedDaoName,
@@ -95,9 +103,13 @@ export const DAOProposalPage = ({
   const [state, dispatch] = useReducer(DAOProposalReducer, initialState);
   const { title, description } = state;
 
-  const client: IdentityserviceQueryClient = new IdentityserviceQueryClient(
-    cosmWasmClient as CosmWasmClient,
-    IDENTITY_SERVICE_CONTRACT,
+  const client: IdentityserviceQueryClient = useMemo(
+    () =>
+      new IdentityserviceQueryClient(
+        cosmWasmClient as CosmWasmClient,
+        IDENTITY_SERVICE_CONTRACT,
+      ),
+    [cosmWasmClient],
   );
 
   const isDirty = useMemo(() => {
@@ -129,19 +141,112 @@ export const DAOProposalPage = ({
     [cosmWasmClient, daoAddress],
   );
 
-  const daoMember = new DaoMembersClient(
-    signingClient as SigningCosmWasmClient,
-    address as string,
-    IDENTITY_SERVICE_CONTRACT,
+  const daoMember = useMemo(
+    () =>
+      new DaoMembersClient(
+        signingClient as SigningCosmWasmClient,
+        address as string,
+        IDENTITY_SERVICE_CONTRACT,
+      ),
+    [address, signingClient],
   );
 
-  const daoClient = new DaoMultisigClient(
-    signingClient as SigningCosmWasmClient,
-    address as string,
-    IDENTITY_SERVICE_CONTRACT,
+  const daoClient = useMemo(
+    () =>
+      new DaoMultisigClient(
+        signingClient as SigningCosmWasmClient,
+        address as string,
+        IDENTITY_SERVICE_CONTRACT,
+      ),
+    [address, signingClient],
   );
 
   const createGovProposalMutation = useDaoMultisigProposeMutation();
+
+  useEffect(() => {
+    async function getThreshold() {
+      try {
+        const threshold = await daoMultisigQueryClient.threshold();
+        let percentage = '0';
+        if ('threshold_quorum' in threshold) {
+          percentage = (
+            Number(threshold.threshold_quorum.threshold) * 100
+          ).toFixed(0);
+        }
+        if ('absolute_count' in threshold) {
+          percentage = Number(threshold.absolute_count.weight).toFixed(0);
+        }
+        if ('absolute_percentage' in threshold) {
+          percentage = (
+            Number(threshold.absolute_percentage.percentage) * 100
+          ).toFixed(0);
+        }
+        dispatch({
+          type: 'SET_INPUT_VALUE',
+          payload: {
+            type: 'threshold',
+            value: percentage,
+          },
+        });
+      } catch (err) {
+        console.error('Error:', err);
+      }
+    }
+    getThreshold();
+  }, [daoMultisigQueryClient, dispatch]);
+
+  const membersArr = useMemo(
+    () => Object.values(state.members).filter(el => !el.isRemoved),
+    [state.members],
+  );
+
+  const { data, isLoading, isFetching } = useDaoMultisigListVotersQuery({
+    client: daoMultisigQueryClient,
+    args: {},
+  });
+
+  useEffect(() => {
+    async function getMemberFromVoters() {
+      const members: Member[] = [];
+      if (!data || membersArr.length > 0) {
+        return members;
+      }
+
+      for (const voter of data.voters) {
+        const ownerId = await client.getIdentityByOwner({
+          owner: voter.addr,
+        });
+        members.push({
+          id: uuid(),
+          name: ownerId.identity?.name ?? '',
+          votingPower: voter.weight,
+        });
+      }
+
+      !membersArr.length &&
+        dispatch({
+          type: 'ADD_MEMBERS',
+          payload: members,
+        });
+    }
+
+    getMemberFromVoters();
+  }, [client, data, dispatch, membersArr.length]);
+
+  const totalVotingPower = useMemo(() => {
+    let votingPowers = 0;
+    membersArr.forEach(el => {
+      if (!el.votingPower) {
+        return;
+      }
+      votingPowers += el.votingPower;
+    });
+    return votingPowers;
+  }, [membersArr]);
+
+  const error = useMemo(() => {
+    return validateForm(state, activeTab);
+  }, [state, activeTab]);
 
   return (
     <Box>
@@ -205,8 +310,9 @@ export const DAOProposalPage = ({
           />
           {activeTab === 'update-directories' && (
             <UpdateDirectories
-              daoMultisigQueryClient={daoMultisigQueryClient}
-              ownerAddress={daoOwner.address}
+              totalVotingPower={totalVotingPower}
+              membersArr={membersArr}
+              isLoading={isFetching || isLoading}
               client={client}
               state={state}
               dispatch={dispatch}
@@ -251,11 +357,10 @@ export const DAOProposalPage = ({
           </Button>
           <Box width={'12px'} />
           <Button
-            disabled={creatingProposal}
+            disabled={creatingProposal || !!error.length}
             onClick={async () => {
               let result = null;
               try {
-                const error = validateForm(state, activeTab);
                 if (error.length) {
                   setErr(error);
                   return;

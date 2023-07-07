@@ -3,6 +3,8 @@ import { Box, Flex, Progress, Text } from '@chakra-ui/react';
 import { MouseEventHandler } from 'react';
 import { ProposalProgress } from './ProposalProgress';
 import { useRouter } from 'next/router';
+import { calculateVotes } from '../../../lib/calculateVotes';
+import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
 
 type BaseProps = {
   totalSupply: number;
@@ -34,6 +36,7 @@ export const ProposalList = ({
   ...rest
 }: Props) => {
   const router = useRouter();
+  const { supply } = useCoinSupplyContext();
 
   const navigateToProposal = (proposalId: string) => {
     if (isGov) {
@@ -62,17 +65,61 @@ export const ProposalList = ({
     );
   } else {
     const proposalItems = proposals.map((proposal: any) => {
-      const threshold = proposal.threshold.absolute_count;
-      const target = threshold ? threshold.weight : 0;
-      const yesPercentage = threshold ? threshold.total_weight : 0;
-      const noPercentage = 100 - yesPercentage;
-
       const propType = isGov
         ? JSON.stringify(proposal.prop_type).split(':')[0].slice(2)
         : '';
       const type = isGov
         ? propType.slice(0, propType.length - 1)
         : proposal.description;
+      if (isGov) {
+        const {
+          coinYes,
+          coinNo,
+          threshold,
+          thresholdPercent,
+          yesPercentage,
+          noPercentage,
+        } = calculateVotes({
+          coin_Yes: proposal?.coins_yes,
+          coin_no: proposal?.coins_no,
+          totalSupply: supply as number,
+        });
+
+        return (
+          <ProposalListItem
+            key={proposal.id + proposal.description}
+            title={proposal.title}
+            yesCount={coinYes}
+            thresholdPercent={thresholdPercent}
+            noCount={coinNo}
+            yesPercent={yesPercentage}
+            noPercent={noPercentage}
+            totalCount={totalSupply}
+            threshold={threshold}
+            type={type}
+            navigateToProposal={navigateToProposal}
+            pass={
+              proposal.status === 'passed' ||
+              proposal.status === 'success' ||
+              proposal.status === 'executed' ||
+              proposal.status === 'success_concluded'
+                ? 'Yes'
+                : 'No'
+            }
+            isGov={isGov}
+            daoAddress={isGov ? undefined : rest.daoAddress}
+            proposalId={proposal.id}
+            onClickListItem={onClickListItem}
+            setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+            setSelectedDaoProposalId={setSelectedProposalId}
+          />
+        );
+      }
+      const threshold = proposal.threshold?.absolute_count;
+      const target = threshold ? threshold.weight : 0;
+      const yesPercentage = threshold ? threshold.total_weight : 0;
+      const noPercentage = 100 - yesPercentage;
+
       return (
         <ProposalListItem
           key={proposal.id + proposal.description}

@@ -1,4 +1,4 @@
-import { Dispatch, useCallback, useEffect, useMemo } from 'react';
+import { Dispatch, useCallback } from 'react';
 import { State, Actions, Member } from '../../DaoProposalReducer';
 import {
   Box,
@@ -20,105 +20,24 @@ import { v4 as uuid } from 'uuid';
 import { AddIcon, QuestionOutlineIcon } from '@chakra-ui/icons';
 import { MemberUpdate } from './DaoMembersEdit';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
-import { useDaoMultisigListVotersQuery } from '../../../../client/DaoMultisig.react-query';
-import { DaoMultisigQueryClient } from '../../../../client/DaoMultisig.client';
 
 type Props = {
   state: State;
   dispatch: Dispatch<Actions>;
   client: IdentityserviceQueryClient;
-  daoMultisigQueryClient: DaoMultisigQueryClient;
-  ownerAddress: string;
+  membersArr: Member[];
+  isLoading: boolean;
+  totalVotingPower: number;
 };
 
 export const UpdateDirectories = ({
+  membersArr,
+  isLoading,
   client,
-  ownerAddress,
   state,
-  daoMultisigQueryClient,
+  totalVotingPower,
   dispatch,
 }: Props) => {
-  const membersArr = useMemo(
-    () => Object.values(state.members).filter(el => !el.isRemoved),
-    [state.members],
-  );
-
-  const { data, isLoading, isFetching } = useDaoMultisigListVotersQuery({
-    client: daoMultisigQueryClient,
-    args: {},
-  });
-
-  useEffect(() => {
-    async function getThreshold() {
-      try {
-        const threshold = await daoMultisigQueryClient.threshold();
-        let percentage = '0';
-        if ('threshold_quorum' in threshold) {
-          percentage = (
-            Number(threshold.threshold_quorum.threshold) * 100
-          ).toFixed(0);
-        }
-        if ('absolute_count' in threshold) {
-          percentage = Number(threshold.absolute_count.weight).toFixed(0);
-        }
-        if ('absolute_percentage' in threshold) {
-          percentage = (
-            Number(threshold.absolute_percentage.percentage) * 100
-          ).toFixed(0);
-        }
-        dispatch({
-          type: 'SET_INPUT_VALUE',
-          payload: {
-            type: 'threshold',
-            value: percentage,
-          },
-        });
-      } catch (err) {
-        console.error('Error:', err);
-      }
-    }
-    getThreshold();
-  }, [daoMultisigQueryClient, dispatch]);
-
-  useEffect(() => {
-    async function getMemberFromVoters() {
-      const members: Member[] = [];
-      if (!data || membersArr.length > 0) {
-        return members;
-      }
-
-      for (const voter of data.voters) {
-        const ownerId = await client.getIdentityByOwner({
-          owner: voter.addr,
-        });
-        members.push({
-          id: uuid(),
-          name: ownerId.identity?.name ?? '',
-          votingPower: voter.weight,
-        });
-      }
-
-      !membersArr.length &&
-        dispatch({
-          type: 'ADD_MEMBERS',
-          payload: members,
-        });
-    }
-
-    getMemberFromVoters();
-  }, [client, data, dispatch, membersArr.length]);
-
-  const totalVotingPower = useMemo(() => {
-    let votingPowers = 0;
-    membersArr.forEach(el => {
-      if (!el.votingPower) {
-        return;
-      }
-      votingPowers += el.votingPower;
-    });
-    return votingPowers;
-  }, [membersArr]);
-
   const onVotingPowerChange = useCallback(
     (id: string, value: number) => {
       dispatch({
@@ -249,10 +168,10 @@ export const UpdateDirectories = ({
         </Button>
         <Spacer />
       </Flex>
-      {isLoading || (isFetching && <Spinner />)}
+      {isLoading && <Spinner />}
       {membersArr.map(daoMember => (
         <MemberUpdate
-          isReadOnly={daoMember.address === ownerAddress}
+          isReadOnly={false}
           key={daoMember.id}
           id={daoMember.id}
           name={daoMember.name}

@@ -122,6 +122,12 @@ export function DAOProposalReducer(state: State, action: Actions): State {
       if (!member) {
         return state;
       }
+      const sameAddressMembers = Object.values(state.members).find(
+        el =>
+          action.payload?.address &&
+          el.address === action.payload.address &&
+          el.id !== action.payload.id,
+      );
       return {
         ...state,
         members: {
@@ -129,6 +135,13 @@ export function DAOProposalReducer(state: State, action: Actions): State {
           [member.id]: {
             ...member,
             ...action.payload,
+            ...(sameAddressMembers
+              ? {
+                  error: 'Address already exists',
+                }
+              : {
+                  error: undefined,
+                }),
           },
         },
       };
