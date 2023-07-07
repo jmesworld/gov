@@ -5,6 +5,7 @@ import { ProposalProgress } from './ProposalProgress';
 import { useRouter } from 'next/router';
 import { calculateVotes } from '../../../lib/calculateVotes';
 import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
+import moment from 'moment';
 
 type BaseProps = {
   totalSupply: number;
@@ -65,6 +66,16 @@ export const ProposalList = ({
     );
   } else {
     const proposalItems = proposals.map((proposal: any) => {
+      let votingDuration = null;
+
+      if (proposal?.voting_start && proposal?.voting_end) {
+        const start = new Date(proposal?.voting_start);
+        const end = new Date(proposal?.voting_end);
+
+        const diff = moment(end).diff(moment(start));
+        votingDuration = moment.duration(diff).humanize();
+      }
+
       const propType = isGov
         ? JSON.stringify(proposal.prop_type).split(':')[0].slice(2)
         : '';
@@ -87,6 +98,7 @@ export const ProposalList = ({
 
         return (
           <ProposalListItem
+            votingDuration={votingDuration ?? undefined}
             key={proposal.id + proposal.description}
             title={proposal.title}
             yesCount={coinYes}
@@ -151,7 +163,15 @@ export const ProposalList = ({
       );
     });
 
-    return <ul>{proposalItems}</ul>;
+    return (
+      <ul
+        style={{
+          display: 'grid',
+        }}
+      >
+        {proposalItems}
+      </ul>
+    );
   }
 };
 
@@ -188,7 +208,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
             fontFamily={'DM Sans'}
             fontWeight="medium"
             fontSize={12}
-            marginLeft={isGov ? '130px' : '125px'}
+            marginLeft={isGov ? '125px' : '125px'}
             marginRight={isGov ? '100px' : '100px'}
             width={'32px'}
           >
@@ -201,29 +221,28 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
             fontFamily={'DM Sans'}
             fontWeight="medium"
             fontSize={12}
-            marginLeft={isGov ? '100px' : '90px'}
-            marginRight={isGov ? '30px' : '60px'}
-            width={'94px'}
+            marginLeft={isGov ? '80px' : '90px'}
+            width={'121px'}
           >
-            % TO PASS
+            FUNDING PER MONTH
           </Text>
         </Box>
-      </Flex>
-      <Flex
-        flexGrow={1}
-        marginLeft={isGov ? '76px' : '35px'}
-        marginRight={isGov ? '84px' : '35px'}
-      >
-        <Text
-          color="rgba(15,0,86,0.8)"
-          fontFamily={'DM Sans'}
-          fontWeight="medium"
-          fontSize={12}
-          textAlign={'center'}
-          width={'94px'}
+        <Flex
+          flexGrow={1}
+          marginLeft={isGov ? '60px' : '35px'}
+          marginRight={isGov ? '84px' : '35px'}
         >
-          PASSING
-        </Text>
+          <Text
+            color="rgba(15,0,86,0.8)"
+            fontFamily={'DM Sans'}
+            fontWeight="medium"
+            fontSize={12}
+            textAlign={'center'}
+            width={'124px'}
+          >
+            FUNDING DURATION
+          </Text>
+        </Flex>
       </Flex>
     </Flex>
   );
@@ -244,6 +263,7 @@ export const ProposalListItem = ({
   setSelectedDaoProposalTitle,
   setSelectedDaoProposalId,
   navigateToProposal,
+  votingDuration,
 }: {
   title: string;
   threshold: number;
@@ -262,6 +282,7 @@ export const ProposalListItem = ({
   setSelectedDaoProposalTitle: Function;
   setSelectedDaoProposalId: Function;
   navigateToProposal: (proposalId: string) => void;
+  votingDuration?: string;
 }) => {
   return (
     <>
@@ -320,7 +341,11 @@ export const ProposalListItem = ({
             />
           </Flex>
         </Flex>
-        <Box marginLeft={isGov ? '90px' : '49px'} justifyContent={'center'}>
+        <Box
+          mr="14"
+          marginLeft={isGov ? '90px' : '49px'}
+          justifyContent={'center'}
+        >
           <Text
             color="white"
             fontWeight="normal"
@@ -331,8 +356,9 @@ export const ProposalListItem = ({
           </Text>
         </Box>
         <Box
-          marginLeft={isGov ? '90px' : '49px'}
+          marginLeft={isGov ? '60px' : '49px'}
           marginRight={'90px'}
+          width="100px"
           justifyContent={'center'}
         >
           <Text
@@ -341,7 +367,7 @@ export const ProposalListItem = ({
             fontSize={14}
             fontFamily="DM Sans"
           >
-            2 Months
+            {votingDuration}
           </Text>
         </Box>
       </Flex>
