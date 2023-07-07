@@ -137,6 +137,7 @@ export const SpendDaoFunds = ({ client, state, dispatch }: Props) => {
 
       {spendArr.map(spend => (
         <DaoTransferFund
+          notCancelable={spendArr.length === 1}
           key={spend.id}
           id={spend.id}
           name={spend.name}

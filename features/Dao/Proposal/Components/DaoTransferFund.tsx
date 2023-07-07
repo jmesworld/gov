@@ -21,6 +21,7 @@ type Props = {
   address?: string | null;
   error?: string;
   amount?: number;
+  notCancelable?: boolean;
   onAmountChange: (id: string, value: number) => void;
   onNameChange: (id: string, value: string) => void;
   onAddress: (id: string, value?: string | null) => void;
@@ -32,6 +33,7 @@ type Props = {
 export const DaoTransferFund = memo(
   ({
     id,
+    notCancelable,
     name,
     address,
     client,
@@ -171,7 +173,11 @@ export const DaoTransferFund = memo(
               onchange={[onNameValueChange, onChangeAddress]}
             />
           </Flex>
-          <InputGroup width={'202px'} height={'48px'} marginRight={'16px'}>
+          <InputGroup
+            width={'202px'}
+            height={'48px'}
+            marginRight={notCancelable ? '34px' : '16px'}
+          >
             <Input
               variant={'outline'}
               width={'202px'}
@@ -200,15 +206,16 @@ export const DaoTransferFund = memo(
               />
             </InputLeftElement>
           </InputGroup>
-
-          <CloseButton
-            size={'24px'}
-            _hover={{ backgroundColor: 'transparent' }}
-            color={'rgba(15,0,86,0.3)'}
-            onClick={() => {
-              onRemove(id);
-            }}
-          />
+          {!notCancelable && (
+            <CloseButton
+              size={'24px'}
+              _hover={{ backgroundColor: 'transparent' }}
+              color={'rgba(15,0,86,0.3)'}
+              onClick={() => {
+                onRemove(id);
+              }}
+            />
+          )}
         </Flex>
         <Text
           mb="3px"
