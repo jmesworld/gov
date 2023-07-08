@@ -37,24 +37,7 @@ export const BalanceDisplay = ({ address }: Props) => {
               mr={1}
               height={4}
             />
-            <Text> {balance?.unstaked}</Text>
-          </Flex>
-          <Flex
-            borderWidth={1}
-            borderStyle="solid"
-            borderColor="purple"
-            px={3}
-            alignItems="center"
-          >
-            <Text mr={3}>bJMES</Text>
-            <Image
-              src="/JMES_bonded_icon.svg"
-              alt="JMES Icon"
-              width={4}
-              mr={1}
-              height={4}
-            />
-            <Text> {balance?.staked}</Text>
+            <Text> {balance?.jmes}</Text>
           </Flex>
         </Flex>
       )}

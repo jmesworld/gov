@@ -27,12 +27,12 @@ export const useDelegate = () => {
   const { signingCosmWasmClient } = useSigningCosmWasmClientContext();
   const { balance, refresh } = useBalanceContext();
   const totalJmes = useMemo(
-    () => Number(balance?.unstaked.toFixed(0) ?? 0),
-    [balance?.unstaked],
+    () => Number(balance?.jmes.toFixed(0) ?? 0),
+    [balance?.jmes],
   );
   const totalBondedJmes = useMemo(
-    () => Number(balance?.staked.toFixed(0) ?? 0),
-    [balance?.staked],
+    () => Number((balance?.bJmes ?? 0).toFixed(0) ?? 0),
+    [balance?.bJmes],
   );
 
   const { address } = useIdentityContext();

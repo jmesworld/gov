@@ -44,6 +44,8 @@ export default function GovernanceProposal({
       <Flex height={'10px'} />
 
       <ProposalList
+        isGovList
+        client={governanceQueryClient}
         totalSupply={supply as number}
         proposals={governanceProposalQuery?.data?.proposals}
         isGov={true}

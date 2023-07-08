@@ -37,7 +37,7 @@ const BalanceContextProvider = ({ children }: Props) => {
   const [balance, setBalance] = useState<Balance | undefined>(undefined);
 
   const refetchInterval = useMemo(() => {
-    if (balance && balance?.bJmes > 0) {
+    if (balance && (balance?.bJmes ?? 0) > 0) {
       return 10 * 60 * 1000;
     }
     // refetch every one second if we have 0 balance

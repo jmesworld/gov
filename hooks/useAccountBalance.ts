@@ -19,8 +19,8 @@ export function useAccountBalance<T extends boolean = false>(
       const bJmes = await cosmWasmClient?.getBalance(address, BJMES_DENOM);
 
       return {
-        jmes: jmes?.amount,
-        bJmes: bJmes?.amount,
+        jmes: Number(jmes?.amount ?? null) / 10e6 ?? 0,
+        bJmes: Number(bJmes?.amount ?? null) / 10e6 ?? 0,
       };
     },
     {

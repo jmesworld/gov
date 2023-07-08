@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Box, Flex, Progress, Text } from '@chakra-ui/react';
+import { Badge, Box, Flex, Progress, Text } from '@chakra-ui/react';
 import { MouseEventHandler } from 'react';
 import { ProposalProgress } from './ProposalProgress';
 import { useRouter } from 'next/router';
 import { calculateVotes } from '../../../lib/calculateVotes';
 import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
 import moment from 'moment';
+import { isProposalGov } from '../../../utils/proposalUti';
+import { GovernanceQueryClient } from '../../../client/Governance.client';
 
 type BaseProps = {
   totalSupply: number;
@@ -13,6 +15,9 @@ type BaseProps = {
   onClickListItem?: MouseEventHandler<HTMLDivElement>;
   setSelectedDaoProposalTitle: Function;
   setSelectedProposalId: Function;
+  client: GovernanceQueryClient;
+  isGovList?: boolean;
+  largeSize?: boolean;
 };
 type Props =
   | (BaseProps & {
@@ -29,17 +34,19 @@ type Props =
 export const ProposalList = ({
   proposals,
   daoName,
-  isGov,
+  largeSize,
   onClickListItem,
   setSelectedDaoProposalTitle,
   setSelectedProposalId,
   totalSupply,
+  client,
+  isGovList,
   ...rest
 }: Props) => {
   const router = useRouter();
   const { supply } = useCoinSupplyContext();
 
-  const navigateToProposal = (proposalId: string) => {
+  const navigateToProposal = (proposalId: string, isGov: boolean) => {
     if (isGov) {
       router.push(`/proposals/${proposalId}`);
       return;
@@ -58,16 +65,14 @@ export const ProposalList = ({
           fontSize={14}
           marginTop={'24px'}
         >
-          {`There are currently no ${
-            isGov ? 'Governance' : 'Dao'
-          } Proposals available to view`}
+          Currently no Proposals available to view
         </Text>
       </Flex>
     );
   } else {
     const proposalItems = proposals.map((proposal: any) => {
       let votingDuration = null;
-
+      const isGov = isProposalGov(proposal, client);
       if (proposal?.voting_start && proposal?.voting_end) {
         const start = new Date(proposal?.voting_start);
         const end = new Date(proposal?.voting_end);
@@ -76,13 +81,15 @@ export const ProposalList = ({
         votingDuration = moment.duration(diff).humanize();
       }
 
-      const propType = isGov
-        ? JSON.stringify(proposal.prop_type).split(':')[0].slice(2)
-        : '';
-      const type = isGov
+      const propType = JSON.stringify(proposal?.prop_type)
+        ?.split(':')?.[0]
+        ?.slice(2);
+
+      const type = propType
         ? propType.slice(0, propType.length - 1)
         : proposal.description;
-      if (isGov) {
+
+      if (isGovList) {
         const {
           coinYes,
           coinNo,
@@ -102,6 +109,7 @@ export const ProposalList = ({
             key={proposal.id + proposal.description}
             title={proposal.title}
             yesCount={coinYes}
+            isGov={isGov}
             thresholdPercent={thresholdPercent}
             noCount={coinNo}
             yesPercent={yesPercentage}
@@ -109,7 +117,7 @@ export const ProposalList = ({
             totalCount={totalSupply}
             threshold={threshold}
             type={type}
-            navigateToProposal={navigateToProposal}
+            navigateToProposal={id => navigateToProposal(id, isGovList)}
             pass={
               proposal.status === 'passed' ||
               proposal.status === 'success' ||
@@ -118,7 +126,7 @@ export const ProposalList = ({
                 ? 'Yes'
                 : 'No'
             }
-            isGov={isGov}
+            largeSize={isGovList ? true : false}
             daoAddress={isGov ? undefined : rest.daoAddress}
             proposalId={proposal.id}
             onClickListItem={onClickListItem}
@@ -143,8 +151,9 @@ export const ProposalList = ({
           noPercent={noPercentage}
           totalCount={totalSupply}
           threshold={target}
+          isGov={isGov}
           type={type}
-          navigateToProposal={navigateToProposal}
+          navigateToProposal={id => navigateToProposal(id, !!isGovList)}
           pass={
             proposal.status === 'passed' ||
             proposal.status === 'success' ||
@@ -153,7 +162,7 @@ export const ProposalList = ({
               ? 'Yes'
               : 'No'
           }
-          isGov={isGov}
+          largeSize={!!largeSize}
           daoAddress={isGov ? undefined : rest.daoAddress}
           proposalId={proposal.id}
           onClickListItem={onClickListItem}
@@ -223,13 +232,14 @@ export const ProposalListItem = ({
   threshold,
   thresholdPercent,
   type,
-  isGov,
+  largeSize,
   proposalId,
   onClickListItem,
   setSelectedDaoProposalTitle,
   setSelectedDaoProposalId,
   navigateToProposal,
   votingDuration,
+  isGov,
 }: {
   title: string;
   threshold: number;
@@ -241,7 +251,7 @@ export const ProposalListItem = ({
   noCount: number;
   noPercent: number;
   totalCount: number;
-  isGov: boolean;
+  largeSize: boolean;
   daoAddress?: string;
   proposalId?: string;
   onClickListItem?: MouseEventHandler<HTMLDivElement>;
@@ -249,13 +259,14 @@ export const ProposalListItem = ({
   setSelectedDaoProposalId: Function;
   navigateToProposal: (proposalId: string) => void;
   votingDuration?: string;
+  isGov?: boolean;
 }) => {
   return (
     <>
       <Flex
         flex={1}
         height={'112px'}
-        width={isGov ? '100%' : '100%'}
+        width={largeSize ? '100%' : '100%'}
         backgroundColor="purple"
         borderRadius={12}
         alignItems={'center'}
@@ -269,12 +280,12 @@ export const ProposalListItem = ({
       >
         <Flex>
           <Flex
-            width={isGov ? '227px' : '151px'}
+            width={largeSize ? '227px' : '151px'}
             flexDirection={'column'}
             justifyContent={'center'}
           >
             <Text
-              width={isGov ? '281px' : '268px'}
+              width={largeSize ? '281px' : '268px'}
               color="white"
               fontFamily={'DM Sans'}
               fontWeight="normal"
@@ -284,7 +295,7 @@ export const ProposalListItem = ({
               {title.length > 20 ? title.substring(0, 20) + '...' : title}
             </Text>
             <Text
-              width={isGov ? '281px' : '268px'}
+              width={largeSize ? '281px' : '268px'}
               color="white"
               fontFamily={'DM Sans'}
               fontWeight="normal"
@@ -294,10 +305,15 @@ export const ProposalListItem = ({
             >
               {type.length > 26 ? title.substring(0, 26) + '...' : type}
             </Text>
+            {isGov && (
+              <Badge w="100px" ml="3" fontSize="10px" color="purple" bg="white">
+                Gov Proposal
+              </Badge>
+            )}
           </Flex>
           <Flex
             // flexGrow={1}
-            width={isGov ? '500px' : '440px'}
+            width={largeSize ? '500px' : '440px'}
             alignItems={'center'}
             justifyContent={'space-around'}
           >
