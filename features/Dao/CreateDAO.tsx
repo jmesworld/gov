@@ -55,6 +55,9 @@ const initialState: State = {
   threshold: 1,
 };
 
+const leaveModalTitle =
+  'Are you sure you want to leave the creation of this Proposal?';
+const leaveModalMessage = 'All data will be lost.';
 const CreateDaoNewForm = ({
   setCreateDaoSelected,
   daoOwner,
@@ -78,9 +81,10 @@ const CreateDaoNewForm = ({
       daoName !== '' || threshold !== 0 || Object.values(members).length > 1
     );
   }, [daoName, members, threshold]);
-
   const [setRouterCheck, navigate] = useLeaveConfirm({
     preventNavigatingAway: isDirty && !isCreatingDao,
+    title: leaveModalTitle,
+    message: leaveModalMessage,
   });
 
   const membersArr = useMemo(() => Object.values(members), [members]);

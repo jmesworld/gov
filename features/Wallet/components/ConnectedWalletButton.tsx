@@ -21,6 +21,8 @@ import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { RefObject } from 'react';
 import { CopyAddressButton } from './CopyAddressButton';
 import { useDelegateContext } from '../../../contexts/DelegateContext';
+import { useLeaveConfirmContext } from '../../../hooks/useLeaveConfirm';
+import { PromiseModal } from '../../components/genial/PromiseModal';
 
 export const ConnectedWalletButton = ({
   identityName,
@@ -29,12 +31,22 @@ export const ConnectedWalletButton = ({
   isLoading,
   isDisabled,
 }: ConnectedWalletType) => {
+  const { check, preventNavigatingAway } = useLeaveConfirmContext();
   const { address, disconnect } = useIdentityContext();
   const { openDelegate } = useDelegateContext();
   const { isOpen, onToggle, buttonRef } = useMenu({
     defaultIsOpen: false,
   });
   const handleDisconnect = () => {
+    if (preventNavigatingAway && check) {
+      PromiseModal({
+        title: 'Are you sure you want to disconnect your Wallet?',
+        description: 'All data will be lost.',
+      }).then(() => {
+        disconnect?.();
+      });
+      return;
+    }
     disconnect?.();
   };
   const identityBalanceInt = parseInt(identityBalance as string);
