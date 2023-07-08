@@ -64,7 +64,6 @@ export default function DaoProposalDetail({
     args: {},
     options: { refetchInterval: 10000 },
   });
-
   const proposalDescription = proposalDetailQuery?.data?.description ?? '';
   /// @ts-ignore
   const expiryDate = proposalDetailQuery?.data?.expires?.at_height ?? 0;
@@ -81,7 +80,6 @@ export default function DaoProposalDetail({
   const yesPercentage = threshold ? threshold.total_weight : 0;
 
   const votes = votesQuery?.data?.votes ?? [];
-
   const myVotingInfo = votersQuery?.data?.voters.filter(
     voter => voter.addr === (address as string),
   ) ?? [{ weight: 0 }];

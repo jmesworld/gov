@@ -14,6 +14,9 @@ import { useCosmWasmClientContext } from '../../../contexts/CosmWasmClient';
 
 import { BalanceDisplay } from './Balance';
 import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
+import { useMemo } from 'react';
+import { GovernanceQueryClient } from '../../../client/Governance.client';
+import { NEXT_PUBLIC_GOVERNANCE_CONTRACT } from '../../../config/defaults';
 
 export default function DaoProposal({
   daoAddress,
@@ -33,9 +36,21 @@ export default function DaoProposal({
 }) {
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { supply } = useCoinSupplyContext();
-  const daoQueryClient = new DaoMultisigQueryClient(
-    cosmWasmClient as CosmWasmClient,
-    daoAddress as string,
+  const daoQueryClient = useMemo(
+    () =>
+      new DaoMultisigQueryClient(
+        cosmWasmClient as CosmWasmClient,
+        daoAddress as string,
+      ),
+    [cosmWasmClient, daoAddress],
+  );
+  const goverrnanceQueryClient = useMemo(
+    () =>
+      new GovernanceQueryClient(
+        cosmWasmClient as CosmWasmClient,
+        NEXT_PUBLIC_GOVERNANCE_CONTRACT,
+      ),
+    [cosmWasmClient],
   );
 
   const { data, isFetching, isLoading } = useDaoMultisigListProposalsQuery({
@@ -66,6 +81,7 @@ export default function DaoProposal({
           <Flex height={'10px'} />
           {data && (
             <ProposalList
+              client={goverrnanceQueryClient}
               daoName={daoName}
               totalSupply={supply as number}
               proposals={data?.proposals}
