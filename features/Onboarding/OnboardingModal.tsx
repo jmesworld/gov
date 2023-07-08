@@ -27,7 +27,7 @@ export default function OnboardingModal() {
     if (!getIdentityName()) {
       return true;
     }
-    if (!balance?.unstaked) {
+    if (!balance?.jmes) {
       return true;
     }
 
@@ -66,9 +66,9 @@ export default function OnboardingModal() {
                     position: 'fixed',
                   }}
                 >
-                  {balance?.unstaked === 0 ? (
+                  {balance?.jmes === 0 ? (
                     <AddTokensCard />
-                  ) : balance?.unstaked &&
+                  ) : balance?.jmes &&
                     !getIdentityName() &&
                     !loadingIdentity ? (
                     <ChooseUsernameCard
