@@ -22,6 +22,7 @@ import { ProposalHeader } from '../../components/Proposal/ProposalHeader';
 import { ProposalMyVote } from '../../components/Proposal/ProposalMyVote';
 import { ProposalVoting } from '../../components/Proposal/ProposalVoting';
 import { useCosmWasmClientContext } from '../../../contexts/CosmWasmClient';
+import DirectoresList from '../Proposal/Components/DirectorsList';
 
 type Props = {
   selectedDao: string;
@@ -33,7 +34,6 @@ type Props = {
 export default function DaoProposalDetail({
   selectedDao,
   selectedDaoName,
-  selectedDaoProposalTitle,
   selectedDaoProposalId,
 }: Props) {
   const { address } = useChain(chainName);
@@ -139,6 +139,10 @@ export default function DaoProposalDetail({
               voted={myVotes.length > 0}
               dao={selectedDao}
               proposalId={selectedDaoProposalId}
+            />
+            <DirectoresList
+              voters={votes ?? []}
+              loading={votersQuery.isLoading}
             />
             {/* <ProposalDaoMembers
               selectedDaoMembersList={daoMembers}

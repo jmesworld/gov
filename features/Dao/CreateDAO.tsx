@@ -78,7 +78,7 @@ const CreateDaoNewForm = ({
 
   const isDirty = useMemo(() => {
     return (
-      daoName !== '' || threshold !== 0 || Object.values(members).length > 1
+      daoName !== '' || threshold !== 1 || Object.values(members).length > 1
     );
   }, [daoName, members, threshold]);
   const [setRouterCheck, navigate] = useLeaveConfirm({
