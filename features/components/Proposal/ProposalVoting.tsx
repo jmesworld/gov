@@ -27,26 +27,19 @@ export const ProposalVoting = (props: Props) => {
         >
           To Pass
         </Text>
-        <ProposalProgress
-          yesCount={yesVotes.length}
-          noCount={noVotes.length}
-          yesPercent={props.yesPercentage}
-          noPercent={100 - props.yesPercentage}
-          target={props.target}
-          targetPercentage={props.target}
-        />
+
         <Divider borderColor="rgba(81, 54, 194, 0.3)" />
         <HStack align="flex-start" spacing="10px" width="100%">
           <ProposalVotes
             type="yes"
             percentage={props.yesPercentage}
             votes={yesVotes}
-          ></ProposalVotes>
+          />
           <ProposalVotes
             type="no"
             percentage={100 - props.yesPercentage}
             votes={noVotes}
-          ></ProposalVotes>
+          />
         </HStack>
       </VStack>
     </Box>
