@@ -14,8 +14,8 @@ type Props = {
   children?: ReactNode;
 };
 type Balance = {
-  unstaked: number;
-  staked: number;
+  jmes: number;
+  bJmes?: number;
 };
 const emptyFN = () => {
   throw new Error('Forgot to wrap your component with BalanceContextProvider');
@@ -37,7 +37,7 @@ const BalanceContextProvider = ({ children }: Props) => {
   const [balance, setBalance] = useState<Balance | undefined>(undefined);
 
   const refetchInterval = useMemo(() => {
-    if (balance && balance.unstaked > 0) {
+    if (balance && balance?.bJmes > 0) {
       return 10 * 60 * 1000;
     }
     // refetch every one second if we have 0 balance
@@ -48,27 +48,25 @@ const BalanceContextProvider = ({ children }: Props) => {
     return !!address;
   }, [address]);
 
-  const currBalance = useAccountBalance(
+  const { data, refetch } = useAccountBalance<false>(
     address,
     refetchInterval,
     balanceFetchEnabled,
   );
   useEffect(() => {
-    if (!currBalance.data) {
+    if (!data) {
       return;
     }
-    if (
-      currBalance.data?.staked === balance?.staked &&
-      currBalance.data?.unstaked === balance?.unstaked
-    ) {
+    if (data?.bJmes === balance?.bJmes && data?.jmes === balance?.jmes) {
       return;
     }
-    setBalance(currBalance.data);
-  }, [balance?.staked, balance?.unstaked, currBalance]);
+
+    setBalance(data as any);
+  }, [balance?.bJmes, balance?.jmes, data]);
 
   const value: BalanceContextType = {
     balance,
-    refresh: currBalance.refetch,
+    refresh: refetch,
   };
   return (
     <BalanceContext.Provider value={value}>{children}</BalanceContext.Provider>

@@ -1,30 +1,26 @@
 import { useQuery } from '@tanstack/react-query';
-import { rest } from '../config/defaults';
 import { JMES_DENOM, BJMES_DENOM } from '../lib/constants';
+import { useCosmWasmClientContext } from '../contexts/CosmWasmClient';
 
-export function useAccountBalance(
+export function useAccountBalance<T extends boolean = false>(
   address: string | undefined,
   refetchInterval = 60 * 1000,
   enabled = true,
 ) {
+  const { cosmWasmClient } = useCosmWasmClientContext();
   return useQuery(
     ['accountBalance', address],
-    async () => {
-      const requestUrl = `${rest}/cosmos/bank/v1beta1/balances/${address}`;
-
-      const response = await fetch(requestUrl);
-      if (!response.ok) {
-        console.error(response);
-        throw new Error('Failed to fetch account balance');
+    async ({ queryKey }) => {
+      const address = queryKey[1] as string | undefined;
+      if (!address) {
+        throw new Error('No address passed');
       }
-      const data = await response.json();
-      const unstakedBalance =
-        data.balances.find((i: any) => i.denom === JMES_DENOM)?.amount ?? 0;
-      const stakedBalance =
-        data.balances.find((i: any) => i.denom === BJMES_DENOM)?.amount ?? 0;
+      const jmes = await cosmWasmClient?.getBalance(address, JMES_DENOM);
+      const bJmes = await cosmWasmClient?.getBalance(address, BJMES_DENOM);
+
       return {
-        unstaked: unstakedBalance / 1000000,
-        staked: stakedBalance / 1000000,
+        jmes: jmes?.amount,
+        bJmes: bJmes?.amount,
       };
     },
     {
@@ -34,7 +30,7 @@ export function useAccountBalance(
       onError: error => {
         console.error(error);
       },
-      enabled,
+      enabled: enabled && !!address && !!cosmWasmClient,
       refetchInterval,
     },
   );

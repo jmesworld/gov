@@ -26,8 +26,8 @@ export const Connected = ({
   return (
     <ConnectedWalletButton
       identityName={getIdentityName()}
-      identityBalance={balance?.unstaked ?? 0}
-      identityStake={balance?.staked ?? 0}
+      identityBalance={balance?.jmes ?? 0}
+      identityStake={balance?.bJmes ?? 0}
       buttonText={buttonText}
       onClickConnectBtn={onClick}
     />
