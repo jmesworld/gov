@@ -127,7 +127,6 @@ export const DAOProposalPage = ({
       return true;
     }
   }, [state]);
-
   useLeaveConfirm({
     preventNavigatingAway: !!isDirty,
   });
@@ -220,6 +219,7 @@ export const DAOProposalPage = ({
           id: uuid(),
           name: ownerId.identity?.name ?? '',
           votingPower: voter.weight,
+          og: true,
         });
       }
 
