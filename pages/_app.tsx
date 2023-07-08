@@ -18,6 +18,7 @@ import { WalletModal } from '../features/Wallet/components/WalletModal';
 import React, { ReactElement } from 'react';
 import { AppStateProvider } from '../contexts/AppStateContext';
 import { CosmWasmClientContextProvider } from '../contexts/CosmWasmClient';
+import { Container as ModalContainer } from 'react-modal-promise';
 const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL as string;
 const chains: Chain[] = [jmesTestnet];
 
@@ -32,6 +33,7 @@ import { DelegateContextProvider } from '../contexts/DelegateContext';
 import { ErrorBoundary } from '../error/errorBondary';
 import { VotingPeriodContextProvider } from '../contexts/VotingPeriodContext';
 import { ValidatorContextProvider } from '../contexts/validatorsContext';
+import { LeaveConfirmContextProvider } from '../hooks/useLeaveConfirm';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   Layout?: ({ children }: { children: ReactElement }) => ReactElement;
@@ -83,12 +85,15 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
                         <ValidatorContextProvider>
                           <DelegateContextProvider>
                             <VotingPeriodContextProvider>
-                              <Layout>
-                                <ErrorBoundary>
-                                  <Component {...pageProps} />
-                                  <OnboardingModal />
-                                </ErrorBoundary>
-                              </Layout>
+                              <LeaveConfirmContextProvider>
+                                <Layout>
+                                  <ErrorBoundary>
+                                    <ModalContainer />
+                                    <Component {...pageProps} />
+                                    <OnboardingModal />
+                                  </ErrorBoundary>
+                                </Layout>
+                              </LeaveConfirmContextProvider>
                             </VotingPeriodContextProvider>
                           </DelegateContextProvider>
                         </ValidatorContextProvider>
