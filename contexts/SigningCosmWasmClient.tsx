@@ -39,7 +39,7 @@ const SigningCosmWasmClientContextProvider = ({ children }: Props) => {
     }
     if (address) assignSigningCosmWasmClient();
     // getSigningCosmWasmClient is a function that changes on every render so we can see changes by address only
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
   const value = {
