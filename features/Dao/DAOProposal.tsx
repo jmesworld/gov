@@ -28,14 +28,14 @@ import {
 } from '../../client/DaoMultisig.client';
 import { SpendDaoFunds } from './Proposal/Components/SpendDaoFunds';
 
-import { DaoMembersClient } from '../../client/DaoMembers.client';
 import { validateForm } from './Proposal/libs/checkIfFormValid';
 import { getRequest } from './Proposal/libs/getRequest';
-import { useDaoMultisigProposeMutation } from '../../client/DaoMultisig.react-query';
 import { useLeaveConfirm } from '../../hooks/useLeaveConfirm';
-import { useRouter } from 'next/router';
 import { useDaoMultisigListVotersQuery } from '../../client/DaoMultisig.react-query';
 import { v4 as uuid } from 'uuid';
+import { ConfigResponse } from '../../client/DaoMultisig.types';
+import * as MultisigClientType from '../../client/DaoMultisig.types';
+import { toBase64 } from '../../utils/identity';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -95,12 +95,14 @@ export const DAOProposalPage = ({
   const [err, setErr] = useState<string[] | undefined>([]);
   const [creatingProposal, setIsCreatingProposal] = useState(false);
   const toast = useToast();
-  const router = useRouter();
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { signingCosmWasmClient: signingClient } =
     useSigningCosmWasmClientContext();
   const [activeTab, setActiveTab] = useState<ProposalTypes>('text');
   const [state, dispatch] = useReducer(DAOProposalReducer, initialState);
+  const [daoMultisigConfig, setDaoMultisigConfig] =
+    useState<ConfigResponse | null>(null);
+
   const { title, description } = state;
 
   const client: IdentityserviceQueryClient = useMemo(
@@ -127,7 +129,8 @@ export const DAOProposalPage = ({
       return true;
     }
   }, [state]);
-  useLeaveConfirm({
+
+  const [setRouteCheck, navigate] = useLeaveConfirm({
     preventNavigatingAway: !!isDirty,
   });
 
@@ -140,27 +143,29 @@ export const DAOProposalPage = ({
     [cosmWasmClient, daoAddress],
   );
 
-  const daoMember = useMemo(
-    () =>
-      new DaoMembersClient(
-        signingClient as SigningCosmWasmClient,
-        address as string,
-        IDENTITY_SERVICE_CONTRACT,
-      ),
-    [address, signingClient],
-  );
-
   const daoClient = useMemo(
     () =>
       new DaoMultisigClient(
         signingClient as SigningCosmWasmClient,
         address as string,
-        IDENTITY_SERVICE_CONTRACT,
+        daoAddress,
       ),
-    [address, signingClient],
+    [daoAddress, address, signingClient],
   );
 
-  const createGovProposalMutation = useDaoMultisigProposeMutation();
+  useEffect(() => {
+    async function fetchConfig() {
+      try {
+        const config = await daoClient.config();
+        setDaoMultisigConfig(config);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchConfig();
+  }, [daoClient]);
+
+  const daoMembersAddress = daoMultisigConfig?.dao_members_addr;
 
   useEffect(() => {
     async function getThreshold() {
@@ -357,9 +362,12 @@ export const DAOProposalPage = ({
           </Button>
           <Box width={'12px'} />
           <Button
-            disabled={creatingProposal || !!error.length}
+            disabled={creatingProposal || !!error.length || !daoMembersAddress}
             onClick={async () => {
               let result = null;
+              if (!daoMembersAddress) {
+                return;
+              }
               try {
                 if (error.length) {
                   setErr(error);
@@ -368,27 +376,40 @@ export const DAOProposalPage = ({
                 setErr([]);
                 setIsCreatingProposal(true);
                 const msg = getRequest(state, activeTab);
+                if (msg && 'update_members' in msg) {
+                  const wasmMsg: MultisigClientType.WasmMsg = {
+                    execute: {
+                      contract_addr: daoMembersAddress,
+                      funds: [],
+                      msg: toBase64(msg),
+                    },
+                  };
+                  result = await daoClient.propose({
+                    title: state.title.value,
+                    description: state.description.value,
+                    msgs: [{ wasm: wasmMsg }],
+                  });
+                }
                 if (msg && 'propose' in msg) {
                   result = await daoClient.propose(msg.propose);
                 }
-                if (msg && 'update_members' in msg) {
-                  result = await daoMember.updateMembers(msg.update_members);
-                }
+
                 if (!msg) {
-                  result = await createGovProposalMutation.mutateAsync({
-                    client: daoClient,
-                    msg: {
-                      title: state.title.value,
-                      description: state.description.value,
-                      msgs: [],
-                    },
+                  result = await daoClient.propose({
+                    title: state.title.value,
+                    description: state.description.value,
+                    msgs: [],
                   });
                 }
-                if (!result) {
+                if (!result && msg && 'propose' in msg) {
                   throw new Error('Something went wrong');
                 }
+                dispatch({
+                  type: 'RESET',
+                  payload: initialState,
+                });
                 const id =
-                  result.events
+                  result?.events
                     .find(el => el.type === 'wasm')
                     ?.attributes.find(el => el.key === 'proposal_id')?.value ??
                   null;
@@ -399,8 +420,10 @@ export const DAOProposalPage = ({
                   type: 'RESET',
                   payload: initialState,
                 });
-                router.push(`/dao/view/${selectedDaoName}/proposals/${id}`);
+                setRouteCheck(false);
+                navigate(`/dao/view/${selectedDaoName}/proposals/${id}`);
               } catch (err) {
+                console.error(err);
                 if (err instanceof Error) {
                   toast({
                     status: 'error',
