@@ -23,6 +23,10 @@ import { ProposalMyVote } from '../../components/Proposal/ProposalMyVote';
 import { ProposalVoting } from '../../components/Proposal/ProposalVoting';
 import { useCosmWasmClientContext } from '../../../contexts/CosmWasmClient';
 import DirectoresList from '../Proposal/Components/DirectorsList';
+import {
+  GetProposalDetail,
+  GovProposalType,
+} from '../Proposal/Components/ProposalType';
 
 type Props = {
   selectedDao: string;
@@ -113,8 +117,11 @@ export default function DaoProposalDetail({
               yesPercentage={yesPercentage}
               target={target}
               votes={votes}
-            />
-            <Box
+            >
+              <GovProposalType proposal={proposalDetailQuery?.data} />
+            </ProposalVoting>
+            <GetProposalDetail proposal={proposalDetailQuery.data} />
+            <Flex
               background="rgba(112, 79, 247, 0.1)"
               borderRadius="12px"
               border="1px solid rgba(112, 79, 247, 0.5)"
@@ -122,15 +129,17 @@ export default function DaoProposalDetail({
               marginTop="20px"
               height="300px"
             >
+              <Text color="purple">Description</Text>
               <Text
+                color="midnight"
+                ml="10px"
                 fontSize="16px"
                 fontWeight="normal"
-                color="rgba(81, 54, 194, 1)"
                 fontFamily="DM Sans"
               >
                 {proposalDescription}
               </Text>
-            </Box>
+            </Flex>
           </Box>
           <VStack width="330px" spacing="30px" align="flex-start">
             <ProposalMyVote

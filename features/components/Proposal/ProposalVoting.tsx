@@ -5,6 +5,7 @@ import { ProposalVotes } from './ProposalVotes';
 export interface Props {
   yesPercentage: number;
   target: number;
+  children?: React.ReactNode;
   votes: Array<{
     vote: string;
     voter: string;
@@ -19,15 +20,15 @@ export const ProposalVoting = (props: Props) => {
   return (
     <Box borderRadius="12px" background="#7453FD" padding="18px 20px">
       <VStack align="flex-start" spacing="20px">
-        <Text
-          color="#fff"
-          fontSize={16}
-          fontWeight="medium"
-          fontFamily="DM Sans"
-        >
-          To Pass
-        </Text>
-
+        {props.children}
+        <ProposalProgress
+          yesCount={yesVotes.length}
+          noCount={noVotes.length}
+          yesPercent={props.yesPercentage}
+          noPercent={100 - props.yesPercentage}
+          target={props.target}
+          targetPercentage={props.target}
+        />
         <Divider borderColor="rgba(81, 54, 194, 0.3)" />
         <HStack align="flex-start" spacing="10px" width="100%">
           <ProposalVotes

@@ -48,7 +48,21 @@ export const useDelegate = () => {
     bondValidators: validatorsMap,
     unBondValidators: unBondMap,
     myUnBondings: myUnBondingMap,
+
+    refetchBondValidators,
+    refetchMyUnBondingsValidators,
+    refetchUnBondValidators,
   } = useValidatorContext();
+
+  useEffect(() => {
+    refetchBondValidators();
+    refetchMyUnBondingsValidators();
+    refetchUnBondValidators();
+  }, [
+    refetchBondValidators,
+    refetchMyUnBondingsValidators,
+    refetchUnBondValidators,
+  ]);
 
   const bondValidators = useMemo(() => {
     return Array.from(validatorsMap?.values() ?? []);

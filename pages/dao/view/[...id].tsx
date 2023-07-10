@@ -7,8 +7,7 @@ import DaoProposalDetail from '../../../features/Dao/components/DaoProposalDetai
 import { useRedirectToHomeForNoWalletConnected } from '../../../hooks/Redirect';
 
 const DAODetail = () => {
-  const { getSelectedDAOByName, afterCreate, selectedDAO, firstLoad } =
-    useDAOContext();
+  const { getSelectedDAOByName, afterCreate, firstLoad } = useDAOContext();
   const {
     setSelectedDaoProposalTitle,
     setDaoProposalDetailOpen,
@@ -22,6 +21,7 @@ const DAODetail = () => {
 
   const id = router.query.id;
   const daoName = id?.[0];
+  const selectedDAO = getSelectedDAOByName(daoName ?? null);
   const proposalKey = id?.[1];
   const proposalId = id?.[2];
 
@@ -42,7 +42,6 @@ const DAODetail = () => {
   }
 
   if (Array.isArray(id) && id.length === 1) {
-    const selectedDAO = getSelectedDAOByName(daoName ?? null);
     if ((afterCreate !== '' && !selectedDAO) || firstLoad) {
       return (
         <Flex alignItems="center">
