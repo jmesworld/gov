@@ -8,6 +8,7 @@ import {
   Flex,
   Image,
   Text,
+  Tooltip,
 } from '@chakra-ui/react';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
@@ -114,13 +115,17 @@ export const DaoMembersListItem = ({
   return (
     <Flex
       width={'100%'}
-      height={'50px'}
+      height={'54px'}
       marginBottom={'6px'}
+      bg="white"
       alignItems={'center'}
       borderColor={'rgba(116,83,256,0.3)'}
       borderWidth={'1px'}
-      bg="white"
-      borderRadius="20PX"
+      borderRadius="12px"
+      _hover={{
+        bg: 'rgba(198, 180, 252, 0.10)',
+        borderColor: 'rgba(116,83,256,0.3)',
+      }}
       pos="relative"
       onMouseEnter={() => {
         setOnMouseEnter(true);
@@ -132,10 +137,8 @@ export const DaoMembersListItem = ({
       <Flex
         p="1px"
         width={'80%'}
-        // height={'48px'}
+        height={'54px'}
         justifyContent="space-between"
-        borderRadius={'20px'}
-        backgroundColor={'white'}
         alignItems={'center'}
         paddingLeft={'20px'}
       >
@@ -158,18 +161,20 @@ export const DaoMembersListItem = ({
                 </Text>
               )}
               {(mouseEnter || copied) && (
-                <Image
-                  cursor="pointer"
-                  display="inline-block"
-                  src="/copy.svg"
-                  width="16px"
-                  height="16px"
-                  marginLeft="4px"
-                  alt="bjmes"
-                  onClick={() => {
-                    copyToClipbaord(address);
-                  }}
-                />
+                <Tooltip label="Copy wallet address" hasArrow placement="top">
+                  <Image
+                    cursor="pointer"
+                    display="inline-block"
+                    src="/copy.svg"
+                    width="16px"
+                    height="16px"
+                    marginLeft="4px"
+                    alt="bjmes"
+                    onClick={() => {
+                      copyToClipbaord(address);
+                    }}
+                  />
+                </Tooltip>
               )}
             </div>
           </Flex>
@@ -202,7 +207,7 @@ export const DaoMembersListItem = ({
       </Flex>
       <span
         style={{
-          zIndex: 99999,
+          zIndex: 99,
           position: 'absolute',
           right: '-10px',
         }}

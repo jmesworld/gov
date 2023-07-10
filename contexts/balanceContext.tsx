@@ -7,8 +7,9 @@ import {
   useState,
 } from 'react';
 
-import { useAccountBalance } from '../hooks/useAccountBalance';
+import { formatBalance, useAccountBalance } from '../hooks/useAccountBalance';
 import { useIdentityContext } from './IdentityContext';
+import { Core } from 'jmes';
 
 type Props = {
   children?: ReactNode;
@@ -17,38 +18,54 @@ type Balance = {
   jmes: number;
   bJmes?: number;
 };
+type FormattedBalance = {
+  jmes: string;
+  bJmes?: string;
+};
+
+type BalanceCoins = {
+  jmes: Core.Coin;
+  bJmes?: Core.Coin;
+};
 const emptyFN = () => {
   throw new Error('Forgot to wrap your component with BalanceContextProvider');
 };
 type BalanceContextType = {
   balance: Balance | undefined;
   refresh: () => void;
+  formattedBalance?: FormattedBalance;
+  balanceCoins?: BalanceCoins;
+  formattedWithSuffix?: FormattedBalance;
 };
 
 const initialState: BalanceContextType = {
   balance: undefined,
   refresh: emptyFN,
+  formattedBalance: undefined,
+  balanceCoins: undefined,
+  formattedWithSuffix: undefined,
 };
 
 const BalanceContext = createContext<BalanceContextType>(initialState);
 
 const BalanceContextProvider = ({ children }: Props) => {
   const { address } = useIdentityContext();
-  const [balance, setBalance] = useState<Balance | undefined>(undefined);
+  const [jmesCoin, setJmesCoin] = useState<Core.Coin | undefined>(undefined);
+  const [bJmesCoin, setBJmesCoin] = useState<Core.Coin | undefined>(undefined);
 
   const refetchInterval = useMemo(() => {
-    if (balance && (balance?.bJmes ?? 0) > 0) {
+    if (jmesCoin && jmesCoin.amount.equals(0)) {
       return 10 * 60 * 1000;
     }
     // refetch every one second if we have 0 balance
     return 1 * 1000;
-  }, [balance]);
+  }, [jmesCoin]);
 
   const balanceFetchEnabled = useMemo(() => {
     return !!address;
   }, [address]);
 
-  const { data, refetch } = useAccountBalance<false>(
+  const { data, refetch } = useAccountBalance(
     address,
     refetchInterval,
     balanceFetchEnabled,
@@ -57,16 +74,81 @@ const BalanceContextProvider = ({ children }: Props) => {
     if (!data) {
       return;
     }
-    if (data?.bJmes === balance?.bJmes && data?.jmes === balance?.jmes) {
+    if (
+      data?.jmes?.toString() === bJmesCoin?.toString() &&
+      data?.jmes?.toString() === jmesCoin?.toString()
+    ) {
       return;
     }
 
-    setBalance(data as any);
-  }, [balance?.bJmes, balance?.jmes, data]);
+    setJmesCoin(data.jmes);
+    setBJmesCoin(data.bJmes);
+  }, [bJmesCoin, data, jmesCoin]);
+
+  const formattedWithSuffix = useMemo(() => {
+    if (!data) {
+      return undefined;
+    }
+    const jmes = formatBalance(
+      data.jmes?.amount.dividedBy(10e6).toNumber() ?? 0,
+    );
+    const bJmes = formatBalance(
+      data.bJmes?.amount.dividedBy(10e6).toNumber() ?? 0,
+    );
+    return {
+      jmes,
+      bJmes,
+    };
+  }, [data]);
+
+  const formattedBalance = useMemo(() => {
+    if (!data) {
+      return undefined;
+    }
+    const jmes =
+      data.jmes?.amount
+        .dividedBy(10e6)
+        .toDecimalPlaces(0)
+        .toNumber()
+        .toLocaleString() ?? '0';
+    const bJmes =
+      data.bJmes?.amount
+        .dividedBy(10e6)
+        .toDecimalPlaces(0)
+        .toNumber()
+        .toLocaleString() ?? '0';
+    return {
+      jmes,
+      bJmes,
+    };
+  }, [data]);
+
+  const balance = useMemo(() => {
+    if (!data) {
+      return undefined;
+    }
+    const jmes =
+      data.jmes?.amount.dividedBy(10e6).toDecimalPlaces(0).toNumber() ?? 0;
+    const bJmes =
+      data.bJmes?.amount.dividedBy(10e6).toDecimalPlaces(0).toNumber() ?? 0;
+    return {
+      jmes,
+      bJmes,
+    };
+  }, [data]);
 
   const value: BalanceContextType = {
     balance,
     refresh: refetch,
+    formattedBalance,
+    formattedWithSuffix,
+    balanceCoins:
+      jmesCoin && bJmesCoin
+        ? {
+            jmes: jmesCoin,
+            bJmes: bJmesCoin,
+          }
+        : undefined,
   };
   return (
     <BalanceContext.Provider value={value}>{children}</BalanceContext.Provider>

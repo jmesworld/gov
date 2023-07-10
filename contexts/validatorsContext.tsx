@@ -8,6 +8,11 @@ type Props = {
   children?: ReactNode;
 };
 
+const emptyFN = () => {
+  throw new Error(
+    'Forgot to wrap your component with ValidatorContextProvider',
+  );
+};
 interface ValidatorContextType {
   bondValidators: Map<string, Core.Validator> | null;
   unBondValidators: Map<string, Core.Delegation> | null;
@@ -20,6 +25,10 @@ interface ValidatorContextType {
   bondValidatorsError: undefined | unknown;
   unBondValidatorsError: undefined | unknown;
   myUnBondingError: undefined | unknown;
+
+  refetchBondValidators: () => void;
+  refetchUnBondValidators: () => void;
+  refetchMyUnBondingsValidators: () => void;
 }
 
 const initialState: ValidatorContextType = {
@@ -32,6 +41,10 @@ const initialState: ValidatorContextType = {
   bondValidatorsError: undefined,
   unBondValidatorsError: undefined,
   myUnBondingError: undefined,
+
+  refetchBondValidators: emptyFN,
+  refetchMyUnBondingsValidators: emptyFN,
+  refetchUnBondValidators: emptyFN,
 };
 
 const ValidatorContext = createContext<ValidatorContextType>(initialState);
@@ -56,6 +69,9 @@ const ValidatorContextProvider = ({ children }: Props) => {
     myUnBondingsError,
     bondValidatorsError,
     unBondedValidatorsError,
+    refetchBondValidators,
+    refetchMyUnBondings,
+    refetchUnBondValidators,
   } = useValidators(client);
 
   const bondValidatorsMap = useMemo(() => {
@@ -89,6 +105,10 @@ const ValidatorContextProvider = ({ children }: Props) => {
     myUnBondingError: myUnBondingsError,
     unBondValidatorsError: unBondedValidatorsError,
     bondValidatorsError: bondValidatorsError,
+
+    refetchBondValidators,
+    refetchMyUnBondingsValidators: refetchMyUnBondings,
+    refetchUnBondValidators,
   };
 
   return (

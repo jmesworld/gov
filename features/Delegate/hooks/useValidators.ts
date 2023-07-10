@@ -23,14 +23,7 @@ const getBondValidators = ({
   queryKey: (string | number)[];
   client: Client;
 }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, limit, offset, page] = queryKey;
-  return client.getValidators({
-    'pagination.limit': limit,
-    'pagination.offset': offset,
-    'pagination.count_total': 'true',
-    'pagination.reverse': 'false',
-  });
+  return client.providers.LCDC.staking.validators();
 };
 
 const getUnBondValidators = ({
@@ -62,6 +55,7 @@ export const useValidators = (client: Client) => {
   >({});
 
   const {
+    refetch: refetchMyUnBondings,
     isFetching: isFetchingMyUnBondings,
     isLoading: isLoadingMyUnBondings,
     error: myUnBondingsError,
@@ -77,6 +71,7 @@ export const useValidators = (client: Client) => {
     },
   });
   const {
+    refetch: refetchBondValidators,
     isFetching: isFetchingBondValidators,
     isLoading: isLoadingBondValidators,
     error: bondValidatorsError,
@@ -92,6 +87,7 @@ export const useValidators = (client: Client) => {
     },
   });
   const {
+    refetch: refetchUnBondValidators,
     data: unBondValidators,
     error: unBondedValidatorsError,
     isLoading: isLoadingUnBondValidators,
@@ -133,6 +129,9 @@ export const useValidators = (client: Client) => {
     return Object.values(bondValidatorList).flat();
   }, [bondValidatorList]);
   return {
+    refetchMyUnBondings,
+    refetchBondValidators,
+    refetchUnBondValidators,
     myUnBondings: myUnBondingsData?.[0],
     myUnBondingsError,
     isLoadingMyUnBondings: isFetchingMyUnBondings || isLoadingMyUnBondings,

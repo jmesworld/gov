@@ -60,6 +60,7 @@ const IdentityContextProvider = ({ children }: Props) => {
     options: {
       refetchOnMount: true,
       refetchOnWindowFocus: false,
+      enabled: !!address,
     },
   });
 

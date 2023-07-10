@@ -16,18 +16,16 @@ import {
 } from '@chakra-ui/react';
 
 import { ConnectedWalletType } from '../../types';
-import { formatBalance } from '../../../hooks/useAccountBalance';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { RefObject } from 'react';
 import { CopyAddressButton } from './CopyAddressButton';
 import { useDelegateContext } from '../../../contexts/DelegateContext';
 import { useLeaveConfirmContext } from '../../../hooks/useLeaveConfirm';
 import { PromiseModal } from '../../components/genial/PromiseModal';
+import { useBalanceContext } from '../../../contexts/balanceContext';
 
 export const ConnectedWalletButton = ({
   identityName,
-  identityBalance,
-  identityStake,
   isLoading,
   isDisabled,
 }: ConnectedWalletType) => {
@@ -49,8 +47,8 @@ export const ConnectedWalletButton = ({
     }
     disconnect?.();
   };
-  const identityBalanceInt = parseInt(identityBalance as string);
-  const identityStakeInt = parseInt(identityStake as string);
+  const { formattedBalance, formattedWithSuffix } = useBalanceContext();
+
   return (
     <Menu isOpen={isOpen}>
       <Flex
@@ -107,7 +105,7 @@ export const ConnectedWalletButton = ({
           </Text>
           <Spacer marginLeft={'13px'} />
           <Tooltip
-            label={`JMES ${identityBalanceInt} `}
+            label={`JMES ${formattedBalance?.jmes} `}
             hasArrow
             placement="bottom"
           >
@@ -125,11 +123,9 @@ export const ConnectedWalletButton = ({
                 marginLeft={'5px'}
                 noOfLines={1}
                 fontFamily="DM Sans"
-              >{`${
-                identityBalance
-                  ? formatBalance(identityBalance as number)
-                  : '0.0'
-              }`}</Text>
+              >
+                {formattedWithSuffix?.jmes}{' '}
+              </Text>
             </Flex>
           </Tooltip>
 
@@ -141,7 +137,7 @@ export const ConnectedWalletButton = ({
             marginRight={'9px'}
           />
           <Tooltip
-            label={`bJMES ${identityStakeInt}`}
+            label={`bJMES ${formattedBalance?.bJmes} `}
             hasArrow
             placement="bottom"
           >
@@ -159,9 +155,9 @@ export const ConnectedWalletButton = ({
                 marginLeft={'5px'}
                 noOfLines={1}
                 fontFamily="DM Sans"
-              >{`${
-                identityStake ? formatBalance(identityStake as number) : '0.0'
-              }`}</Text>
+              >
+                {formattedWithSuffix?.bJmes}
+              </Text>
             </Flex>
           </Tooltip>
         </Flex>

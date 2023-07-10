@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { JMES_DENOM, BJMES_DENOM } from '../lib/constants';
 import { useCosmWasmClientContext } from '../contexts/CosmWasmClient';
+import { Core } from 'jmes';
 
-export function useAccountBalance<T extends boolean = false>(
+export function useAccountBalance(
   address: string | undefined,
   refetchInterval = 60 * 1000,
   enabled = true,
@@ -19,8 +20,8 @@ export function useAccountBalance<T extends boolean = false>(
       const bJmes = await cosmWasmClient?.getBalance(address, BJMES_DENOM);
 
       return {
-        jmes: Number(jmes?.amount ?? null) / 10e6 ?? 0,
-        bJmes: Number(bJmes?.amount ?? null) / 10e6 ?? 0,
+        jmes: jmes ? new Core.Coin(jmes.denom, jmes.amount) : undefined,
+        bJmes: bJmes ? new Core.Coin(bJmes.denom, bJmes.amount) : undefined,
       };
     },
     {
@@ -36,20 +37,26 @@ export function useAccountBalance<T extends boolean = false>(
   );
 }
 
-export function formatBalance(value: number): string {
+export function formatBalance(balance: number) {
+  const coin = new Core.Coin(JMES_DENOM, balance);
+  return formatWithSuffix(coin.amount.absoluteValue().toNumber(), 1);
+}
+
+const formatWithSuffix = (value: number, decimalPlaces = 1) => {
   if (value === 0) {
     return '0.0';
   }
 
   const suffixes = ['', 'k', 'm', 'b', 't'];
+
   const base = Math.floor(Math.log10(Math.abs(value)) / 3);
-  //TODO: base sometimes is -1 when we have value < 1
   const suffix = suffixes[base > 0 ? base : 0];
   const scaledValue = value / Math.pow(10, base * 3);
+
   const formattedValue = scaledValue.toLocaleString(undefined, {
     minimumFractionDigits: 0,
-    maximumFractionDigits: 1,
+    maximumFractionDigits: decimalPlaces,
   });
 
   return `${formattedValue}${suffix}`;
-}
+};

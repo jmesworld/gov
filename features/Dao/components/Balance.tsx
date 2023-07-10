@@ -1,5 +1,8 @@
 import { Flex, Spinner, Text } from '@chakra-ui/react';
-import { useAccountBalance } from '../../../hooks/useAccountBalance';
+import {
+  formatBalance,
+  useAccountBalance,
+} from '../../../hooks/useAccountBalance';
 import { Image } from '@chakra-ui/react';
 
 type Props = {
@@ -37,7 +40,11 @@ export const BalanceDisplay = ({ address }: Props) => {
               mr={1}
               height={4}
             />
-            <Text> {balance?.jmes}</Text>
+            <Text>
+              {formatBalance(
+                balance?.jmes?.amount.dividedBy(10e6).toNumber() ?? 0,
+              )}
+            </Text>
           </Flex>
         </Flex>
       )}

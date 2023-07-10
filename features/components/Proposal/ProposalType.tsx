@@ -7,17 +7,22 @@ export const ProposalType = ({
   isActive,
   onClick,
   label,
+  mb = '14px',
+  proposalDetail = false,
+  fullWidth = false,
 }: {
   label?: string;
   type: string;
   isActive: boolean;
-  onClick: MouseEventHandler<HTMLDivElement>;
+  onClick?: MouseEventHandler<HTMLDivElement>;
+  mb?: string;
+  proposalDetail?: boolean;
+  fullWidth?: boolean;
 }) => {
   return (
     <Flex
-      width={'220px'}
+      width={fullWidth ? '100%' : '220px'}
       height={'48px'}
-      marginBottom={'14px'}
       borderRadius={'12px'}
       alignItems={'center'}
       paddingLeft={'10.16PX'}
@@ -25,6 +30,7 @@ export const ProposalType = ({
       backgroundColor={isActive ? 'darkPurple' : 'purple'}
       cursor={'pointer'}
       onClick={onClick}
+      mb={mb ?? 0}
     >
       <Image
         src={getImgSrc(type)}
@@ -40,7 +46,7 @@ export const ProposalType = ({
         fontFamily="DM Sans"
         marginLeft={'10px'}
       >
-        {label || getLabel(type)}
+        {label || getLabel(type)} {proposalDetail ? 'Proposal' : ''}
       </Text>
       <Spacer />
       {isActive ? <CheckIcon color={'green'} /> : ''}
