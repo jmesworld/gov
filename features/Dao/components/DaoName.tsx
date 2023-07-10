@@ -8,7 +8,7 @@ import { IdentityserviceQueryClient } from '../../../client/Identityservice.clie
 
 const nameSchema = z
   .string()
-  .regex(/^[a-z\\-]+$/, {
+  .regex(/^[a-z]+$/, {
     message: 'Name must be lowercase and only contain letters and dashes',
   })
   .min(2, {
@@ -18,8 +18,8 @@ const nameSchema = z
     message: 'Name must have at most is 20 character',
   });
 
-const nameSchemaForEachChar = z.string().regex(/^[a-z\\-]+$/);
-const capitalNameSchema = z.string().regex(/^[A-Z\\-]+$/);
+const nameSchemaForEachChar = z.string().regex(/^[a-z]+$/);
+const capitalNameSchema = z.string().regex(/^[A-Z]+$/);
 
 type Props = {
   daoName: string;
@@ -53,7 +53,7 @@ export const DaoName = ({ daoName, dispatch, daoNameError, client }: Props) => {
       type: 'SET_DAO_NAME',
       payload: {
         value: daoName,
-        error: data?.identity?.owner ? 'DAO name already exists' : undefined,
+        error: data?.identity?.owner ? 'Name already exists' : undefined,
       },
     });
   }, [data, daoNameDebounced, daoName, dispatch]);
