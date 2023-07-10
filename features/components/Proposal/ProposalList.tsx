@@ -233,7 +233,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
           fontSize={12}
           width={'155px'}
         >
-          FUNDING PER MONTH
+          {isGov ? 'FUNDING PER MONTH' : 'Funding P/M'}
         </Text>
       </Box>
       <Flex width={'155px'}>
@@ -245,7 +245,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
           textAlign={'left'}
           width={'124px'}
         >
-          FUNDING DURATION
+          {isGov ? 'FUNDING DURATION' : 'FUNDING DURATION'}
         </Text>
       </Flex>
     </Flex>

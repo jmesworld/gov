@@ -184,15 +184,7 @@ export const DaoMembersListItem = ({
             fontSize={12}
             fontFamily="DM Sans"
           >
-            <Image
-              display="inline-block"
-              src="/JMES_icon.svg"
-              width="12px"
-              height="12px"
-              marginRight="4px"
-              alt="bjmes"
-            />
-            0.0000
+            {address.slice(0, 20)}...{address.slice(-6) ?? ''}
           </Text>
         </Flex>
         <Badge
@@ -207,7 +199,7 @@ export const DaoMembersListItem = ({
       </Flex>
       <span
         style={{
-          zIndex: 99,
+          zIndex: 999,
           position: 'absolute',
           right: '-10px',
         }}

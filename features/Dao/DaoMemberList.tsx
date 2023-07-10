@@ -6,19 +6,20 @@ import {
   CircularProgress,
   CircularProgressLabel,
   Flex,
+  Image,
   Text,
   Tooltip,
 } from '@chakra-ui/react';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { DaoMultisigQueryClient } from '../../client/DaoMultisig.client';
 import { useDaoMultisigListVotersQuery } from '../../client/DaoMultisig.react-query';
 import { IdentityserviceQueryClient } from '../../client/Identityservice.client';
 import { useIdentityserviceGetIdentityByOwnerQuery } from '../../client/Identityservice.react-query';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
+import { useClipboardTimeout } from '../../hooks/useClipboard';
 // FIXME: fix this
-const tooltip_text =
-  'Lorem Ipsum is simply dummy text of the printing and typesetting industry.';
+const tooltip_text = 'List of directors in this Dao.';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -34,6 +35,7 @@ export default function DaoMembersList({
     client: daoMultisigQueryClient,
     args: {},
   });
+
   return (
     <Box width={'265px'} marginLeft={'41px'}>
       <Flex>
@@ -45,7 +47,7 @@ export default function DaoMembersList({
           marginBottom={'12px'}
           fontFamily="DM Sans"
         >
-          DAO MEMBERS
+          DIRECTORS
         </Text>
         <Tooltip
           hasArrow={true}
@@ -129,6 +131,8 @@ export const DaoMembersListItem = ({
   setSelectedDaoMembersList: Function;
 }) => {
   const { cosmWasmClient } = useCosmWasmClientContext();
+  const [mouseEnter, setOnMouseEnter] = useState(false);
+  const [copied, copyToClipbaord] = useClipboardTimeout();
 
   const identityserviceQueryClient = new IdentityserviceQueryClient(
     cosmWasmClient as CosmWasmClient,
@@ -159,36 +163,85 @@ export const DaoMembersListItem = ({
 
   return (
     <Flex
-      width={'265px'}
+      width={'100%'}
       height={'54px'}
       marginBottom={'6px'}
+      bg="white"
       alignItems={'center'}
+      borderColor={'rgba(116,83,256,0.3)'}
+      borderWidth={'1px'}
+      borderRadius="12px"
+      _hover={{
+        bg: 'rgba(198, 180, 252, 0.10)',
+        borderColor: 'rgba(116,83,256,0.3)',
+      }}
+      pos="relative"
+      onMouseEnter={() => {
+        setOnMouseEnter(true);
+      }}
+      onMouseLeave={() => {
+        setOnMouseEnter(false);
+      }}
     >
       <Flex
-        width={'100%'}
-        height={'48px'}
-        borderColor={'rgba(116,83,256,0.3)'}
-        borderWidth={'1px'}
-        borderRadius={'90px'}
-        backgroundColor={'white'}
+        p="1px"
+        width={'80%'}
+        height={'54px'}
+        justifyContent="space-between"
         alignItems={'center'}
         paddingLeft={'20px'}
       >
-        <Text
-          color="purple"
-          fontWeight="medium"
-          fontSize={14}
-          fontFamily="DM Sans"
-        >
-          {identityQuery.data
-            ? identityQuery.data?.identity?.name
-            : `${address?.substring(0, 10)}...`}
-        </Text>
+        <Flex flexDir="column">
+          <Flex>
+            <Text
+              color="purple"
+              fontWeight="medium"
+              fontSize={16}
+              fontFamily="DM Sans"
+            >
+              {identityQuery.data
+                ? identityQuery.data?.identity?.name
+                : `${address?.substring(0, 10)}...`}
+            </Text>
+            <div>
+              {copied && (
+                <Text display="inline" ml="2" fontSize={14}>
+                  copied
+                </Text>
+              )}
+              {(mouseEnter || copied) && (
+                <Tooltip label="Copy wallet address" hasArrow placement="top">
+                  <Image
+                    cursor="pointer"
+                    display="inline-block"
+                    src="/copy.svg"
+                    width="16px"
+                    height="16px"
+                    marginLeft="4px"
+                    alt="bjmes"
+                    onClick={() => {
+                      copyToClipbaord(address);
+                    }}
+                  />
+                </Tooltip>
+              )}
+            </div>
+          </Flex>
+          <Text
+            color="midnight"
+            fontWeight="medium"
+            fontSize={12}
+            fontFamily="DM Sans"
+          >
+            {address.slice(0, 10)}...{address.slice(-6) ?? ''}
+          </Text>
+        </Flex>
       </Flex>
       <span
         style={{
-          zIndex: 99999,
-          position: 'fixed',
+          zIndex: 99,
+          position: 'absolute',
+          right: '-10px',
         }}
       >
         <Flex
@@ -198,8 +251,9 @@ export const DaoMembersListItem = ({
           borderWidth={'1px'}
           borderRadius={'360px'}
           backgroundColor={'white'}
-          marginLeft={'211px'}
+          marginLeft={'51px'}
           justifyContent={'center'}
+          pos="relative"
         >
           <Center>
             <CircularProgress
