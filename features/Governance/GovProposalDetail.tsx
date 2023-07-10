@@ -50,7 +50,6 @@ export default function GovProposalDetail({
       refetchInterval: 10000,
     },
   });
-
   const proposalDescription = data?.description ?? '';
   const expiryDate = data?.voting_end ?? 0;
   const expiryDateTimestamp = data ? expiryDate * 1000 : -1;
@@ -77,6 +76,10 @@ export default function GovProposalDetail({
       data?.no_voters?.includes(address as string)) ??
     false;
 
+  const status = useMemo(() => {
+    return data?.status;
+  }, [data?.status]);
+  console.log('status', status);
   return (
     <>
       <Flex height={'47px'} />
@@ -124,7 +127,27 @@ export default function GovProposalDetail({
             align="flex-start"
           >
             <GovProposalMyVote voted={voted} proposalId={proposalId}>
-              {isPostingPeriod && (
+              {isPostingPeriod &&
+                (status === 'voting' || status === 'posted') && (
+                  <Box
+                    backdropFilter="auto"
+                    backdropBlur="3px"
+                    p="4"
+                    width="full"
+                    h="full"
+                    m="auto"
+                    zIndex="3"
+                    bg="rgba(255,255,255,.5)"
+                    pos="absolute"
+                  >
+                    <Text fontSize="xl" textAlign="center">
+                      Please wait until the voting starts.
+                    </Text>
+                    <Text textAlign="center">{nextPeriodTimeLeft}</Text>
+                  </Box>
+                )}
+
+              {!(status === 'voting' || status === 'posted') && (
                 <Box
                   backdropFilter="auto"
                   backdropBlur="3px"
@@ -136,16 +159,20 @@ export default function GovProposalDetail({
                   bg="rgba(255,255,255,.5)"
                   pos="absolute"
                 >
-                  <Text fontSize="xl" textAlign="center">
-                    Please wait until the voting starts.
-                  </Text>
-                  <Text textAlign="center">{nextPeriodTimeLeft}</Text>
+                  {(status === 'expired' || status === 'expired_concluded') && (
+                    <Text fontSize="xl" textAlign="center">
+                      This proposal has expired.
+                    </Text>
+                  )}
+
+                  {(status === 'success' || status === 'success_concluded') && (
+                    <Text fontSize="xl" textAlign="center">
+                      This proposal has passed.
+                    </Text>
+                  )}
                 </Box>
               )}
             </GovProposalMyVote>
-            {/* <ProposalDaoMembers
-              selectedDaoMembersList={daoMembers}
-            /> */}
           </VStack>
         </HStack>
       ) : (

@@ -95,7 +95,7 @@ const GovProposalMyVote = (props: Props) => {
                   },
                   args: { fee },
                 })
-                .then(result => {
+                .then(() => {
                   toast({
                     title: 'Vote submitted.',
                     description: "We've submitted your Vote.",
@@ -165,7 +165,7 @@ const GovProposalMyVote = (props: Props) => {
                   },
                   args: { fee },
                 })
-                .then(result => {
+                .then(() => {
                   toast({
                     title: 'Vote submitted.',
                     description: "We've submitted your Vote.",

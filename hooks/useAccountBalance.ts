@@ -50,6 +50,7 @@ const formatWithSuffix = (value: number, decimalPlaces = 1) => {
   const suffixes = ['', 'k', 'm', 'b', 't'];
 
   const base = Math.floor(Math.log10(Math.abs(value)) / 3);
+  if (base < 0) return value.toFixed(decimalPlaces);
   const suffix = suffixes[base > 0 ? base : 0];
   const scaledValue = value / Math.pow(10, base * 3);
 
