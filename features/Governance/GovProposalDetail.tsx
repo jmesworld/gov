@@ -1,17 +1,22 @@
 import {
   Box,
+  Button,
   Center,
   CircularProgress,
   Flex,
   HStack,
   Text,
   VStack,
+  useToast,
 } from '@chakra-ui/react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useChain } from '@cosmos-kit/react';
 
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { GovernanceQueryClient } from '../../client/Governance.client';
+import {
+  GovernanceClient,
+  GovernanceQueryClient,
+} from '../../client/Governance.client';
 import { useGovernanceProposalQuery } from '../../client/Governance.react-query';
 
 import { chainName } from '../../config/defaults';
@@ -22,6 +27,7 @@ import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { calculateVotes } from '../../lib/calculateVotes';
 import { useCoinSupplyContext } from '../../contexts/CoinSupply';
 import { useVotingPeriodContext } from '../../contexts/VotingPeriodContext';
+import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 
 const GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -31,11 +37,13 @@ export default function GovProposalDetail({
 }: {
   proposalId: number;
 }) {
+  const toast = useToast();
   const { cosmWasmClient } = useCosmWasmClientContext();
+  const { signingCosmWasmClient } = useSigningCosmWasmClientContext();
   const { supply } = useCoinSupplyContext();
   const { isPostingPeriod, nextPeriodTimeLeft } = useVotingPeriodContext();
   const { address } = useChain(chainName);
-
+  const [concluding, setConcluding] = useState(false);
   const govQueryClient = new GovernanceQueryClient(
     cosmWasmClient as CosmWasmClient,
     GOVERNANCE_CONTRACT,
@@ -50,6 +58,18 @@ export default function GovProposalDetail({
       refetchInterval: 10000,
     },
   });
+  const govMutationClient = useMemo(
+    () =>
+      signingCosmWasmClient && address
+        ? new GovernanceClient(
+            signingCosmWasmClient,
+            address as string,
+            GOVERNANCE_CONTRACT,
+          )
+        : null,
+    [signingCosmWasmClient, address],
+  );
+
   const proposalDescription = data?.description ?? '';
   const expiryDate = data?.voting_end ?? 0;
   const expiryDateTimestamp = data ? expiryDate * 1000 : -1;
@@ -76,10 +96,32 @@ export default function GovProposalDetail({
       data?.no_voters?.includes(address as string)) ??
     false;
 
+  const concludeVote = async () => {
+    try {
+      setConcluding(true);
+      await govMutationClient?.conclude({
+        id: proposalId,
+      });
+      toast({
+        title: 'Vote submitted.',
+        description: "We've submitted your Vote.",
+        status: 'success',
+      });
+      setConcluding(false);
+    } catch (err) {
+      if (err instanceof Error)
+        toast({
+          title: 'Error',
+          description: err.message,
+          status: 'error',
+        });
+    }
+    setConcluding(false);
+  };
+
   const status = useMemo(() => {
     return data?.status;
   }, [data?.status]);
-  console.log('status', status);
   return (
     <>
       <Flex height={'47px'} />
@@ -173,6 +215,29 @@ export default function GovProposalDetail({
                 </Box>
               )}
             </GovProposalMyVote>
+            {(status === 'expired' || status === 'success') && (
+              <Button
+                disabled={concluding}
+                mt="37px"
+                as="button"
+                height="48px"
+                width="100%"
+                lineHeight="16px"
+                border="1px"
+                borderRadius="90px"
+                fontSize="14px"
+                fontWeight="medium"
+                bg="#A1F0C4"
+                borderColor="#91D8B0"
+                loadingText="Concluding"
+                color="#0F0056"
+                fontFamily="DM Sans"
+                onClick={concludeVote}
+                isLoading={concluding}
+              >
+                Conclude
+              </Button>
+            )}
           </VStack>
         </HStack>
       ) : (
