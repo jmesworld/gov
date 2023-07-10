@@ -6,12 +6,17 @@ import { useRouter } from 'next/router';
 import { calculateVotes } from '../../../lib/calculateVotes';
 import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
 import moment from 'moment';
-import { isProposalGov } from '../../../utils/proposalUti';
+import {
+  calculateFundingPerMonth,
+  isProposalGov,
+} from '../../../utils/proposalUti';
 import { GovernanceQueryClient } from '../../../client/Governance.client';
+import { ProposalResponse } from '../../../client/Governance.types';
+import { ProposalResponseForEmpty } from '../../../client/DaoMultisig.types';
 
 type BaseProps = {
   totalSupply: number;
-  proposals: any;
+  proposals: ProposalResponse[] | ProposalResponseForEmpty[];
   onClickListItem?: MouseEventHandler<HTMLDivElement>;
   setSelectedDaoProposalTitle: Function;
   setSelectedProposalId: Function;
@@ -54,7 +59,7 @@ export const ProposalList = ({
     router.push(`/dao/view/${daoName}/proposals/${proposalId}`);
   };
 
-  if (!proposals || Array.from(proposals).length === 0) {
+  if (!proposals || !Array.isArray(proposals) || proposals.length === 0) {
     return (
       <Flex justifyContent="center" width="100%">
         <Text
@@ -102,13 +107,37 @@ export const ProposalList = ({
           coin_no: proposal?.coins_no,
           totalSupply: supply as number,
         });
+        const fundingPerMonth = calculateFundingPerMonth(
+          proposal?.start_block ?? 0,
+        );
+        const statusSuccess = () => {
+          if (
+            proposal.status === 'success' ||
+            proposal.status === 'success_concluded'
+          ) {
+            return true;
+          }
+          if (
+            proposal.status === 'expired' ||
+            proposal.status === 'expired_concluded'
+          ) {
+            return false;
+          }
+          return undefined;
+        };
 
         return (
           <ProposalListItem
+            fundingPerMonth={String(fundingPerMonth)}
+            inActive={
+              proposal.status === 'success_concluded' ||
+              proposal.status === 'expired_concluded'
+            }
             votingDuration={votingDuration ?? undefined}
             key={proposal.id + proposal.description}
             title={proposal.title}
             yesCount={coinYes}
+            passed={statusSuccess()}
             isGov={isGov}
             thresholdPercent={thresholdPercent}
             noCount={coinNo}
@@ -222,7 +251,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
     </Flex>
   );
 };
-
+// TODO: refactor this component to use the new ProposalListItem component
 export const ProposalListItem = ({
   title,
   yesCount,
@@ -240,6 +269,9 @@ export const ProposalListItem = ({
   navigateToProposal,
   votingDuration,
   isGov,
+  inActive,
+  fundingPerMonth,
+  passed,
 }: {
   title: string;
   threshold: number;
@@ -260,10 +292,14 @@ export const ProposalListItem = ({
   navigateToProposal: (proposalId: string) => void;
   votingDuration?: string;
   isGov?: boolean;
+  inActive?: boolean;
+  fundingPerMonth?: string;
+  passed?: boolean;
 }) => {
   return (
     <>
       <Flex
+        opacity={inActive ? '0.5' : '1'}
         flex={1}
         height={'112px'}
         width={largeSize ? '100%' : '100%'}
@@ -305,6 +341,19 @@ export const ProposalListItem = ({
             >
               {type.length > 26 ? title.substring(0, 26) + '...' : type}
             </Text>
+            {passed !== undefined && (
+              <Badge
+                w="60px"
+                rounded="full"
+                ml="3"
+                bg={passed ? 'green' : 'red'}
+                fontSize="10px"
+                color="white"
+                textAlign="center"
+              >
+                {passed ? 'Passed' : 'Failed'}
+              </Badge>
+            )}
             {isGov && (
               <Badge w="100px" ml="3" fontSize="10px" color="purple" bg="white">
                 Gov Proposal
@@ -312,7 +361,6 @@ export const ProposalListItem = ({
             )}
           </Flex>
           <Flex
-            // flexGrow={1}
             width={largeSize ? '500px' : '440px'}
             alignItems={'center'}
             justifyContent={'space-around'}
@@ -328,26 +376,17 @@ export const ProposalListItem = ({
             />
           </Flex>
         </Flex>
-        <Box
-          width="155px"
-          // marginLeft={isGov ? '90px' : '90px'}
-          justifyContent={'center'}
-        >
+        <Box width="155px" justifyContent={'center'}>
           <Text
             color="white"
             fontWeight="normal"
             fontSize={14}
             fontFamily="DM Sans"
           >
-            1000.00
+            {fundingPerMonth}
           </Text>
         </Box>
-        <Box
-          // marginLeft={isGov ? '60px' : '49px'}
-          // marginRight={'90px'}
-          width="155px"
-          justifyContent={'center'}
-        >
+        <Box width="155px" justifyContent={'center'}>
           <Text
             color="white"
             fontWeight="normal"

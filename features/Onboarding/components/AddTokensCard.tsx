@@ -17,13 +17,13 @@ import { useAccountBalance } from '../../../hooks/useAccountBalance';
 import { useChain } from '@cosmos-kit/react';
 import { chainName } from '../../../config/defaults';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
+import { useBalanceContext } from '../../../contexts/balanceContext';
 
 const AddTokensCard = () => {
   const toast = useToast();
   const { address } = useChain(chainName);
   const { disconnect } = useIdentityContext();
-  const identityBalanceQuery = useAccountBalance(address as string);
-  const balance: any = identityBalanceQuery.data ?? 0;
+  const { balance } = useBalanceContext();
 
   return (
     <>
@@ -117,11 +117,7 @@ const AddTokensCard = () => {
                       noOfLines={1}
                       fontFamily="DM Sans"
                     >
-                      {`${
-                        identityBalanceQuery.isSuccess
-                          ? balance.unstaked
-                          : 'loading...'
-                      }`}
+                      {balance?.jmes}
                     </Text>
                   </Flex>
                 </Box>

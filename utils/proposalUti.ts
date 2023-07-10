@@ -101,3 +101,7 @@ export const getGovProposalType = (
     excuteMsg,
   };
 };
+
+export const calculateFundingPerMonth = (blocks: number) => {
+  return ((blocks / 5) * 2629746).toFixed(0);
+};

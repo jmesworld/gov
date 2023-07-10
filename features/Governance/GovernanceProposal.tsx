@@ -34,7 +34,6 @@ export default function GovernanceProposal({
       refetchInterval: 10000,
     },
   });
-
   return (
     <>
       <Flex height={'35px'} />
@@ -47,7 +46,7 @@ export default function GovernanceProposal({
         isGovList
         client={governanceQueryClient}
         totalSupply={supply as number}
-        proposals={governanceProposalQuery?.data?.proposals}
+        proposals={governanceProposalQuery?.data?.proposals ?? []}
         isGov={true}
         setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
         setSelectedProposalId={setSelectedProposalId}
