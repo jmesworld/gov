@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Box, Flex, Text } from '@chakra-ui/react';
+import { Box, Flex, Image, Text, Tooltip } from '@chakra-ui/react';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import DaoMembersList from '../DaoMemberList';
 
@@ -17,6 +17,7 @@ import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
 import { useMemo } from 'react';
 import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { NEXT_PUBLIC_GOVERNANCE_CONTRACT } from '../../../config/defaults';
+import { useClipboardTimeout } from '../../../hooks/useClipboard';
 
 export default function DaoProposal({
   daoAddress,
@@ -36,6 +37,7 @@ export default function DaoProposal({
 }) {
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { supply } = useCoinSupplyContext();
+  const [copied, copyToClipboard] = useClipboardTimeout();
   const daoQueryClient = useMemo(
     () =>
       new DaoMultisigQueryClient(
@@ -65,15 +67,44 @@ export default function DaoProposal({
   return (
     <>
       <Flex height={'47px'} />
-      <Text
-        color={'darkPurple'}
-        fontWeight="bold"
-        fontSize={28}
-        fontFamily="DM Sans"
-      >
-        {daoName}
-      </Text>
-      <BalanceDisplay address={daoAddress} />
+      <Flex flexDir="column">
+        <Text
+          color={'darkPurple'}
+          fontWeight="bold"
+          fontSize={28}
+          fontFamily="DM Sans"
+        >
+          {daoName}
+        </Text>
+        <Flex>
+          <Flex mt="2" alignItems="center">
+            <Text mr="2" color="purple">
+              {daoAddress.slice(0, 20)}...{daoAddress.slice(-6)}
+            </Text>
+            {copied && (
+              <Text display="inline" ml="2" fontSize={14}>
+                copied
+              </Text>
+            )}
+            <Tooltip hasArrow label="Copy DAO address" placement="top">
+              <Image
+                mr="4"
+                cursor="pointer"
+                display="inline-block"
+                src="/copy.svg"
+                width="16px"
+                height="16px"
+                marginLeft="2px"
+                alt="Dao Address"
+                onClick={() => {
+                  copyToClipboard(daoAddress);
+                }}
+              />
+            </Tooltip>
+          </Flex>
+          <BalanceDisplay address={daoAddress} />
+        </Flex>
+      </Flex>
       <Flex height={'16px'} />
       <Flex>
         <Box flexGrow={1}>
