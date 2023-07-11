@@ -33,8 +33,6 @@ const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
-const NEXT_PUBLIC_BJMES_TOKEN_CONTRACT = process.env
-  .NEXT_PUBLIC_BJMES_TOKEN_CONTRACT as string;
 
 export const CreateIdentitySection = () => {
   const chainContext = useChain(chainName);
