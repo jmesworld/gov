@@ -47,7 +47,6 @@ export default function DaoProposalDetail({
     cosmWasmClient as CosmWasmClient,
     selectedDao as string,
   );
-
   const proposalDetailQuery = useDaoMultisigProposalQuery({
     client: daoMultisigQueryClient,
     args: {

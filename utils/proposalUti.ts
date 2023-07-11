@@ -1,6 +1,6 @@
 import { ProposalResponseForEmpty } from '../client/DaoMultisig.types';
 import { GovernanceQueryClient } from '../client/Governance.client';
-import { ProposalMsg } from '../client/Governance.types';
+import { ProposalMsg, ProposalResponse } from '../client/Governance.types';
 import { fromBase64ToString } from './identity';
 
 export const isProposalGov = (
@@ -100,6 +100,28 @@ export const getGovProposalType = (
     proposalType,
     excuteMsg,
   };
+};
+
+export const getProposalTypeForGovPublicProposals = (
+  propsal: ProposalResponse,
+) => {
+  const propType = propsal.prop_type;
+  if ('text' in propType) {
+    return 'text';
+  }
+  if ('core_slot' in propType) {
+    return 'core_slot';
+  }
+  if ('revoke_proposal' in propType) {
+    return 'revoke_proposal';
+  }
+  if ('improvement' in propType) {
+    return 'improvement';
+  }
+  if ('feature_request' in propType) {
+    return 'feature_request';
+  }
+  return null;
 };
 
 export const calculateFundingPerMonth = (blocks: number) => {

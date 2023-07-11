@@ -24,6 +24,9 @@ export const defaultThemeObject = {
     lilac: '#C6B4FC',
     lightLilac: '#E7E2F8',
     red: '#FF5876',
+    textPrimary: {
+      100: 'rgba(15,0,86,0.8)',
+    },
   },
   breakPoints: {
     sm: '30em',

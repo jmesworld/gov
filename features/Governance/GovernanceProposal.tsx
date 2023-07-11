@@ -1,4 +1,4 @@
-import { Flex } from '@chakra-ui/react';
+import { Flex, Text } from '@chakra-ui/react';
 import { GovernanceQueryClient } from '../../client/Governance.client';
 import { useGovernanceProposalsQuery } from '../../client/Governance.react-query';
 
@@ -9,6 +9,10 @@ import { ProposalHeader } from '../components/Proposal/ProposalList';
 import { ProposalList } from '../components/Proposal/ProposalList';
 import { useAppState } from '../../contexts/AppStateContext';
 import { useCoinSupplyContext } from '../../contexts/CoinSupply';
+import { useMemo } from 'react';
+
+import { getProposalTypeForGovPublicProposals } from '../../utils/proposalUti';
+import { ProposalResponse } from '../../client/Governance.types';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -16,6 +20,26 @@ type Props = {
   cosmWasmClient: CosmWasmClient;
   setSelectedProposalId: (id: number) => void;
 };
+
+// ORDER OF PROPOSAL TYPES
+const proposalTypeOrder = {
+  revoke_proposal: 1,
+  core_slot: 2,
+  text: 3,
+  improvement: 4,
+  feature_request: 5,
+};
+
+const sortProposalsByType = (a: ProposalResponse, b: ProposalResponse) => {
+  const aType = getProposalTypeForGovPublicProposals(a);
+  const bType = getProposalTypeForGovPublicProposals(b);
+  if (!aType || !bType) return 0;
+  if (aType === bType) {
+    return 0;
+  }
+  return proposalTypeOrder[aType] - proposalTypeOrder[bType];
+};
+
 export default function GovernanceProposal({
   setSelectedProposalId,
   cosmWasmClient,
@@ -27,13 +51,79 @@ export default function GovernanceProposal({
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   );
 
-  const governanceProposalQuery = useGovernanceProposalsQuery({
+  const { data } = useGovernanceProposalsQuery({
     client: governanceQueryClient,
     args: {},
     options: {
       refetchInterval: 10000,
     },
   });
+
+  const currentCycleProposals = useMemo(() => {
+    if (!data) return [];
+    return data.proposals
+      .filter(p => p.status === 'voting' || p.status === 'posted')
+      .sort(sortProposalsByType);
+  }, [data]);
+
+  const notConcluded = useMemo(() => {
+    if (!data) return [];
+    return data.proposals
+      .filter(p => {
+        if (p.status === 'success' || p.status === 'expired') {
+          return true;
+        }
+        return false;
+      })
+      .sort(sortProposalsByType);
+  }, [data]);
+
+  const expired = useMemo(() => {
+    if (!data) return [];
+    const expired = data.proposals.filter(p => {
+      if (p.status === 'expired_concluded') {
+        return true;
+      }
+      if (p.status !== 'success_concluded') {
+        return false;
+      }
+      // TODO: update the fund duration
+      const fundDuration = 0;
+
+      if (p.start_block <= fundDuration + (p.concluded ?? 0)) {
+        return true;
+      }
+      return false;
+    });
+
+    const failed = expired
+      .filter(p => p.status === 'expired_concluded')
+      .sort(sortProposalsByType);
+    const passed = expired
+      .filter(p => p.status === 'success_concluded')
+      .sort(sortProposalsByType);
+
+    return [...passed, ...failed];
+  }, [data]);
+
+  const funded = useMemo(() => {
+    if (!data) return [];
+    return data.proposals
+      .filter(p => {
+        if (p.status !== 'success_concluded') {
+          return false;
+        }
+
+        // TODO: update the fund duration
+        const fundDuration = 0;
+        if (p.start_block > fundDuration + (p.concluded ?? 0)) {
+          return true;
+        }
+        return false;
+      })
+      .sort(sortProposalsByType);
+  }, [data]);
+
   return (
     <>
       <Flex height={'35px'} />
@@ -41,16 +131,85 @@ export default function GovernanceProposal({
       <Flex height={'46px'} />
       <ProposalHeader isGov={true} />
       <Flex height={'10px'} />
+      {currentCycleProposals.length > 0 && (
+        <ProposalList
+          isGovList
+          client={governanceQueryClient}
+          totalSupply={supply as number}
+          proposals={currentCycleProposals}
+          isGov={true}
+          setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+          setSelectedProposalId={setSelectedProposalId}
+        />
+      )}
 
-      <ProposalList
-        isGovList
-        client={governanceQueryClient}
-        totalSupply={supply as number}
-        proposals={governanceProposalQuery?.data?.proposals ?? []}
-        isGov={true}
-        setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-        setSelectedProposalId={setSelectedProposalId}
-      />
+      {notConcluded.length > 0 && (
+        <Flex flexDir="column">
+          <Text
+            my="4"
+            fontSize="xs"
+            autoCapitalize="all"
+            color="textPrimary.100"
+            mb="4"
+          >
+            NOT CONCLUDED
+          </Text>
+          <ProposalList
+            isGovList
+            client={governanceQueryClient}
+            totalSupply={supply as number}
+            proposals={notConcluded}
+            isGov={true}
+            setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+            setSelectedProposalId={setSelectedProposalId}
+          />
+        </Flex>
+      )}
+
+      {funded.length > 0 && (
+        <Flex flexDir="column">
+          <Text
+            my="4"
+            fontSize="xs"
+            autoCapitalize="all"
+            color="textPrimary.100"
+            mb="4"
+          >
+            FUNDED
+          </Text>
+          <ProposalList
+            isGovList
+            client={governanceQueryClient}
+            totalSupply={supply as number}
+            proposals={funded}
+            isGov={true}
+            setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+            setSelectedProposalId={setSelectedProposalId}
+          />
+        </Flex>
+      )}
+      {expired.length > 0 && (
+        <Flex flexDir="column">
+          <Text
+            my="4"
+            fontSize="xs"
+            autoCapitalize="all"
+            color="textPrimary.100"
+            mb="4"
+          >
+            EXPIRED
+          </Text>
+          <ProposalList
+            isGovList
+            client={governanceQueryClient}
+            totalSupply={supply as number}
+            proposals={expired}
+            isGov={true}
+            setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+            setSelectedProposalId={setSelectedProposalId}
+          />
+        </Flex>
+      )}
     </>
   );
 }
