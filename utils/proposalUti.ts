@@ -3,13 +3,15 @@ import { GovernanceQueryClient } from '../client/Governance.client';
 import { ProposalMsg } from '../client/Governance.types';
 import { fromBase64ToString } from './identity';
 
-export const isProposalGov = (
+export const getProposalExcuteMsg = (
   proposal: ProposalResponseForEmpty,
-  client: GovernanceQueryClient,
-) => {
+): {
+  excuteMsg: { propose: ProposalMsg } | null;
+  contractAddr: string | null;
+} => {
+  let excuteMsg: null | { propose: ProposalMsg } = null;
   let contractAddr: null | string = null;
-
-  proposal.msgs?.forEach(msg => {
+  proposal?.msgs?.forEach(msg => {
     if (!msg) {
       return;
     }
@@ -20,17 +22,31 @@ export const isProposalGov = (
     if (!('execute' in wasm)) {
       return;
     }
-    const wasmMessage = wasm.execute.msg;
-    const stringMessage = fromBase64ToString(wasmMessage);
-    if (!stringMessage) {
-      return;
-    }
+    const wasmMessage = wasm?.execute?.msg;
     if (!wasmMessage) {
       return;
     }
-
+    const stringMessage = fromBase64ToString<{ propose: ProposalMsg }>(
+      wasmMessage,
+    );
+    if (!stringMessage) {
+      return;
+    }
+    excuteMsg = stringMessage;
     contractAddr = wasm.execute.contract_addr;
   });
+
+  return {
+    excuteMsg,
+    contractAddr,
+  };
+};
+
+export const isProposalGov = (
+  proposal: ProposalResponseForEmpty,
+  client: GovernanceQueryClient,
+) => {
+  const { contractAddr } = getProposalExcuteMsg(proposal);
   if (!contractAddr) {
     return false;
   }
@@ -49,52 +65,30 @@ export const getGovProposalType = (
   excuteMsg: ProposalMessageType | null;
 } => {
   let proposalType: null | string = null;
-  let excuteMsg: null | ProposalMessageType = null;
-  proposal?.msgs?.forEach(msg => {
-    if (!msg) {
-      return;
-    }
-    if (!('wasm' in msg)) {
-      return;
-    }
-    const wasm = msg.wasm;
-    if (!('execute' in wasm)) {
-      return;
-    }
-    const wasmMessage = wasm?.execute?.msg;
-    if (!wasmMessage) {
-      return;
-    }
-    const stringMessage = fromBase64ToString(
-      wasmMessage,
-    ) as ProposalMessageType;
-    excuteMsg = stringMessage;
-    if (!stringMessage) {
-      return;
-    }
-    if ('text_proposal' in stringMessage.propose) {
-      proposalType = 'text';
-      return;
-    }
-    if ('core_slot' in stringMessage.propose) {
-      proposalType = 'core-slot';
-      return;
-    }
-    if ('revoke_proposal' in stringMessage.propose) {
-      proposalType = 'revoke-proposal';
-      return;
-    }
+  const { excuteMsg } = getProposalExcuteMsg(proposal);
+  if (!excuteMsg || !('propose' in excuteMsg)) {
+    return {
+      proposalType,
+      excuteMsg,
+    };
+  }
+  if (excuteMsg && 'text_proposal' in excuteMsg.propose) {
+    proposalType = 'text';
+  }
+  if (excuteMsg && 'core_slot' in excuteMsg.propose) {
+    proposalType = 'core-slot';
+  }
+  if (excuteMsg && 'revoke_proposal' in excuteMsg.propose) {
+    proposalType = 'revoke-proposal';
+  }
 
-    if ('improvement' in stringMessage.propose) {
-      proposalType = 'improvement';
-      return;
-    }
+  if (excuteMsg && 'improvement' in excuteMsg.propose) {
+    proposalType = 'improvement';
+  }
 
-    if ('request_feature' in stringMessage.propose) {
-      proposalType = 'feature-request';
-      return;
-    }
-  });
+  if (excuteMsg && 'request_feature' in excuteMsg.propose) {
+    proposalType = 'feature-request';
+  }
 
   return {
     proposalType,

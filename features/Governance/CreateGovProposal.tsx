@@ -27,11 +27,14 @@ import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmC
 import { useIdentityContext } from '../../contexts/IdentityContext';
 import { useLeaveConfirm } from '../../hooks/useLeaveConfirm';
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
-
+const CodeEditor = dynamic(import('../components/genial/CodeEditor'), {
+  ssr: false,
+});
 const fee: StdFee = {
   amount: [{ amount: '30000', denom: 'ujmes' }],
   gas: '10000000',
@@ -70,6 +73,7 @@ export default function CreateGovProposal({
     useState<ProposalTypes>(allowedProposalTypes[0]);
   const [proposalTitle, setProposalTitle] = useState('');
   const [proposalDescription, setProposalDescription] = useState('');
+  const [improvementMsgs, setImprovementMsgs] = useState<string>('');
   const [slotType, setSlotType] = useState('brand');
   const [isFundingNeeded, setFundingNeeded] = useState(false);
   const [fundingAmount, setFundingAmount] = useState(0);
@@ -265,19 +269,35 @@ export default function CreateGovProposal({
                 p={0}
                 borderColor={'lilac'}
               />
-              <Textarea
-                variant={'outline'}
-                width={'874px'}
-                height={'138px'}
-                borderColor={'primary.500'}
-                background={'primary.100'}
-                focusBorderColor="darkPurple"
-                borderRadius={12}
-                marginTop={'12px'}
-                color={'purple'}
-                onChange={e => setProposalDescription(e.target.value)}
-                placeholder={'Improvement Msg'}
-              />
+              <Flex
+                mt="4"
+                background="rgba(112, 79, 247, 0.1)"
+                borderRadius="12px"
+                border="1px solid rgba(112, 79, 247, 0.5)"
+                padding="14px 16px"
+                marginTop="20px"
+                overflowY="auto"
+              >
+                <CodeEditor
+                  width="100%"
+                  style={{
+                    backgroundColor: 'transparent',
+                    height: '300px',
+                  }}
+                  placeholder="Improvements"
+                  setOptions={{
+                    highlightActiveLine: true,
+                    highlightGutterLine: true,
+                    showPrintMargin: false,
+                    hScrollBarAlwaysVisible: true,
+                  }}
+                  editorProps={{
+                    $blockScrolling: false,
+                  }}
+                  value={improvementMsgs}
+                  onChange={setImprovementMsgs}
+                />
+              </Flex>
             </Box>
           ) : (
             ''
@@ -519,6 +539,7 @@ export default function CreateGovProposal({
                 //
                 const proposalMsg = {
                   propose: getProposalExecuteMsg({
+                    improvementMsgs,
                     type: selectedProposalType,
                     featureApproved: numberOfNFTToMint,
 
@@ -655,6 +676,7 @@ const getProposalExecuteMsg = ({
   amount,
   duration,
   featureApproved,
+  improvementMsgs,
 }: {
   type: ProposalTypes;
   title: string;
@@ -666,6 +688,7 @@ const getProposalExecuteMsg = ({
   amount?: number;
   duration?: number;
   featureApproved: number;
+  improvementMsgs: string;
 }) => {
   // "text", "core-slot", "revoke-core-slot", "improvement"
   let msg: Governance.ProposalMsg;
@@ -698,7 +721,7 @@ const getProposalExecuteMsg = ({
     case 'revoke-proposal':
       msg = {
         revoke_proposal: {
-          description: description,
+          description: improvementMsgs,
           revoke_proposal_id: revoke_proposal_id as number,
           title: title,
         },

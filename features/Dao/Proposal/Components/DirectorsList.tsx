@@ -16,7 +16,7 @@ import { useIdentityserviceGetIdentityByOwnerQuery } from '../../../../client/Id
 import { useCosmWasmClientContext } from '../../../../contexts/CosmWasmClient';
 import { VoteInfo } from '../../../../client/DaoMultisig.types';
 import { useClipboardTimeout } from '../../../../hooks/useClipboard';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 // FIXME: fix this
 
 const IDENTITY_SERVICE_CONTRACT = process.env
@@ -74,19 +74,21 @@ export const MembersList = ({
     0,
   );
 
-  const membersList = members?.map(member => {
-    const weight = member.weight;
-    return (
-      <DaoMembersListItem
-        isYes={member.vote === 'yes'}
-        key={member.voter}
-        address={member.voter}
-        weightPercent={(weight / totalWeight) * 100}
-      />
-    );
-  });
-
-  return <ul>{membersList}</ul>;
+  return (
+    <ul>
+      {members?.map(member => {
+        const weight = member.weight;
+        return (
+          <DaoMembersListItem
+            isYes={member.vote === 'yes'}
+            key={member.voter}
+            address={member.voter}
+            weightPercent={(weight / totalWeight) * 100}
+          />
+        );
+      })}
+    </ul>
+  );
 };
 
 export const DaoMembersListItem = ({
@@ -101,10 +103,14 @@ export const DaoMembersListItem = ({
   const [mouseEnter, setOnMouseEnter] = useState(false);
   const { cosmWasmClient } = useCosmWasmClientContext();
   const [copied, copyToClipbaord] = useClipboardTimeout();
-  const identityserviceQueryClient = new IdentityserviceQueryClient(
-    cosmWasmClient as CosmWasmClient,
+  const identityserviceQueryClient = useMemo(
+    () =>
+      new IdentityserviceQueryClient(
+        cosmWasmClient as CosmWasmClient,
 
-    IDENTITY_SERVICE_CONTRACT,
+        IDENTITY_SERVICE_CONTRACT,
+      ),
+    [cosmWasmClient],
   );
 
   const identityQuery = useIdentityserviceGetIdentityByOwnerQuery({

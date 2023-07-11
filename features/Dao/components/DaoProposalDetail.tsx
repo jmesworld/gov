@@ -27,6 +27,7 @@ import {
   GetProposalDetail,
   GovProposalType,
 } from '../Proposal/Components/ProposalType';
+import { ProposalExcuteRawData } from '../Proposal/Components/ProposalRawData';
 
 type Props = {
   selectedDao: string;
@@ -94,6 +95,7 @@ export default function DaoProposalDetail({
     votesQuery?.data?.votes.filter(
       vote => vote.voter === (address as string),
     ) ?? [];
+
   return (
     <>
       <Flex height={'47px'} />
@@ -103,12 +105,12 @@ export default function DaoProposalDetail({
         proposalTitle={proposalDetailQuery?.data?.title ?? ''}
         proposalExpiry={expiryDateTimestamp}
       />
-      {proposalDetailQuery.isLoading ||
-        (proposalDetailQuery.isFetching && !proposalDetailQuery?.data && (
+      {(proposalDetailQuery.isLoading || proposalDetailQuery.isFetching) &&
+        !proposalDetailQuery?.data && (
           <Center marginTop={'80px'}>
             <CircularProgress isIndeterminate color="darkPurple" />
           </Center>
-        ))}
+        )}
 
       {proposalDetailQuery.data && (
         <HStack spacing="54px" align="flex-start">
@@ -140,6 +142,7 @@ export default function DaoProposalDetail({
                 {proposalDescription}
               </Text>
             </Flex>
+            <ProposalExcuteRawData proposal={proposalDetailQuery.data} />
           </Box>
           <VStack width="330px" spacing="30px" align="flex-start">
             <ProposalMyVote
