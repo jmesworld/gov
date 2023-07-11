@@ -301,7 +301,7 @@ export const ProposalListItem = ({
       <Flex
         opacity={inActive ? '0.5' : '1'}
         flex={1}
-        height={'112px'}
+        height={'89px'}
         width={largeSize ? '100%' : '100%'}
         backgroundColor="purple"
         borderRadius={12}
