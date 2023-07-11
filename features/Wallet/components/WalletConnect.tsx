@@ -4,7 +4,7 @@ import { Icon, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 
 import { FiAlertTriangle } from 'react-icons/fi';
 import { WalletStatus } from '@cosmos-kit/core';
-import { addJMEStoKeplr, checkJMESInKeplr } from '../../../actions/keplr';
+// import { addJMEStoKeplr, checkJMESInKeplr } from '../../../actions/keplr';
 
 import { ConnectedWalletButton } from './ConnectedWalletButton';
 import { ConnectWalletButton } from './ConnectWalletButton';
@@ -102,14 +102,14 @@ export const Error = ({
 }) => {
   const bg = useColorModeValue('orange.200', 'orange.300');
 
-  useEffect(() => {
-    checkJMESInKeplr().then(res => {
-      if (res === false) {
-        addJMEStoKeplr();
-      }
-      return;
-    });
-  }, []);
+  // useEffect(() => {
+  //   checkJMESInKeplr().then(res => {
+  //     if (res === false) {
+  //       addJMEStoKeplr();
+  //     }
+  //     return;
+  //   });
+  // }, []);
 
   return (
     <Stack>

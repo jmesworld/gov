@@ -1,9 +1,9 @@
 {
   "$schema": "../assetlist.schema.json",
-  "chain_name": "JMES Testnet",
+  "chain_name": "jmesprenet",
   "assets": [
     {
-      "description": "The native staking token of JMES.",
+      "description": "The native staking and governance token of the JMES testnet.",
       "denom_units": [
         {
           "denom": "ujmes",
@@ -18,10 +18,21 @@
       "name": "JMES",
       "display": "jmes",
       "symbol": "JMES",
-      "logo_URIs": {
-        "png": "https://raw.githubusercontent.com/cosmos/chain-registry/master/terra2/images/luna.png"
-      },
-      "coingecko_id": "jmes-testnet"
+      "logo_URIs": {}
+    },
+    {
+      "description": "The native staking and governance token of the JMES testnet.",
+      "denom_units": [
+        {
+          "denom": "jmes",
+          "exponent": 6
+        }
+      ],
+      "base": "jmes",
+      "name": "JMES",
+      "display": "jmes",
+      "symbol": "JMES",
+      "logo_URIs": {}
     }
   ]
 }

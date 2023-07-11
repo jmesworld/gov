@@ -7,10 +7,10 @@ import { defaultTheme } from '../config';
 import { wallets as keplrWallets } from '@cosmos-kit/keplr-extension';
 
 import { SignerOptions } from '@cosmos-kit/core';
-import { assets } from 'chain-registry';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Chain } from '@chain-registry/types';
 import jmesTestnet from '../config/chains/jmes-testnet/chain.json';
+import jmesAssets from '../config/chains/jmes-testnet/assetlist.json';
 import { chainName } from '../config/defaults';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import OnboardingModal from '../features/Onboarding/OnboardingModal';
@@ -19,8 +19,10 @@ import React, { ReactElement } from 'react';
 import { AppStateProvider } from '../contexts/AppStateContext';
 import { CosmWasmClientContextProvider } from '../contexts/CosmWasmClient';
 import { Container as ModalContainer } from 'react-modal-promise';
+
 const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL as string;
 const chains: Chain[] = [jmesTestnet];
+const assets = [jmesAssets];
 
 import type { NextPage } from 'next';
 import { Layout } from '../layouts/main';

@@ -1,14 +1,14 @@
 {
   "$schema": "../chain.schema.json",
-  "chain_name": "JMES Testnet",
+  "chain_name": "jmesprenet",
   "status": "live",
   "network_type": "testnet",
-  "website": "https://www.jmes.cloud/",
-  "pretty_name": "JMES Testnet",
-  "chain_id": "jmes-testnet",
-  "daemon_name": "jmesd",
-  "node_home": "$HOME/.jmes",
+  "pretty_name": "JMES Prenet",
+  "chain_id": "jmes-prenet",
   "bech32_prefix": "jmes",
+  "daemon_name": "jmesd",
+  "node_home": "$HOME/.jmesd",
+  "key_algos": ["secp256k1"],
   "slip44": 6280,
   "fees": {
     "fee_tokens": [
@@ -18,13 +18,6 @@
         "low_gas_price": 0.0125,
         "average_gas_price": 0.015,
         "high_gas_price": 0.15
-      }
-    ]
-  },
-  "staking": {
-    "staking_tokens": [
-      {
-        "denom": "ujmes"
       }
     ]
   },
@@ -52,13 +45,13 @@
   "apis": {
     "rpc": [
       {
-        "address": "https://validator-proxy-service-o6lht.ondigitalocean.app/rpc",
+        "address": "https://seahorse-app-rbtye.ondigitalocean.app",
         "provider": "jmesworld"
       }
     ],
     "rest": [
       {
-        "address": "https://validator-proxy-service-o6lht.ondigitalocean.app/rpc",
+        "address": "https://dolphin-app-85b49.ondigitalocean.app",
         "provider": "jmesworld"
       }
     ],
