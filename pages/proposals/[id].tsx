@@ -2,6 +2,8 @@ import { useRouter } from 'next/router';
 import type { NextPageWithLayout } from '../_app';
 import GovProposalDetail from '../../features/Governance/GovProposalDetail';
 import { CoinSupplyContextProvider } from '../../contexts/CoinSupply';
+import { ClosePageButton } from '../../features/components/genial/ClosePageButton';
+import { Box, Flex } from '@chakra-ui/react';
 
 const ProposalDetail: NextPageWithLayout = () => {
   const router = useRouter();
@@ -12,7 +14,16 @@ const ProposalDetail: NextPageWithLayout = () => {
 
   return (
     <CoinSupplyContextProvider>
-      <GovProposalDetail proposalId={Number(id)} />;
+      <Flex h="100%" justifyContent="space-between" flexDir="column">
+        <Box>
+          <GovProposalDetail proposalId={Number(id)} />
+        </Box>
+        <ClosePageButton
+          onClose={() => {
+            router.push('/');
+          }}
+        />
+      </Flex>
     </CoinSupplyContextProvider>
   );
 };

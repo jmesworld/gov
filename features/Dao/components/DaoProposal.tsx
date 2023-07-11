@@ -91,7 +91,7 @@ export default function DaoProposal({
   }, [data, goverrnanceQueryClient]);
 
   return (
-    <>
+    <Box pb="4">
       <Flex height={'47px'} />
       <Flex flexDir="column">
         <Text
@@ -206,6 +206,6 @@ export default function DaoProposal({
           setSelectedDaoMembersList={setSelectedDaoMembersList}
         />
       </Flex>
-    </>
+    </Box>
   );
 }

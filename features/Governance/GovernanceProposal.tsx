@@ -125,7 +125,7 @@ export default function GovernanceProposal({
   }, [data]);
 
   return (
-    <>
+    <Flex flexDir="column" pb="4">
       <Flex height={'35px'} />
       <GovHeader />
       <Flex height={'46px'} />
@@ -204,6 +204,6 @@ export default function GovernanceProposal({
           />
         </Flex>
       )}
-    </>
+    </Flex>
   );
 }

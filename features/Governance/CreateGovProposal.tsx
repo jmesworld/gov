@@ -26,8 +26,8 @@ import * as Governance from '../../client/Governance.types';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 import { useIdentityContext } from '../../contexts/IdentityContext';
 import { useLeaveConfirm } from '../../hooks/useLeaveConfirm';
-import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
+import { Link } from '../components/genial/Link';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -66,7 +66,6 @@ export default function CreateGovProposal({
   setCreateGovProposalSelected: Function;
 }) {
   const { address } = useIdentityContext();
-  const router = useRouter();
   const toast = useToast();
 
   const [selectedProposalType, setSelectedProposalType] =
@@ -99,7 +98,7 @@ export default function CreateGovProposal({
       isFundingNeeded ||
       fundingAmount ||
       fundingPeriod !== default_funding_duration ||
-      !isCreatingGovProposal ||
+      isCreatingGovProposal ||
       revokeProposalId !== -1 ||
       numberOfNFTToMint !== 0
     );
@@ -127,8 +126,8 @@ export default function CreateGovProposal({
     setNumberOfNFTToMint(0);
   };
 
-  useLeaveConfirm({
-    preventNavigatingAway: !isDirty,
+  const [setCheck, navigate] = useLeaveConfirm({
+    preventNavigatingAway: !!isDirty,
   });
 
   // Dynamically show required sections for different proposal types
@@ -149,15 +148,18 @@ export default function CreateGovProposal({
     <>
       <Flex height={'47px'} />
       <Flex>
-        <Text
-          color={'darkPurple'}
-          fontWeight="bold"
-          fontSize={30}
-          fontFamily="DM Sans"
-          style={{ textDecoration: 'underline' }}
-        >
-          {selectedDaoName}
-        </Text>
+        <Link href={`/dao/view/${selectedDaoName}`}>
+          <Text
+            color={'darkPurple'}
+            cursor="pointer"
+            fontWeight="bold"
+            fontSize={30}
+            fontFamily="DM Sans"
+            style={{ textDecoration: 'underline' }}
+          >
+            {selectedDaoName}
+          </Text>
+        </Link>
         <Box
           width={'6px'}
           height={'6px'}
@@ -520,7 +522,10 @@ export default function CreateGovProposal({
               width={'99px'}
               height={'42px'}
               variant={'link'}
-              onClick={() => setCreateGovProposalSelected(false)}
+              onClick={() => {
+                navigate(`/dao/view/${selectedDaoName}`);
+                setCreateGovProposalSelected(false);
+              }}
             >
               <Text
                 color={'darkPurple'}
@@ -594,6 +599,7 @@ export default function CreateGovProposal({
                     },
                   })
                   .then(result => {
+                    setCheck(false);
                     const id = result.events
                       .find(e => e.type === 'wasm')
                       ?.attributes.find(el => el.key === 'proposal_id')?.value;
@@ -612,7 +618,7 @@ export default function CreateGovProposal({
                       },
                     });
                     restForm();
-                    router.push(`/dao/view/${selectedDaoName}/proposals/${id}`);
+                    navigate(`/dao/view/${selectedDaoName}`);
                   })
                   .catch(error => {
                     toast({

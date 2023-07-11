@@ -257,7 +257,7 @@ const CreateDaoNewForm = ({
     return thereIsError || totalVotingPower < 100 || totalVotingPower > 100;
   }, [daoNameError, duplicateNames, membersArr, threshold, totalVotingPower]);
   return (
-    <Box width={'100%'}>
+    <Box width={'100%'} pb="4">
       <Box width="70%">
         <Box marginTop={'35px'}>
           <Text
@@ -590,7 +590,10 @@ const CreateDaoNewForm = ({
           width={'99px'}
           height={'42px'}
           variant={'link'}
-          onClick={() => setCreateDaoSelected('')}
+          onClick={() => {
+            setCreateDaoSelected('');
+            navigate('/');
+          }}
         >
           <Text
             color={'darkPurple'}

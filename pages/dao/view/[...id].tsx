@@ -1,10 +1,11 @@
 import { useRouter } from 'next/router';
-import { Flex, Spinner, Text } from '@chakra-ui/react';
+import { Box, Flex, Spinner, Text } from '@chakra-ui/react';
 import { useAppState } from '../../../contexts/AppStateContext';
 import DaoProposal from '../../../features/Dao/components/DaoProposal';
 import { useDAOContext } from '../../../contexts/DAOContext';
 import DaoProposalDetail from '../../../features/Dao/components/DaoProposalDetail';
 import { useRedirectToHomeForNoWalletConnected } from '../../../hooks/Redirect';
+import { ClosePageButton } from '../../../features/components/genial/ClosePageButton';
 
 const DAODetail = () => {
   const { getSelectedDAOByName, afterCreate, firstLoad } = useDAOContext();
@@ -31,12 +32,23 @@ const DAODetail = () => {
   if (Array.isArray(id) && id.length > 2) {
     if (proposalKey === 'proposals' && selectedDAO && daoName && proposalId) {
       return (
-        <DaoProposalDetail
-          selectedDao={selectedDAO.address}
-          selectedDaoName={selectedDAO.name}
-          selectedDaoProposalTitle={''}
-          selectedDaoProposalId={Number(proposalId)}
-        />
+        <Flex h="100%" gap="4" justifyContent="space-between" flexDir="column">
+          <Box>
+            <DaoProposalDetail
+              selectedDao={selectedDAO.address}
+              selectedDaoName={selectedDAO.name}
+              selectedDaoProposalTitle={''}
+              selectedDaoProposalId={Number(proposalId)}
+            />
+          </Box>
+          <Box>
+            <ClosePageButton
+              onClose={() => {
+                router.push(`/dao/view/${daoName}`);
+              }}
+            />
+          </Box>
+        </Flex>
       );
     }
   }
