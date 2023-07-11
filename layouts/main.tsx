@@ -60,7 +60,15 @@ export const Layout = ({ children }: { children: ReactElement }) => {
           >
             <Header />
           </Flex>
-          <Box as="main" display={'block'} overflow={'visible'}>
+          <Box
+            as="main"
+            display={'block'}
+            w="full"
+            height="90%"
+            overflowY="auto"
+            pos="relative"
+            overflow={'visible'}
+          >
             {children}
           </Box>
         </Box>

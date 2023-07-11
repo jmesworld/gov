@@ -36,6 +36,7 @@ import { v4 as uuid } from 'uuid';
 import { ConfigResponse } from '../../client/DaoMultisig.types';
 import * as MultisigClientType from '../../client/DaoMultisig.types';
 import { toBase64 } from '../../utils/identity';
+import { Link } from '../components/genial/Link';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -254,17 +255,21 @@ export const DAOProposalPage = ({
   }, [state, activeTab]);
 
   return (
-    <Box>
-      <Flex mb={'26px'}>
-        <Text
-          color={'darkPurple'}
-          fontWeight="bold"
-          fontSize={30}
-          fontFamily="DM Sans"
-          style={{ textDecoration: 'underline' }}
-        >
-          {selectedDaoName}
-        </Text>
+    <Box pb="2">
+      <Flex height={'47px'} />
+      <Flex mb={'47px'}>
+        <Link href={`/dao/view/${selectedDaoName}`}>
+          <Text
+            color={'darkPurple'}
+            cursor="pointer"
+            fontWeight="bold"
+            fontSize={30}
+            fontFamily="DM Sans"
+            style={{ textDecoration: 'underline' }}
+          >
+            {selectedDaoName}
+          </Text>
+        </Link>
         <Box
           width={'6px'}
           height={'6px'}
@@ -348,7 +353,10 @@ export const DAOProposalPage = ({
             width={'99px'}
             height={'42px'}
             variant={'link'}
-            onClick={() => setCreateDaoSelected(false)}
+            onClick={() => {
+              navigate(`/dao/view/${selectedDaoName}`);
+              setCreateDaoSelected(false);
+            }}
           >
             <Text
               color={'darkPurple'}
