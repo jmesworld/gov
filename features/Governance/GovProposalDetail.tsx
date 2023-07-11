@@ -103,14 +103,16 @@ export default function GovProposalDetail({
         id: proposalId,
       });
       toast({
-        title: 'Vote submitted.',
-        description: "We've submitted your Vote.",
+        colorScheme: 'green',
+        title: 'Concluded Vote',
+        description: "We've concluded the vote.",
         status: 'success',
       });
       setConcluding(false);
     } catch (err) {
       if (err instanceof Error)
         toast({
+          colorScheme: 'red',
           title: 'Error',
           description: err.message,
           status: 'error',

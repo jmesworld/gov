@@ -29,7 +29,7 @@ export const GovProposalType = ({ proposal }: Props) => {
 export const GetProposalDetail = ({ proposal }: Props) => {
   if (!proposal) return null;
   const { excuteMsg } = getGovProposalType(proposal);
-  if (!excuteMsg) return null;
+  if (!excuteMsg || !excuteMsg.propose) return null;
 
   if ('core_slot' in excuteMsg.propose) {
     const brand = excuteMsg.propose.core_slot.slot;
