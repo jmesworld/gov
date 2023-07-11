@@ -209,18 +209,26 @@ export const ProposalList = ({
   }
 };
 
-export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
+export const ProposalHeader = ({
+  isGov,
+  proposalTitle,
+}: {
+  isGov: boolean;
+  proposalTitle?: string;
+}) => {
   return (
     <Flex flex={1} width={isGov ? '100%' : '100%'}>
       <Flex>
-        <Box width={isGov ? '227px' : '151px'}>
+        <Box width={isGov ? '227px' : '171px'}>
           <Text
             color="rgba(15,0,86,0.8)"
             fontWeight="medium"
             fontFamily="DM Sans"
             fontSize={12}
           >
-            {isGov ? ' PROPOSALS' : 'DAO PROPOSALS'}
+            {proposalTitle}
+            {!proposalTitle && isGov && ' PROPOSALS'}
+            {!proposalTitle && !isGov && 'DAO PROPOSALS'}
           </Text>
         </Box>
         <Box width={isGov ? '500px' : '440px'}></Box>
@@ -233,7 +241,7 @@ export const ProposalHeader = ({ isGov }: { isGov: boolean }) => {
           fontSize={12}
           width={'155px'}
         >
-          {isGov ? 'FUNDING PER MONTH' : 'Funding P/M'}
+          {isGov ? 'FUNDING PER MONTH' : 'FUNDING P/M'}
         </Text>
       </Box>
       <Flex width={'155px'}>
@@ -316,17 +324,21 @@ export const ProposalListItem = ({
       >
         <Flex>
           <Flex
+            flexWrap="wrap"
             width={largeSize ? '227px' : '151px'}
             flexDirection={'column'}
             justifyContent={'center'}
           >
             <Text
-              width={largeSize ? '281px' : '268px'}
               color="white"
               fontFamily={'DM Sans'}
               fontWeight="normal"
               fontSize={18}
+              width={largeSize ? '227px' : '151px'}
               marginLeft={'14px'}
+              whiteSpace="pre-wrap"
+              noOfLines={3}
+              textOverflow="ellipsis"
             >
               {title.length > 20 ? title.substring(0, 20) + '...' : title}
             </Text>
@@ -352,11 +364,6 @@ export const ProposalListItem = ({
                 textAlign="center"
               >
                 {passed ? 'Passed' : 'Failed'}
-              </Badge>
-            )}
-            {isGov && (
-              <Badge w="100px" ml="3" fontSize="10px" color="purple" bg="white">
-                Gov Proposal
               </Badge>
             )}
           </Flex>

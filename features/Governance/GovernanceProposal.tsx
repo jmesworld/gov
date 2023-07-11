@@ -145,13 +145,7 @@ export default function GovernanceProposal({
 
       {notConcluded.length > 0 && (
         <Flex flexDir="column">
-          <Text
-            my="4"
-            fontSize="xs"
-            autoCapitalize="all"
-            color="textPrimary.100"
-            mb="4"
-          >
+          <Text my="4" fontSize="xs" color="textPrimary.100" mb="4">
             NOT CONCLUDED
           </Text>
           <ProposalList
