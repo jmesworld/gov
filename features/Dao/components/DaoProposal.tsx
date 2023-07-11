@@ -18,6 +18,8 @@ import { useMemo } from 'react';
 import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { NEXT_PUBLIC_GOVERNANCE_CONTRACT } from '../../../config/defaults';
 import { useClipboardTimeout } from '../../../hooks/useClipboard';
+import { isProposalGov } from '../../../utils/proposalUti';
+import { ProposalResponseForEmpty } from '../../../client/DaoMultisig.types';
 
 export default function DaoProposal({
   daoAddress,
@@ -64,6 +66,30 @@ export default function DaoProposal({
     },
   });
 
+  const proposals = useMemo(() => {
+    const gov: ProposalResponseForEmpty[] = [];
+    const daoPropsal: ProposalResponseForEmpty[] = [];
+    if (!data) {
+      return {
+        gov,
+        daoPropsal,
+      };
+    }
+    data.proposals.forEach(proposal => {
+      const isGovProposal = isProposalGov(proposal, goverrnanceQueryClient);
+      if (isGovProposal) {
+        gov.push(proposal);
+        return;
+      }
+
+      daoPropsal.push(proposal);
+    });
+    return {
+      gov,
+      daoPropsal,
+    };
+  }, [data, goverrnanceQueryClient]);
+
   return (
     <>
       <Flex height={'47px'} />
@@ -108,22 +134,55 @@ export default function DaoProposal({
       <Flex height={'16px'} />
       <Flex>
         <Box flexGrow={1}>
-          <ProposalHeader isGov={false} />
+          <ProposalHeader
+            proposalTitle=" GOVERNANCE PROPOSAL/s"
+            isGov={false}
+          />
           <Flex height={'10px'} />
-          {data && (
-            <ProposalList
-              client={goverrnanceQueryClient}
-              daoName={daoName}
-              totalSupply={supply as number}
-              proposals={data?.proposals}
-              isGov={false}
-              daoAddress={daoAddress}
-              onClickListItem={() => {
-                setDaoProposalDetailOpen(true);
-              }}
-              setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-              setSelectedProposalId={setSelectedProposalId}
-            />
+
+          {proposals?.gov?.length > 0 && (
+            <Flex flexDir="column">
+              <ProposalList
+                client={goverrnanceQueryClient}
+                daoName={daoName}
+                totalSupply={supply as number}
+                proposals={proposals.gov}
+                isGov={false}
+                daoAddress={daoAddress}
+                onClickListItem={() => {
+                  setDaoProposalDetailOpen(true);
+                }}
+                setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+                setSelectedProposalId={setSelectedProposalId}
+              />
+            </Flex>
+          )}
+
+          {proposals?.daoPropsal?.length > 0 && (
+            <Flex flexDir="column">
+              <Text
+                my="4"
+                fontSize="xs"
+                autoCapitalize="all"
+                color="textPrimary.100"
+                mb="4"
+              >
+                DAO PROPOSAL/s
+              </Text>
+              <ProposalList
+                client={goverrnanceQueryClient}
+                daoName={daoName}
+                totalSupply={supply as number}
+                proposals={proposals.daoPropsal}
+                isGov={false}
+                daoAddress={daoAddress}
+                onClickListItem={() => {
+                  setDaoProposalDetailOpen(true);
+                }}
+                setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+                setSelectedProposalId={setSelectedProposalId}
+              />
+            </Flex>
           )}
 
           {isLoading ||
