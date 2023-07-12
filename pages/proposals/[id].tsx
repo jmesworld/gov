@@ -14,7 +14,7 @@ const ProposalDetail: NextPageWithLayout = () => {
 
   return (
     <CoinSupplyContextProvider>
-      <Flex h="100%" justifyContent="space-between" flexDir="column">
+      <Flex h="100%" justifyContent="space-between" gap="4" flexDir="column">
         <Box>
           <GovProposalDetail proposalId={Number(id)} />
         </Box>
