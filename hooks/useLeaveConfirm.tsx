@@ -68,7 +68,7 @@ export function useLeaveConfirm({
   preventNavigatingAway: isDirty,
   title = defaultTitle,
   message = defaultMessage,
-}: Props): [(check: false) => void, (route: string) => void] {
+}: Props): [(check: boolean) => void, (route: string) => void] {
   const { check, setCheck, preventNavigatingAway, setPreventNavigatingAway } =
     useLeaveConfirmContext();
 

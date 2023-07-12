@@ -383,6 +383,7 @@ export const DAOProposalPage = ({
                 }
                 setErr([]);
                 setIsCreatingProposal(true);
+                setRouteCheck(false);
                 const msg = getRequest(state, activeTab);
                 if (msg && 'update_members' in msg) {
                   const wasmMsg: MultisigClientType.WasmMsg = {
@@ -412,6 +413,7 @@ export const DAOProposalPage = ({
                 if (!result && msg && 'propose' in msg) {
                   throw new Error('Something went wrong');
                 }
+
                 dispatch({
                   type: 'RESET',
                   payload: initialState,
@@ -428,7 +430,6 @@ export const DAOProposalPage = ({
                   type: 'RESET',
                   payload: initialState,
                 });
-                setRouteCheck(false);
                 navigate(`/dao/view/${selectedDaoName}/proposals/${id}`);
               } catch (err) {
                 console.error(err);
@@ -439,6 +440,7 @@ export const DAOProposalPage = ({
                   });
                 }
               }
+              setRouteCheck(true);
               setIsCreatingProposal(false);
             }}
             backgroundColor={'green'}

@@ -540,7 +540,7 @@ export default function CreateGovProposal({
             <Box width={'12px'} />
             <Button
               disabled={!isFormValid}
-              onClick={() => {
+              onClick={async () => {
                 //
                 const proposalMsg = {
                   propose: getProposalExecuteMsg({
@@ -572,6 +572,7 @@ export default function CreateGovProposal({
                     ],
                   }),
                 };
+                setCheck(false);
                 setCreatingGovProposal(true);
                 const wasmMsg: Governance.WasmMsg = {
                   execute: {
@@ -580,9 +581,8 @@ export default function CreateGovProposal({
                     msg: toBase64(proposalMsg),
                   },
                 };
-
-                createGovProposalMutation
-                  .mutateAsync({
+                try {
+                  const result = await createGovProposalMutation.mutateAsync({
                     client: daoClient,
                     msg: {
                       title: proposalTitle,
@@ -597,33 +597,32 @@ export default function CreateGovProposal({
                       fee,
                       funds: [{ amount: '10000000', denom: 'ujmes' }],
                     },
-                  })
-                  .then(result => {
-                    setCheck(false);
-                    const id = result.events
-                      .find(e => e.type === 'wasm')
-                      ?.attributes.find(el => el.key === 'proposal_id')?.value;
-                    if (!id) {
-                      throw new Error('Proposal id not found');
-                    }
-                    toast({
-                      title: 'Proposal created.',
-                      description: "We've created your Proposal.",
-                      status: 'success',
-                      duration: 9000,
-                      isClosable: true,
-                      containerStyle: {
-                        backgroundColor: 'darkPurple',
-                        borderRadius: 12,
-                      },
-                    });
-                    restForm();
-                    navigate(`/dao/view/${selectedDaoName}`);
-                  })
-                  .catch(error => {
+                  });
+
+                  const id = result.events
+                    .find(e => e.type === 'wasm')
+                    ?.attributes.find(el => el.key === 'proposal_id')?.value;
+                  if (!id) {
+                    throw new Error('Proposal id not found');
+                  }
+                  toast({
+                    title: 'Proposal created.',
+                    description: "We've created your Proposal.",
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                    containerStyle: {
+                      backgroundColor: 'darkPurple',
+                      borderRadius: 12,
+                    },
+                  });
+                  restForm();
+                  navigate(`/dao/view/${selectedDaoName}`);
+                } catch (err) {
+                  if (err instanceof Error) {
                     toast({
                       title: 'Proposal creation error',
-                      description: error.toString(),
+                      description: err.toString(),
                       status: 'error',
                       duration: 9000,
                       isClosable: true,
@@ -632,10 +631,11 @@ export default function CreateGovProposal({
                         borderRadius: 12,
                       },
                     });
-                  })
-                  .finally(() => {
-                    setCreatingGovProposal(false);
-                  });
+                  }
+                }
+
+                setCreatingGovProposal(false);
+                setCheck(true);
               }}
               backgroundColor={'green'}
               borderRadius={90}
