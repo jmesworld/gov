@@ -1,4 +1,5 @@
-import { Flex, Text } from '@chakra-ui/react';
+import React from 'react';
+import { Flex, Switch, Text } from '@chakra-ui/react';
 import { getProposalExcuteMsg } from '../../../../utils/proposalUti';
 import dynamic from 'next/dynamic';
 import { ProposalResponseForEmpty } from '../../../../client/DaoMultisig.types';
@@ -10,7 +11,8 @@ type Props = {
 };
 
 export const ProposalExcuteRawData = ({ proposal }: Props) => {
-  const excuteMessage = getProposalExcuteMsg(proposal);
+  const { excuteMsgs, msgs } = getProposalExcuteMsg(proposal);
+  const [isJson, setIsJson] = React.useState(true);
 
   return (
     <Flex
@@ -21,13 +23,31 @@ export const ProposalExcuteRawData = ({ proposal }: Props) => {
       border="1px solid rgba(112, 79, 247, 0.5)"
       padding="14px 16px"
       marginTop="20px"
+      pos="relative"
     >
+      <Flex
+        pos="absolute"
+        right={0}
+        display="flex"
+        alignItems="center"
+        gap="3"
+        mr="3"
+        zIndex={99}
+      >
+        <Text color="purple"> {isJson ? 'JSON' : 'Base64'} </Text>
+        <Switch
+          color="purple"
+          size="sm"
+          onChange={() => setIsJson(!isJson)}
+          isChecked={isJson}
+        />
+      </Flex>
       <Text color="purple">Raw Proposal Data</Text>
       <Flex flexGrow={1} w="full">
         <CodeEditor
           width="100%"
           showPrintMargin
-          showGutter={false}
+          showGutter={true}
           readonly
           style={{
             backgroundColor: 'transparent',
@@ -37,13 +57,17 @@ export const ProposalExcuteRawData = ({ proposal }: Props) => {
             highlightSelectedWord: false,
             highlightActiveLine: false,
             showPrintMargin: false,
-            showGutter: false,
-            showLineNumbers: true,
+            showGutter: true,
+            showLineNumbers: false,
           }}
           editorProps={{
             $blockScrolling: true,
           }}
-          value={JSON.stringify(excuteMessage, null, 2)}
+          value={
+            isJson
+              ? JSON.stringify(excuteMsgs, null, 2)
+              : JSON.stringify(msgs, null, 2)
+          }
         />
       </Flex>
     </Flex>

@@ -7,9 +7,12 @@ export const getProposalExcuteMsg = (
   proposal: ProposalResponseForEmpty,
 ): {
   excuteMsg: { propose: ProposalMsg } | null;
+  excuteMsgs: ProposalResponseForEmpty['msgs'];
   contractAddr: string | null;
+  msgs: ProposalResponseForEmpty['msgs'];
 } => {
-  let excuteMsg: null | { propose: ProposalMsg } = null;
+  const excuteMsgs: ProposalResponseForEmpty['msgs'] = [];
+  let excuteMsg: { propose: ProposalMsg } | null = null;
   let contractAddr: null | string = null;
   proposal?.msgs?.forEach(msg => {
     if (!msg) {
@@ -29,16 +32,32 @@ export const getProposalExcuteMsg = (
     const stringMessage = fromBase64ToString<{ propose: ProposalMsg }>(
       wasmMessage,
     );
+    excuteMsg = stringMessage;
     if (!stringMessage) {
       return;
     }
-    excuteMsg = stringMessage;
+    excuteMsgs.push({
+      ...msg,
+      wasm: {
+        ...wasm,
+        execute: {
+          ...wasm.execute,
+          // Assinging a decoded object to msg
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          /// @ts-ignore
+          msg: stringMessage,
+        },
+      },
+    });
+
     contractAddr = wasm.execute.contract_addr;
   });
 
   return {
     excuteMsg,
+    excuteMsgs,
     contractAddr,
+    msgs: proposal.msgs,
   };
 };
 

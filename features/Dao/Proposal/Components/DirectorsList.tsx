@@ -128,6 +128,7 @@ export const DaoMembersListItem = ({
       borderColor={'rgba(116,83,256,0.3)'}
       borderWidth={'1px'}
       borderRadius="12px"
+      borderRightRadius={44}
       _hover={{
         bg: 'rgba(198, 180, 252, 0.10)',
         borderColor: 'rgba(116,83,256,0.3)',
@@ -205,9 +206,9 @@ export const DaoMembersListItem = ({
       </Flex>
       <span
         style={{
-          zIndex: 999,
+          zIndex: 99,
           position: 'absolute',
-          right: '-10px',
+          right: '0px',
         }}
       >
         <Flex
