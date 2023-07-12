@@ -1,4 +1,4 @@
-import { Box, Flex, Progress, Text } from '@chakra-ui/react';
+import { Box, Flex, Progress, Text, Tooltip } from '@chakra-ui/react';
 import { formatBalance } from '../../../hooks/useAccountBalance';
 
 interface ProposalProgressType {
@@ -34,18 +34,24 @@ export const ProposalProgress = ({
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Text
-          color="white"
-          fontWeight="normal"
-          fontSize={14}
-          fontFamily="DM Sans"
-          textTransform="uppercase"
-          opacity={yesPercent > noPercent ? '1' : '0.5'}
-          width={'58px'}
-          textAlign={'left'}
-        >
-          Yes {formatBalance(yesCount)}
-        </Text>
+        <Tooltip hasArrow label={formatBalance(yesCount, 2)}>
+          <Text
+            color="white"
+            fontWeight="normal"
+            fontSize={14}
+            fontFamily="DM Sans"
+            textTransform="uppercase"
+            opacity={yesPercent > noPercent ? '1' : '0.5'}
+            width={'65px'}
+            textOverflow="ellipsis"
+            textAlign={'left'}
+          >
+            <Box as="span" display="inline-block" width="30px">
+              Yes
+            </Box>
+            <span>{formatBalance(yesCount, 1)}</span>
+          </Text>
+        </Tooltip>
         <Progress
           value={yesPercent}
           backgroundColor={'#5136C2'}
@@ -60,22 +66,28 @@ export const ProposalProgress = ({
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Text
-          color="white"
-          fontWeight="normal"
-          fontSize={14}
-          fontFamily="DM Sans"
-          textTransform="uppercase"
-          opacity={yesPercent > noPercent ? '0.5' : '1'}
-          width={'58px'}
-          textAlign={'left'}
-        >
-          No {formatBalance(noCount)}
-        </Text>
+        <Tooltip hasArrow label={formatBalance(noCount, 2)}>
+          <Text
+            color="white"
+            fontWeight="normal"
+            fontSize={14}
+            fontFamily="DM Sans"
+            textTransform="uppercase"
+            textOverflow="ellipsis"
+            opacity={yesPercent > noPercent ? '0.5' : '1'}
+            width={'65px'}
+            textAlign={'left'}
+          >
+            <Box as="span" display="inline-block" width="30px">
+              No
+            </Box>
+            <span>{formatBalance(noCount, 1)}</span>
+          </Text>
+        </Tooltip>
         <Progress
           value={noPercent}
           backgroundColor={'#5136C2'}
-          width={'calc(100% - 56px)'}
+          width={'calc(100% - 65px)'}
           height={'10px'}
           borderRadius={'10px'}
           variant={'red'}
@@ -113,7 +125,7 @@ export const ProposalProgress = ({
               letterSpacing={'-0.05em'}
               textAlign={'center'}
             >
-              {formatBalance(target)}
+              {formatBalance(target, 2)}
             </Text>
           </Box>
           <Flex

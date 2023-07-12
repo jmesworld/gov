@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Badge, Box, Flex, Progress, Text } from '@chakra-ui/react';
+import { Badge, Box, Flex, Image, Progress, Text } from '@chakra-ui/react';
 import { MouseEventHandler } from 'react';
 import { ProposalProgress } from './ProposalProgress';
 import { useRouter } from 'next/router';
@@ -8,11 +8,14 @@ import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
 import moment from 'moment';
 import {
   calculateFundingPerMonth,
+  getGovProposalType,
   isProposalGov,
 } from '../../../utils/proposalUti';
 import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { ProposalResponse } from '../../../client/Governance.types';
 import { ProposalResponseForEmpty } from '../../../client/DaoMultisig.types';
+import { formatString } from '../../../lib/strings';
+import { formatBalanceWithComma } from '../../../hooks/useAccountBalance';
 
 type BaseProps = {
   totalSupply: number;
@@ -86,14 +89,6 @@ export const ProposalList = ({
         votingDuration = moment.duration(diff).humanize();
       }
 
-      const propType = JSON.stringify(proposal?.prop_type)
-        ?.split(':')?.[0]
-        ?.slice(2);
-
-      const type = propType
-        ? propType.slice(0, propType.length - 1)
-        : proposal.description;
-
       if (isGovList) {
         const {
           coinYes,
@@ -107,6 +102,13 @@ export const ProposalList = ({
           coin_no: proposal?.coins_no,
           totalSupply: supply as number,
         });
+        const propType = JSON.stringify(proposal?.prop_type)
+          ?.split(':')?.[0]
+          ?.slice(2);
+
+        const type = propType
+          ? propType.slice(0, propType.length - 1)
+          : proposal.description;
         const fundingPerMonth = calculateFundingPerMonth(
           proposal?.start_block ?? 0,
         );
@@ -145,7 +147,7 @@ export const ProposalList = ({
             noPercent={noPercentage}
             totalCount={totalSupply}
             threshold={threshold}
-            type={type}
+            type={formatString(type)}
             navigateToProposal={id => navigateToProposal(id, isGovList)}
             pass={
               proposal.status === 'passed' ||
@@ -168,6 +170,7 @@ export const ProposalList = ({
       const target = threshold ? threshold.weight : 0;
       const yesPercentage = threshold ? threshold.total_weight : 0;
       const noPercentage = 100 - yesPercentage;
+      const propsalType = getGovProposalType(proposal);
 
       return (
         <ProposalListItem
@@ -181,7 +184,11 @@ export const ProposalList = ({
           totalCount={totalSupply}
           threshold={target}
           isGov={isGov}
-          type={type}
+          type={
+            propsalType.proposalType
+              ? formatString(propsalType.proposalType)
+              : ''
+          }
           navigateToProposal={id => navigateToProposal(id, !!isGovList)}
           pass={
             proposal.status === 'passed' ||
@@ -217,9 +224,9 @@ export const ProposalHeader = ({
   proposalTitle?: string;
 }) => {
   return (
-    <Flex flex={1} width={isGov ? '100%' : '100%'}>
-      <Flex>
-        <Box width={isGov ? '227px' : '171px'}>
+    <Flex flex={1} minWidth={isGov ? '1000px' : '500px'} width="100%">
+      <Flex width={isGov ? '70%' : '90%'}>
+        <Box width="30%">
           <Text
             color="rgba(15,0,86,0.8)"
             fontWeight="medium"
@@ -231,31 +238,35 @@ export const ProposalHeader = ({
             {!proposalTitle && !isGov && 'DAO PROPOSALS'}
           </Text>
         </Box>
-        <Box width={isGov ? '500px' : '440px'}></Box>
+        <Box width={'70%'}></Box>
       </Flex>
-      <Box>
-        <Text
-          color="rgba(15,0,86,0.8)"
-          fontFamily={'DM Sans'}
-          fontWeight="medium"
-          fontSize={12}
-          width={'155px'}
-        >
-          {isGov ? 'FUNDING PER MONTH' : 'FUNDING P/M'}
-        </Text>
-      </Box>
-      <Flex width={'155px'}>
-        <Text
-          color="rgba(15,0,86,0.8)"
-          fontFamily={'DM Sans'}
-          fontWeight="medium"
-          fontSize={12}
-          textAlign={'left'}
-          width={'124px'}
-        >
-          {isGov ? 'FUNDING DURATION' : 'FUNDING DURATION'}
-        </Text>
-      </Flex>
+      {isGov && (
+        <>
+          <Box width={'15%'}>
+            <Text
+              color="rgba(15,0,86,0.8)"
+              fontFamily={'DM Sans'}
+              fontWeight="medium"
+              fontSize={12}
+              width={'155px'}
+            >
+              {isGov ? 'FUNDING PER MONTH' : 'FUNDING P/M'}
+            </Text>
+          </Box>
+          <Flex width={'15%'}>
+            <Text
+              color="rgba(15,0,86,0.8)"
+              fontFamily={'DM Sans'}
+              fontWeight="medium"
+              fontSize={12}
+              textAlign={'left'}
+              width={'124px'}
+            >
+              {isGov ? 'FUNDING DURATION' : 'FUNDING DURATION'}
+            </Text>
+          </Flex>
+        </>
+      )}
     </Flex>
   );
 };
@@ -276,7 +287,6 @@ export const ProposalListItem = ({
   setSelectedDaoProposalId,
   navigateToProposal,
   votingDuration,
-  isGov,
   inActive,
   fundingPerMonth,
   passed,
@@ -307,6 +317,7 @@ export const ProposalListItem = ({
   return (
     <>
       <Flex
+        minWidth={largeSize ? '1000px' : '500px'}
         opacity={inActive ? '0.5' : '1'}
         flex={1}
         height={'89px'}
@@ -322,10 +333,10 @@ export const ProposalListItem = ({
         }}
         cursor={'pointer'}
       >
-        <Flex>
+        <Flex width={largeSize ? '70%' : '90%'}>
           <Flex
             flexWrap="wrap"
-            width={largeSize ? '227px' : '151px'}
+            width={'30%'}
             flexDirection={'column'}
             justifyContent={'center'}
           >
@@ -334,7 +345,7 @@ export const ProposalListItem = ({
               fontFamily={'DM Sans'}
               fontWeight="normal"
               fontSize={18}
-              width={largeSize ? '227px' : '151px'}
+              width={'100%'}
               marginLeft={'14px'}
               whiteSpace="pre-wrap"
               noOfLines={3}
@@ -351,11 +362,12 @@ export const ProposalListItem = ({
               marginLeft={'14px'}
               opacity={'70%'}
             >
-              {type.length > 26 ? title.substring(0, 26) + '...' : type}
+              {type.length > 26 ? type.substring(0, 26) + '...' : type}
             </Text>
             {passed !== undefined && (
               <Badge
                 w="60px"
+                py="2px"
                 rounded="full"
                 ml="3"
                 bg={passed ? 'green' : 'red'}
@@ -368,12 +380,12 @@ export const ProposalListItem = ({
             )}
           </Flex>
           <Flex
-            width={largeSize ? '500px' : '440px'}
+            width={'70%'}
+            pr="6"
             alignItems={'center'}
             justifyContent={'space-around'}
           >
             <ProposalProgress
-              width={430}
               targetPercentage={thresholdPercent}
               yesCount={yesCount}
               noCount={noCount}
@@ -383,26 +395,39 @@ export const ProposalListItem = ({
             />
           </Flex>
         </Flex>
-        <Box width="155px" justifyContent={'center'}>
-          <Text
-            color="white"
-            fontWeight="normal"
-            fontSize={14}
-            fontFamily="DM Sans"
-          >
-            {fundingPerMonth}
-          </Text>
-        </Box>
-        <Box width="155px" justifyContent={'center'}>
-          <Text
-            color="white"
-            fontWeight="normal"
-            fontSize={14}
-            fontFamily="DM Sans"
-          >
-            {votingDuration}
-          </Text>
-        </Box>
+        {largeSize && (
+          <>
+            <Flex width="15%" alignItems="center" justifyContent="flex-start">
+              <Image
+                src="/JMES_Icon_white.svg"
+                alt="JMES Icon"
+                width={'9px'}
+                mr="1"
+                height={'10.98px'}
+              />
+              <Text
+                color="white"
+                fontWeight="normal"
+                fontSize={14}
+                fontFamily="DM Sans"
+              >
+                {formatBalanceWithComma(
+                  Number(fundingPerMonth ?? 0) / 10e6 || 0,
+                )}
+              </Text>
+            </Flex>
+            <Box width="15%" justifyContent={'center'}>
+              <Text
+                color="white"
+                fontWeight="normal"
+                fontSize={14}
+                fontFamily="DM Sans"
+              >
+                {votingDuration}
+              </Text>
+            </Box>
+          </>
+        )}
       </Flex>
     </>
   );

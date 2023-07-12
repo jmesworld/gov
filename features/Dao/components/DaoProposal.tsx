@@ -142,7 +142,7 @@ export default function DaoProposal({
       <Flex>
         <Box flexGrow={1}>
           <ProposalHeader
-            proposalTitle=" GOVERNANCE PROPOSAL/s"
+            proposalTitle=" GOVERNANCE PROPOSAL/S"
             isGov={false}
           />
           <Flex height={'10px'} />
@@ -174,7 +174,7 @@ export default function DaoProposal({
                 color="textPrimary.100"
                 mb="4"
               >
-                DAO PROPOSAL/s
+                DAO PROPOSAL/S
               </Text>
               <ProposalList
                 client={goverrnanceQueryClient}

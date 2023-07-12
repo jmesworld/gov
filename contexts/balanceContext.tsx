@@ -96,8 +96,8 @@ const BalanceContextProvider = ({ children }: Props) => {
       data.bJmes?.amount.dividedBy(1e6).toDecimalPlaces(1).toNumber() ?? 0,
     );
     return {
-      jmes,
-      bJmes,
+      jmes: String(jmes),
+      bJmes: String(bJmes),
     };
   }, [data]);
 
