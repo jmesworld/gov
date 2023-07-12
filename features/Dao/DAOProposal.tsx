@@ -84,10 +84,12 @@ export const DAOProposalPage = ({
   setCreateDaoSelected,
   daoAddress,
   selectedDaoName,
+  selectedTab,
 }: {
   daoOwner: { name: string; address: string; votingPower: number };
   // eslint-disable-next-line @typescript-eslint/ban-types
   setCreateDaoSelected: Function;
+  selectedTab?: ProposalTypes;
   identityName: string;
   daoAddress: string;
   selectedDaoName: string;
@@ -99,7 +101,9 @@ export const DAOProposalPage = ({
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { signingCosmWasmClient: signingClient } =
     useSigningCosmWasmClientContext();
-  const [activeTab, setActiveTab] = useState<ProposalTypes>('text');
+  const [activeTab, setActiveTab] = useState<ProposalTypes>(
+    selectedTab ?? 'text',
+  );
   const [state, dispatch] = useReducer(DAOProposalReducer, initialState);
   const [daoMultisigConfig, setDaoMultisigConfig] =
     useState<ConfigResponse | null>(null);

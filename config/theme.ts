@@ -39,6 +39,19 @@ export const defaultThemeObject = {
     largeSoft: 'rgba(60, 64, 67, 0.15) 0px 2px 10px 6px;',
   },
   components: {
+    Button: {
+      variants: {
+        purple: {
+          bg: 'purple',
+          borderColor: 'purple',
+          color: 'white',
+          _hover: {
+            bg: 'darkPurple',
+          },
+          fontWeight: 'normal',
+        },
+      },
+    },
     Progress: {
       variants: {
         green: {
