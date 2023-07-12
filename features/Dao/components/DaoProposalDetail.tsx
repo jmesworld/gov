@@ -28,6 +28,8 @@ import {
   GovProposalType,
 } from '../Proposal/Components/ProposalType';
 import { ProposalExcuteRawData } from '../Proposal/Components/ProposalRawData';
+import { useDAOContext } from '../../../contexts/DAOContext';
+import { useEffect } from 'react';
 
 type Props = {
   selectedDao: string;
@@ -43,6 +45,11 @@ export default function DaoProposalDetail({
 }: Props) {
   const { address } = useChain(chainName);
   const { cosmWasmClient } = useCosmWasmClientContext();
+  const { setSelectedDAOByAddress } = useDAOContext();
+
+  useEffect(() => {
+    setSelectedDAOByAddress(selectedDao);
+  }, [selectedDao, setSelectedDAOByAddress]);
 
   const daoMultisigQueryClient = new DaoMultisigQueryClient(
     cosmWasmClient as CosmWasmClient,

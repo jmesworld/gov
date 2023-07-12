@@ -5,6 +5,7 @@ import {
   Button,
   useToast,
   CircularProgress,
+  Tooltip,
 } from '@chakra-ui/react';
 import { useChain } from '@cosmos-kit/react';
 import { chainName } from '../../config/defaults';
@@ -71,146 +72,160 @@ const GovProposalMyVote = (props: Props) => {
           marginTop="40px"
           isDisabled={props.voted}
         >
-          <Button
-            as="button"
-            height="42px"
-            width="50%"
-            lineHeight="16px"
-            border="1px"
-            borderRadius="90px"
-            fontSize="14px"
-            fontWeight="medium"
-            bg="#A1F0C4"
-            borderColor="#91D8B0"
-            color="#0F0056"
-            fontFamily="DM Sans"
-            onClick={() => {
-              setSubmittingYesVote(true);
-              voteMutation
-                .mutateAsync({
-                  client: daoMultisigClient,
-                  msg: {
-                    id: props.proposalId,
-                    vote: 'yes',
-                  },
-                  args: { fee },
-                })
-                .then(() => {
-                  toast({
-                    title: 'Vote submitted.',
-                    description: "We've submitted your Vote.",
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    containerStyle: {
-                      backgroundColor: 'darkPurple',
-                      borderRadius: 12,
-                    },
-                  });
-                })
-                .catch(error => {
-                  toast({
-                    title: 'Vote creation error',
-                    description: error.toString(),
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    containerStyle: {
-                      backgroundColor: 'red',
-                      borderRadius: 12,
-                    },
-                  });
-                })
-                .finally(() => setSubmittingYesVote(false));
-            }}
+          <Tooltip
+            hasArrow
+            isDisabled={!!address}
+            label="Please connect your wallet to participate in governance"
           >
-            {!isSubmittingYesVote ? (
-              <Text
-                color="midnight"
-                fontFamily={'DM Sans'}
-                fontWeight="medium"
-                fontSize={14}
-              >
-                Yes
-              </Text>
-            ) : (
-              <CircularProgress
-                isIndeterminate
-                size={'24px'}
-                color="midnight"
-              />
-            )}
-          </Button>
-          <Button
-            as="button"
-            height="42px"
-            width="50%"
-            lineHeight="16px"
-            border="1px"
-            borderRadius="90px"
-            fontSize="14px"
-            fontWeight="medium"
-            bg="#FF5876"
-            borderColor="#E54F6A"
-            color="#fff"
-            fontFamily="DM Sans"
-            onClick={() => {
-              setSubmittingNoVote(true);
-              voteMutation
-                .mutateAsync({
-                  client: daoMultisigClient,
-                  msg: {
-                    id: props.proposalId,
-                    vote: 'no',
-                  },
-                  args: { fee },
-                })
-                .then(() => {
-                  toast({
-                    title: 'Vote submitted.',
-                    description: "We've submitted your Vote.",
-                    status: 'success',
-                    duration: 9000,
-                    isClosable: true,
-                    containerStyle: {
-                      backgroundColor: 'darkPurple',
-                      borderRadius: 12,
+            <Button
+              disabled={!address}
+              as="button"
+              height="42px"
+              width="50%"
+              lineHeight="16px"
+              border="1px"
+              borderRadius="90px"
+              fontSize="14px"
+              fontWeight="medium"
+              bg="#A1F0C4"
+              borderColor="#91D8B0"
+              color="#0F0056"
+              fontFamily="DM Sans"
+              onClick={() => {
+                setSubmittingYesVote(true);
+                voteMutation
+                  .mutateAsync({
+                    client: daoMultisigClient,
+                    msg: {
+                      id: props.proposalId,
+                      vote: 'yes',
                     },
-                  });
-                })
-                .catch(error => {
-                  toast({
-                    title: 'Vote creation error',
-                    description: error.toString(),
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    containerStyle: {
-                      backgroundColor: 'red',
-                      borderRadius: 12,
-                    },
-                  });
-                })
-                .finally(() => setSubmittingNoVote(false));
-            }}
+                    args: { fee },
+                  })
+                  .then(() => {
+                    toast({
+                      title: 'Vote submitted.',
+                      description: "We've submitted your Vote.",
+                      status: 'success',
+                      duration: 9000,
+                      isClosable: true,
+                      containerStyle: {
+                        backgroundColor: 'darkPurple',
+                        borderRadius: 12,
+                      },
+                    });
+                  })
+                  .catch(error => {
+                    toast({
+                      title: 'Vote creation error',
+                      description: error.toString(),
+                      status: 'error',
+                      duration: 9000,
+                      isClosable: true,
+                      containerStyle: {
+                        backgroundColor: 'red',
+                        borderRadius: 12,
+                      },
+                    });
+                  })
+                  .finally(() => setSubmittingYesVote(false));
+              }}
+            >
+              {!isSubmittingYesVote ? (
+                <Text
+                  color="midnight"
+                  fontFamily={'DM Sans'}
+                  fontWeight="medium"
+                  fontSize={14}
+                >
+                  Yes
+                </Text>
+              ) : (
+                <CircularProgress
+                  isIndeterminate
+                  size={'24px'}
+                  color="midnight"
+                />
+              )}
+            </Button>
+          </Tooltip>
+          <Tooltip
+            hasArrow
+            isDisabled={!!address}
+            label="Please connect your wallet to participate in governance"
           >
-            {!isSubmittingNoVote ? (
-              <Text
-                color="midnight"
-                fontFamily={'DM Sans'}
-                fontWeight="medium"
-                fontSize={14}
-              >
-                No
-              </Text>
-            ) : (
-              <CircularProgress
-                isIndeterminate
-                size={'24px'}
-                color="midnight"
-              />
-            )}
-          </Button>
+            <Button
+              disabled={!address}
+              as="button"
+              height="42px"
+              width="50%"
+              lineHeight="16px"
+              border="1px"
+              borderRadius="90px"
+              fontSize="14px"
+              fontWeight="medium"
+              bg="#FF5876"
+              borderColor="#E54F6A"
+              color="#fff"
+              fontFamily="DM Sans"
+              onClick={() => {
+                setSubmittingNoVote(true);
+                voteMutation
+                  .mutateAsync({
+                    client: daoMultisigClient,
+                    msg: {
+                      id: props.proposalId,
+                      vote: 'no',
+                    },
+                    args: { fee },
+                  })
+                  .then(() => {
+                    toast({
+                      title: 'Vote submitted.',
+                      description: "We've submitted your Vote.",
+                      status: 'success',
+                      duration: 9000,
+                      isClosable: true,
+                      containerStyle: {
+                        backgroundColor: 'darkPurple',
+                        borderRadius: 12,
+                      },
+                    });
+                  })
+                  .catch(error => {
+                    toast({
+                      title: 'Vote creation error',
+                      description: error.toString(),
+                      status: 'error',
+                      duration: 9000,
+                      isClosable: true,
+                      containerStyle: {
+                        backgroundColor: 'red',
+                        borderRadius: 12,
+                      },
+                    });
+                  })
+                  .finally(() => setSubmittingNoVote(false));
+              }}
+            >
+              {!isSubmittingNoVote ? (
+                <Text
+                  color="midnight"
+                  fontFamily={'DM Sans'}
+                  fontWeight="medium"
+                  fontSize={14}
+                >
+                  No
+                </Text>
+              ) : (
+                <CircularProgress
+                  isIndeterminate
+                  size={'24px'}
+                  color="midnight"
+                />
+              )}
+            </Button>
+          </Tooltip>
         </ButtonGroup>
       </Box>
     </Box>

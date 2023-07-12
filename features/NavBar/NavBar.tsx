@@ -149,7 +149,8 @@ const NavBar = ({
             disabled={
               ['/', '/proposals/[id]', '/dao/create'].includes(router.route) ||
               status !== WalletStatus.Connected ||
-              !identityName
+              !identityName ||
+              !selectedDAO
             }
           />
         </Link>

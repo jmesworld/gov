@@ -14,12 +14,13 @@ import { useCosmWasmClientContext } from '../../../contexts/CosmWasmClient';
 
 import { BalanceDisplay } from './Balance';
 import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { NEXT_PUBLIC_GOVERNANCE_CONTRACT } from '../../../config/defaults';
 import { useClipboardTimeout } from '../../../hooks/useClipboard';
 import { isProposalGov } from '../../../utils/proposalUti';
 import { ProposalResponseForEmpty } from '../../../client/DaoMultisig.types';
+import { useDAOContext } from '../../../contexts/DAOContext';
 
 export default function DaoProposal({
   daoAddress,
@@ -37,6 +38,12 @@ export default function DaoProposal({
   setSelectedDaoMembersList: Function;
   setSelectedProposalId: Function;
 }) {
+  const { setSelectedDAOByAddress } = useDAOContext();
+
+  useEffect(() => {
+    setSelectedDAOByAddress(daoAddress);
+  }, [daoAddress, setSelectedDAOByAddress]);
+
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { supply } = useCoinSupplyContext();
   const [copied, copyToClipboard] = useClipboardTimeout();
