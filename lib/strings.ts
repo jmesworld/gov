@@ -7,6 +7,7 @@ export const formatString = (text: string): string => {
 
   return text
     .replace(/_/g, ' ')
+    .replace(/-/g, ' ')
     .split(' ')
     .map(capitalizeFirstLetter)
     .join(' ');
