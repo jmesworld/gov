@@ -8,14 +8,15 @@ import { IdentityserviceQueryClient } from '../../../client/Identityservice.clie
 
 const nameSchema = z
   .string()
-  .regex(/^[a-z]+$/, {
-    message: 'Name must be lowercase and only contain letters and dashes',
-  })
+
   .min(2, {
     message: 'Name must have at least 1 character',
   })
   .max(20, {
     message: 'Name must have at most is 20 character',
+  })
+  .regex(/^[a-z]+$/, {
+    message: 'Name must be lowercase and only contain letters and dashes',
   });
 
 const nameSchemaForEachChar = z.string().regex(/^[a-z]+$/);
@@ -73,7 +74,8 @@ export const DaoName = ({ daoName, dispatch, daoNameError, client }: Props) => {
         height={'48px'}
         borderColor={'primary.500'}
         background={'primary.100'}
-        focusBorderColor="darkPurple"
+        errorBorderColor="red"
+        focusBorderColor={daoNameError ? 'red' : 'darkPurple'}
         value={daoName}
         borderRadius={12}
         color={'purple'}
