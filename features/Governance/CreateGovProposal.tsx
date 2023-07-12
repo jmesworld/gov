@@ -28,6 +28,10 @@ import { useIdentityContext } from '../../contexts/IdentityContext';
 import { useLeaveConfirm } from '../../hooks/useLeaveConfirm';
 import dynamic from 'next/dynamic';
 import { Link } from '../components/genial/Link';
+import {
+  proposalDescriptionValidator,
+  proposalTitleValidator,
+} from '../../utils/proposalValidate';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -70,8 +74,17 @@ export default function CreateGovProposal({
 
   const [selectedProposalType, setSelectedProposalType] =
     useState<ProposalTypes>(allowedProposalTypes[0]);
-  const [proposalTitle, setProposalTitle] = useState('');
-  const [proposalDescription, setProposalDescription] = useState('');
+  const [proposalTitle, setProposalTitle] = useState<{
+    value: string;
+    error: string;
+  }>({
+    value: '',
+    error: '',
+  });
+  const [proposalDescription, setProposalDescription] = useState({
+    value: '',
+    error: '',
+  });
   const [improvementMsgs, setImprovementMsgs] = useState<string>('');
   const [slotType, setSlotType] = useState('brand');
   const [isFundingNeeded, setFundingNeeded] = useState(false);
@@ -115,8 +128,14 @@ export default function CreateGovProposal({
   ]);
 
   const restForm = () => {
-    setProposalTitle('');
-    setProposalDescription('');
+    setProposalTitle({
+      value: '',
+      error: '',
+    });
+    setProposalDescription({
+      value: '',
+      error: '',
+    });
     setSlotType('brand');
     setFundingNeeded(false);
     setFundingAmount(0);
@@ -142,7 +161,10 @@ export default function CreateGovProposal({
   const createGovProposalMutation = useDaoMultisigProposeMutation();
 
   const isFormValid =
-    proposalTitle.length > 1 && proposalDescription.length > 1;
+    proposalTitle.value.length > 1 &&
+    proposalTitle.error === '' &&
+    proposalDescription.value.length > 1 &&
+    proposalDescription.error === '';
 
   return (
     <>
@@ -198,7 +220,7 @@ export default function CreateGovProposal({
             />
           ))}
         </Box>
-        <Box width={'220px'} marginRight={'52px'}>
+        <Box width={'100%'} marginRight={'52px'}>
           <Text
             color={'rgba(15,0,86,0.8)'}
             fontWeight="medium"
@@ -214,12 +236,36 @@ export default function CreateGovProposal({
             height={'48px'}
             borderColor={'primary.500'}
             background={'primary.100'}
-            focusBorderColor="darkPurple"
+            focusBorderColor={proposalTitle.error ? 'red' : 'darkPurple'}
             borderRadius={12}
             color={'purple'}
-            onChange={e => setProposalTitle(e.target.value)}
+            isInvalid={proposalTitle.error !== ''}
+            errorBorderColor="red"
+            onChange={e => {
+              const parsedTitle = proposalTitleValidator.safeParse(
+                e.target.value,
+              );
+              setProposalTitle({
+                value: e.target.value,
+                error: parsedTitle.success
+                  ? ''
+                  : parsedTitle.error.errors[0].message,
+              });
+            }}
             placeholder={'Title'}
           />
+          <Text
+            color={'red'}
+            fontWeight="normal"
+            fontSize={12}
+            height={'13px'}
+            w="Full"
+            fontFamily="DM Sans"
+            mt="5px"
+            mb={'10px'}
+          >
+            {proposalTitle.error}
+          </Text>
           <Box height={'12px'} />
           <Textarea
             variant={'outline'}
@@ -227,12 +273,36 @@ export default function CreateGovProposal({
             height={'320px'}
             borderColor={'primary.500'}
             background={'primary.100'}
-            focusBorderColor="darkPurple"
+            isInvalid={proposalDescription.error !== ''}
+            errorBorderColor="red"
+            focusBorderColor={proposalDescription.error ? 'red' : 'darkPurple'}
             borderRadius={12}
             color={'purple'}
-            onChange={e => setProposalDescription(e.target.value)}
+            onChange={e => {
+              const parsedDescription = proposalDescriptionValidator.safeParse(
+                e.target.value,
+              );
+              setProposalDescription({
+                value: e.target.value,
+                error: parsedDescription.success
+                  ? ''
+                  : parsedDescription.error.errors[0].message,
+              });
+            }}
             placeholder={'Description'}
           />
+          <Text
+            color={'red'}
+            fontWeight="normal"
+            fontSize={12}
+            height={'13px'}
+            w="Full"
+            fontFamily="DM Sans"
+            mt="5px"
+            mb={'10px'}
+          >
+            {proposalDescription.error}
+          </Text>
           {selectedProposalType === 'revoke-proposal' ? (
             <Box marginTop={'10px'} width={'872px'}>
               <Divider
@@ -551,8 +621,8 @@ export default function CreateGovProposal({
                     isFundingRequired: isFundingNeeded,
                     amount: fundingAmount,
                     duration: fundingPeriod * 30 * 24 * 60 * 60, // months to seconds
-                    title: proposalTitle,
-                    description: proposalDescription,
+                    title: proposalTitle.value,
+                    description: proposalDescription.value,
                     slot: getSlot(slotType) as Governance.CoreSlot,
                     revoke_proposal_id: revokeProposalId,
                     msgs: [
@@ -585,8 +655,8 @@ export default function CreateGovProposal({
                   const result = await createGovProposalMutation.mutateAsync({
                     client: daoClient,
                     msg: {
-                      title: proposalTitle,
-                      description: proposalDescription,
+                      title: proposalTitle.value,
+                      description: proposalDescription.value,
                       msgs: [
                         {
                           wasm: wasmMsg,

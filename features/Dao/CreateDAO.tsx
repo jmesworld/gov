@@ -291,7 +291,6 @@ const CreateDaoNewForm = ({
             fontFamily={'DM Sans'}
             fontWeight="normal"
             fontSize={12}
-            marginLeft={'18px'}
             marginTop={'8px'}
           >
             {daoNameError}
