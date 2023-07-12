@@ -90,10 +90,10 @@ const BalanceContextProvider = ({ children }: Props) => {
       return undefined;
     }
     const jmes = formatBalance(
-      data.jmes?.amount.dividedBy(10e6).toDecimalPlaces(1).toNumber() ?? 0,
+      data.jmes?.amount.dividedBy(1e6).toDecimalPlaces(1).toNumber() ?? 0,
     );
     const bJmes = formatBalance(
-      data.bJmes?.amount.dividedBy(10e6).toDecimalPlaces(1).toNumber() ?? 0,
+      data.bJmes?.amount.dividedBy(1e6).toDecimalPlaces(1).toNumber() ?? 0,
     );
     return {
       jmes,
@@ -107,13 +107,13 @@ const BalanceContextProvider = ({ children }: Props) => {
     }
     const jmes =
       data.jmes?.amount
-        .dividedBy(10e6)
+        .dividedBy(1e6)
         .toDecimalPlaces(6)
         .toNumber()
         .toLocaleString() ?? '0';
     const bJmes =
       data.bJmes?.amount
-        .dividedBy(10e6)
+        .dividedBy(1e6)
         .toDecimalPlaces(6)
         .toNumber()
         .toLocaleString() ?? '0';
@@ -128,9 +128,9 @@ const BalanceContextProvider = ({ children }: Props) => {
       return undefined;
     }
     const jmes =
-      data.jmes?.amount.dividedBy(10e6).toDecimalPlaces(1).toNumber() ?? 0;
+      data.jmes?.amount.dividedBy(1e6).toDecimalPlaces(1).toNumber() ?? 0;
     const bJmes =
-      data.bJmes?.amount.dividedBy(10e6).toDecimalPlaces(1).toNumber() ?? 0;
+      data.bJmes?.amount.dividedBy(1e6).toDecimalPlaces(1).toNumber() ?? 0;
     return {
       jmes,
       bJmes,
