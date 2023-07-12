@@ -1,9 +1,11 @@
+import { useRouter } from 'next/router';
 import { useDAOContext } from '../../contexts/DAOContext';
 import { useIdentityContext } from '../../contexts/IdentityContext';
-import { DAOProposalPage } from '../../features/Dao/DAOProposal';
+import { DAOProposalPage, ProposalTypes } from '../../features/Dao/DAOProposal';
 import { useRedirectToHomeForNoWalletConnected } from '../../hooks/Redirect';
 
 const DAOProposal = () => {
+  const router = useRouter();
   const { selectedDAO, setSelectedDAOByAddress } = useDAOContext();
   const { getIdentityName, address } = useIdentityContext();
 
@@ -12,8 +14,11 @@ const DAOProposal = () => {
   if (!selectedDAO) {
     return 'no DAO selected';
   }
+  const selectedTab = (router.query.tab as ProposalTypes) ?? undefined;
+
   return (
     <DAOProposalPage
+      selectedTab={selectedTab}
       identityName={getIdentityName() as string}
       daoAddress={selectedDAO.address}
       selectedDaoName={selectedDAO.name}

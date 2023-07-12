@@ -15,10 +15,14 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { StdFee } from '@cosmjs/amino';
-import { DaoMultisigClient } from '../../client/DaoMultisig.client';
+import {
+  DaoMultisigClient,
+  DaoMultisigQueryClient,
+} from '../../client/DaoMultisig.client';
 import { useDaoMultisigProposeMutation } from '../../client/DaoMultisig.react-query';
+import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 
 import { ProposalType } from '../components/Proposal/ProposalType';
 import { toBase64 } from '../../utils/identity';
@@ -32,6 +36,9 @@ import {
   proposalDescriptionValidator,
   proposalTitleValidator,
 } from '../../utils/proposalValidate';
+import { convertMonthToBlock } from '../../utils/block';
+import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
+import { VoterDetail } from '../../client/DaoMultisig.types';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -44,7 +51,7 @@ const fee: StdFee = {
   gas: '10000000',
 };
 
-const default_funding_duration = (3 * 30 * 86400) / 5; // convert 3 months to number of blocks
+const default_funding_duration = 3;
 export type ProposalTypes =
   | 'text'
   | 'core-slot'
@@ -69,6 +76,16 @@ export default function CreateGovProposal({
   // eslint-disable-next-line @typescript-eslint/ban-types
   setCreateGovProposalSelected: Function;
 }) {
+  const { cosmWasmClient } = useCosmWasmClientContext();
+  const daoQueryClient = useMemo(
+    () =>
+      new DaoMultisigQueryClient(
+        cosmWasmClient as CosmWasmClient,
+        selectedDao as string,
+      ),
+    [cosmWasmClient, selectedDao],
+  );
+
   const { address } = useIdentityContext();
   const toast = useToast();
 
@@ -92,6 +109,40 @@ export default function CreateGovProposal({
   const [fundingPeriod, setFundingPeriod] = useState(default_funding_duration);
   const [isCreatingGovProposal, setCreatingGovProposal] = useState(false);
   const [revokeProposalId, setRevokeId] = useState(-1);
+  const [daoMembers, setDaoMembers] = useState<VoterDetail[]>([]);
+  const [daoThreshold, setDaoThreshold] = useState<number | string>(0);
+
+  useEffect(() => {
+    const getMemberList = async () => {
+      try {
+        const result = await daoQueryClient.listVoters({});
+        const threshold = await daoQueryClient.threshold();
+        if ('absolute_count' in threshold) {
+          setDaoThreshold(threshold.absolute_count.weight);
+        }
+        if ('absolute_percentage' in threshold) {
+          setDaoThreshold(threshold.absolute_percentage.percentage);
+        }
+        if ('threshold_quorum' in threshold) {
+          setDaoThreshold(threshold.threshold_quorum.threshold.toString());
+        }
+
+        setDaoMembers(result.voters);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    getMemberList();
+  }, [daoQueryClient]);
+
+  const coreSlotsDisabled = useMemo(() => {
+    return (
+      selectedProposalType === 'core-slot' &&
+      daoMembers.length > 0 &&
+      (daoMembers.length < 3 ||
+        daoMembers.some(member => member.weight > Number(daoThreshold) ?? 0))
+    );
+  }, [daoMembers, daoThreshold, selectedProposalType]);
 
   const [numberOfNFTToMint, setNumberOfNFTToMint] = useState(0);
   const { signingCosmWasmClient: signingClient } =
@@ -220,7 +271,30 @@ export default function CreateGovProposal({
             />
           ))}
         </Box>
-        <Box width={'100%'} marginRight={'52px'}>
+        <Box width={'100%'} marginRight={'52px'} position="relative">
+          {coreSlotsDisabled && (
+            <Flex
+              position="absolute"
+              zIndex={99}
+              width="100%"
+              alignItems="center"
+              justifyContent="center"
+              height="100%"
+              flexDir="column"
+              bg="rgba(0,0,0,.2)"
+              backdropFilter="auto"
+              rounded="xl"
+              backdropBlur="6px"
+            >
+              <Text mb="4">
+                Please change the DAO membership to comply with the membership
+                rules
+              </Text>
+              <Link href="/dao/proposals?tab=update-directories">
+                <Button variant="purple">Change</Button>
+              </Link>
+            </Flex>
+          )}
           <Text
             color={'rgba(15,0,86,0.8)'}
             fontWeight="medium"
@@ -470,31 +544,36 @@ export default function CreateGovProposal({
           {isFundigRequired ? (
             <Box width={'872px'}>
               <Flex marginBottom={'17px'} height={'41px'} align={'flex-end'}>
-                <Text
-                  color={'darkPurple'}
-                  fontWeight="normal"
-                  fontSize={16}
-                  fontFamily="DM Sans"
-                  marginRight={'52px'}
-                >
-                  Do you need funding?
-                </Text>
-                <Switch
-                  id="funding-option"
-                  isChecked={isFundingNeeded}
-                  onChange={() => setFundingNeeded(!isFundingNeeded)}
-                />
-                <Text
-                  color={'darkPurple'}
-                  fontWeight="normal"
-                  fontSize={16}
-                  fontFamily="DM Sans"
-                  marginLeft={'8px'}
-                >
-                  Yes
-                </Text>
-                {isFundingNeeded ? (
-                  <Flex marginLeft={'28px'} height={'41px'} align={'flex-end'}>
+                {selectedProposalType === 'text' && (
+                  <Flex mr={'28px'}>
+                    <Text
+                      color={'darkPurple'}
+                      fontWeight="normal"
+                      fontSize={16}
+                      fontFamily="DM Sans"
+                      marginRight={'52px'}
+                    >
+                      Do you need funding?
+                    </Text>
+
+                    <Switch
+                      id="funding-option"
+                      isChecked={isFundingNeeded}
+                      onChange={() => setFundingNeeded(!isFundingNeeded)}
+                    />
+                    <Text
+                      color={'darkPurple'}
+                      fontWeight="normal"
+                      fontSize={16}
+                      fontFamily="DM Sans"
+                      marginLeft={'8px'}
+                    >
+                      Yes
+                    </Text>
+                  </Flex>
+                )}
+                {(isFundingNeeded || selectedProposalType !== 'text') && (
+                  <Flex height={'41px'} align={'flex-end'}>
                     <Text
                       color={'darkPurple'}
                       fontWeight="normal"
@@ -509,6 +588,7 @@ export default function CreateGovProposal({
                       borderColor={'primary.500'}
                       background={'transparent'}
                       color={'purple'}
+                      value={fundingAmount}
                       onChange={e => setFundingAmount(parseInt(e.target.value))}
                       border="none"
                       borderBottom="1px solid"
@@ -533,15 +613,13 @@ export default function CreateGovProposal({
                     <Input
                       width={'106px'}
                       height={'41px'}
+                      value={fundingPeriod}
                       borderColor={'primary.500'}
                       background={'transparent'}
                       focusBorderColor="darkPurple"
                       color={'purple'}
                       onChange={
-                        e =>
-                          setFundingPeriod(
-                            parseInt(e.target.value) * 30 * 86400,
-                          ) // convert period in months to blocks
+                        e => setFundingPeriod(parseInt(e.target.value)) // convert period in months to blocks
                       }
                       border="none"
                       borderBottom="1px solid"
@@ -564,8 +642,6 @@ export default function CreateGovProposal({
                       months.
                     </Text>
                   </Flex>
-                ) : (
-                  ''
                 )}
               </Flex>
               <Divider
@@ -619,10 +695,11 @@ export default function CreateGovProposal({
                     featureApproved: numberOfNFTToMint,
 
                     isFundingRequired: isFundingNeeded,
+                    // convert to blocks
                     amount: fundingAmount,
-                    duration: fundingPeriod * 30 * 24 * 60 * 60, // months to seconds
                     title: proposalTitle.value,
                     description: proposalDescription.value,
+                    duration: convertMonthToBlock(fundingPeriod), // months to seconds
                     slot: getSlot(slotType) as Governance.CoreSlot,
                     revoke_proposal_id: revokeProposalId,
                     msgs: [
