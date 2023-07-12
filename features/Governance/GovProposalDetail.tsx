@@ -6,6 +6,7 @@ import {
   Flex,
   HStack,
   Text,
+  Tooltip,
   VStack,
   useToast,
 } from '@chakra-ui/react';
@@ -218,27 +219,33 @@ export default function GovProposalDetail({
               )}
             </GovProposalMyVote>
             {(status === 'expired' || status === 'success') && (
-              <Button
-                disabled={concluding}
-                mt="37px"
-                as="button"
-                height="48px"
-                width="100%"
-                lineHeight="16px"
-                border="1px"
-                borderRadius="90px"
-                fontSize="14px"
-                fontWeight="medium"
-                bg="#A1F0C4"
-                borderColor="#91D8B0"
-                loadingText="Concluding"
-                color="#0F0056"
-                fontFamily="DM Sans"
-                onClick={concludeVote}
-                isLoading={concluding}
+              <Tooltip
+                hasArrow
+                label="Please connect your wallet to participate in governance"
+                isDisabled={!!address}
               >
-                Conclude
-              </Button>
+                <Button
+                  disabled={concluding || !address}
+                  mt="37px"
+                  as="button"
+                  height="48px"
+                  width="100%"
+                  lineHeight="16px"
+                  border="1px"
+                  borderRadius="90px"
+                  fontSize="14px"
+                  fontWeight="medium"
+                  bg="#A1F0C4"
+                  borderColor="#91D8B0"
+                  loadingText="Concluding"
+                  color="#0F0056"
+                  fontFamily="DM Sans"
+                  onClick={concludeVote}
+                  isLoading={concluding}
+                >
+                  Conclude
+                </Button>
+              </Tooltip>
             )}
           </VStack>
         </HStack>
