@@ -16,7 +16,7 @@ export const BalanceDisplay = ({ address }: Props) => {
     isFetching: loadingBalance,
   } = useAccountBalance(address, 1 * 1000);
   const balanceInJmes = useMemo(() => {
-    return balance?.jmes?.amount.dividedBy(10e6).toNumber() ?? 0;
+    return balance?.jmes?.amount.dividedBy(1e6).toNumber() ?? 0;
   }, [balance]);
   return (
     <>
