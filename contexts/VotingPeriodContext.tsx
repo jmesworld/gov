@@ -47,7 +47,7 @@ const VotingPeriodContextProvider = ({ children }: Props) => {
   const { data } = useGovernancePeriodInfoQuery({
     client: governanceQueryClient ?? undefined,
     options: {
-      enabled: false ||governanceQueryClient !== null, // The query will only run when governanceQueryClient is not null
+      enabled: false || governanceQueryClient !== null, // The query will only run when governanceQueryClient is not null
       refetchInterval: 5000,
       cacheTime: 5000,
       staleTime: 5000,
@@ -57,21 +57,21 @@ const VotingPeriodContextProvider = ({ children }: Props) => {
     () => data?.current_period,
     [data?.current_period],
   );
-  const nextTimePeriod = useMemo(() => {
-    const nextVotingStart = data?.next_voting_start;
-    const nextPostingStart = data?.next_posting_start;
+  const nextTimePeriod = () => {
+    const currentVotingEnd = data?.current_voting_end;
+    const currentVotingStart = data?.current_voting_start ?? 0;
 
     const nextPeriodStart =
-      currentPeriod === 'posting' ? nextPostingStart : nextVotingStart;
+      currentPeriod === 'posting' ? currentVotingStart : currentVotingEnd;
     const nextPeriodStartTimeLeft = momentLeft(nextPeriodStart).toString();
     return nextPeriodStartTimeLeft;
-  }, [currentPeriod, data?.next_posting_start, data?.next_voting_start]);
+  };
 
   const value = {
     isPostingPeriod: currentPeriod === 'posting',
     period: capitalizeFirstLetter(currentPeriod),
     postingPeriod: currentPeriod as ProposalPeriod,
-    nextPeriodTimeLeft: nextTimePeriod,
+    nextPeriodTimeLeft: nextTimePeriod(),
     data,
   };
 

@@ -129,15 +129,17 @@ export default function DaoProposalDetail({
               <GovProposalType proposal={proposalDetailQuery?.data} />
             </ProposalVoting>
             <GetProposalDetail proposal={proposalDetailQuery.data} />
+            <Text color="purple" mt="4">
+              Description
+            </Text>
             <Flex
               background="rgba(112, 79, 247, 0.1)"
               borderRadius="12px"
               border="1px solid rgba(112, 79, 247, 0.5)"
               padding="14px 16px"
-              marginTop="20px"
+              marginTop="2"
               height="300px"
             >
-              <Text color="purple">Description</Text>
               <Text
                 color="midnight"
                 ml="10px"

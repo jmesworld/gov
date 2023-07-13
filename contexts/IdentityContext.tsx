@@ -28,6 +28,7 @@ type IdentityContextType = {
   address: string | undefined;
   disconnect: () => void;
   identityServiceQueryClient?: IdentityserviceQueryClient;
+  refetchIdentity: () => void;
 };
 
 const initialState: IdentityContextType = {
@@ -36,6 +37,7 @@ const initialState: IdentityContextType = {
   loadingIdentity: false,
   address: undefined,
   disconnect: emptyFN,
+  refetchIdentity: emptyFN,
 };
 
 const IdentityContext = createContext<IdentityContextType>(initialState);
@@ -80,6 +82,7 @@ const IdentityContextProvider = ({ children }: Props) => {
       identityOwnerQuery?.isLoading || identityOwnerQuery?.isFetching,
     disconnect,
     identityServiceQueryClient: identityserviceClient,
+    refetchIdentity: identityOwnerQuery?.refetch,
   };
   return (
     <IdentityContext.Provider value={value}>

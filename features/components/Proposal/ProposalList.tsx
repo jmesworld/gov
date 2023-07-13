@@ -5,7 +5,6 @@ import { ProposalProgress } from './ProposalProgress';
 import { useRouter } from 'next/router';
 import { calculateVotes } from '../../../lib/calculateVotes';
 import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
-import moment from 'moment';
 import {
   calculateFundingPerMonth,
   getGovProposalType,
@@ -16,6 +15,7 @@ import { ProposalResponse } from '../../../client/Governance.types';
 import { ProposalResponseForEmpty } from '../../../client/DaoMultisig.types';
 import { formatString } from '../../../lib/strings';
 import { formatBalanceWithComma } from '../../../hooks/useAccountBalance';
+import { convertBlockToMonth } from '../../../utils/block';
 
 type BaseProps = {
   totalSupply: number;
@@ -80,13 +80,16 @@ export const ProposalList = ({
   } else {
     const proposalItems = proposals.map((proposal: any) => {
       let votingDuration = null;
+      let votingDurationNum = null;
       const isGov = isProposalGov(proposal, client);
-      if (proposal?.voting_start && proposal?.voting_end) {
-        const start = new Date(proposal?.voting_start);
-        const end = new Date(proposal?.voting_end);
-
-        const diff = moment(end).diff(moment(start));
-        votingDuration = moment.duration(diff).humanize();
+      if (proposal?.funding && proposal?.funding?.duration_in_blocks) {
+        const duration = convertBlockToMonth(
+          proposal?.funding?.duration_in_blocks,
+        );
+        votingDurationNum = duration.toFixed(0);
+        votingDuration = `${duration.toFixed(0)} month${
+          duration > 1 ? 's' : ''
+        }`;
       }
 
       if (isGovList) {
@@ -109,9 +112,12 @@ export const ProposalList = ({
         const type = propType
           ? propType.slice(0, propType.length - 1)
           : proposal.description;
-        const fundingPerMonth = calculateFundingPerMonth(
-          proposal?.start_block ?? 0,
-        );
+        console.log('proposal', proposal);
+        const fundingPerMonth =
+          Number(
+            (proposal?.funding.amount ?? 0) / (Number(votingDurationNum) || 1),
+          ) ?? 0;
+
         const statusSuccess = () => {
           if (
             proposal.status === 'success' ||
@@ -146,7 +152,7 @@ export const ProposalList = ({
             yesPercent={yesPercentage}
             noPercent={noPercentage}
             totalCount={totalSupply}
-            threshold={threshold}
+            threshold={Number(threshold)}
             type={formatString(type)}
             navigateToProposal={id => navigateToProposal(id, isGovList)}
             pass={
@@ -411,9 +417,7 @@ export const ProposalListItem = ({
                 fontSize={14}
                 fontFamily="DM Sans"
               >
-                {formatBalanceWithComma(
-                  Number(fundingPerMonth ?? 0) / 10e6 || 0,
-                )}
+                {formatBalanceWithComma(Number(fundingPerMonth ?? 0) || 0)}
               </Text>
             </Flex>
             <Box width="15%" justifyContent={'center'}>

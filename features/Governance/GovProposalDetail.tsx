@@ -142,7 +142,7 @@ export default function GovProposalDetail({
               yesPercent={yesPercentage}
               noPercent={noPercentage}
               targetPercentage={thresholdPercent}
-              target={threshold}
+              target={Number(threshold) || 0}
               yesVotesPercentage={yesPercentage}
               noVotesPercentage={noPercentage}
             />

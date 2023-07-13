@@ -24,6 +24,7 @@ import { useCosmWasmClientContext } from '../../../contexts/CosmWasmClient';
 import { useDebounce } from '../../../hooks/useDebounce';
 import { useChain } from '@cosmos-kit/react';
 import { chainName } from '../../../config/defaults';
+import { useIdentityContext } from '../../../contexts/IdentityContext';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -48,6 +49,7 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
   const { cosmWasmClient } = useCosmWasmClientContext();
   const [signingClient, setSigningClient] =
     useState<SigningCosmWasmClient | null>(null);
+  const { refetchIdentity } = useIdentityContext();
 
   const { disconnect, address, status, closeView, getSigningCosmWasmClient } =
     useChain(chainName);
@@ -125,6 +127,7 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
         },
         args: { fee },
       })
+      .then(() => refetchIdentity())
       .then(() => {
         toast({
           title: 'Identity created.',

@@ -156,8 +156,8 @@ export default function CreateGovProposal({
 
   const isDirty = useMemo(() => {
     return (
-      proposalTitle ||
-      proposalDescription ||
+      proposalTitle.value ||
+      proposalDescription.value ||
       slotType !== 'brand' ||
       isFundingNeeded ||
       fundingAmount ||

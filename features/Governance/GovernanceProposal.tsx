@@ -77,7 +77,6 @@ export default function GovernanceProposal({
       })
       .sort(sortProposalsByType);
   }, [data]);
-
   const expired = useMemo(() => {
     if (!data) return [];
     const expired = data.proposals.filter(p => {
@@ -87,10 +86,12 @@ export default function GovernanceProposal({
       if (p.status !== 'success_concluded') {
         return false;
       }
-      // TODO: update the fund duration
-      const fundDuration = 0;
+      // TODO: update ts type when become available
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      /// @ts-ignore
+      const fundDuration = p.funding.duration_in_blocks;
 
-      if (p.start_block <= fundDuration + (p.concluded ?? 0)) {
+      if (p.start_block <= fundDuration + (p.concluded_at_height ?? 0)) {
         return true;
       }
       return false;
@@ -114,9 +115,11 @@ export default function GovernanceProposal({
           return false;
         }
 
-        // TODO: update the fund duration
-        const fundDuration = 0;
-        if (p.start_block > fundDuration + (p.concluded ?? 0)) {
+        // TODO: update the TS
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        /// @ts-ignore
+        const fundDuration = p.funding.duration_in_blocks;
+        if (p.start_block > fundDuration + (p.concluded_at_height ?? 0)) {
           return true;
         }
         return false;
