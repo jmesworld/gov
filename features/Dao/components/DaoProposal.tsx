@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Box, Flex, Image, Text, Tooltip } from '@chakra-ui/react';
+import { Box, Button, Flex, Image, Text, Tooltip } from '@chakra-ui/react';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import DaoMembersList from '../DaoMemberList';
 
@@ -21,6 +21,8 @@ import { useClipboardTimeout } from '../../../hooks/useClipboard';
 import { isProposalGov } from '../../../utils/proposalUti';
 import { ProposalResponseForEmpty } from '../../../client/DaoMultisig.types';
 import { useDAOContext } from '../../../contexts/DAOContext';
+import Link from 'next/link';
+import { AddIcon } from '@chakra-ui/icons';
 
 export default function DaoProposal({
   daoAddress,
@@ -109,44 +111,76 @@ export default function DaoProposal({
         >
           {daoName}
         </Text>
-        <Flex>
-          <Flex mt="2" alignItems="center">
-            <Text mr="2" color="purple">
-              {daoAddress.slice(0, 20)}...{daoAddress.slice(-6)}
-            </Text>
-            {copied && (
-              <Text display="inline" ml="2" fontSize={14}>
-                copied
-              </Text>
-            )}
-            <Tooltip hasArrow label="Copy DAO address" placement="top">
-              <Image
-                mr="4"
-                cursor="pointer"
-                display="inline-block"
-                src="/copy.svg"
-                width="16px"
-                height="16px"
-                marginLeft="2px"
-                alt="Dao Address"
-                onClick={() => {
-                  copyToClipboard(daoAddress);
-                }}
-              />
-            </Tooltip>
-          </Flex>
-          <BalanceDisplay address={daoAddress} />
-        </Flex>
       </Flex>
-      <Flex height={'16px'} />
       <Flex>
         <Box flexGrow={1}>
+          <Flex justifyContent="space-between">
+            <Flex>
+              <Flex mt="2" alignItems="center">
+                <Text mr="2" color="purple">
+                  {daoAddress.slice(0, 20)}...{daoAddress.slice(-6)}
+                </Text>
+                {copied && (
+                  <Text display="inline" ml="2" fontSize={14}>
+                    copied
+                  </Text>
+                )}
+                <Tooltip hasArrow label="Copy DAO address" placement="top">
+                  <Image
+                    mr="4"
+                    cursor="pointer"
+                    display="inline-block"
+                    src="/copy.svg"
+                    width="16px"
+                    height="16px"
+                    marginLeft="2px"
+                    alt="Dao Address"
+                    onClick={() => {
+                      copyToClipboard(daoAddress);
+                    }}
+                  />
+                </Tooltip>
+              </Flex>
+              <BalanceDisplay address={daoAddress} />
+            </Flex>
+            <Flex flexDir="row" flexWrap="wrap" gap="2">
+              <Link href="/dao/proposals">
+                <Button
+                  rounded="full"
+                  height="48px"
+                  color="purple"
+                  fontWeight="normal"
+                  py="0.5"
+                  size="sm"
+                  variant="outline"
+                  borderColor="purple"
+                >
+                  <AddIcon boxSize={'10px'} mr="2" color="brand" />
+                  DAO Proposal
+                </Button>
+              </Link>
+              <Link href="/proposals/create">
+                <Button
+                  rounded="full"
+                  height="48px"
+                  color="purple"
+                  fontWeight="normal"
+                  py="0.5"
+                  size="sm"
+                  variant="outline"
+                  borderColor="purple"
+                >
+                  <AddIcon boxSize={'10px'} mr="2" color="brand" />
+                  GOV Proposal
+                </Button>
+              </Link>
+            </Flex>
+          </Flex>
+          <Flex height={'20px'} />
           <ProposalHeader
             proposalTitle=" GOVERNANCE PROPOSAL/S"
             isGov={false}
           />
-          <Flex height={'10px'} />
-
           {proposals?.gov?.length > 0 && (
             <Flex flexDir="column">
               <ProposalList

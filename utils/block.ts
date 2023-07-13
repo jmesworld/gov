@@ -1,3 +1,9 @@
+const SECONDS_IN_A_MONTH = 2629745;
+
 export const convertMonthToBlock = (month: number): number => {
-  return (month * 2629745) / 5;
+  return (month * SECONDS_IN_A_MONTH) / 5;
+};
+
+export const convertBlockToMonth = (block: number): number => {
+  return (block * 5) / SECONDS_IN_A_MONTH;
 };

@@ -19,7 +19,7 @@ export const calculateVotes = ({
   return {
     coinYes,
     coinNo,
-    threshold,
+    threshold: threshold.toFixed(2),
     thresholdPercent,
     yesPercentage,
     noPercentage,
