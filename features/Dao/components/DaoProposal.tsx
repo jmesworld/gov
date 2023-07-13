@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { Box, Button, Flex, Image, Text, Tooltip } from '@chakra-ui/react';
+import { useRef } from 'react';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import DaoMembersList from '../DaoMemberList';
 
@@ -41,7 +42,7 @@ export default function DaoProposal({
   setSelectedProposalId: Function;
 }) {
   const { setSelectedDAOByAddress } = useDAOContext();
-
+  const tooltipRef = useRef(null);
   useEffect(() => {
     setSelectedDAOByAddress(daoAddress);
   }, [daoAddress, setSelectedDAOByAddress]);
@@ -111,6 +112,47 @@ export default function DaoProposal({
         >
           {daoName}
         </Text>
+        <Flex>
+          <Flex
+            mt="2"
+            py={2}
+            alignItems="center"
+            bg="white"
+            borderRadius={22}
+            border={1}
+            borderStyle="solid"
+            borderColor="primary.100"
+            px="4"
+          >
+            <Text mr="2" color="purple">
+              {daoAddress.slice(0, 20)}...{daoAddress.slice(-6)}
+            </Text>
+
+            <Tooltip
+              ref={tooltipRef}
+              // show tooltip after copy
+              isOpen={copied || undefined}
+              hasArrow
+              label={copied ? '✅ Copied Address' : 'Copy DAO address'}
+              placement="top"
+            >
+              <Image
+                mr="4"
+                cursor="pointer"
+                display="inline-block"
+                src="/copy.svg"
+                width="18px"
+                height="18px"
+                marginLeft="2px"
+                alt="Dao Address"
+                onClick={() => {
+                  copyToClipboard(daoAddress);
+                }}
+              />
+            </Tooltip>
+            <BalanceDisplay asCard={false} address={daoAddress} />
+          </Flex>
+        </Flex>
       </Flex>
       <Flex>
         <Box flexGrow={1}>

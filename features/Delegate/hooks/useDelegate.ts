@@ -12,7 +12,7 @@ type TransferFormType = {
   jmesValue: number;
   bJmesValue: number;
   sliderValue: number;
-  valueToMove: number;
+  valueToMove: number | undefined;
 };
 
 type BondingState = {
@@ -158,7 +158,7 @@ export const useDelegate = () => {
           sliderValue: bonding
             ? Number((value / (totalJmes / 100)).toFixed(0))
             : Number((value / (totalBondedJmes / 100)).toFixed(0)),
-          valueToMove: value,
+          valueToMove: val === '' ? undefined : value,
         };
       });
     },
@@ -174,7 +174,7 @@ export const useDelegate = () => {
       {
         total: bonding ? totalJmes : totalBondedJmes,
         current: bonding ? jmesValue : bJmesValue,
-        transfer: valueToMove,
+        transfer: valueToMove ?? 0,
       },
       bonding,
       !bonding
@@ -216,7 +216,7 @@ export const useDelegate = () => {
         await signingCosmWasmClient?.delegateTokens(
           address,
           selectedValidator,
-          coin(valueToMove * 1e6, JMES_DENOM),
+          coin((valueToMove ?? 0) * 1e6, JMES_DENOM),
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           /// @ts-ignore ( Issue with different type)
           'auto',
@@ -232,7 +232,7 @@ export const useDelegate = () => {
         await signingCosmWasmClient?.undelegateTokens(
           address,
           selectedUnBonding,
-          coin(valueToMove * 1e6, JMES_DENOM),
+          coin((valueToMove ?? 0) * 1e6, JMES_DENOM),
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           /// @ts-ignore ( Issue with different type)
           'auto',

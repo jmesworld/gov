@@ -291,7 +291,7 @@ export const DAOProposalPage = ({
           Create DAO Proposal
         </Text>
       </Flex>
-      <BalanceDisplay address={daoAddress ?? ''} />
+      <BalanceDisplay asCard address={daoAddress ?? ''} />
       <Flex flexGrow={1} width={'full'} height={'26px'} />
       <Flex flexGrow={1} width="full">
         <Box marginRight="44px">
