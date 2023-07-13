@@ -60,56 +60,54 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = new QueryClient();
 
   return (
-    <>
-      <ChakraProvider theme={defaultTheme}>
-        <QueryClientProvider client={queryClient}>
-          <ChainProvider
-            chains={chains}
-            assetLists={assets}
-            wallets={[...keplrWallets]}
-            walletModal={undefined}
-            modalViews={{
-              Connected: WalletModal,
-            }}
-            signerOptions={signerOptions}
-            endpointOptions={{
-              [chainName]: {
-                rpc: [RPC_URL],
-              },
-            }}
-          >
-            <CosmWasmClientContextProvider>
-              <IdentityContextProvider>
-                <BalanceContextProvider>
-                  <DAOContextProvider>
-                    <AppStateProvider>
-                      <SigningCosmWasmClientContextProvider>
-                        <ValidatorContextProvider>
-                          <DelegateContextProvider>
-                            <VotingPeriodContextProvider>
-                              <LeaveConfirmContextProvider>
-                                <Layout>
-                                  <ErrorBoundary>
-                                    <ModalContainer />
-                                    <Component {...pageProps} />
-                                    <OnboardingModal />
-                                  </ErrorBoundary>
-                                </Layout>
-                              </LeaveConfirmContextProvider>
-                            </VotingPeriodContextProvider>
-                          </DelegateContextProvider>
-                        </ValidatorContextProvider>
-                      </SigningCosmWasmClientContextProvider>
-                    </AppStateProvider>
-                  </DAOContextProvider>
-                </BalanceContextProvider>
-                <ReactQueryDevtools initialIsOpen={false} />
-              </IdentityContextProvider>
-            </CosmWasmClientContextProvider>
-          </ChainProvider>
-        </QueryClientProvider>
-      </ChakraProvider>
-    </>
+    <ChakraProvider theme={defaultTheme}>
+      <QueryClientProvider client={queryClient}>
+        <ChainProvider
+          chains={chains}
+          assetLists={assets}
+          wallets={[...keplrWallets]}
+          walletModal={undefined}
+          modalViews={{
+            Connected: WalletModal,
+          }}
+          signerOptions={signerOptions}
+          endpointOptions={{
+            [chainName]: {
+              rpc: [RPC_URL],
+            },
+          }}
+        >
+          <CosmWasmClientContextProvider>
+            <IdentityContextProvider>
+              <BalanceContextProvider>
+                <DAOContextProvider>
+                  <AppStateProvider>
+                    <SigningCosmWasmClientContextProvider>
+                      <ValidatorContextProvider>
+                        <DelegateContextProvider>
+                          <VotingPeriodContextProvider>
+                            <LeaveConfirmContextProvider>
+                              <Layout>
+                                <ErrorBoundary>
+                                  <ModalContainer />
+                                  <Component {...pageProps} />
+                                  <OnboardingModal />
+                                </ErrorBoundary>
+                              </Layout>
+                            </LeaveConfirmContextProvider>
+                          </VotingPeriodContextProvider>
+                        </DelegateContextProvider>
+                      </ValidatorContextProvider>
+                    </SigningCosmWasmClientContextProvider>
+                  </AppStateProvider>
+                </DAOContextProvider>
+              </BalanceContextProvider>
+              <ReactQueryDevtools initialIsOpen={false} />
+            </IdentityContextProvider>
+          </CosmWasmClientContextProvider>
+        </ChainProvider>
+      </QueryClientProvider>
+    </ChakraProvider>
   );
 }
 

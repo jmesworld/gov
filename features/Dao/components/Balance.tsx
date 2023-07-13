@@ -25,7 +25,6 @@ export const BalanceDisplay = ({ address, asCard }: Props) => {
     <>
       {(fetchingBalance || loadingBalance) && !balance && (
         <Flex>
-          <Text fontSize="sm"> Loading Balance ...</Text>
           <Spinner size="sm" />
         </Flex>
       )}

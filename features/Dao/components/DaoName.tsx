@@ -5,21 +5,9 @@ import { z } from 'zod';
 import { Actions } from '../createDAOReducer';
 import { useDebounce } from '../../../hooks/useDebounce';
 import { IdentityserviceQueryClient } from '../../../client/Identityservice.client';
+import { daoNameSchema } from '../../../utils/dao';
 
-const nameSchema = z
-  .string()
-
-  .min(2, {
-    message: 'Name must have at least 1 character',
-  })
-  .max(20, {
-    message: 'Name must have at most is 20 character',
-  })
-  .regex(/^[a-z]+$/, {
-    message: 'Name must be lowercase and only contain letters and dashes',
-  });
-
-const nameSchemaForEachChar = z.string().regex(/^[a-z]+$/);
+const nameSchemaForEachChar = z.string().regex(/^[a-z0-9]+$/);
 const capitalNameSchema = z.string().regex(/^[A-Z]+$/);
 
 type Props = {
@@ -105,7 +93,7 @@ export const DaoName = ({ daoName, dispatch, daoNameError, client }: Props) => {
         onChange={e => {
           const value = e.target.value;
 
-          const name = nameSchema.safeParse(value);
+          const name = daoNameSchema.safeParse(value);
           dispatch({
             type: 'SET_DAO_NAME',
             payload: {

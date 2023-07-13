@@ -15,19 +15,14 @@ import {
   Spacer,
   Text,
 } from '@chakra-ui/react';
-
-import {
-  Suspense,
-  Dispatch,
-  SetStateAction,
-  ReactNode,
-  useMemo,
-  memo,
-} from 'react';
+import { z } from 'zod';
+import { Suspense, Dispatch, SetStateAction, ReactNode, memo } from 'react';
 import { IdentityserviceQueryClient } from '../../../client/Identityservice.client';
 import OnboardingProgressIndicator from '../components/OnboardingProgressIndicator';
 import { useIdentityserviceGetIdentityByNameQuery } from '../../../client/Identityservice.react-query';
-import { validateName } from '../../../utils/identity';
+
+const nameSchemaForEachChar = z.string().regex(/^[a-z0-9]+$/);
+const capitalNameSchema = z.string().regex(/^[A-Z]+$/);
 
 // eslint-disable-next-line react/display-name
 export const SearchResults = memo(
@@ -35,20 +30,20 @@ export const SearchResults = memo(
     query,
     client,
     setIsIdentityNameAvailable,
+    queryError,
   }: {
     query: string;
     client: IdentityserviceQueryClient;
     setIsIdentityNameAvailable: Dispatch<SetStateAction<boolean>>;
+    queryError: string;
   }) => {
-    const nameInvalid = useMemo(() => validateName(query), [query]);
-
     const { data, isLoading, error } = useIdentityserviceGetIdentityByNameQuery(
       {
         client,
         args: { name: query },
 
         options: {
-          enabled: !nameInvalid,
+          enabled: !queryError,
           staleTime: 1000,
           cacheTime: 1000,
           retry: 3,
@@ -57,7 +52,7 @@ export const SearchResults = memo(
             setIsIdentityNameAvailable(false);
           },
           onSuccess: data => {
-            if (!nameInvalid)
+            if (!queryError)
               setIsIdentityNameAvailable(!data?.identity?.name.toString());
             else setIsIdentityNameAvailable(false);
           },
@@ -77,26 +72,17 @@ export const SearchResults = memo(
         fontFamily={'DM Sans'}
         fontWeight="normal"
         fontSize={12}
+        height={'16px'}
         marginLeft={'18px'}
         marginTop={'8px'}
       >
-        {query && nameInvalid && (
-          <Text
-            color={
-              ['NameTooLong', 'NameTooShort'].includes(nameInvalid.name)
-                ? 'orange'
-                : 'red'
-            }
-          >
-            {nameInvalid.message}
-          </Text>
-        )}
+        {queryError && <Text color="red">{queryError}</Text>}
 
-        {data?.identity?.name.toString() === query && !nameInvalid && (
+        {data?.identity?.name.toString() === query && !queryError && (
           <Text color="red">Name taken!</Text>
         )}
 
-        {query && !nameInvalid && data?.identity?.name.toString() !== query && (
+        {query && !queryError && data?.identity?.name.toString() !== query && (
           <Text color="green">Name is available!</Text>
         )}
       </Text>
@@ -220,6 +206,33 @@ export const ChooseUsernameCardComponent = ({
                     fontSize={'16px'}
                     fontWeight="normal"
                     value={usernameInput}
+                    onKeyDown={e => {
+                      const character = e.key;
+                      if (character === 'Backspace') {
+                        return;
+                      }
+                      if (character === ' ' || character === 'Spacebar') {
+                        e.preventDefault();
+                      }
+
+                      if (character === 'Enter') {
+                        onIdentityCreateClick();
+                      }
+
+                      const name = nameSchemaForEachChar.safeParse(character);
+                      const capitalName =
+                        capitalNameSchema.safeParse(character);
+
+                      if (capitalName.success) {
+                        e.preventDefault();
+                        onUsernameChange(
+                          usernameInput + character.toLowerCase(),
+                        );
+                      }
+                      if (!name.success) {
+                        e.preventDefault();
+                      }
+                    }}
                     onChange={e => onUsernameChange(e.target.value)}
                     onBlur={onUsernameInputBlur}
                   />

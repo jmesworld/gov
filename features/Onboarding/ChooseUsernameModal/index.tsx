@@ -25,6 +25,7 @@ import { useDebounce } from '../../../hooks/useDebounce';
 import { useChain } from '@cosmos-kit/react';
 import { chainName } from '../../../config/defaults';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
+import { daoNameSchema } from '../../../utils/dao';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -103,6 +104,7 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
   });
 
   const [query, setQuery] = useState('');
+  const [usernameError, setUsernameError] = useState('');
   const debouncedQuery = useDebounce<string>({
     value: query,
     delay: 300,
@@ -164,12 +166,22 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
       onDisconnect={onDisconnect}
       isCreatingIdentity={isCreatingIdentity}
       usernameInput={query}
-      onUsernameChange={setQuery}
+      onUsernameChange={val => {
+        const nameParse = daoNameSchema.safeParse(val);
+        if (!nameParse.success) {
+          setUsernameError(nameParse.error.errors[0].message);
+          setQuery(val);
+          return;
+        }
+        setUsernameError('');
+        setQuery(val);
+      }}
       onUsernameInputBlur={() => identityNameQuery.refetch()}
       showInputCheckIcon={showInputCheckIcon}
       createIdentityDisabled={!isIdentityNameAvailable}
       searchComponent={
         <SearchResults
+          queryError={usernameError}
           client={client}
           setIsIdentityNameAvailable={setIsIdentityNameAvailable}
           query={deferredQuery}

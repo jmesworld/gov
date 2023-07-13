@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "ts-check": "tsc --noEmit",
     "postinstall": "husky install"
   },
   "dependencies": {
