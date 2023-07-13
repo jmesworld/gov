@@ -4,9 +4,6 @@
  * and run the @cosmwasm/ts-codegen generate command to regenerate this file.
  */
 
-import * as _0 from './ArtDealer.types';
-import * as _1 from './ArtDealer.client';
-import * as _2 from './ArtDealer.react-query';
 import * as _3 from './DaoMembers.types';
 import * as _4 from './DaoMembers.client';
 import * as _5 from './DaoMembers.react-query';
@@ -20,7 +17,6 @@ import * as _12 from './Identityservice.types';
 import * as _13 from './Identityservice.client';
 import * as _14 from './Identityservice.react-query';
 export namespace contracts {
-  export const ArtDealer = { ..._0, ..._1, ..._2 };
   export const DaoMembers = { ..._3, ..._4, ..._5 };
   export const DaoMultisig = { ..._6, ..._7, ..._8 };
   export const Governance = { ..._9, ..._10, ..._11 };
