@@ -7,6 +7,7 @@ const config: ThemeConfig = {
 
 export const defaultThemeObject = {
   config,
+
   fonts: {
     body: `DM Sans, ${theme.fonts.body}`,
     heading: `DM Sans, ${theme.fonts.heading}`,
@@ -69,4 +70,4 @@ export const defaultThemeObject = {
   },
 };
 
-export const defaultTheme = extendTheme(defaultThemeObject);
+export const defaultTheme = extendTheme({ ...defaultThemeObject, config });

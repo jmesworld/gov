@@ -103,99 +103,75 @@ export default function DaoProposal({
   return (
     <Box pb="4">
       <Flex height={'47px'} />
-      <Flex flexDir="column">
-        <Text
-          color={'darkPurple'}
-          fontWeight="bold"
-          fontSize={28}
-          fontFamily="DM Sans"
-        >
-          {daoName}
-        </Text>
-        <Flex>
-          <Flex
-            mt="2"
-            py={2}
-            alignItems="center"
-            bg="white"
-            borderRadius={22}
-            border={1}
-            borderStyle="solid"
-            borderColor="primary.100"
-            px="4"
+      <Flex
+        style={{
+          width: 'calc( 100% - 306px )',
+        }}
+      >
+        <Flex flexDir="column" w="full">
+          <Text
+            color={'darkPurple'}
+            fontWeight="bold"
+            fontSize={28}
+            mb="3"
+            fontFamily="DM Sans"
           >
-            <Text mr="2" color="purple">
-              {daoAddress.slice(0, 20)}...{daoAddress.slice(-6)}
-            </Text>
-
-            <Tooltip
-              ref={tooltipRef}
-              // show tooltip after copy
-              isOpen={copied || undefined}
-              hasArrow
-              label={copied ? '✅ Copied Address' : 'Copy DAO address'}
-              placement="top"
+            {daoName}
+          </Text>
+          <Flex w="full" alignItems="center" justifyContent="space-between">
+            <Flex
+              mt="2"
+              py={2}
+              alignItems="center"
+              bg="white"
+              borderRadius={22}
+              border={1}
+              borderStyle="solid"
+              borderColor="primary.100"
+              px="4"
             >
-              <Image
-                mr="4"
-                cursor="pointer"
-                display="inline-block"
-                src="/copy.svg"
-                width="18px"
-                height="18px"
-                marginLeft="2px"
-                alt="Dao Address"
-                onClick={() => {
-                  copyToClipboard(daoAddress);
-                }}
-              />
-            </Tooltip>
-            <BalanceDisplay asCard={false} address={daoAddress} />
-          </Flex>
-        </Flex>
-      </Flex>
-      <Flex>
-        <Box flexGrow={1}>
-          <Flex justifyContent="space-between">
-            <Flex>
-              <Flex mt="2" alignItems="center">
-                <Text mr="2" color="purple">
-                  {daoAddress.slice(0, 20)}...{daoAddress.slice(-6)}
-                </Text>
-                {copied && (
-                  <Text display="inline" ml="2" fontSize={14}>
-                    copied
-                  </Text>
-                )}
-                <Tooltip hasArrow label="Copy DAO address" placement="top">
-                  <Image
-                    mr="4"
-                    cursor="pointer"
-                    display="inline-block"
-                    src="/copy.svg"
-                    width="16px"
-                    height="16px"
-                    marginLeft="2px"
-                    alt="Dao Address"
-                    onClick={() => {
-                      copyToClipboard(daoAddress);
-                    }}
-                  />
-                </Tooltip>
-              </Flex>
-              <BalanceDisplay address={daoAddress} />
+              <Text mr="2" color="purple">
+                {daoAddress.slice(0, 20)}...{daoAddress.slice(-6)}
+              </Text>
+
+              <Tooltip
+                ref={tooltipRef}
+                // show tooltip after copy
+                isOpen={copied || undefined}
+                hasArrow
+                label={copied ? '✅ Copied Address' : 'Copy DAO address'}
+                placement="top"
+              >
+                <Image
+                  mr="4"
+                  cursor="pointer"
+                  display="inline-block"
+                  src="/copy.svg"
+                  width="18px"
+                  height="18px"
+                  marginLeft="2px"
+                  alt="Dao Address"
+                  onClick={() => {
+                    copyToClipboard(daoAddress);
+                  }}
+                />
+              </Tooltip>
+              <BalanceDisplay asCard={false} address={daoAddress} />
             </Flex>
             <Flex flexDir="row" flexWrap="wrap" gap="2">
               <Link href="/dao/proposals">
                 <Button
                   rounded="full"
-                  height="48px"
-                  color="purple"
+                  bg="darkPurple"
+                  color="white"
                   fontWeight="normal"
-                  py="0.5"
-                  size="sm"
-                  variant="outline"
-                  borderColor="purple"
+                  py="13px"
+                  // TODO: move to theme config
+                  _hover={{
+                    bg: 'purple',
+                  }}
+                  variant="solid"
+                  borderColor="darKPurple"
                 >
                   <AddIcon boxSize={'10px'} mr="2" color="brand" />
                   DAO Proposal
@@ -204,13 +180,15 @@ export default function DaoProposal({
               <Link href="/proposals/create">
                 <Button
                   rounded="full"
-                  height="48px"
-                  color="purple"
+                  bg="darkPurple"
+                  color="white"
                   fontWeight="normal"
-                  py="0.5"
-                  size="sm"
-                  variant="outline"
-                  borderColor="purple"
+                  py="13px"
+                  _hover={{
+                    bg: 'purple',
+                  }}
+                  variant="solid"
+                  borderColor="darkPurple"
                 >
                   <AddIcon boxSize={'10px'} mr="2" color="brand" />
                   GOV Proposal
@@ -218,6 +196,10 @@ export default function DaoProposal({
               </Link>
             </Flex>
           </Flex>
+        </Flex>
+      </Flex>
+      <Flex>
+        <Box flexGrow={1}>
           <Flex height={'20px'} />
           <ProposalHeader
             proposalTitle=" GOVERNANCE PROPOSAL/S"

@@ -23,10 +23,6 @@ export const Layout = ({ children }: { children: ReactElement }) => {
 
   return (
     <Container maxW="100%" padding={0} backgroundColor="bg">
-      <Head>
-        <title>JMES Governance</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
       <Flex padding={0} width={'100vw'} height={'100vh'}>
         <ErrorBoundary>
           <NavBar
