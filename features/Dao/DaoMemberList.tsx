@@ -50,7 +50,7 @@ export default function DaoMembersList({
           DIRECTORS
         </Text>
         <Tooltip
-          hasArrow={true}
+          hasArrow
           label={tooltip_text}
           bg={'midnight'}
           color={'white'}
@@ -204,13 +204,15 @@ export const DaoMembersListItem = ({
                 : `${address?.substring(0, 10)}...`}
             </Text>
             <div>
-              {copied && (
-                <Text display="inline" ml="2" fontSize={14}>
-                  copied
-                </Text>
-              )}
               {(mouseEnter || copied) && (
-                <Tooltip label="Copy wallet address" hasArrow placement="top">
+                <Tooltip
+                  isOpen={copied || undefined}
+                  label={
+                    copied ? '✅ Copied Wallet Address' : 'Copy wallet address'
+                  }
+                  hasArrow
+                  placement="top"
+                >
                   <Image
                     cursor="pointer"
                     display="inline-block"

@@ -65,7 +65,7 @@ export const Delegate = ({ onClose }: Props) => {
     isLoadingUnBondings,
     onValueChange,
   } = useDelegate();
-
+  const numberValueToMove = Number(valueToMove) || 0;
   const delegateButtonEnabled = useMemo(() => {
     const selected = bonding ? selectedValidator : selectedUnBonding;
     return selected && !isMovingNotValid && !delegatingToken;
@@ -235,15 +235,17 @@ export const Delegate = ({ onClose }: Props) => {
                       <Input
                         isInvalid={
                           bonding
-                            ? valueToMove > totalJmes || valueToMove < 1
-                            : valueToMove > totalBondedJmes || valueToMove < 1
+                            ? numberValueToMove > totalJmes ||
+                              numberValueToMove < 1
+                            : numberValueToMove > totalBondedJmes ||
+                              numberValueToMove < 1
                         }
                         errorBorderColor="red"
                         type="number"
                         onChange={e => onValueChange(e.target.value)}
                         bg="transparent"
                         color="white"
-                        value={valueToMove}
+                        value={numberValueToMove}
                         fontFamily={'DM Sans'}
                         fontWeight="700"
                         fontSize={28}
@@ -412,7 +414,7 @@ export const Delegate = ({ onClose }: Props) => {
                       height={'10px'}
                       marginLeft="8px"
                     />
-                    {valueToMove}
+                    {numberValueToMove}
                   </Text>
                 </Button>
                 <Text
