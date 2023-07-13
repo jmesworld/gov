@@ -45,13 +45,13 @@
   "apis": {
     "rpc": [
       {
-        "address": "https://seahorse-app-rbtye.ondigitalocean.app",
+        "address": "https://jmes-rpc-proxy-5shu9.ondigitalocean.app",
         "provider": "jmesworld"
       }
     ],
     "rest": [
       {
-        "address": "https://dolphin-app-85b49.ondigitalocean.app",
+        "address": "https://jmes-lcd-proxy-7s9bz.ondigitalocean.app",
         "provider": "jmesworld"
       }
     ],
