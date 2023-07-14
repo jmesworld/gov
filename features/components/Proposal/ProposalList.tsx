@@ -114,7 +114,7 @@ export const ProposalList = ({
           : proposal.description;
         const fundingPerMonth =
           Number(
-            (proposal?.funding.amount ?? 0) / (Number(votingDurationNum) || 1),
+            (proposal?.funding?.amount ?? 0) / (Number(votingDurationNum) || 1),
           ) ?? 0;
 
         const statusSuccess = () => {
