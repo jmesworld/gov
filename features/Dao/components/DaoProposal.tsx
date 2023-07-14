@@ -24,7 +24,6 @@ import { ProposalResponseForEmpty } from '../../../client/DaoMultisig.types';
 import { useDAOContext } from '../../../contexts/DAOContext';
 import Link from 'next/link';
 import { AddIcon } from '@chakra-ui/icons';
-import moment from 'moment';
 
 export default function DaoProposal({
   daoAddress,
@@ -76,6 +75,7 @@ export default function DaoProposal({
       refetchInterval: 10000,
     },
   });
+
   const isInActive = useMemo(() => {
     if (!data) {
       return [];
@@ -83,10 +83,10 @@ export default function DaoProposal({
     return data.proposals.filter(proposal => {
       let atTime: string | null = null;
       if ('at_time' in proposal.expires) {
-        atTime = proposal.expires.at_time;
+        atTime = ((Number(proposal.expires.at_time) || 0) / 1e6).toFixed(0);
       }
       if (atTime === null) return false;
-      return moment().isAfter(moment(atTime));
+      return Date.now() > Number(atTime);
     });
   }, [data]);
 
@@ -103,9 +103,9 @@ export default function DaoProposal({
       const isGovProposal = isProposalGov(proposal, goverrnanceQueryClient);
       let atTime: string | null = null;
       if ('at_time' in proposal.expires) {
-        atTime = proposal.expires.at_time;
+        atTime = ((Number(proposal.expires.at_time) || 0) / 1e6).toFixed(0);
       }
-      if (atTime !== null && moment().isAfter(atTime)) {
+      if (atTime !== null && Date.now() > Number(atTime)) {
         return;
       }
 
@@ -284,6 +284,7 @@ export default function DaoProposal({
                 INACTIVE
               </Text>
               <ProposalList
+                isAllInactive
                 client={goverrnanceQueryClient}
                 daoName={daoName}
                 totalSupply={supply as number}

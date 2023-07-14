@@ -213,16 +213,9 @@ export const ProposalList = ({
               : ''
           }
           navigateToProposal={id => navigateToProposal(id, !!isGovList)}
-          pass={
-            proposal.status === 'passed' ||
-            proposal.status === 'success' ||
-            proposal.status === 'executed' ||
-            proposal.status === 'success_concluded'
-              ? 'Yes'
-              : 'No'
-          }
           largeSize={!!goToDaoDetail}
           label={isAllInactive ? formatString(proposal.status) : undefined}
+          labelSuccess={proposal.status === 'passed'}
           daoAddress={daoAddress}
           proposalId={proposal.id}
           onClickListItem={onClickListItem}
@@ -312,10 +305,11 @@ export const DaoProposalListItem = ({
   passed,
   daoAddress,
   daoClient,
+  label,
+  labelSuccess,
 }: {
   title: string;
   threshold: number;
-  pass: string;
   type: string;
   totalCount: number;
   largeSize: boolean;
@@ -331,6 +325,8 @@ export const DaoProposalListItem = ({
   passed?: boolean;
   daoClient?: DaoMultisigQueryClient;
   daoAddress?: string;
+  label?: string;
+  labelSuccess?: boolean;
 }) => {
   const votesQuery = useDaoMultisigListVotesQuery({
     client: daoClient,
@@ -413,7 +409,7 @@ export const DaoProposalListItem = ({
             >
               {type.length > 26 ? type.substring(0, 26) + '...' : type}
             </Text>
-            {passed !== undefined && (
+            {passed !== undefined && !label && (
               <Badge
                 w="60px"
                 py="2px"
@@ -426,6 +422,23 @@ export const DaoProposalListItem = ({
               >
                 {passed ? 'Passed' : 'Failed'}
               </Badge>
+            )}
+            {label && (
+              <Box>
+                <Badge
+                  w="auto"
+                  px="6px"
+                  py="2px"
+                  rounded="full"
+                  ml="3"
+                  bg={labelSuccess ? 'green' : 'red'}
+                  fontSize="10px"
+                  color="white"
+                  textAlign="center"
+                >
+                  {label}
+                </Badge>
+              </Box>
             )}
           </Flex>
           <Flex
@@ -501,6 +514,7 @@ export const ProposalListItem = ({
   fundingPerMonth,
   passed,
   label,
+  labelSuccess,
 }: {
   title: string;
   threshold: number;
@@ -524,6 +538,7 @@ export const ProposalListItem = ({
   fundingPerMonth?: string;
   passed?: boolean;
   label?: string;
+  labelSuccess?: boolean;
 }) => {
   return (
     <>
@@ -590,18 +605,21 @@ export const ProposalListItem = ({
               </Badge>
             )}
             {label && (
-              <Badge
-                w="60px"
-                py="2px"
-                rounded="full"
-                ml="3"
-                bg={label === 'Active' ? 'green' : 'red'}
-                fontSize="10px"
-                color="white"
-                textAlign="center"
-              >
-                {label}
-              </Badge>
+              <Box>
+                <Badge
+                  w="auto"
+                  px="6px"
+                  py="2px"
+                  rounded="full"
+                  ml="3"
+                  bg={labelSuccess ? 'green' : 'red'}
+                  fontSize="10px"
+                  color="white"
+                  textAlign="center"
+                >
+                  {label}
+                </Badge>
+              </Box>
             )}
           </Flex>
           <Flex
