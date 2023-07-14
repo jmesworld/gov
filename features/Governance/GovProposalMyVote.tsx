@@ -29,6 +29,7 @@ export interface Props {
   voted: boolean;
   proposalId: number;
   children?: ReactNode;
+  refetch: () => Promise<unknown>;
 }
 
 const GovProposalMyVote = (props: Props) => {
@@ -102,6 +103,7 @@ const GovProposalMyVote = (props: Props) => {
                     },
                     args: { fee },
                   })
+                  .then(() => props.refetch())
                   .then(() => {
                     toast({
                       title: 'Vote submitted.',
@@ -179,6 +181,7 @@ const GovProposalMyVote = (props: Props) => {
                     },
                     args: { fee },
                   })
+                  .then(() => props.refetch())
                   .then(() => {
                     toast({
                       title: 'Vote submitted.',

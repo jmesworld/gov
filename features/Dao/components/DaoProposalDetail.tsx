@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { useEffect, useMemo } from 'react';
 import {
   Box,
   Center,
@@ -32,7 +33,6 @@ import {
 } from '../Proposal/Components/ProposalType';
 import { ProposalExcuteRawData } from '../Proposal/Components/ProposalRawData';
 import { useDAOContext } from '../../../contexts/DAOContext';
-import { useEffect, useMemo, useState } from 'react';
 import { isProposalGov } from '../../../utils/proposalUti';
 import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { useVotingPeriodContext } from '../../../contexts/VotingPeriodContext';
@@ -52,7 +52,6 @@ export default function DaoProposalDetail({
   const { address } = useChain(chainName);
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { setSelectedDAOByAddress } = useDAOContext();
-  const [showExcute, setShowExecute] = useState(false);
   const { isPostingPeriod } = useVotingPeriodContext();
 
   useEffect(() => {
@@ -166,17 +165,12 @@ export default function DaoProposalDetail({
       };
     });
   }, [daoMembers?.data?.voters, votesQuery?.data?.votes]);
-  useEffect(() => {
-    if (!proposalDetailQuery?.data?.status) return;
-    const status = proposalDetailQuery?.data?.status;
 
-    if (status !== 'executed' && target <= yesPercentage) {
-      setShowExecute(true);
-      return;
-    }
-    setShowExecute(false);
-  }, [proposalDetailQuery?.data, target, yesPercentage]);
-  console.log('is gov', isGov, isPostingPeriod);
+  const status = useMemo(
+    () => proposalDetailQuery?.data?.status,
+    [proposalDetailQuery?.data?.status],
+  );
+
   return (
     <>
       <Flex height={'47px'} />
@@ -229,8 +223,8 @@ export default function DaoProposalDetail({
           </Box>
           <VStack width="330px" spacing="30px" align="flex-start">
             <ProposalMyVote
-              setHideExecute={setShowExecute}
-              hideExecute={!showExcute}
+              refetch={proposalDetailQuery.refetch}
+              hideExecute={!(status !== 'executed' && target <= yesPercentage)}
               disableExecute={!!isGov && !isPostingPeriod}
               myVotingPower={myVotingPower}
               passed={passed}
