@@ -828,7 +828,6 @@ const getProposalExecuteMsg = ({
   description,
   slot,
   revoke_proposal_id,
-  msgs,
   amount,
   duration,
   featureApproved,
