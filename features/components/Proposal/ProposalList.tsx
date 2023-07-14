@@ -1,21 +1,19 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { Badge, Box, Flex, Image, Progress, Text } from '@chakra-ui/react';
-import { MouseEventHandler } from 'react';
+import { MouseEventHandler, useMemo } from 'react';
 import { ProposalProgress } from './ProposalProgress';
 import { useRouter } from 'next/router';
 import { calculateVotes } from '../../../lib/calculateVotes';
 import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
-import {
-  calculateFundingPerMonth,
-  getGovProposalType,
-  isProposalGov,
-} from '../../../utils/proposalUti';
+import { getGovProposalType, isProposalGov } from '../../../utils/proposalUti';
 import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { ProposalResponse } from '../../../client/Governance.types';
 import { ProposalResponseForEmpty } from '../../../client/DaoMultisig.types';
 import { formatString } from '../../../lib/strings';
 import { formatBalanceWithComma } from '../../../hooks/useAccountBalance';
 import { convertBlockToMonth } from '../../../utils/block';
+import { useDaoMultisigListVotesQuery } from '../../../client/DaoMultisig.react-query';
+import { DaoMultisigQueryClient } from '../../../client/DaoMultisig.client';
 
 type BaseProps = {
   totalSupply: number;
@@ -26,6 +24,7 @@ type BaseProps = {
   client: GovernanceQueryClient;
   isGovList?: boolean;
   largeSize?: boolean;
+  daoClient?: DaoMultisigQueryClient;
 };
 type Props =
   | (BaseProps & {
@@ -49,7 +48,8 @@ export const ProposalList = ({
   totalSupply,
   client,
   isGovList,
-  ...rest
+  daoAddress,
+  daoClient,
 }: Props) => {
   const router = useRouter();
   const { supply } = useCoinSupplyContext();
@@ -112,7 +112,6 @@ export const ProposalList = ({
         const type = propType
           ? propType.slice(0, propType.length - 1)
           : proposal.description;
-        console.log('proposal', proposal);
         const fundingPerMonth =
           Number(
             (proposal?.funding.amount ?? 0) / (Number(votingDurationNum) || 1),
@@ -164,7 +163,7 @@ export const ProposalList = ({
                 : 'No'
             }
             largeSize={isGovList ? true : false}
-            daoAddress={isGov ? undefined : rest.daoAddress}
+            daoAddress={undefined}
             proposalId={proposal.id}
             onClickListItem={onClickListItem}
             setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
@@ -174,19 +173,13 @@ export const ProposalList = ({
       }
       const threshold = proposal.threshold?.absolute_count;
       const target = threshold ? threshold.weight : 0;
-      const yesPercentage = threshold ? threshold.total_weight : 0;
-      const noPercentage = 100 - yesPercentage;
       const propsalType = getGovProposalType(proposal);
 
       return (
-        <ProposalListItem
+        <DaoProposalListItem
           key={proposal.id + proposal.description}
           title={proposal.title}
-          yesCount={yesPercentage}
-          thresholdPercent={target}
-          noCount={noPercentage}
-          yesPercent={yesPercentage}
-          noPercent={noPercentage}
+          daoClient={daoClient}
           totalCount={totalSupply}
           threshold={target}
           isGov={isGov}
@@ -205,7 +198,7 @@ export const ProposalList = ({
               : 'No'
           }
           largeSize={!!largeSize}
-          daoAddress={isGov ? undefined : rest.daoAddress}
+          daoAddress={daoAddress}
           proposalId={proposal.id}
           onClickListItem={onClickListItem}
           setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
@@ -276,6 +269,192 @@ export const ProposalHeader = ({
     </Flex>
   );
 };
+
+// TODO: refactor this component to use the new ProposalListItem component
+export const DaoProposalListItem = ({
+  title,
+  threshold,
+  type,
+  largeSize,
+  proposalId,
+  onClickListItem,
+  setSelectedDaoProposalTitle,
+  setSelectedDaoProposalId,
+  navigateToProposal,
+  votingDuration,
+  inActive,
+  fundingPerMonth,
+  passed,
+  daoAddress,
+  daoClient,
+}: {
+  title: string;
+  threshold: number;
+  pass: string;
+  type: string;
+  totalCount: number;
+  largeSize: boolean;
+  proposalId?: string;
+  onClickListItem?: MouseEventHandler<HTMLDivElement>;
+  setSelectedDaoProposalTitle: Function;
+  setSelectedDaoProposalId: Function;
+  navigateToProposal: (proposalId: string) => void;
+  votingDuration?: string;
+  isGov?: boolean;
+  inActive?: boolean;
+  fundingPerMonth?: string;
+  passed?: boolean;
+  daoClient?: DaoMultisigQueryClient;
+  daoAddress?: string;
+}) => {
+  const votesQuery = useDaoMultisigListVotesQuery({
+    client: daoClient,
+    args: { proposalId: Number(proposalId) || 0 },
+    options: {
+      refetchInterval: 10000,
+      enabled: !!daoAddress,
+    },
+  });
+
+  const yesPercentage = useMemo(() => {
+    return (
+      votesQuery?.data?.votes.reduce((acc, vote) => {
+        if (vote.vote === 'yes') {
+          return acc + vote.weight;
+        }
+        return acc;
+      }, 0) ?? 0
+    );
+  }, [votesQuery?.data?.votes]);
+
+  const noPercentage = useMemo(() => {
+    return (
+      votesQuery?.data?.votes.reduce((acc, vote) => {
+        if (vote.vote === 'no') {
+          return acc + vote.weight;
+        }
+        return acc;
+      }, 0) ?? 0
+    );
+  }, [votesQuery?.data?.votes]);
+
+  return (
+    <>
+      <Flex
+        minWidth={largeSize ? '1000px' : '500px'}
+        opacity={inActive ? '0.5' : '1'}
+        flex={1}
+        height={'89px'}
+        width={largeSize ? '100%' : '100%'}
+        backgroundColor="purple"
+        borderRadius={12}
+        alignItems={'center'}
+        onClick={e => {
+          onClickListItem && onClickListItem(e);
+          setSelectedDaoProposalTitle(title);
+          setSelectedDaoProposalId(proposalId);
+          navigateToProposal(proposalId as string);
+        }}
+        cursor={'pointer'}
+      >
+        <Flex width={largeSize ? '70%' : '90%'}>
+          <Flex
+            flexWrap="wrap"
+            width={'30%'}
+            flexDirection={'column'}
+            justifyContent={'center'}
+          >
+            <Text
+              color="white"
+              fontFamily={'DM Sans'}
+              fontWeight="normal"
+              fontSize={18}
+              width={'100%'}
+              marginLeft={'14px'}
+              whiteSpace="pre-wrap"
+              noOfLines={3}
+              textOverflow="ellipsis"
+            >
+              {title.length > 20 ? title.substring(0, 20) + '...' : title}
+            </Text>
+            <Text
+              width={largeSize ? '281px' : '268px'}
+              color="white"
+              fontFamily={'DM Sans'}
+              fontWeight="normal"
+              fontSize={14}
+              marginLeft={'14px'}
+              opacity={'70%'}
+            >
+              {type.length > 26 ? type.substring(0, 26) + '...' : type}
+            </Text>
+            {passed !== undefined && (
+              <Badge
+                w="60px"
+                py="2px"
+                rounded="full"
+                ml="3"
+                bg={passed ? 'green' : 'red'}
+                fontSize="10px"
+                color="white"
+                textAlign="center"
+              >
+                {passed ? 'Passed' : 'Failed'}
+              </Badge>
+            )}
+          </Flex>
+          <Flex
+            width={'70%'}
+            pr="6"
+            alignItems={'center'}
+            justifyContent={'space-around'}
+          >
+            <ProposalProgress
+              targetPercentage={threshold}
+              yesCount={yesPercentage}
+              noCount={noPercentage}
+              noPercent={noPercentage}
+              yesPercent={yesPercentage}
+              target={threshold}
+            />
+          </Flex>
+        </Flex>
+        {largeSize && (
+          <>
+            <Flex width="15%" alignItems="center" justifyContent="flex-start">
+              <Image
+                src="/JMES_Icon_white.svg"
+                alt="JMES Icon"
+                width={'9px'}
+                mr="1"
+                height={'10.98px'}
+              />
+              <Text
+                color="white"
+                fontWeight="normal"
+                fontSize={14}
+                fontFamily="DM Sans"
+              >
+                {formatBalanceWithComma(Number(fundingPerMonth ?? 0) || 0)}
+              </Text>
+            </Flex>
+            <Box width="15%" justifyContent={'center'}>
+              <Text
+                color="white"
+                fontWeight="normal"
+                fontSize={14}
+                fontFamily="DM Sans"
+              >
+                {votingDuration}
+              </Text>
+            </Box>
+          </>
+        )}
+      </Flex>
+    </>
+  );
+};
+
 // TODO: refactor this component to use the new ProposalListItem component
 export const ProposalListItem = ({
   title,

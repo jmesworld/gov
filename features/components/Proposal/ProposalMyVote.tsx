@@ -30,6 +30,8 @@ export interface ProposalMyVote {
   passed: boolean;
   dao: string;
   proposalId: number;
+  disableExecute: boolean;
+  setDisableExecute: (disable: boolean) => void;
 }
 
 export const ProposalMyVote = (props: ProposalMyVote) => {
@@ -238,61 +240,66 @@ export const ProposalMyVote = (props: ProposalMyVote) => {
           </Button>
         </ButtonGroup>
       </Box>
-      <Button
-        mt="37px"
-        as="button"
-        height="48px"
-        width="100%"
-        lineHeight="16px"
-        border="1px"
-        borderRadius="90px"
-        fontSize="14px"
-        fontWeight="medium"
-        bg="#A1F0C4"
-        borderColor="#91D8B0"
-        color="#0F0056"
-        fontFamily="DM Sans"
-        onClick={() => {
-          setSubmittingExecuteVote(true);
-          executeMutation
-            .mutateAsync({
-              client: daoMultisigClient,
-              msg: {
-                proposalId: props.proposalId,
-              },
-              args: { fee },
-            })
-            .then(() => {
-              toast({
-                title: 'Proposal executed.',
-                description: 'Proposal executed successfully.',
-                status: 'success',
-                duration: 9000,
-                isClosable: true,
-                containerStyle: {
-                  backgroundColor: 'darkPurple',
-                  borderRadius: 12,
+      {!props.disableExecute && (
+        <Button
+          mt="37px"
+          as="button"
+          height="48px"
+          width="100%"
+          lineHeight="16px"
+          border="1px"
+          borderRadius="90px"
+          fontSize="14px"
+          fontWeight="medium"
+          bg="#A1F0C4"
+          borderColor="#91D8B0"
+          isLoading={isSubmittingExecuteVote}
+          loadingText="Executing..."
+          color="#0F0056"
+          fontFamily="DM Sans"
+          onClick={() => {
+            setSubmittingExecuteVote(true);
+            executeMutation
+              .mutateAsync({
+                client: daoMultisigClient,
+                msg: {
+                  proposalId: props.proposalId,
                 },
-              });
-            })
-            .catch(error => {
-              toast({
-                title: 'Proposal execution error',
-                description: error.toString(),
-                status: 'error',
-                duration: 9000,
-                isClosable: true,
-                containerStyle: {
-                  backgroundColor: 'red',
-                  borderRadius: 12,
-                },
-              });
-            })
-            .finally(() => setSubmittingExecuteVote(false));
-        }}
-      >
-        Execute
-      </Button>
+                args: { fee },
+              })
+              .then(() => {
+                toast({
+                  title: 'Proposal executed.',
+                  description: 'Proposal executed successfully.',
+                  status: 'success',
+                  duration: 9000,
+                  isClosable: true,
+                  containerStyle: {
+                    backgroundColor: 'darkPurple',
+                    borderRadius: 12,
+                  },
+                });
+                props.setDisableExecute(true);
+              })
+              .catch(error => {
+                toast({
+                  title: 'Proposal execution error',
+                  description: error.toString(),
+                  status: 'error',
+                  duration: 9000,
+                  isClosable: true,
+                  containerStyle: {
+                    backgroundColor: 'red',
+                    borderRadius: 12,
+                  },
+                });
+              })
+              .finally(() => setSubmittingExecuteVote(false));
+          }}
+        >
+          Execute
+        </Button>
+      )}
     </Box>
   );
 };

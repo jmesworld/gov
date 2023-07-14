@@ -7,19 +7,15 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Slider,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderTrack,
   Spacer,
   Spinner,
   Text,
-  Tooltip,
 } from '@chakra-ui/react';
 import { v4 as uuid } from 'uuid';
 import { AddIcon, QuestionOutlineIcon } from '@chakra-ui/icons';
 import { MemberUpdate } from './DaoMembersEdit';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
+import { AutoDistributeAsInt } from '../../../../utils/autoDistribute';
 
 type Props = {
   state: State;
@@ -34,7 +30,6 @@ export const UpdateDirectories = ({
   membersArr,
   isLoading,
   client,
-  state,
   totalVotingPower,
   dispatch,
 }: Props) => {
@@ -140,14 +135,14 @@ export const UpdateDirectories = ({
           width={'126px'}
           height={'48px'}
           onClick={() => {
-            const power = 100 / membersArr.length;
-            membersArr.forEach(member => {
+            const power = AutoDistributeAsInt(100, membersArr.length);
+            membersArr.forEach((member, i) => {
               dispatch({
                 type: 'SET_MEMBER_VALUE',
                 payload: {
                   id: member.id,
                   name: member.name,
-                  votingPower: power,
+                  votingPower: power[i],
                 },
               });
             });
@@ -233,7 +228,7 @@ export const UpdateDirectories = ({
           </InputRightElement>
         </InputGroup>
       </Flex>
-      <Text
+      {/* <Text
         marginTop={'73px'}
         color={'rgba(15,0,86,0.8)'}
         fontFamily="DM Sans"
@@ -242,8 +237,8 @@ export const UpdateDirectories = ({
         marginBottom={'8px'}
       >
         % TO PASS
-      </Text>
-      <Slider
+      </Text> */}
+      {/* <Slider
         aria-label="dao-proposal-threshold"
         value={Number(state.threshold.value) || 0}
         defaultValue={Number(state.threshold.value) || 0}
@@ -279,8 +274,8 @@ export const UpdateDirectories = ({
         >
           <SliderThumb height={'32px'} />
         </Tooltip>
-      </Slider>
-      <Flex
+      </Slider> */}
+      {/* <Flex
         marginTop={'12px'}
         marginBottom={'93px'}
         height={'48px'}
@@ -303,7 +298,7 @@ export const UpdateDirectories = ({
         </Text>
 
         <Spacer />
-      </Flex>
+      </Flex> */}
     </Flex>
   );
 };

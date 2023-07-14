@@ -18,7 +18,15 @@ export const getRequest = (state: State, activeProposalType: ProposalTypes) => {
 
       // remove list
       const memberRemoveList = Object.values(members)
-        .filter(el => el.og && el.isRemoved)
+        .filter(el => {
+          const sameAddress = Object.values(members).filter(
+            el2 => el2.address === el.address && !el2.isRemoved,
+          );
+          if (sameAddress.length > 1) {
+            return false;
+          }
+          el.og && el.isRemoved;
+        })
         .map(el => el.address as string);
 
       response = {

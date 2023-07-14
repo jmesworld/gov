@@ -19,7 +19,6 @@ import { DAOProposalReducer, Member, State } from './DaoProposalReducer';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 import { useIdentityContext } from '../../contexts/IdentityContext';
-import { BalanceDisplay } from './components/Balance';
 import { BasicForm } from './Proposal/Components/BasicForm';
 import { UpdateDirectories } from './Proposal/Components/UpdateDirectories';
 import {
@@ -172,37 +171,37 @@ export const DAOProposalPage = ({
 
   const daoMembersAddress = daoMultisigConfig?.dao_members_addr;
 
-  useEffect(() => {
-    async function getThreshold() {
-      try {
-        const threshold = await daoMultisigQueryClient.threshold();
-        let percentage = '0';
-        if ('threshold_quorum' in threshold) {
-          percentage = (
-            Number(threshold.threshold_quorum.threshold) * 100
-          ).toFixed(0);
-        }
-        if ('absolute_count' in threshold) {
-          percentage = Number(threshold.absolute_count.weight).toFixed(0);
-        }
-        if ('absolute_percentage' in threshold) {
-          percentage = (
-            Number(threshold.absolute_percentage.percentage) * 100
-          ).toFixed(0);
-        }
-        dispatch({
-          type: 'SET_INPUT_VALUE',
-          payload: {
-            type: 'threshold',
-            value: percentage,
-          },
-        });
-      } catch (err) {
-        console.error('Error:', err);
-      }
-    }
-    getThreshold();
-  }, [daoMultisigQueryClient, dispatch]);
+  // useEffect(() => {
+  //   async function getThreshold() {
+  //     try {
+  //       const threshold = await daoMultisigQueryClient.threshold();
+  //       let percentage = '0';
+  //       if ('threshold_quorum' in threshold) {
+  //         percentage = (
+  //           Number(threshold.threshold_quorum.threshold) * 100
+  //         ).toFixed(0);
+  //       }
+  //       if ('absolute_count' in threshold) {
+  //         percentage = Number(threshold.absolute_count.weight).toFixed(0);
+  //       }
+  //       if ('absolute_percentage' in threshold) {
+  //         percentage = (
+  //           Number(threshold.absolute_percentage.percentage) * 100
+  //         ).toFixed(0);
+  //       }
+  //       dispatch({
+  //         type: 'SET_INPUT_VALUE',
+  //         payload: {
+  //           type: 'threshold',
+  //           value: percentage,
+  //         },
+  //       });
+  //     } catch (err) {
+  //       console.error('Error:', err);
+  //     }
+  //   }
+  //   getThreshold();
+  // }, [daoMultisigQueryClient, dispatch]);
 
   const membersArr = useMemo(
     () => Object.values(state.members).filter(el => !el.isRemoved),
@@ -254,10 +253,10 @@ export const DAOProposalPage = ({
     return votingPowers;
   }, [membersArr]);
 
-  const error = useMemo(() => {
+  const error = () => {
     return validateForm(state, activeTab);
-  }, [state, activeTab]);
-
+  };
+  console.log('state', error);
   return (
     <Box pb="2">
       <Flex height={'47px'} />
@@ -291,7 +290,6 @@ export const DAOProposalPage = ({
           Create DAO Proposal
         </Text>
       </Flex>
-      <BalanceDisplay asCard address={daoAddress ?? ''} />
       <Flex flexGrow={1} width={'full'} height={'26px'} />
       <Flex flexGrow={1} width="full">
         <Box marginRight="44px">
@@ -374,7 +372,9 @@ export const DAOProposalPage = ({
           </Button>
           <Box width={'12px'} />
           <Button
-            disabled={creatingProposal || !!error.length || !daoMembersAddress}
+            disabled={
+              creatingProposal || !!error().length || !daoMembersAddress
+            }
             onClick={async () => {
               let result = null;
               if (!daoMembersAddress) {

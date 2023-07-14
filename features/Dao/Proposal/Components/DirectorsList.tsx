@@ -14,7 +14,6 @@ import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
 import { useIdentityserviceGetIdentityByOwnerQuery } from '../../../../client/Identityservice.react-query';
 import { useCosmWasmClientContext } from '../../../../contexts/CosmWasmClient';
-import { VoteInfo } from '../../../../client/DaoMultisig.types';
 import { useClipboardTimeout } from '../../../../hooks/useClipboard';
 import { useMemo, useState } from 'react';
 // FIXME: fix this
@@ -26,7 +25,11 @@ export default function DirectoresList({
   voters,
   loading,
 }: {
-  voters: VoteInfo[];
+  voters: {
+    voter: string;
+    vote?: string;
+    weight: number;
+  }[];
   loading: boolean;
 }) {
   return (
@@ -66,13 +69,13 @@ export default function DirectoresList({
 export const MembersList = ({
   members,
 }: {
-  // TODO: fix ts type
-  members: VoteInfo[];
+  members: {
+    voter: string;
+    vote?: string;
+    weight: number;
+  }[];
 }) => {
-  const totalWeight = members?.reduce(
-    (acc: number, o: VoteInfo) => acc + o.weight,
-    0,
-  );
+  const totalWeight = members?.reduce((acc: number, o) => acc + o.weight, 0);
 
   return (
     <ul>
@@ -80,7 +83,9 @@ export const MembersList = ({
         const weight = member.weight;
         return (
           <DaoMembersListItem
-            isYes={member.vote === 'yes'}
+            isYes={
+              member.vote !== undefined ? member.vote === 'yes' : undefined
+            }
             key={member.voter}
             address={member.voter}
             weightPercent={(weight / totalWeight) * 100}
@@ -98,7 +103,7 @@ export const DaoMembersListItem = ({
 }: {
   address: string;
   weightPercent: any;
-  isYes: boolean;
+  isYes?: boolean;
 }) => {
   const [mouseEnter, setOnMouseEnter] = useState(false);
   const { cosmWasmClient } = useCosmWasmClientContext();
@@ -196,15 +201,17 @@ export const DaoMembersListItem = ({
             {address.slice(0, 20)}...{address.slice(-6) ?? ''}
           </Text>
         </Flex>
-        <Badge
-          fontWeight="normal"
-          rounded="full"
-          px="3"
-          py="1"
-          bg={isYes ? 'green' : 'red'}
-        >
-          {isYes ? 'Yes' : 'No'}
-        </Badge>
+        {isYes !== undefined && (
+          <Badge
+            fontWeight="normal"
+            rounded="full"
+            px="3"
+            py="1"
+            bg={isYes ? 'green' : 'red'}
+          >
+            {isYes ? 'Yes' : 'No'}
+          </Badge>
+        )}
       </Flex>
       <span
         style={{

@@ -126,6 +126,7 @@ export function DAOProposalReducer(state: State, action: Actions): State {
         el =>
           action.payload?.address &&
           el.address === action.payload.address &&
+          !el.isRemoved &&
           el.id !== action.payload.id,
       );
       return {
