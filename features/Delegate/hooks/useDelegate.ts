@@ -84,6 +84,7 @@ export const useDelegate = () => {
     valueToMove: 0,
     sliderValue: sliderDefaultValue,
   });
+
   const { jmesValue, bJmesValue, valueToMove } = transferForm;
 
   const [bondingState, setBondingState] = useState<BondingState>({
@@ -241,7 +242,9 @@ export const useDelegate = () => {
           title: 'UnDelegated Token ',
         });
       }
+      await refetchMyUnBondingsValidators();
       await refresh();
+      onChangeSlider(sliderDefaultValue);
     } catch (err) {
       if (err instanceof Error)
         toast({
@@ -266,11 +269,12 @@ export const useDelegate = () => {
     address,
     toast,
     bonding,
+    refresh,
+    refetchMyUnBondingsValidators,
     selectedValidator,
     signingCosmWasmClient,
     valueToMove,
     selectedUnBonding,
-    refresh,
     totalJmes,
     totalBondedJmes,
   ]);
