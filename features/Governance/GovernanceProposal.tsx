@@ -13,6 +13,7 @@ import { useMemo } from 'react';
 
 import { getProposalTypeForGovPublicProposals } from '../../utils/proposalUti';
 import { ProposalResponse } from '../../client/Governance.types';
+import { useVotingPeriodContext } from '../../contexts/VotingPeriodContext';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -44,6 +45,7 @@ export default function GovernanceProposal({
   setSelectedProposalId,
   cosmWasmClient,
 }: Props) {
+  const { data: votingData } = useVotingPeriodContext();
   const { setSelectedDaoProposalTitle } = useAppState();
   const { supply } = useCoinSupplyContext();
   const governanceQueryClient = new GovernanceQueryClient(
@@ -76,6 +78,7 @@ export default function GovernanceProposal({
       })
       .sort(sortProposalsByType);
   }, [data]);
+
   const expired = useMemo(() => {
     if (!data) return [];
     const expired = data.proposals.filter(p => {
@@ -85,12 +88,15 @@ export default function GovernanceProposal({
       if (p.status !== 'success_concluded') {
         return false;
       }
-      // TODO: update ts type when become available
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       /// @ts-ignore
-      const fundDuration = p.funding.duration_in_blocks;
+      const fundDuration = p?.funding?.duration_in_blocks;
+      if (!fundDuration) return true;
 
-      if (p.start_block <= fundDuration + (p.concluded_at_height ?? 0)) {
+      if (
+        (votingData?.current_block ?? 0) <=
+        fundDuration + (p.concluded_at_height ?? 0)
+      ) {
         return true;
       }
       return false;
@@ -104,7 +110,7 @@ export default function GovernanceProposal({
       .sort(sortProposalsByType);
 
     return [...passed, ...failed];
-  }, [data]);
+  }, [data, votingData?.current_block]);
 
   const funded = useMemo(() => {
     if (!data) return [];
@@ -113,18 +119,21 @@ export default function GovernanceProposal({
         if (p.status !== 'success_concluded') {
           return false;
         }
-
-        // TODO: update the TS
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         /// @ts-ignore
-        const fundDuration = p.funding.duration_in_blocks;
-        if (p.start_block > fundDuration + (p.concluded_at_height ?? 0)) {
+        const fundDuration = p?.funding?.duration_in_blocks;
+        if (!fundDuration) return false;
+
+        if (
+          (votingData?.current_block ?? 0) >
+          fundDuration + (p.concluded_at_height ?? 0)
+        ) {
           return true;
         }
         return false;
       })
       .sort(sortProposalsByType);
-  }, [data]);
+  }, [data, votingData]);
 
   return (
     <Flex flexDir="column" pb="4">
