@@ -5,7 +5,11 @@ import { ProposalProgress } from './ProposalProgress';
 import { useRouter } from 'next/router';
 import { calculateVotes } from '../../../lib/calculateVotes';
 import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
-import { getGovProposalType, isProposalGov } from '../../../utils/proposalUti';
+import {
+  getFunding,
+  getGovProposalType,
+  isProposalGov,
+} from '../../../utils/proposalUti';
 import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { ProposalResponse } from '../../../client/Governance.types';
 import { ProposalResponseForEmpty } from '../../../client/DaoMultisig.types';
@@ -25,6 +29,7 @@ type BaseProps = {
   isGovList?: boolean;
   largeSize?: boolean;
   daoClient?: DaoMultisigQueryClient;
+  goToDaoDetail?: boolean;
 };
 type Props =
   | (BaseProps & {
@@ -49,13 +54,14 @@ export const ProposalList = ({
   client,
   isGovList,
   daoAddress,
+  goToDaoDetail,
   daoClient,
 }: Props) => {
   const router = useRouter();
   const { supply } = useCoinSupplyContext();
 
   const navigateToProposal = (proposalId: string, isGov: boolean) => {
-    if (isGov) {
+    if (isGov && !goToDaoDetail) {
       router.push(`/proposals/${proposalId}`);
       return;
     }
@@ -79,20 +85,20 @@ export const ProposalList = ({
     );
   } else {
     const proposalItems = proposals.map((proposal: any) => {
-      let votingDuration = null;
-      let votingDurationNum = null;
       const isGov = isProposalGov(proposal, client);
-      if (proposal?.funding && proposal?.funding?.duration_in_blocks) {
-        const duration = convertBlockToMonth(
-          proposal?.funding?.duration_in_blocks,
-        );
-        votingDurationNum = duration.toFixed(0);
-        votingDuration = `${duration.toFixed(0)} month${
-          duration > 1 ? 's' : ''
-        }`;
-      }
 
-      if (isGovList) {
+      if (isGovList && !goToDaoDetail) {
+        let votingDuration = null;
+        let votingDurationNum = null;
+        if (proposal?.funding && proposal?.funding?.duration_in_blocks) {
+          const duration = convertBlockToMonth(
+            proposal?.funding?.duration_in_blocks,
+          );
+          votingDurationNum = duration.toFixed(0);
+          votingDuration = `${duration.toFixed(0)} month${
+            duration > 1 ? 's' : ''
+          }`;
+        }
         const {
           coinYes,
           coinNo,
@@ -135,12 +141,12 @@ export const ProposalList = ({
 
         return (
           <ProposalListItem
-            fundingPerMonth={String(fundingPerMonth)}
+            fundingPerMonth={String(fundingPerMonth) || '-'}
             inActive={
               proposal.status === 'success_concluded' ||
               proposal.status === 'expired_concluded'
             }
-            votingDuration={votingDuration ?? undefined}
+            votingDuration={votingDuration ?? '-'}
             key={proposal.id + proposal.description}
             title={proposal.title}
             yesCount={coinYes}
@@ -171,12 +177,33 @@ export const ProposalList = ({
           />
         );
       }
+      const fund = getFunding(proposal);
+      let votingDuration: null | string = null;
+      let votingDurationNum = null;
+      let fundingPerMonth = null;
+      if (fund?.duration_in_blocks) {
+        const durationInBlock = Number(fund?.duration_in_blocks);
+        const duration = convertBlockToMonth(durationInBlock);
+        votingDurationNum = duration.toFixed(0);
+        votingDuration = `${duration.toFixed(0)} month${
+          duration > 1 ? 's' : ''
+        }`;
+      }
+
+      if (fund?.amount) {
+        fundingPerMonth = (
+          Number(fund?.amount || 0) / (Number(votingDurationNum) || 1)
+        ).toFixed(0);
+      }
+
       const threshold = proposal.threshold?.absolute_count;
       const target = threshold ? threshold.weight : 0;
       const propsalType = getGovProposalType(proposal);
 
       return (
         <DaoProposalListItem
+          votingDuration={goToDaoDetail ? votingDuration || '-' : '-'}
+          fundingPerMonth={goToDaoDetail ? String(fundingPerMonth) : '-'}
           key={proposal.id + proposal.description}
           title={proposal.title}
           daoClient={daoClient}
@@ -197,7 +224,7 @@ export const ProposalList = ({
               ? 'Yes'
               : 'No'
           }
-          largeSize={!!largeSize}
+          largeSize={!!goToDaoDetail}
           daoAddress={daoAddress}
           proposalId={proposal.id}
           onClickListItem={onClickListItem}
@@ -357,7 +384,7 @@ export const DaoProposalListItem = ({
         }}
         cursor={'pointer'}
       >
-        <Flex width={largeSize ? '70%' : '90%'}>
+        <Flex width={'70%'}>
           <Flex
             flexWrap="wrap"
             width={'30%'}

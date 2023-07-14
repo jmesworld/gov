@@ -206,7 +206,7 @@ export default function DaoProposal({
             <Flex flexDir="column" mb="25px">
               <ProposalHeader
                 proposalTitle=" GOVERNANCE PROPOSAL/S"
-                isGov={false}
+                isGov={true}
               />
               <Flex height={'9px'} />
               <ProposalList
@@ -216,7 +216,8 @@ export default function DaoProposal({
                 totalSupply={supply as number}
                 proposals={proposals.gov}
                 isGov={false}
-                isGovList={false}
+                goToDaoDetail
+                isGovList={true}
                 daoAddress={daoAddress}
                 onClickListItem={() => {
                   setDaoProposalDetailOpen(true);
