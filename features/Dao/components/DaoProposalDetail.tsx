@@ -29,7 +29,7 @@ import {
 } from '../Proposal/Components/ProposalType';
 import { ProposalExcuteRawData } from '../Proposal/Components/ProposalRawData';
 import { useDAOContext } from '../../../contexts/DAOContext';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type Props = {
   selectedDao: string;
@@ -46,6 +46,7 @@ export default function DaoProposalDetail({
   const { address } = useChain(chainName);
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { setSelectedDAOByAddress } = useDAOContext();
+  const [showExcute, setShowExecute] = useState(false);
 
   useEffect(() => {
     setSelectedDAOByAddress(selectedDao);
@@ -64,6 +65,7 @@ export default function DaoProposalDetail({
       refetchInterval: 1000,
     },
   });
+
   const votesQuery = useDaoMultisigListVotesQuery({
     client: daoMultisigQueryClient,
     args: { proposalId: selectedDaoProposalId },
@@ -75,6 +77,13 @@ export default function DaoProposalDetail({
     args: {},
     options: { refetchInterval: 10000 },
   });
+
+  const daoMembers = useDaoMultisigListVotersQuery({
+    client: daoMultisigQueryClient,
+    args: {},
+    options: { refetchInterval: 10000 },
+  });
+
   const proposalDescription = proposalDetailQuery?.data?.description ?? '';
   /// @ts-ignore
   const expiryDate = proposalDetailQuery?.data?.expires?.at_height ?? 0;
@@ -83,14 +92,34 @@ export default function DaoProposalDetail({
   const expiryDateTimestamp = proposalDetailQuery?.data
     ? genesisTimestamp + expiryDate * averageBlockTime * 1000
     : -1;
-
-  const threshold =
+  const threshold = useMemo(() => {
     /// @ts-ignore
-    proposalDetailQuery?.data?.threshold?.absolute_count;
-  const target = threshold ? threshold.weight : 0;
-  const yesPercentage = threshold ? threshold.total_weight : 0;
+    return proposalDetailQuery?.data?.threshold?.absolute_count;
+  }, [proposalDetailQuery?.data?.threshold]);
 
-  const votes = votesQuery?.data?.votes ?? [];
+  const target = threshold ? threshold.weight : 0;
+  const yesPercentage = useMemo(() => {
+    return (
+      votesQuery?.data?.votes.reduce((acc, vote) => {
+        if (vote.vote === 'yes') {
+          return acc + vote.weight;
+        }
+        return acc;
+      }, 0) ?? 0
+    );
+  }, [votesQuery?.data?.votes]);
+
+  const noPercentage = useMemo(() => {
+    return (
+      votesQuery?.data?.votes.reduce((acc, vote) => {
+        if (vote.vote === 'no') {
+          return acc + vote.weight;
+        }
+        return acc;
+      }, 0) ?? 0
+    );
+  }, [votesQuery?.data?.votes]);
+
   const myVotingInfo = votersQuery?.data?.voters.filter(
     voter => voter.addr === (address as string),
   ) ?? [{ weight: 0 }];
@@ -101,6 +130,29 @@ export default function DaoProposalDetail({
     votesQuery?.data?.votes.filter(
       vote => vote.voter === (address as string),
     ) ?? [];
+
+  const voters = useMemo(() => {
+    const members = daoMembers?.data?.voters ?? [];
+    const memberVoted = votesQuery?.data?.votes ?? [];
+    return members.map(member => {
+      const vote = memberVoted.find(vote => vote.voter === member.addr);
+      return {
+        ...member,
+        voter: member.addr,
+        vote: vote?.vote as string,
+      };
+    });
+  }, [daoMembers?.data?.voters, votesQuery?.data?.votes]);
+  useEffect(() => {
+    if (!proposalDetailQuery?.data?.status) return;
+    const status = proposalDetailQuery?.data?.status;
+
+    if (status !== 'executed' && target <= yesPercentage) {
+      setShowExecute(true);
+      return;
+    }
+    setShowExecute(false);
+  }, [proposalDetailQuery?.data, target, yesPercentage]);
 
   return (
     <>
@@ -122,9 +174,9 @@ export default function DaoProposalDetail({
         <HStack spacing="54px" align="flex-start">
           <Box flexGrow={1} cursor="pointer">
             <ProposalVoting
+              noPercentage={noPercentage}
               yesPercentage={yesPercentage}
               target={target}
-              votes={votes}
             >
               <GovProposalType proposal={proposalDetailQuery?.data} />
             </ProposalVoting>
@@ -154,6 +206,8 @@ export default function DaoProposalDetail({
           </Box>
           <VStack width="330px" spacing="30px" align="flex-start">
             <ProposalMyVote
+              setDisableExecute={setShowExecute}
+              disableExecute={!showExcute}
               myVotingPower={myVotingPower}
               passed={passed}
               voted={myVotes.length > 0}
@@ -161,8 +215,8 @@ export default function DaoProposalDetail({
               proposalId={selectedDaoProposalId}
             />
             <DirectoresList
-              voters={votes ?? []}
-              loading={votersQuery.isLoading}
+              voters={voters ?? []}
+              loading={votersQuery.isFetching}
             />
             {/* <ProposalDaoMembers
               selectedDaoMembersList={daoMembers}

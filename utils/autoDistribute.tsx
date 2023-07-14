@@ -8,5 +8,5 @@ export const AutoDistributeAsInt = (total: number, users: number) => {
     result.push(base + (i < remainder ? 1 : 0));
   }
 
-  return result;
+  return result.reverse();
 };

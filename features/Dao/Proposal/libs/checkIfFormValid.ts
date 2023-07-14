@@ -33,9 +33,6 @@ export const validateForm = (
       errors.push('Voting Power added should be 100');
     }
 
-    if (state.threshold.error || state.threshold.value == '0') {
-      errors.push('Threshold should be correct');
-    }
     return errors;
   }
 

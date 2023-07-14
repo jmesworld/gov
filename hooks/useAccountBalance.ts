@@ -37,7 +37,10 @@ export function useAccountBalance(
   );
 }
 
-export function formatBalance(balance: number, decimalPlaces = 2) {
+export function formatBalance(balance?: number, decimalPlaces = 2) {
+  if (!balance) {
+    return '0';
+  }
   const coin = new Core.Coin(JMES_DENOM, balance);
   return formatWithSuffix(
     coin.amount.absoluteValue().toNumber(),

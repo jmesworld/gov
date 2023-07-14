@@ -208,11 +208,13 @@ export default function DaoProposal({
           {proposals?.gov?.length > 0 && (
             <Flex flexDir="column">
               <ProposalList
+                daoClient={daoQueryClient}
                 client={goverrnanceQueryClient}
                 daoName={daoName}
                 totalSupply={supply as number}
                 proposals={proposals.gov}
                 isGov={false}
+                isGovList={false}
                 daoAddress={daoAddress}
                 onClickListItem={() => {
                   setDaoProposalDetailOpen(true);
@@ -235,11 +237,13 @@ export default function DaoProposal({
                 DAO PROPOSAL/S
               </Text>
               <ProposalList
+                daoClient={daoQueryClient}
                 client={goverrnanceQueryClient}
                 daoName={daoName}
                 totalSupply={supply as number}
                 proposals={proposals.daoPropsal}
                 isGov={false}
+                isGovList={false}
                 daoAddress={daoAddress}
                 onClickListItem={() => {
                   setDaoProposalDetailOpen(true);
