@@ -31,8 +31,8 @@ export interface ProposalMyVoteType {
   dao: string;
   proposalId: number;
   hideExecute: boolean;
-  setHideExecute: (hide: boolean) => void;
   disableExecute: boolean;
+  refetch: () => Promise<unknown>;
 }
 
 export const ProposalMyVote = (props: ProposalMyVoteType) => {
@@ -53,7 +53,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
           }
           setSigningClient(signingClient);
         })
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
     }
   }, [address, getSigningCosmWasmClient]);
 
@@ -90,7 +90,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
           margin="20px 0 0"
           fontFamily="DM Sans"
         >
-          {props.myVotingPower}.00%
+          {props.myVotingPower}%
         </Text>
         <ButtonGroup
           gap="6px"
@@ -122,6 +122,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                   },
                   args: { fee },
                 })
+                .then(() => props.refetch())
                 .then(() => {
                   toast({
                     title: 'Vote submitted.',
@@ -193,6 +194,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                   },
                   args: { fee },
                 })
+                .then(() => props.refetch())
                 .then(() => {
                   toast({
                     title: 'Vote submitted.',
@@ -269,6 +271,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                 },
                 args: { fee },
               })
+              .then(() => props.refetch())
               .then(() => {
                 toast({
                   title: 'Proposal executed.',
@@ -281,7 +284,6 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                     borderRadius: 12,
                   },
                 });
-                props.setHideExecute(true);
               })
               .catch(error => {
                 toast({

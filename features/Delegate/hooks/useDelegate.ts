@@ -202,6 +202,7 @@ export const useDelegate = () => {
           bonding ? 'delegate' : 'undelegate'
         }, please fix the issues!`,
         duration: 4000,
+        status: 'error',
       });
       return;
     }
@@ -225,6 +226,7 @@ export const useDelegate = () => {
 
         toast({
           title: 'Delegated Token ',
+          status: 'success',
         });
       } else {
         if (!selectedUnBonding) {
@@ -240,6 +242,7 @@ export const useDelegate = () => {
         );
         toast({
           title: 'UnDelegated Token ',
+          status: 'success'
         });
       }
       await refetchMyUnBondingsValidators();

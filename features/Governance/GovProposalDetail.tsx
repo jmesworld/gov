@@ -50,7 +50,7 @@ export default function GovProposalDetail({
     GOVERNANCE_CONTRACT,
   );
 
-  const { data } = useGovernanceProposalQuery({
+  const { data, refetch } = useGovernanceProposalQuery({
     client: govQueryClient,
     args: {
       id: proposalId,
@@ -103,8 +103,8 @@ export default function GovProposalDetail({
       await govMutationClient?.conclude({
         id: proposalId,
       });
+      await refetch();
       toast({
-        colorScheme: 'green',
         title: 'Concluded Vote',
         description: "We've concluded the vote.",
         status: 'success',
@@ -113,7 +113,6 @@ export default function GovProposalDetail({
     } catch (err) {
       if (err instanceof Error)
         toast({
-          colorScheme: 'red',
           title: 'Error',
           description: err.message,
           status: 'error',
@@ -171,7 +170,11 @@ export default function GovProposalDetail({
             spacing="30px"
             align="flex-start"
           >
-            <GovProposalMyVote voted={voted} proposalId={proposalId}>
+            <GovProposalMyVote
+              refetch={refetch}
+              voted={voted}
+              proposalId={proposalId}
+            >
               {isPostingPeriod &&
                 (status === 'voting' || status === 'posted') && (
                   <Box

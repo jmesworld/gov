@@ -428,6 +428,7 @@ export const DAOProposalPage = ({
                     ?.attributes.find(el => el.key === 'proposal_id')?.value ??
                   null;
                 toast({
+                  status: 'success',
                   title: 'Created Dao Proposal',
                 });
                 dispatch({
