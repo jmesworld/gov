@@ -164,14 +164,6 @@ export const ProposalList = ({
             threshold={Number(threshold)}
             type={formatString(type)}
             navigateToProposal={id => navigateToProposal(id, isGovList)}
-            pass={
-              proposal.status === 'passed' ||
-              proposal.status === 'success' ||
-              proposal.status === 'executed' ||
-              proposal.status === 'success_concluded'
-                ? 'Yes'
-                : 'No'
-            }
             largeSize={isGovList ? true : false}
             daoAddress={undefined}
             proposalId={proposal.id}
@@ -230,6 +222,7 @@ export const ProposalList = ({
               : 'No'
           }
           largeSize={!!goToDaoDetail}
+          label={isAllInactive ? formatString(proposal.status) : undefined}
           daoAddress={daoAddress}
           proposalId={proposal.id}
           onClickListItem={onClickListItem}
@@ -507,10 +500,10 @@ export const ProposalListItem = ({
   inActive,
   fundingPerMonth,
   passed,
+  label,
 }: {
   title: string;
   threshold: number;
-  pass: string;
   type: string;
   yesCount: number;
   yesPercent: number;
@@ -530,6 +523,7 @@ export const ProposalListItem = ({
   inActive?: boolean;
   fundingPerMonth?: string;
   passed?: boolean;
+  label?: string;
 }) => {
   return (
     <>
@@ -581,7 +575,7 @@ export const ProposalListItem = ({
             >
               {type.length > 26 ? type.substring(0, 26) + '...' : type}
             </Text>
-            {passed !== undefined && (
+            {passed !== undefined && !label && (
               <Badge
                 w="60px"
                 py="2px"
@@ -593,6 +587,20 @@ export const ProposalListItem = ({
                 textAlign="center"
               >
                 {passed ? 'Passed' : 'Failed'}
+              </Badge>
+            )}
+            {label && (
+              <Badge
+                w="60px"
+                py="2px"
+                rounded="full"
+                ml="3"
+                bg={label === 'Active' ? 'green' : 'red'}
+                fontSize="10px"
+                color="white"
+                textAlign="center"
+              >
+                {label}
               </Badge>
             )}
           </Flex>
