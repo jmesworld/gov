@@ -171,10 +171,6 @@ export const DaoMembersListItem = ({
       borderColor={'rgba(116,83,256,0.3)'}
       borderWidth={'1px'}
       borderRadius="12px"
-      _hover={{
-        bg: 'rgba(198, 180, 252, 0.10)',
-        borderColor: 'rgba(116,83,256,0.3)',
-      }}
       pos="relative"
       onMouseEnter={() => {
         setOnMouseEnter(true);

@@ -162,7 +162,7 @@ export default function DaoProposal({
               <Link href="/dao/proposals">
                 <Button
                   rounded="full"
-                  bg="darkPurple"
+                  bg="purple"
                   color="white"
                   fontWeight="normal"
                   py="13px"
@@ -180,7 +180,7 @@ export default function DaoProposal({
               <Link href="/proposals/create">
                 <Button
                   rounded="full"
-                  bg="darkPurple"
+                  bg="purple"
                   color="white"
                   fontWeight="normal"
                   py="13px"
@@ -201,12 +201,14 @@ export default function DaoProposal({
       <Flex>
         <Box flexGrow={1}>
           <Flex height={'20px'} />
-          <ProposalHeader
-            proposalTitle=" GOVERNANCE PROPOSAL/S"
-            isGov={false}
-          />
+
           {proposals?.gov?.length > 0 && (
-            <Flex flexDir="column">
+            <Flex flexDir="column" mb="25px">
+              <ProposalHeader
+                proposalTitle=" GOVERNANCE PROPOSAL/S"
+                isGov={false}
+              />
+              <Flex height={'9px'} />
               <ProposalList
                 daoClient={daoQueryClient}
                 client={goverrnanceQueryClient}
@@ -226,16 +228,9 @@ export default function DaoProposal({
           )}
 
           {proposals?.daoPropsal?.length > 0 && (
-            <Flex flexDir="column">
-              <Text
-                my="4"
-                fontSize="xs"
-                autoCapitalize="all"
-                color="textPrimary.100"
-                mb="4"
-              >
-                DAO PROPOSAL/S
-              </Text>
+            <Flex flexDir="column" mb="25px">
+              <ProposalHeader proposalTitle=" DAO PROPOSAL/S" isGov={false} />
+              <Flex height={'9px'} />
               <ProposalList
                 daoClient={daoQueryClient}
                 client={goverrnanceQueryClient}

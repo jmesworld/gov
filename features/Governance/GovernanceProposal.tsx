@@ -1,4 +1,4 @@
-import { Flex, Text } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 import { GovernanceQueryClient } from '../../client/Governance.client';
 import { useGovernanceProposalsQuery } from '../../client/Governance.react-query';
 
@@ -140,25 +140,26 @@ export default function GovernanceProposal({
       <Flex height={'35px'} />
       <GovHeader />
       <Flex height={'46px'} />
-      <ProposalHeader isGov={true} />
-      <Flex height={'10px'} />
       {currentCycleProposals.length > 0 && (
-        <ProposalList
-          isGovList
-          client={governanceQueryClient}
-          totalSupply={supply as number}
-          proposals={currentCycleProposals}
-          isGov={true}
-          setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-          setSelectedProposalId={setSelectedProposalId}
-        />
+        <Flex flexDir="column" mb="25px">
+          <ProposalHeader proposalTitle="CURRENT CYCLE" isGov={true} />
+          <Flex height={'9px'} />
+          <ProposalList
+            isGovList
+            client={governanceQueryClient}
+            totalSupply={supply as number}
+            proposals={currentCycleProposals}
+            isGov={true}
+            setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+            setSelectedProposalId={setSelectedProposalId}
+          />
+        </Flex>
       )}
 
       {notConcluded.length > 0 && (
-        <Flex flexDir="column">
-          <Text my="4" fontSize="xs" color="textPrimary.100" mb="4">
-            NOT CONCLUDED
-          </Text>
+        <Flex flexDir="column" mb="25px">
+          <ProposalHeader proposalTitle="NOT CONCLUDED" isGov={true} />
+          <Flex height={'9px'} />
           <ProposalList
             isGovList
             client={governanceQueryClient}
@@ -172,16 +173,9 @@ export default function GovernanceProposal({
       )}
 
       {funded.length > 0 && (
-        <Flex flexDir="column">
-          <Text
-            my="4"
-            fontSize="xs"
-            autoCapitalize="all"
-            color="textPrimary.100"
-            mb="4"
-          >
-            FUNDED
-          </Text>
+        <Flex flexDir="column" mb="25px">
+          <ProposalHeader proposalTitle="FUNDED" isGov={true} />
+          <Flex height={'9px'} />
           <ProposalList
             isGovList
             client={governanceQueryClient}
@@ -194,16 +188,9 @@ export default function GovernanceProposal({
         </Flex>
       )}
       {expired.length > 0 && (
-        <Flex flexDir="column">
-          <Text
-            my="4"
-            fontSize="xs"
-            autoCapitalize="all"
-            color="textPrimary.100"
-            mb="4"
-          >
-            EXPIRED
-          </Text>
+        <Flex flexDir="column" mb="25px">
+          <ProposalHeader proposalTitle="EXPIRED " isGov={true} />
+          <Flex height={'9px'} />
           <ProposalList
             isGovList
             client={governanceQueryClient}
