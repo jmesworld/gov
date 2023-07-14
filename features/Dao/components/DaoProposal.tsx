@@ -24,6 +24,7 @@ import { ProposalResponseForEmpty } from '../../../client/DaoMultisig.types';
 import { useDAOContext } from '../../../contexts/DAOContext';
 import Link from 'next/link';
 import { AddIcon } from '@chakra-ui/icons';
+import moment from 'moment';
 
 export default function DaoProposal({
   daoAddress,
@@ -75,6 +76,19 @@ export default function DaoProposal({
       refetchInterval: 10000,
     },
   });
+  const isInActive = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+    return data.proposals.filter(proposal => {
+      let atTime: string | null = null;
+      if ('at_time' in proposal.expires) {
+        atTime = proposal.expires.at_time;
+      }
+      if (atTime === null) return false;
+      return moment().isAfter(moment(atTime));
+    });
+  }, [data]);
 
   const proposals = useMemo(() => {
     const gov: ProposalResponseForEmpty[] = [];
@@ -87,6 +101,14 @@ export default function DaoProposal({
     }
     data.proposals.forEach(proposal => {
       const isGovProposal = isProposalGov(proposal, goverrnanceQueryClient);
+      let atTime: string | null = null;
+      if ('at_time' in proposal.expires) {
+        atTime = proposal.expires.at_time;
+      }
+      if (atTime !== null && moment().isAfter(atTime)) {
+        return;
+      }
+
       if (isGovProposal) {
         gov.push(proposal);
         return;
@@ -240,6 +262,33 @@ export default function DaoProposal({
                 proposals={proposals.daoPropsal}
                 isGov={false}
                 isGovList={false}
+                daoAddress={daoAddress}
+                onClickListItem={() => {
+                  setDaoProposalDetailOpen(true);
+                }}
+                setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+                setSelectedProposalId={setSelectedProposalId}
+              />
+            </Flex>
+          )}
+
+          {isInActive?.length > 0 && (
+            <Flex flexDir="column">
+              <Text
+                my="4"
+                fontSize="xs"
+                autoCapitalize="all"
+                color="textPrimary.100"
+                mb="4"
+              >
+                INACTIVE
+              </Text>
+              <ProposalList
+                client={goverrnanceQueryClient}
+                daoName={daoName}
+                totalSupply={supply as number}
+                proposals={isInActive}
+                isGov={false}
                 daoAddress={daoAddress}
                 onClickListItem={() => {
                   setDaoProposalDetailOpen(true);

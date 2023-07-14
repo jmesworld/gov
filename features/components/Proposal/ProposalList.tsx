@@ -30,6 +30,7 @@ type BaseProps = {
   largeSize?: boolean;
   daoClient?: DaoMultisigQueryClient;
   goToDaoDetail?: boolean;
+  isAllInactive?: boolean;
 };
 type Props =
   | (BaseProps & {
@@ -56,6 +57,8 @@ export const ProposalList = ({
   daoAddress,
   goToDaoDetail,
   daoClient,
+  isAllInactive,
+  ...rest
 }: Props) => {
   const router = useRouter();
   const { supply } = useCoinSupplyContext();
@@ -143,6 +146,7 @@ export const ProposalList = ({
           <ProposalListItem
             fundingPerMonth={String(fundingPerMonth) || '-'}
             inActive={
+              isAllInactive ||
               proposal.status === 'success_concluded' ||
               proposal.status === 'expired_concluded'
             }
@@ -210,6 +214,7 @@ export const ProposalList = ({
           totalCount={totalSupply}
           threshold={target}
           isGov={isGov}
+          inActive={isAllInactive}
           type={
             propsalType.proposalType
               ? formatString(propsalType.proposalType)
