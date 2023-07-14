@@ -145,9 +145,14 @@ export const calculateFundingPerMonth = (blocks: number) => {
 const msgSchema = z.array(z.object({}));
 
 export const parseMsg = (msg: string) => {
-  const parsed = msgSchema.safeParse(JSON.parse(msg));
-  if (parsed.success) {
-    return parsed.data;
+  try {
+    const parsedMsg = JSON.parse(msg);
+    const parsed = msgSchema.safeParse(parsedMsg);
+    if (parsed.success) {
+      return parsed.data;
+    }
+  } catch (e) {
+    throw new Error('Invalid Improvement Message format ');
   }
   throw new Error('Invalid msg');
 };

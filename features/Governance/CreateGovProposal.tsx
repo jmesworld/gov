@@ -349,6 +349,7 @@ export default function CreateGovProposal({
             borderColor={'primary.500'}
             background={'primary.100'}
             isInvalid={proposalDescription.error !== ''}
+            value={proposalDescription.value}
             errorBorderColor="red"
             focusBorderColor={proposalDescription.error ? 'red' : 'darkPurple'}
             borderRadius={12}
