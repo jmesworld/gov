@@ -116,6 +116,24 @@ export const getGovProposalType = (
   };
 };
 
+export const getFunding = (proposal: ProposalResponseForEmpty) => {
+  const { excuteMsg } = getProposalExcuteMsg(proposal);
+  if (!excuteMsg || !('propose' in excuteMsg)) {
+    return null;
+  }
+  if (excuteMsg && 'text_proposal' in excuteMsg.propose) {
+    return excuteMsg.propose.text_proposal.funding;
+  }
+  if (excuteMsg && 'core_slot' in excuteMsg.propose) {
+    return excuteMsg.propose.core_slot.funding;
+  }
+
+  if (excuteMsg && 'request_feature' in excuteMsg.propose) {
+    return excuteMsg.propose.request_feature.funding;
+  }
+  return null;
+};
+
 export const getProposalTypeForGovPublicProposals = (
   propsal: ProposalResponse,
 ) => {

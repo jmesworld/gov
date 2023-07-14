@@ -24,19 +24,20 @@ const fee: StdFee = {
   gas: '10000000',
 };
 
-export interface ProposalMyVote {
+export interface ProposalMyVoteType {
   myVotingPower: number;
   voted: boolean;
   passed: boolean;
   dao: string;
   proposalId: number;
+  hideExecute: boolean;
+  setHideExecute: (hide: boolean) => void;
   disableExecute: boolean;
-  setDisableExecute: (disable: boolean) => void;
 }
 
-export const ProposalMyVote = (props: ProposalMyVote) => {
+export const ProposalMyVote = (props: ProposalMyVoteType) => {
   const toast = useToast();
-  const { address, status, getSigningCosmWasmClient } = useChain(chainName);
+  const { address, getSigningCosmWasmClient } = useChain(chainName);
   const [isSubmittingYesVote, setSubmittingYesVote] = useState(false);
   const [isSubmittingNoVote, setSubmittingNoVote] = useState(false);
   const [isSubmittingExecuteVote, setSubmittingExecuteVote] = useState(false);
@@ -240,7 +241,7 @@ export const ProposalMyVote = (props: ProposalMyVote) => {
           </Button>
         </ButtonGroup>
       </Box>
-      {!props.disableExecute && (
+      {!props.hideExecute && (
         <Button
           mt="37px"
           as="button"
@@ -254,6 +255,7 @@ export const ProposalMyVote = (props: ProposalMyVote) => {
           bg="#A1F0C4"
           borderColor="#91D8B0"
           isLoading={isSubmittingExecuteVote}
+          disabled={props.disableExecute}
           loadingText="Executing..."
           color="#0F0056"
           fontFamily="DM Sans"
@@ -279,7 +281,7 @@ export const ProposalMyVote = (props: ProposalMyVote) => {
                     borderRadius: 12,
                   },
                 });
-                props.setDisableExecute(true);
+                props.setHideExecute(true);
               })
               .catch(error => {
                 toast({

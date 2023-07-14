@@ -9,7 +9,10 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { useChain } from '@cosmos-kit/react';
-import { chainName } from '../../../config/defaults';
+import {
+  NEXT_PUBLIC_GOVERNANCE_CONTRACT,
+  chainName,
+} from '../../../config/defaults';
 
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { DaoMultisigQueryClient } from '../../../client/DaoMultisig.client';
@@ -30,6 +33,9 @@ import {
 import { ProposalExcuteRawData } from '../Proposal/Components/ProposalRawData';
 import { useDAOContext } from '../../../contexts/DAOContext';
 import { useEffect, useMemo, useState } from 'react';
+import { isProposalGov } from '../../../utils/proposalUti';
+import { GovernanceQueryClient } from '../../../client/Governance.client';
+import { useVotingPeriodContext } from '../../../contexts/VotingPeriodContext';
 
 type Props = {
   selectedDao: string;
@@ -47,11 +53,20 @@ export default function DaoProposalDetail({
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { setSelectedDAOByAddress } = useDAOContext();
   const [showExcute, setShowExecute] = useState(false);
+  const { isPostingPeriod } = useVotingPeriodContext();
 
   useEffect(() => {
     setSelectedDAOByAddress(selectedDao);
   }, [selectedDao, setSelectedDAOByAddress]);
 
+  const goverrnanceQueryClient = useMemo(
+    () =>
+      new GovernanceQueryClient(
+        cosmWasmClient as CosmWasmClient,
+        NEXT_PUBLIC_GOVERNANCE_CONTRACT,
+      ),
+    [cosmWasmClient],
+  );
   const daoMultisigQueryClient = new DaoMultisigQueryClient(
     cosmWasmClient as CosmWasmClient,
     selectedDao as string,
@@ -120,6 +135,14 @@ export default function DaoProposalDetail({
     );
   }, [votesQuery?.data?.votes]);
 
+  const isGov = useMemo(
+    () =>
+      proposalDetailQuery?.data
+        ? isProposalGov(proposalDetailQuery.data, goverrnanceQueryClient)
+        : undefined,
+    [proposalDetailQuery?.data, goverrnanceQueryClient],
+  );
+
   const myVotingInfo = votersQuery?.data?.voters.filter(
     voter => voter.addr === (address as string),
   ) ?? [{ weight: 0 }];
@@ -153,7 +176,7 @@ export default function DaoProposalDetail({
     }
     setShowExecute(false);
   }, [proposalDetailQuery?.data, target, yesPercentage]);
-
+  console.log('is gov', isGov, isPostingPeriod);
   return (
     <>
       <Flex height={'47px'} />
@@ -206,8 +229,9 @@ export default function DaoProposalDetail({
           </Box>
           <VStack width="330px" spacing="30px" align="flex-start">
             <ProposalMyVote
-              setDisableExecute={setShowExecute}
-              disableExecute={!showExcute}
+              setHideExecute={setShowExecute}
+              hideExecute={!showExcute}
+              disableExecute={!!isGov && !isPostingPeriod}
               myVotingPower={myVotingPower}
               passed={passed}
               voted={myVotes.length > 0}
