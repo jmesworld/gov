@@ -2,6 +2,7 @@ import { ProposalResponseForEmpty } from '../client/DaoMultisig.types';
 import { GovernanceQueryClient } from '../client/Governance.client';
 import { ProposalMsg, ProposalResponse } from '../client/Governance.types';
 import { fromBase64ToString } from './identity';
+import { z } from 'zod';
 
 export const getProposalExcuteMsg = (
   proposal: ProposalResponseForEmpty,
@@ -139,4 +140,14 @@ export const getProposalTypeForGovPublicProposals = (
 
 export const calculateFundingPerMonth = (blocks: number) => {
   return ((blocks * 5) / 2629745).toFixed(0);
+};
+
+const msgSchema = z.array(z.object({}));
+
+export const parseMsg = (msg: string) => {
+  const parsed = msgSchema.safeParse(JSON.parse(msg));
+  if (parsed.success) {
+    return parsed.data;
+  }
+  throw new Error('Invalid msg');
 };

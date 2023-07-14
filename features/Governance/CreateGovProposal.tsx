@@ -39,6 +39,7 @@ import {
 import { convertMonthToBlock } from '../../utils/block';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { VoterDetail } from '../../client/DaoMultisig.types';
+import { parseMsg } from '../../utils/proposalUti';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -687,48 +688,49 @@ export default function CreateGovProposal({
             <Button
               disabled={!isFormValid}
               onClick={async () => {
-                //
-                const proposalMsg = {
-                  propose: getProposalExecuteMsg({
-                    improvementMsgs,
-                    type: selectedProposalType,
-                    featureApproved: numberOfNFTToMint,
+                try {
+                  //
+                  const proposalMsg = {
+                    propose: getProposalExecuteMsg({
+                      improvementMsgs,
+                      type: selectedProposalType,
+                      featureApproved: numberOfNFTToMint,
 
-                    isFundingRequired: isFundingNeeded,
-                    // convert to blocks
-                    amount: fundingAmount,
-                    title: proposalTitle.value,
-                    description: proposalDescription.value,
-                    duration: convertMonthToBlock(fundingPeriod), // months to seconds
-                    slot: getSlot(slotType) as Governance.CoreSlot,
-                    revoke_proposal_id: revokeProposalId,
-                    msgs: [
-                      {
-                        bank: {
-                          send: {
-                            amount: [
-                              {
-                                denom: 'ujmes',
-                                amount: '10000000',
-                              },
-                            ],
-                            to_address: selectedDao as string,
+                      isFundingRequired: isFundingNeeded,
+                      // convert to blocks
+                      amount: fundingAmount,
+                      title: proposalTitle.value,
+                      description: proposalDescription.value,
+                      duration: convertMonthToBlock(fundingPeriod), // months to seconds
+                      slot: getSlot(slotType) as Governance.CoreSlot,
+                      revoke_proposal_id: revokeProposalId,
+                      msgs: [
+                        {
+                          bank: {
+                            send: {
+                              amount: [
+                                {
+                                  denom: 'ujmes',
+                                  amount: '10000000',
+                                },
+                              ],
+                              to_address: selectedDao as string,
+                            },
                           },
                         },
-                      },
-                    ],
-                  }),
-                };
-                setCheck(false);
-                setCreatingGovProposal(true);
-                const wasmMsg: Governance.WasmMsg = {
-                  execute: {
-                    contract_addr: NEXT_PUBLIC_GOVERNANCE_CONTRACT,
-                    funds: [{ amount: '10000000', denom: 'ujmes' }],
-                    msg: toBase64(proposalMsg),
-                  },
-                };
-                try {
+                      ],
+                    }),
+                  };
+                  setCheck(false);
+                  setCreatingGovProposal(true);
+                  const wasmMsg: Governance.WasmMsg = {
+                    execute: {
+                      contract_addr: NEXT_PUBLIC_GOVERNANCE_CONTRACT,
+                      funds: [{ amount: '10000000', denom: 'ujmes' }],
+                      msg: toBase64(proposalMsg),
+                    },
+                  };
+
                   const result = await createGovProposalMutation.mutateAsync({
                     client: daoClient,
                     msg: {
@@ -849,8 +851,8 @@ const getProposalExecuteMsg = ({
     case 'text':
       msg = {
         text_proposal: {
-          description: description,
-          title: title,
+          description,
+          title,
           funding: {
             amount: amount?.toString() as string,
             duration_in_blocks: duration as number,
@@ -861,8 +863,8 @@ const getProposalExecuteMsg = ({
     case 'core-slot':
       msg = {
         core_slot: {
-          description: description,
-          title: title,
+          description,
+          title,
           slot: slot as Governance.CoreSlot,
           funding: {
             amount: amount?.toString() as string,
@@ -874,21 +876,29 @@ const getProposalExecuteMsg = ({
     case 'revoke-proposal':
       msg = {
         revoke_proposal: {
-          description: improvementMsgs,
+          description,
           revoke_proposal_id: revoke_proposal_id as number,
           title: title,
         },
       };
       return msg;
-    case 'improvement':
-      msg = {
-        improvement: {
-          description: description,
-          title: title,
-          msgs: msgs as Governance.CosmosMsgForEmpty[],
-        },
-      };
-      return msg;
+    case 'improvement': {
+      try {
+        const impMsg = parseMsg(
+          improvementMsgs,
+        ) as Governance.CosmosMsgForEmpty[];
+        msg = {
+          improvement: {
+            description,
+            title,
+            msgs: impMsg as Governance.CosmosMsgForEmpty[],
+          },
+        };
+        return msg;
+      } catch (err) {
+        throw new Error('Improvement message is not valid');
+      }
+    }
     case 'feature-request':
       msg = {
         request_feature: {
