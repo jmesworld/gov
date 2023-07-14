@@ -245,7 +245,7 @@ export const Delegate = ({ onClose }: Props) => {
                         onChange={e => onValueChange(e.target.value)}
                         bg="transparent"
                         color="white"
-                        value={numberValueToMove}
+                        value={valueToMove}
                         fontFamily={'DM Sans'}
                         fontWeight="700"
                         fontSize={28}
