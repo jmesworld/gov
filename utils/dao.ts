@@ -6,10 +6,10 @@ const maxChar = 20;
 export const daoNameSchema = z
   .string()
   .min(minChar, {
-    message: `Name must be at least ${minChar} characters long`,
+    message: `Name must exceed ${minChar} characters`,
   })
   .max(maxChar, {
-    message: `Name must be at most ${maxChar} characters long`,
+    message: `Name must not exceed ${maxChar} characters`,
   })
   .regex(/^[a-z0-9]+$/, {
     message: `Name must only contain lowercase letters and numbers`,

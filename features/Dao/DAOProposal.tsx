@@ -228,6 +228,7 @@ export const DAOProposalPage = ({
           id: uuid(),
           name: ownerId.identity?.name ?? '',
           votingPower: voter.weight,
+          ogWeight: voter.weight,
           og: true,
         });
       }
@@ -256,7 +257,6 @@ export const DAOProposalPage = ({
   const error = () => {
     return validateForm(state, activeTab);
   };
-  console.log('state', error);
   return (
     <Box pb="2">
       <Flex height={'47px'} />

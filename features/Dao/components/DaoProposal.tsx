@@ -221,7 +221,7 @@ export default function DaoProposal({
         </Flex>
       </Flex>
       <Flex>
-        <Box flexGrow={1}>
+        <Box flexGrow={1} minWidth="700px">
           <Flex height={'20px'} />
 
           {proposals?.gov?.length > 0 && (
@@ -232,6 +232,7 @@ export default function DaoProposal({
               />
               <Flex height={'9px'} />
               <ProposalList
+                showPassingOrFailing
                 daoClient={daoQueryClient}
                 client={goverrnanceQueryClient}
                 daoName={daoName}
@@ -255,6 +256,7 @@ export default function DaoProposal({
               <ProposalHeader proposalTitle=" DAO PROPOSAL/S" isGov={false} />
               <Flex height={'9px'} />
               <ProposalList
+                showPassingOrFailing
                 daoClient={daoQueryClient}
                 client={goverrnanceQueryClient}
                 daoName={daoName}

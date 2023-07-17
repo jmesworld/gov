@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { MouseEventHandler, ReactNode, useEffect } from 'react';
+import React, { MouseEventHandler, ReactNode } from 'react';
 import { Icon, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 
 import { FiAlertTriangle } from 'react-icons/fi';

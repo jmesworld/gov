@@ -20,15 +20,16 @@ export const getRequest = (state: State, activeProposalType: ProposalTypes) => {
       const memberRemoveList = Object.values(members)
         .filter(el => {
           const sameAddress = Object.values(members).filter(
-            el2 => el2.address === el.address && !el2.isRemoved,
+            el2 =>
+              el2.address === el.address && !el2.isRemoved && el2.id !== el.id,
           );
-          if (sameAddress.length > 1) {
+
+          if (sameAddress.length >= 1) {
             return false;
           }
-          el.og && el.isRemoved;
+          return el.og && el.isRemoved;
         })
         .map(el => el.address as string);
-
       response = {
         update_members: {
           remove: memberRemoveList,

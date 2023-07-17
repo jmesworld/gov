@@ -36,6 +36,7 @@ import { ErrorBoundary } from '../error/errorBondary';
 import { VotingPeriodContextProvider } from '../contexts/VotingPeriodContext';
 import { ValidatorContextProvider } from '../contexts/validatorsContext';
 import { LeaveConfirmContextProvider } from '../hooks/useLeaveConfirm';
+import { useRouter } from 'next/router';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   Layout?: ({ children }: { children: ReactElement }) => ReactElement;
@@ -46,6 +47,7 @@ type AppPropsWithLayout = AppProps & {
 };
 
 function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
+  const router = useRouter();
   const signerOptions: SignerOptions = {
     // eslint-disable-next-line   @typescript-eslint/no-unused-vars
     signingCosmwasm: (_chain: Chain) => {
@@ -90,7 +92,10 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
                               <Layout>
                                 <ErrorBoundary>
                                   <ModalContainer />
-                                  <Component {...pageProps} />
+                                  <Component
+                                    key={router.asPath}
+                                    {...pageProps}
+                                  />
                                   <OnboardingModal />
                                 </ErrorBoundary>
                               </Layout>

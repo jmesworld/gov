@@ -18,6 +18,9 @@ export const movingValidator = (
       ? `You can't un-bond more than the validator ${amount}`
       : undefined;
   }
+  if (bonding && balance.transfer > balance.total) {
+    return `You can't bond more than your JMES balance`;
+  }
   if (balance.total === 0) {
     return 'You have no balance to move';
   }

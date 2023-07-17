@@ -17,12 +17,12 @@ import {
 
 import { ConnectedWalletType } from '../../types';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
-import { RefObject } from 'react';
-import { CopyAddressButton } from './CopyAddressButton';
+import { RefObject, useState } from 'react';
 import { useDelegateContext } from '../../../contexts/DelegateContext';
 import { useLeaveConfirmContext } from '../../../hooks/useLeaveConfirm';
 import { PromiseModal } from '../../components/genial/PromiseModal';
 import { useBalanceContext } from '../../../contexts/balanceContext';
+import { useClipboardTimeout } from '../../../hooks/useClipboard';
 
 export const ConnectedWalletButton = ({
   identityName,
@@ -31,6 +31,8 @@ export const ConnectedWalletButton = ({
 }: ConnectedWalletType) => {
   const { check, preventNavigatingAway } = useLeaveConfirmContext();
   const { address, disconnect } = useIdentityContext();
+  const [mouseEnter, setOnMouseEnter] = useState(false);
+  const [copied, copyToClipbaord] = useClipboardTimeout();
   const { openDelegate } = useDelegateContext();
   const { isOpen, onToggle, buttonRef } = useMenu({
     defaultIsOpen: false,
@@ -57,6 +59,12 @@ export const ConnectedWalletButton = ({
         onClick={e => {
           onToggle();
           e.preventDefault();
+        }}
+        onMouseEnter={() => {
+          setOnMouseEnter(true);
+        }}
+        onMouseLeave={() => {
+          setOnMouseEnter(false);
         }}
         cursor="pointer"
         _hover={{ bg: 'white' }}
@@ -90,19 +98,48 @@ export const ConnectedWalletButton = ({
             height={'16px'}
             alt="Wallet Icon"
           />
-          <Text
-            color="#7453FD"
-            fontWeight="bold"
-            fontSize={12}
-            marginLeft={'5.3px'}
-            fontFamily="DM Sans"
-            whiteSpace="nowrap"
-            overflow="hidden"
-            textOverflow="ellipsis"
-            maxW={'100px'}
-          >
-            {identityName ? identityName : address}
-          </Text>
+          <Tooltip hasArrow label={address}>
+            <Text
+              color="#7453FD"
+              fontWeight="bold"
+              fontSize={12}
+              marginLeft={'5.3px'}
+              fontFamily="DM Sans"
+              whiteSpace="nowrap"
+              overflow="hidden"
+              textOverflow="ellipsis"
+              maxW={'100px'}
+            >
+              {identityName ? identityName : address}
+            </Text>
+          </Tooltip>
+          {(mouseEnter || copied) && (
+            <Tooltip
+              isOpen={copied || undefined}
+              label={copied ? '✅ Copied Address' : 'Copy  address'}
+              hasArrow
+              onClick={e => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              placement="top"
+            >
+              <Image
+                cursor="pointer"
+                display="inline-block"
+                src="/copy.svg"
+                width="16px"
+                height="16px"
+                marginLeft="4px"
+                alt="jmes"
+                onClick={e => {
+                  copyToClipbaord(address ?? '');
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+              />
+            </Tooltip>
+          )}
           <Spacer marginLeft={'13px'} />
           <Tooltip
             label={`JMES ${formattedBalance?.jmes} `}
@@ -183,26 +220,19 @@ export const ConnectedWalletButton = ({
         minW={'271px'}
         maxW={'400px'}
       >
-        <MenuItem
-          backgroundColor="white"
-          padding="2"
-          _hover={{ bg: 'white' }}
-          borderRadius={'8px'}
-          bg="bg"
-        >
-          <CopyAddressButton address={address} />
-        </MenuItem>
         <Box
           onClick={() => {
             openDelegate();
           }}
         >
           <MenuItem
-            padding="2"
             backgroundColor="white"
             _hover={{ bg: 'white' }}
             borderRadius={'8px'}
             bg="bg"
+            paddingX="4px"
+            paddingTop="5px"
+            paddingBottom="0"
           >
             <Flex
               bg="bg"
@@ -234,7 +264,9 @@ export const ConnectedWalletButton = ({
         </Box>
         <MenuItem
           backgroundColor="white"
-          padding="2"
+          paddingX="4px"
+          paddingTop="3px"
+          paddingBottom="5px"
           _hover={{ bg: 'white' }}
           borderRadius={'8px'}
           onClick={handleDisconnect}

@@ -170,7 +170,6 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
             )}
           </Button>
           <Button
-            pb="2"
             as="button"
             height="42px"
             width="50%"

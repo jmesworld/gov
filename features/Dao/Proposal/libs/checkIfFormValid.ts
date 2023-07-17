@@ -20,12 +20,23 @@ export const validateForm = (
   if (activeTab === 'update-directories') {
     const membersArr = Object.values(state.members);
     const memberHasErrors = membersArr.some(
-      member => member.error || !(member.name && member.address),
+      member =>
+        member.error ||
+        !(member.name && member.address) ||
+        (member.votingPower !== undefined && member.votingPower <= 0),
     );
+    const votingPowerHasChanged = membersArr.some(
+      member => member.votingPower !== member.ogWeight || member.isRemoved,
+    );
+    if (!votingPowerHasChanged) {
+      errors.push('Please change voting power of at least one member');
+    }
+
     if (memberHasErrors) {
       errors.push('Please Enter Members correctly');
     }
     const memberVoteAddition = membersArr.reduce((acc, curr) => {
+      if (curr.isRemoved) return acc;
       acc += curr.votingPower ?? 0;
       return acc;
     }, 0);

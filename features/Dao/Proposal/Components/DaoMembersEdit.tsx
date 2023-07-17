@@ -168,7 +168,7 @@ export const MemberUpdate = memo(
             type={'number'}
             onChange={e => {
               const power = Number(e.target.value) ?? 0;
-              onVotingPowerChange(id, power);
+              onVotingPowerChange(id, Math.abs(power));
             }}
           />
 

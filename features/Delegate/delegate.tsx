@@ -156,7 +156,15 @@ export const Delegate = ({ onClose }: Props) => {
                         readOnly
                         bg="transparent"
                         color="white"
-                        value={jmesValue}
+                        value={
+                          bonding
+                            ? jmesValue > 0
+                              ? jmesValue
+                              : 0
+                            : totalJmes + totalBondedJmes < jmesValue
+                            ? 0
+                            : jmesValue
+                        }
                         fontFamily={'DM Sans'}
                         fontWeight="700"
                         fontSize={28}
@@ -167,6 +175,20 @@ export const Delegate = ({ onClose }: Props) => {
                         textAlign="center"
                       />
                     </Box>
+                    <Text
+                      color="red"
+                      fontFamily={'DM Sans'}
+                      fontWeight="500"
+                      fontSize={12}
+                      lineHeight="20px"
+                      mt={1}
+                      textAlign="center"
+                    >
+                      {bonding && jmesValue < 0 ? 'Not enough Balance' : ''}
+                      {!bonding && totalJmes + totalBondedJmes < jmesValue
+                        ? 'Not enough bJMES'
+                        : ''}
+                    </Text>
                   </Box>
                   <Box marginTop="44px">
                     <Tooltip
@@ -235,10 +257,8 @@ export const Delegate = ({ onClose }: Props) => {
                       <Input
                         isInvalid={
                           bonding
-                            ? numberValueToMove > totalJmes ||
-                              numberValueToMove < 1
-                            : numberValueToMove > totalBondedJmes ||
-                              numberValueToMove < 1
+                            ? numberValueToMove > totalJmes
+                            : numberValueToMove > totalBondedJmes
                         }
                         errorBorderColor="red"
                         type="number"
@@ -367,7 +387,7 @@ export const Delegate = ({ onClose }: Props) => {
                           textAlign="center"
                           marginTop="8px"
                         >
-                          {sliderValue}%
+                          {sliderValue > 100 ? 'invalid' : `${sliderValue}%`}
                         </Text>
                       </Box>
                     </SliderThumb>
