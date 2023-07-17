@@ -1,7 +1,6 @@
 import { ReactElement } from 'react';
 import { Box, Container, Flex, useBreakpointValue } from '@chakra-ui/react';
 import MobileViewDisabled from '../features/Onboarding/components/MobileViewDisabled';
-import Head from 'next/head';
 import { Header, NavBar } from '../features';
 import { useChain } from '@cosmos-kit/react';
 import { chainName } from '../config/defaults';

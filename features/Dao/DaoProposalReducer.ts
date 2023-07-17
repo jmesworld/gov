@@ -2,6 +2,7 @@ import type { Member as MemberBasic } from './createDAOReducer';
 export type Member = MemberBasic & {
   og?: boolean;
   isRemoved?: boolean;
+  ogWeight?: number;
 };
 type Spend = {
   id: string;

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { QuestionOutlineIcon } from '@chakra-ui/icons';
 import {
   Box,
   Center,
@@ -19,7 +18,6 @@ import { useIdentityserviceGetIdentityByOwnerQuery } from '../../client/Identity
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { useClipboardTimeout } from '../../hooks/useClipboard';
 // FIXME: fix this
-const tooltip_text = 'List of directors in this Dao.';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -37,7 +35,7 @@ export default function DaoMembersList({
   });
 
   return (
-    <Box width={'265px'} marginLeft={'41px'}>
+    <Box width={'265px'} minWidth="185px" marginLeft={'41px'}>
       <Flex>
         <Text
           color="rgba(15,0,86,0.8)"
@@ -49,23 +47,6 @@ export default function DaoMembersList({
         >
           DIRECTORS
         </Text>
-        <Tooltip
-          hasArrow
-          label={tooltip_text}
-          bg={'midnight'}
-          color={'white'}
-          direction={'rtl'}
-          placement={'top'}
-          borderRadius={'10px'}
-          width={'173px'}
-          height={'86px'}
-        >
-          <QuestionOutlineIcon
-            width={'16px'}
-            height={'16px'}
-            color={'rgba(0,0,0,0.4)'}
-          />
-        </Tooltip>
       </Flex>
       <MembersList
         members={data ? data?.voters : []}

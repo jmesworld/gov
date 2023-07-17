@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useMemo, useState, useReducer, useCallback } from 'react';
 
-import { AddIcon, QuestionOutlineIcon } from '@chakra-ui/icons';
+import { AddIcon } from '@chakra-ui/icons';
 import {
   IdentityserviceClient,
   IdentityserviceQueryClient,
@@ -52,7 +52,7 @@ const initialState: State = {
   ownerId: '',
   members: {},
   daoName: '',
-  threshold: 1,
+  threshold: 100,
 };
 
 const leaveModalTitle =
@@ -296,83 +296,86 @@ const CreateDaoNewForm = ({
             {daoNameError}
           </Text>
           <Flex width="100%" marginTop={'40px'} marginBottom={'23px'}>
-            <Button
-              variant={'outline'}
-              borderColor={'purple'}
-              width={'126px'}
-              height={'48px'}
-              onClick={() => {
-                dispatch({
-                  type: 'ADD_MEMBER',
-                  payload: {
-                    id: uuid(),
-                    name: '',
-                    votingPower: 0,
-                  },
-                });
-              }}
-              borderRadius={50}
-              backgroundColor={'transparent'}
-              _hover={{ bg: 'transparent' }}
-              justifyContent={'start'}
-            >
-              <Flex marginLeft={'0px'} alignItems={'center'}>
-                <AddIcon boxSize={'10px'} color="#7453FD" />
+            <Flex width="85%">
+              <Button
+                variant={'outline'}
+                borderColor={'purple'}
+                width={'126px'}
+                height={'48px'}
+                onClick={() => {
+                  dispatch({
+                    type: 'ADD_MEMBER',
+                    payload: {
+                      id: uuid(),
+                      name: '',
+                      votingPower: 0,
+                    },
+                  });
+                }}
+                borderRadius={50}
+                backgroundColor={'transparent'}
+                _hover={{ bg: 'transparent' }}
+                justifyContent={'start'}
+              >
+                <Flex marginLeft={'0px'} alignItems={'center'}>
+                  <AddIcon boxSize={'10px'} color="#7453FD" />
+                  <Text
+                    color="purple"
+                    fontWeight="medium"
+                    fontSize={14}
+                    marginLeft={'10px'}
+                    fontFamily="DM Sans"
+                  >
+                    Director
+                  </Text>
+                </Flex>
+              </Button>
+              <Box width={'8px'} />
+              <Button
+                variant={'outline'}
+                borderColor={'purple'}
+                width={'126px'}
+                height={'48px'}
+                onClick={() => {
+                  const power = AutoDistributeAsInt(100, membersArr.length);
+                  membersArr.forEach((member, i) => {
+                    dispatch({
+                      type: 'SET_VALUE',
+                      payload: {
+                        id: member.id,
+                        votingPower: power[i] ?? 0,
+                      },
+                    });
+                  });
+                }}
+                borderRadius={50}
+                backgroundColor={'transparent'}
+                _hover={{ bg: 'transparent' }}
+                justifyContent={'center'}
+              >
                 <Text
                   color="purple"
                   fontWeight="medium"
                   fontSize={14}
-                  marginLeft={'10px'}
                   fontFamily="DM Sans"
                 >
-                  Director
+                  Auto Distribute
                 </Text>
-              </Flex>
-            </Button>
-            <Box width={'8px'} />
-            <Button
-              variant={'outline'}
-              borderColor={'purple'}
-              width={'126px'}
-              height={'48px'}
-              onClick={() => {
-                const power = AutoDistributeAsInt(100, membersArr.length);
-                membersArr.forEach((member, i) => {
-                  dispatch({
-                    type: 'SET_VALUE',
-                    payload: {
-                      id: member.id,
-                      votingPower: power[i] ?? 0,
-                    },
-                  });
-                });
-              }}
-              borderRadius={50}
-              backgroundColor={'transparent'}
-              _hover={{ bg: 'transparent' }}
-              justifyContent={'center'}
-            >
+              </Button>
+            </Flex>
+            <Flex width="13%">
               <Text
-                color="purple"
-                fontWeight="medium"
-                fontSize={14}
+                color={'rgba(15,0,86,0.8)'}
                 fontFamily="DM Sans"
+                fontSize={12}
+                pl="5px"
+                fontWeight="medium"
+                marginBottom={'17px'}
+                alignSelf={'center'}
               >
-                Auto Distribute
+                SHARE OF VOTES
               </Text>
-            </Button>
-            <Spacer />
-            <Text
-              color={'rgba(15,0,86,0.8)'}
-              fontFamily="DM Sans"
-              fontSize={12}
-              fontWeight="medium"
-              marginBottom={'17px'}
-              marginRight={'21px'}
-              alignSelf={'center'}
-            >
-              SHARE OF VOTES
-            </Text>
+            </Flex>
           </Flex>
           {membersArr.map(daoMember => (
             <MemberUpdate
@@ -398,52 +401,61 @@ const CreateDaoNewForm = ({
             width={'100%%'}
             justifyContent="space-between"
           >
-            <Flex width="85%">
-              <QuestionOutlineIcon
-                width={'16px'}
-                height={'16px'}
-                color={'rgba(0,0,0,0.4)'}
-              />
+            <Flex
+              flexDir="column"
+              alignItems="flex-end"
+              justifyContent="flex-end"
+              width={'100%'}
+              mt="10px"
+            >
+              <InputGroup
+                pl="8px"
+                flexWrap="wrap"
+                width={'13%'}
+                height={'48px'}
+              >
+                <Input
+                  variant={'outline'}
+                  width={'100%'}
+                  height={'100%'}
+                  textAlign="center"
+                  borderColor={'primary.500'}
+                  background={totalVotingPower === 100 ? 'purple' : 'red'}
+                  focusBorderColor="darkPurple"
+                  borderRadius={12}
+                  color={'white'}
+                  fontWeight={'normal'}
+                  value={totalVotingPower}
+                />
+
+                <InputRightElement width="30%" height={'100%'}>
+                  <Text
+                    mr="20px"
+                    textAlign="left"
+                    color={'purple'}
+                    fontFamily="DM Sans"
+                    fontSize={16}
+                    fontWeight="normal"
+                    textColor="white"
+                  >
+                    %
+                  </Text>
+                </InputRightElement>
+              </InputGroup>
+
               <Text
-                color={totalVotingPower > 100 ? 'red' : 'rgba(0,0,0,0.7)'}
+                color="red"
                 fontFamily="DM Sans"
-                fontSize={14}
+                fontSize={12}
+                height={'16px'}
+                pt="5px"
                 fontWeight="normal"
                 marginLeft={'12px'}
               >
-                Total Share of Votes must equal 100%
+                {totalVotingPower !== 100 &&
+                  'Total Share of Votes must equal 100%'}
               </Text>
             </Flex>
-
-            <InputGroup pl="10PX" width={'13%'} height={'48px'}>
-              <Input
-                variant={'outline'}
-                width={'100%'}
-                height={'100%'}
-                textAlign="center"
-                borderColor={'primary.500'}
-                background={totalVotingPower === 100 ? 'purple' : 'red'}
-                focusBorderColor="darkPurple"
-                borderRadius={12}
-                color={'white'}
-                fontWeight={'normal'}
-                value={totalVotingPower}
-              />
-
-              <InputRightElement width="30%" height={'100%'}>
-                <Text
-                  mr="20px"
-                  textAlign="left"
-                  color={'purple'}
-                  fontFamily="DM Sans"
-                  fontSize={16}
-                  fontWeight="normal"
-                  textColor="white"
-                >
-                  %
-                </Text>
-              </InputRightElement>
-            </InputGroup>
             <Flex width="29px" />
           </Flex>
           <Text
@@ -570,19 +582,14 @@ const CreateDaoNewForm = ({
         alignItems={'center'}
         width={'100%'}
       >
-        <QuestionOutlineIcon
-          width={'16px'}
-          height={'16px'}
-          color={'rgba(0,0,0,0.4)'}
-        />
         <Text
-          color={individualGreeterThanThreshold ? 'red' : 'rgba(0,0,0,0.7)'}
+          color="red"
           fontFamily="DM Sans"
           fontSize={14}
           fontWeight="normal"
-          marginLeft={'12px'}
         >
-          Individual Share of Votes must not exceed % to Pass
+          {individualGreeterThanThreshold &&
+            'Individual Share of Votes must not exceed % to Pass'}
         </Text>
         <Spacer />
         <Button

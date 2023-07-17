@@ -204,18 +204,22 @@ export default function GovProposalDetail({
                   h="full"
                   m="auto"
                   zIndex="3"
-                  bg="rgba(255,255,255,.5)"
+                  bg="purple"
                   pos="absolute"
+                  color="white"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
                 >
                   {(status === 'expired' || status === 'expired_concluded') && (
                     <Text fontSize="xl" textAlign="center">
-                      This proposal has expired.
+                      Proposal expired
                     </Text>
                   )}
 
                   {(status === 'success' || status === 'success_concluded') && (
                     <Text fontSize="xl" textAlign="center">
-                      This proposal has passed.
+                      Proposal passed
                     </Text>
                   )}
                 </Box>

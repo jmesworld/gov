@@ -145,6 +145,7 @@ export default function GovernanceProposal({
           <ProposalHeader proposalTitle="CURRENT CYCLE" isGov={true} />
           <Flex height={'9px'} />
           <ProposalList
+            showPassingOrFailing
             isGovList
             client={governanceQueryClient}
             totalSupply={supply as number}

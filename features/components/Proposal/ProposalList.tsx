@@ -31,6 +31,7 @@ type BaseProps = {
   daoClient?: DaoMultisigQueryClient;
   goToDaoDetail?: boolean;
   isAllInactive?: boolean;
+  showPassingOrFailing?: boolean;
 };
 type Props =
   | (BaseProps & {
@@ -58,6 +59,7 @@ export const ProposalList = ({
   goToDaoDetail,
   daoClient,
   isAllInactive,
+  showPassingOrFailing,
   ...rest
 }: Props) => {
   const router = useRouter();
@@ -142,6 +144,13 @@ export const ProposalList = ({
           return undefined;
         };
 
+        const isPassing = () => {
+          if (!showPassingOrFailing) {
+            return undefined;
+          }
+          return thresholdPercent <= yesPercentage ? 'Passing' : 'Failing';
+        };
+
         return (
           <ProposalListItem
             fundingPerMonth={String(fundingPerMonth) || '-'}
@@ -150,6 +159,8 @@ export const ProposalList = ({
               proposal.status === 'success_concluded' ||
               proposal.status === 'expired_concluded'
             }
+            label={isPassing()}
+            labelSuccess={isPassing() === 'Passing'}
             votingDuration={votingDuration ?? '-'}
             key={proposal.id + proposal.description}
             title={proposal.title}
@@ -198,6 +209,7 @@ export const ProposalList = ({
 
       return (
         <DaoProposalListItem
+          showIsPassing={true}
           votingDuration={goToDaoDetail ? votingDuration || '-' : '-'}
           fundingPerMonth={goToDaoDetail ? String(fundingPerMonth) : '-'}
           key={proposal.id + proposal.description}
@@ -307,6 +319,7 @@ export const DaoProposalListItem = ({
   daoClient,
   label,
   labelSuccess,
+  showIsPassing,
 }: {
   title: string;
   threshold: number;
@@ -327,6 +340,7 @@ export const DaoProposalListItem = ({
   daoAddress?: string;
   label?: string;
   labelSuccess?: boolean;
+  showIsPassing: boolean;
 }) => {
   const votesQuery = useDaoMultisigListVotesQuery({
     client: daoClient,
@@ -358,6 +372,17 @@ export const DaoProposalListItem = ({
       }, 0) ?? 0
     );
   }, [votesQuery?.data?.votes]);
+
+  const passing = useMemo(() => {
+    if (showIsPassing) {
+      return yesPercentage >= threshold ? 'Passing' : 'Failing';
+    }
+    return undefined;
+  }, [yesPercentage, threshold, showIsPassing]);
+
+  const passingSuccess = useMemo(() => {
+    return passing === 'Passing';
+  }, [passing]);
 
   return (
     <>
@@ -409,7 +434,7 @@ export const DaoProposalListItem = ({
             >
               {type.length > 26 ? type.substring(0, 26) + '...' : type}
             </Text>
-            {passed !== undefined && !label && (
+            {!passing && passed !== undefined && !label && (
               <Badge
                 w="60px"
                 py="2px"
@@ -417,13 +442,14 @@ export const DaoProposalListItem = ({
                 ml="3"
                 bg={passed ? 'green' : 'red'}
                 fontSize="10px"
-                color="white"
+                fontWeight="normal"
+                color="black"
                 textAlign="center"
               >
                 {passed ? 'Passed' : 'Failed'}
               </Badge>
             )}
-            {label && (
+            {(label || passing) && (
               <Box>
                 <Badge
                   w="auto"
@@ -431,12 +457,13 @@ export const DaoProposalListItem = ({
                   py="2px"
                   rounded="full"
                   ml="3"
-                  bg={labelSuccess ? 'green' : 'red'}
+                  fontWeight="normal"
+                  bg={labelSuccess || passingSuccess ? 'green' : 'red'}
                   fontSize="10px"
-                  color="white"
+                  color="black"
                   textAlign="center"
                 >
-                  {label}
+                  {label || passing}
                 </Badge>
               </Box>
             )}
@@ -596,9 +623,10 @@ export const ProposalListItem = ({
                 py="2px"
                 rounded="full"
                 ml="3"
+                fontWeight="normal"
                 bg={passed ? 'green' : 'red'}
                 fontSize="10px"
-                color="white"
+                color="black"
                 textAlign="center"
               >
                 {passed ? 'Passed' : 'Failed'}
@@ -610,11 +638,12 @@ export const ProposalListItem = ({
                   w="auto"
                   px="6px"
                   py="2px"
+                  fontWeight="normal"
                   rounded="full"
                   ml="3"
                   bg={labelSuccess ? 'green' : 'red'}
                   fontSize="10px"
-                  color="white"
+                  color="black"
                   textAlign="center"
                 >
                   {label}

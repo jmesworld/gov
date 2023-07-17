@@ -106,11 +106,17 @@ const BalanceContextProvider = ({ children }: Props) => {
       return undefined;
     }
     const jmes =
-      data.jmes?.amount.dividedBy(1e6).toDecimalPlaces(6).toLocaleString() ??
-      '0';
+      data.jmes?.amount
+        .dividedBy(1e6)
+        .toDecimalPlaces(6)
+        .toNumber()
+        .toLocaleString() ?? '0';
     const bJmes =
-      data.bJmes?.amount.dividedBy(1e6).toDecimalPlaces(6).toLocaleString() ??
-      '0';
+      data.bJmes?.amount
+        .dividedBy(1e6)
+        .toDecimalPlaces(6)
+        .toNumber()
+        .toLocaleString() ?? '0';
     return {
       jmes,
       bJmes,
