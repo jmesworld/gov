@@ -92,6 +92,39 @@ export default function GovProposalDetail({
     [data?.coins_no, data?.coins_yes, supply],
   );
 
+  const isPassing = useMemo(() => {
+    if (thresholdPercent === undefined || yesPercentage === undefined) {
+      return undefined;
+    }
+    return thresholdPercent <= yesPercentage ? 'Passing' : 'Failing';
+  }, [thresholdPercent, yesPercentage]);
+
+  const passed = useMemo(() => {
+    if (data?.status === 'success' || data?.status === 'success_concluded') {
+      return true;
+    }
+    if (data?.status === 'expired' || data?.status === 'expired_concluded') {
+      return false;
+    }
+    return undefined;
+  }, [data?.status]);
+
+  const label = useMemo(() => {
+    if (passed !== undefined) {
+      return {
+        label: passed ? 'Passed' : 'Failed',
+        success: passed,
+      };
+    }
+    if (isPassing !== undefined) {
+      return {
+        label: isPassing,
+        success: isPassing === 'Passing',
+      };
+    }
+    return undefined;
+  }, [passed, isPassing]);
+
   const voted =
     (data?.yes_voters?.includes(address as string) ||
       data?.no_voters?.includes(address as string)) ??
@@ -144,7 +177,9 @@ export default function GovProposalDetail({
               target={Number(threshold) || 0}
               yesVotesPercentage={yesPercentage}
               noVotesPercentage={noPercentage}
+              label={label}
             />
+
             <Box
               background="rgba(112, 79, 247, 0.1)"
               borderRadius="12px"

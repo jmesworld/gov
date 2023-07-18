@@ -303,8 +303,8 @@ export default function CreateGovProposal({
                 Membership Violation!
               </AlertTitle>
               <AlertDescription maxWidth="lg">
-                Your current Dao membership is in violation of the membership
-                rules
+                Your current DAO structure is in violation of the Core Slot
+                membership rules
               </AlertDescription>
             </Alert>
           )}

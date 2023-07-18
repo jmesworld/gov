@@ -36,6 +36,7 @@ import { useDAOContext } from '../../../contexts/DAOContext';
 import { isProposalGov } from '../../../utils/proposalUti';
 import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { useVotingPeriodContext } from '../../../contexts/VotingPeriodContext';
+import { getLabel } from '../../../utils/daoProposalUtil';
 
 type Props = {
   selectedDao: string;
@@ -173,6 +174,14 @@ export default function DaoProposalDetail({
     [proposalDetailQuery?.data?.status],
   );
 
+  const label = useMemo(() => {
+    return getLabel({
+      proposal: proposalDetailQuery?.data,
+      yesVotes: yesPercentage,
+      threshold,
+    });
+  }, [proposalDetailQuery.data, yesPercentage, threshold]);
+
   return (
     <>
       <Flex height={'47px'} />
@@ -196,9 +205,15 @@ export default function DaoProposalDetail({
               noPercentage={noPercentage}
               yesPercentage={yesPercentage}
               target={target}
+              label={
+                label
+                  ? { label: label.label, success: label.labelSuccess }
+                  : undefined
+              }
             >
               <GovProposalType proposal={proposalDetailQuery?.data} />
             </ProposalVoting>
+
             <GetProposalDetail proposal={proposalDetailQuery.data} />
             <Text color="purple" mt="4">
               Description

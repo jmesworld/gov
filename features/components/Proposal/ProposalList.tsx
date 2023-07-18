@@ -27,7 +27,7 @@ import { formatBalanceWithComma } from '../../../hooks/useAccountBalance';
 import { convertBlockToMonth } from '../../../utils/block';
 import { useDaoMultisigListVotesQuery } from '../../../client/DaoMultisig.react-query';
 import { DaoMultisigQueryClient } from '../../../client/DaoMultisig.client';
-import { ProposalType, getLabelForProposalTypes } from './ProposalType';
+import { getLabelForProposalTypes } from './ProposalType';
 
 type BaseProps = {
   totalSupply: number;
@@ -141,9 +141,12 @@ export const ProposalList = ({
           coreSlotType = Object.keys(coreSlot)?.[0];
         }
         const fundingPerMonth =
-          Number(
-            (proposal?.funding?.amount ?? 0) / (Number(votingDurationNum) || 1),
-          ) ?? 0;
+          proposal?.funding?.amount !== undefined
+            ? Number(
+                (proposal?.funding?.amount ?? 0) /
+                  (Number(votingDurationNum) || 1),
+              ) ?? 0
+            : undefined;
 
         const statusSuccess = () => {
           if (
@@ -187,7 +190,11 @@ export const ProposalList = ({
 
         return (
           <ProposalListItem
-            fundingPerMonth={String(fundingPerMonth) || '-'}
+            fundingPerMonth={
+              fundingPerMonth !== undefined
+                ? String(fundingPerMonth)
+                : undefined
+            }
             inActive={
               isAllInactive ||
               proposal.status === 'success_concluded' ||
@@ -746,21 +753,35 @@ export const ProposalListItem = ({
         {largeSize && (
           <>
             <Flex width="15%" alignItems="center" justifyContent="flex-start">
-              <Image
-                src="/JMES_Icon_white.svg"
-                alt="JMES Icon"
-                width={'9px'}
-                mr="1"
-                height={'10.98px'}
-              />
-              <Text
-                color="white"
-                fontWeight="normal"
-                fontSize={14}
-                fontFamily="DM Sans"
-              >
-                {formatBalanceWithComma(Number(fundingPerMonth ?? 0) || 0)}
-              </Text>
+              {fundingPerMonth === undefined && (
+                <Text
+                  color="white"
+                  fontWeight="normal"
+                  fontSize={14}
+                  fontFamily="DM Sans"
+                >
+                  -
+                </Text>
+              )}
+              {fundingPerMonth !== undefined && (
+                <>
+                  <Image
+                    src="/JMES_Icon_white.svg"
+                    alt="JMES Icon"
+                    width={'9px'}
+                    mr="1"
+                    height={'10.98px'}
+                  />
+                  <Text
+                    color="white"
+                    fontWeight="normal"
+                    fontSize={14}
+                    fontFamily="DM Sans"
+                  >
+                    {formatBalanceWithComma(Number(fundingPerMonth ?? 0) || 0)}
+                  </Text>
+                </>
+              )}
             </Flex>
             <Box width="15%" justifyContent={'center'}>
               <Text

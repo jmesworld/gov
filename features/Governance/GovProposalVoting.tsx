@@ -1,4 +1,4 @@
-import { Box, Text, VStack, Divider } from '@chakra-ui/react';
+import { Box, Text, VStack, Badge, Flex } from '@chakra-ui/react';
 import { ProposalProgress } from '../components/Proposal/ProposalProgress';
 
 export interface Props {
@@ -10,6 +10,10 @@ export interface Props {
   noPercent: number;
   target: number;
   targetPercentage: number;
+  label?: {
+    label: string;
+    success: boolean;
+  };
 }
 
 const GovProposalVoting = ({
@@ -19,18 +23,11 @@ const GovProposalVoting = ({
   noCount,
   targetPercentage,
   target,
+  label,
 }: Props) => {
   return (
     <Box borderRadius="12px" background="#7453FD" padding="18px 20px">
-      <VStack align="flex-start" spacing="20px">
-        <Text
-          color="#fff"
-          fontSize={16}
-          fontWeight="medium"
-          fontFamily="DM Sans"
-        >
-          To Pass
-        </Text>
+      <VStack align="flex-start" spacing="10px">
         <ProposalProgress
           targetPercentage={targetPercentage}
           yesPercent={yesPercent}
@@ -39,7 +36,19 @@ const GovProposalVoting = ({
           yesCount={yesCount}
           target={target}
         />
-        <Divider borderColor="rgba(81, 54, 194, 0.3)" />
+        {label && (
+          <Flex alignItems="center" w="full">
+            <Badge
+              fontWeight="normal"
+              color="black"
+              rounded="full"
+              px="2"
+              bg={label.success ? 'green' : 'red'}
+            >
+              {label.label}
+            </Badge>
+          </Flex>
+        )}
       </VStack>
     </Box>
   );
