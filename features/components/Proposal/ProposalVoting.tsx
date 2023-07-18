@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Box, VStack } from '@chakra-ui/react';
+import { Badge, Box, Flex } from '@chakra-ui/react';
 import { ProposalProgress } from './ProposalProgress';
 
 export interface Props {
@@ -7,22 +7,44 @@ export interface Props {
   noPercentage: number;
   target: number;
   children?: ReactNode;
+  label?: {
+    label: string;
+    success: boolean;
+  };
 }
 
-export const ProposalVoting = (props: Props) => {
+export const ProposalVoting = ({
+  children,
+  yesPercentage,
+  noPercentage,
+  target,
+  label,
+}: Props) => {
   return (
     <Box borderRadius="12px" background="#7453FD" padding="18px 20px">
-      <VStack align="flex-start" spacing="20px">
-        {props.children}
+      <Flex flexDir="column" align="flex-start">
+        {children}
         <ProposalProgress
-          yesCount={props.yesPercentage}
-          noCount={props.noPercentage}
-          yesPercent={props.yesPercentage}
-          noPercent={props.noPercentage}
-          target={props.target}
-          targetPercentage={props.target}
+          yesCount={yesPercentage}
+          noCount={noPercentage}
+          yesPercent={yesPercentage}
+          noPercent={noPercentage}
+          target={target}
+          targetPercentage={target}
         />
-      </VStack>
+        {label && (
+          <Badge
+            rounded="full"
+            px="2"
+            fontWeight="normal"
+            mt="10px"
+            ml="10px"
+            bg={label.success ? 'green' : 'red'}
+          >
+            {label.label}
+          </Badge>
+        )}
+      </Flex>
     </Box>
   );
 };
