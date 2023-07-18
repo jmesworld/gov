@@ -203,6 +203,7 @@ export const DaoMembersListItem = ({
             rounded="full"
             px="3"
             py="1"
+            color="black"
             bg={isYes ? 'green' : 'red'}
           >
             {isYes ? 'Yes' : 'No'}

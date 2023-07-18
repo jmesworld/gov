@@ -83,7 +83,7 @@ export const MembersList = ({
   const totalWeight = members?.reduce((acc, o) => acc + o.weight, 0);
 
   const membersList = members
-    ?.sort((a, b) => a.weight - b.weight)
+    ?.sort((a, b) => b.weight - a.weight)
     .map(member => {
       const weight = member.weight;
       return (
