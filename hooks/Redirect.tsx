@@ -8,7 +8,7 @@ export const useRedirectToHomeForNoWalletConnected = () => {
   const { address, loadingIdentity } = useIdentityContext();
 
   const Loading = useMemo(() => {
-    if (!address) {
+    if (!address && !loadingIdentity) {
       return 'Redirecting...';
     }
     if (loadingIdentity) {
@@ -18,10 +18,10 @@ export const useRedirectToHomeForNoWalletConnected = () => {
   }, [address, loadingIdentity]);
 
   useEffect(() => {
-    if (!address) {
+    if (!address && !loadingIdentity) {
       router.push('/');
     }
-  }, [Loading, address, router]);
+  }, [Loading, address, loadingIdentity, router]);
 
   return [Loading];
 };

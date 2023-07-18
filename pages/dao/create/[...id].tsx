@@ -9,14 +9,14 @@ const CreateProposal = () => {
   const router = useRouter();
   const { setSelectedDAOByName, getSelectedDAOByName, firstLoad } =
     useDAOContext();
+
+  const id = router?.query.id;
   const [Redirect] = useRedirectToHomeForNoWalletConnected();
   if (Redirect) return Redirect;
-  const id = router?.query.id;
   if (firstLoad) {
     return (
-      <Flex alignItems="center">
+      <Flex alignItems="center" justifyContent="center" h="full" w="full">
         <Spinner size="sm" mr="2" />
-        <Text>Loading DAO ...</Text>
       </Flex>
     );
   }

@@ -156,14 +156,16 @@ export default function DaoProposalDetail({
   const voters = useMemo(() => {
     const members = daoMembers?.data?.voters ?? [];
     const memberVoted = votesQuery?.data?.votes ?? [];
-    return members.map(member => {
-      const vote = memberVoted.find(vote => vote.voter === member.addr);
-      return {
-        ...member,
-        voter: member.addr,
-        vote: vote?.vote as string,
-      };
-    });
+    return members
+      ?.sort((a, b) => b.weight - a.weight)
+      ?.map(member => {
+        const vote = memberVoted.find(vote => vote.voter === member.addr);
+        return {
+          ...member,
+          voter: member.addr,
+          vote: vote?.vote as string,
+        };
+      });
   }, [daoMembers?.data?.voters, votesQuery?.data?.votes]);
 
   const status = useMemo(
