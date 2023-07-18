@@ -94,7 +94,7 @@ export default function GovernanceProposal({
       if (!fundDuration) return true;
 
       if (
-        (votingData?.current_block ?? 0) <=
+        (votingData?.current_block ?? 0) >=
         fundDuration + (p.concluded_at_height ?? 0)
       ) {
         return true;
@@ -125,7 +125,7 @@ export default function GovernanceProposal({
         if (!fundDuration) return false;
 
         if (
-          (votingData?.current_block ?? 0) >
+          (votingData?.current_block ?? 0) <
           fundDuration + (p.concluded_at_height ?? 0)
         ) {
           return true;

@@ -1,11 +1,20 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Badge, Box, Flex, Image, Progress, Text } from '@chakra-ui/react';
+import {
+  Badge,
+  Box,
+  Flex,
+  Image,
+  Progress,
+  Text,
+  Tooltip,
+} from '@chakra-ui/react';
 import { MouseEventHandler, useMemo } from 'react';
 import { ProposalProgress } from './ProposalProgress';
 import { useRouter } from 'next/router';
 import { calculateVotes } from '../../../lib/calculateVotes';
 import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
 import {
+  getDaoProposalType,
   getFunding,
   getGovProposalType,
   isProposalGov,
@@ -18,6 +27,7 @@ import { formatBalanceWithComma } from '../../../hooks/useAccountBalance';
 import { convertBlockToMonth } from '../../../utils/block';
 import { useDaoMultisigListVotesQuery } from '../../../client/DaoMultisig.react-query';
 import { DaoMultisigQueryClient } from '../../../client/DaoMultisig.client';
+import { ProposalType, getLabelForProposalTypes } from './ProposalType';
 
 type BaseProps = {
   totalSupply: number;
@@ -125,6 +135,11 @@ export const ProposalList = ({
         const type = propType
           ? propType.slice(0, propType.length - 1)
           : proposal.description;
+        const coreSlot = proposal?.prop_type?.core_slot;
+        let coreSlotType: string | null = null;
+        if (coreSlot) {
+          coreSlotType = Object.keys(coreSlot)?.[0];
+        }
         const fundingPerMonth =
           Number(
             (proposal?.funding?.amount ?? 0) / (Number(votingDurationNum) || 1),
@@ -192,7 +207,9 @@ export const ProposalList = ({
             noPercent={noPercentage}
             totalCount={totalSupply}
             threshold={Number(threshold)}
-            type={formatString(type)}
+            type={`${getLabelForProposalTypes(type)}${
+              coreSlotType ? ` - ${formatString(coreSlotType)}` : ''
+            } `}
             navigateToProposal={id => navigateToProposal(id, isGovList)}
             largeSize={isGovList ? true : false}
             daoAddress={undefined}
@@ -225,7 +242,7 @@ export const ProposalList = ({
       const threshold = proposal.threshold?.absolute_count;
       const target = threshold ? threshold.weight : 0;
       const propsalType = getGovProposalType(proposal);
-
+      const daoProposalType = getDaoProposalType(proposal);
       const hasPassed = () => {
         if (!showPassedOrFailed) {
           return undefined;
@@ -252,7 +269,9 @@ export const ProposalList = ({
           inActive={isAllInactive}
           type={
             propsalType.proposalType
-              ? formatString(propsalType.proposalType)
+              ? getLabelForProposalTypes(propsalType.proposalType)
+              : daoProposalType
+              ? getLabelForProposalTypes(daoProposalType)
               : ''
           }
           navigateToProposal={id => navigateToProposal(id, !!isGovList)}
@@ -425,11 +444,11 @@ export const DaoProposalListItem = ({
   return (
     <>
       <Flex
-        minWidth={largeSize ? '1000px' : '500px'}
+        minWidth={'1000px'}
         opacity={inActive ? '0.5' : '1'}
         flex={1}
         height={'89px'}
-        width={largeSize ? '100%' : '100%'}
+        width={'100%'}
         backgroundColor="purple"
         borderRadius={12}
         alignItems={'center'}
@@ -448,19 +467,21 @@ export const DaoProposalListItem = ({
             flexDirection={'column'}
             justifyContent={'center'}
           >
-            <Text
-              color="white"
-              fontFamily={'DM Sans'}
-              fontWeight="normal"
-              fontSize={18}
-              width={'100%'}
-              marginLeft={'14px'}
-              whiteSpace="pre-wrap"
-              noOfLines={3}
-              textOverflow="ellipsis"
-            >
-              {title.length > 20 ? title.substring(0, 20) + '...' : title}
-            </Text>
+            <Tooltip hasArrow isDisabled={title.length < 20} label={title}>
+              <Text
+                color="white"
+                fontFamily={'DM Sans'}
+                fontWeight="normal"
+                fontSize={18}
+                width={'100%'}
+                marginLeft={'14px'}
+                whiteSpace="pre-wrap"
+                noOfLines={3}
+                textOverflow="ellipsis"
+              >
+                {title.length > 20 ? title.substring(0, 20) + '...' : title}
+              </Text>
+            </Tooltip>
             <Text
               width={largeSize ? '281px' : '268px'}
               color="white"
@@ -522,37 +543,50 @@ export const DaoProposalListItem = ({
             />
           </Flex>
         </Flex>
-        {largeSize && (
-          <>
-            <Flex width="15%" alignItems="center" justifyContent="flex-start">
-              <Image
-                src="/JMES_Icon_white.svg"
-                alt="JMES Icon"
-                width={'9px'}
-                mr="1"
-                height={'10.98px'}
-              />
+
+        <>
+          <Flex width="15%" alignItems="center" justifyContent="flex-start">
+            {!largeSize && (
               <Text
                 color="white"
                 fontWeight="normal"
                 fontSize={14}
                 fontFamily="DM Sans"
               >
-                {formatBalanceWithComma(Number(fundingPerMonth ?? 0) || 0)}
+                -
               </Text>
-            </Flex>
-            <Box width="15%" justifyContent={'center'}>
-              <Text
-                color="white"
-                fontWeight="normal"
-                fontSize={14}
-                fontFamily="DM Sans"
-              >
-                {votingDuration}
-              </Text>
-            </Box>
-          </>
-        )}
+            )}
+            {largeSize && (
+              <>
+                <Image
+                  src="/JMES_Icon_white.svg"
+                  alt="JMES Icon"
+                  width={'9px'}
+                  mr="1"
+                  height={'10.98px'}
+                />
+                <Text
+                  color="white"
+                  fontWeight="normal"
+                  fontSize={14}
+                  fontFamily="DM Sans"
+                >
+                  {formatBalanceWithComma(Number(fundingPerMonth ?? 0) || 0)}
+                </Text>
+              </>
+            )}
+          </Flex>
+          <Box width="15%" justifyContent={'center'}>
+            <Text
+              color="white"
+              fontWeight="normal"
+              fontSize={14}
+              fontFamily="DM Sans"
+            >
+              {votingDuration}
+            </Text>
+          </Box>
+        </>
       </Flex>
     </>
   );
@@ -629,21 +663,24 @@ export const ProposalListItem = ({
             flexWrap="wrap"
             width={'30%'}
             flexDirection={'column'}
-            justifyContent={'center'}
+            align="flex-start"
+            justifyContent="space-around"
           >
-            <Text
-              color="white"
-              fontFamily={'DM Sans'}
-              fontWeight="normal"
-              fontSize={18}
-              width={'100%'}
-              marginLeft={'14px'}
-              whiteSpace="pre-wrap"
-              noOfLines={3}
-              textOverflow="ellipsis"
-            >
-              {title.length > 20 ? title.substring(0, 20) + '...' : title}
-            </Text>
+            <Tooltip isDisabled={title.length < 20} label={title}>
+              <Text
+                color="white"
+                fontFamily={'DM Sans'}
+                fontWeight="normal"
+                fontSize={18}
+                width={'100%'}
+                marginLeft={'14px'}
+                whiteSpace="pre-wrap"
+                noOfLines={3}
+                textOverflow="ellipsis"
+              >
+                {title.length > 20 ? title.substring(0, 20) + '...' : title}
+              </Text>
+            </Tooltip>
             <Text
               width={largeSize ? '281px' : '268px'}
               color="white"
@@ -657,6 +694,7 @@ export const ProposalListItem = ({
             </Text>
             {passed !== undefined && !label && (
               <Badge
+                mt="3px"
                 w="60px"
                 py="2px"
                 rounded="full"

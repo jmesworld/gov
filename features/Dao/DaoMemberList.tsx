@@ -37,13 +37,15 @@ export default function DaoMembersList({
 
   return (
     <Box width={'265px'} minWidth="185px" marginLeft={'41px'}>
+      <Flex height={'20px'} />
+
       <Flex>
         <Text
           color="rgba(15,0,86,0.8)"
           fontWeight="medium"
           fontSize={12}
           marginRight={'6px'}
-          marginBottom={'12px'}
+          marginBottom={'9px'}
           fontFamily="DM Sans"
         >
           DIRECTORS

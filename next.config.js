@@ -2,5 +2,5 @@
 
 module.exports = {
   reactStrictMode: false,
-  swcMinify: true
+  swcMinify: true,
 };

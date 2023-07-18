@@ -5,6 +5,7 @@ import {
   Button,
   useToast,
   CircularProgress,
+  Flex,
 } from '@chakra-ui/react';
 import { useChain } from '@cosmos-kit/react';
 
@@ -80,22 +81,33 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
           fontWeight="medium"
           fontFamily="DM Sans"
         >
-          My Voting Power
+          Please Vote...
         </Text>
-        <Text
-          fontSize="24px"
-          fontWeight="normal"
-          marginBottom="12px"
-          color="#fff"
-          margin="20px 0 0"
-          fontFamily="DM Sans"
-        >
-          {props.myVotingPower}%
-        </Text>
+        <Flex w="full" justifyContent="flex-start" alignItems="center">
+          <Text
+            color="#fff"
+            fontSize={16}
+            fontWeight="medium"
+            fontFamily="DM Sans"
+          >
+            My Voting Power:
+          </Text>
+          <Text
+            ml="20px"
+            fontSize="24px"
+            fontWeight="normal"
+            color="#fff"
+            fontFamily="DM Sans"
+          >
+            {props.myVotingPower}%
+          </Text>
+        </Flex>
+
         <ButtonGroup
           gap="6px"
           width="100%"
-          marginTop="40px"
+          marginTop="20px"
+          marginBottom="10px"
           isDisabled={props.voted}
         >
           <Button
