@@ -17,90 +17,90 @@ export interface ConfigResponse {
 }
 export type ExecuteMsg =
   | {
-      propose: ProposalMsg;
-    }
+    propose: ProposalMsg;
+  }
   | {
-      vote: {
-        id: number;
-        vote: VoteOption;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      conclude: {
-        id: number;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      set_contract: {
-        art_dealer: string;
-        identityservice: string;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      set_core_slot: {
-        proposal_id: number;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      unset_core_slot: {
-        proposal_id: number;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      resign_core_slot: {
-        note: string;
-        slot: CoreSlot;
-        [k: string]: unknown;
-      };
+    vote: {
+      id: number;
+      vote: VoteOption;
+      [k: string]: unknown;
     };
+  }
+  | {
+    conclude: {
+      id: number;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    set_contract: {
+      art_dealer: string;
+      identityservice: string;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    set_core_slot: {
+      proposal_id: number;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    unset_core_slot: {
+      proposal_id: number;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    resign_core_slot: {
+      note: string;
+      slot: CoreSlot;
+      [k: string]: unknown;
+    };
+  };
 export type ProposalMsg =
   | {
-      text_proposal: {
-        description: string;
-        funding?: Funding | null;
-        title: string;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      request_feature: {
-        description: string;
-        feature: Feature;
-        funding: Funding;
-        title: string;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      improvement: {
-        description: string;
-        msgs: CosmosMsgForEmpty[];
-        title: string;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      core_slot: {
-        description: string;
-        funding: Funding;
-        slot: CoreSlot;
-        title: string;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      revoke_proposal: {
-        description: string;
-        revoke_proposal_id: number;
-        title: string;
-        [k: string]: unknown;
-      };
+    text_proposal: {
+      description: string;
+      funding?: Funding | null;
+      title: string;
+      [k: string]: unknown;
     };
+  }
+  | {
+    request_feature: {
+      description: string;
+      feature: Feature;
+      funding: Funding;
+      title: string;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    improvement: {
+      description: string;
+      msgs: CosmosMsgForEmpty[];
+      title: string;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    core_slot: {
+      description: string;
+      funding: Funding;
+      slot: CoreSlot;
+      title: string;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    revoke_proposal: {
+      description: string;
+      revoke_proposal_id: number;
+      title: string;
+      [k: string]: unknown;
+    };
+  };
 export type Feature = {
   art_dealer: {
     approved: number;
@@ -109,150 +109,150 @@ export type Feature = {
 };
 export type CosmosMsgForEmpty =
   | {
-      bank: BankMsg;
-    }
+    bank: BankMsg;
+  }
   | {
-      custom: Empty;
-    }
+    custom: Empty;
+  }
   | {
-      staking: StakingMsg;
-    }
+    staking: StakingMsg;
+  }
   | {
-      distribution: DistributionMsg;
-    }
+    distribution: DistributionMsg;
+  }
   | {
-      stargate: {
-        type_url: string;
-        value: Binary;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      ibc: IbcMsg;
-    }
-  | {
-      wasm: WasmMsg;
-    }
-  | {
-      gov: GovMsg;
+    stargate: {
+      type_url: string;
+      value: Binary;
+      [k: string]: unknown;
     };
+  }
+  | {
+    ibc: IbcMsg;
+  }
+  | {
+    wasm: WasmMsg;
+  }
+  | {
+    gov: GovMsg;
+  };
 export type BankMsg =
   | {
-      send: {
-        amount: Coin[];
-        to_address: string;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      burn: {
-        amount: Coin[];
-        [k: string]: unknown;
-      };
+    send: {
+      amount: Coin[];
+      to_address: string;
+      [k: string]: unknown;
     };
+  }
+  | {
+    burn: {
+      amount: Coin[];
+      [k: string]: unknown;
+    };
+  };
 export type StakingMsg =
   | {
-      delegate: {
-        amount: Coin;
-        validator: string;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      undelegate: {
-        amount: Coin;
-        validator: string;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      redelegate: {
-        amount: Coin;
-        dst_validator: string;
-        src_validator: string;
-        [k: string]: unknown;
-      };
+    delegate: {
+      amount: Coin;
+      validator: string;
+      [k: string]: unknown;
     };
+  }
+  | {
+    undelegate: {
+      amount: Coin;
+      validator: string;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    redelegate: {
+      amount: Coin;
+      dst_validator: string;
+      src_validator: string;
+      [k: string]: unknown;
+    };
+  };
 export type DistributionMsg =
   | {
-      set_withdraw_address: {
-        address: string;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      withdraw_delegator_reward: {
-        validator: string;
-        [k: string]: unknown;
-      };
+    set_withdraw_address: {
+      address: string;
+      [k: string]: unknown;
     };
+  }
+  | {
+    withdraw_delegator_reward: {
+      validator: string;
+      [k: string]: unknown;
+    };
+  };
 export type Binary = string;
 export type IbcMsg =
   | {
-      transfer: {
-        amount: Coin;
-        channel_id: string;
-        timeout: IbcTimeout;
-        to_address: string;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      send_packet: {
-        channel_id: string;
-        data: Binary;
-        timeout: IbcTimeout;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      close_channel: {
-        channel_id: string;
-        [k: string]: unknown;
-      };
+    transfer: {
+      amount: Coin;
+      channel_id: string;
+      timeout: IbcTimeout;
+      to_address: string;
+      [k: string]: unknown;
     };
+  }
+  | {
+    send_packet: {
+      channel_id: string;
+      data: Binary;
+      timeout: IbcTimeout;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    close_channel: {
+      channel_id: string;
+      [k: string]: unknown;
+    };
+  };
 export type Timestamp = Uint64;
 export type Uint64 = string;
 export type WasmMsg =
   | {
-      execute: {
-        contract_addr: string;
-        funds: Coin[];
-        msg: Binary;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      instantiate: {
-        admin?: string | null;
-        code_id: number;
-        funds: Coin[];
-        label: string;
-        msg: Binary;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      migrate: {
-        contract_addr: string;
-        msg: Binary;
-        new_code_id: number;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      update_admin: {
-        admin: string;
-        contract_addr: string;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      clear_admin: {
-        contract_addr: string;
-        [k: string]: unknown;
-      };
+    execute: {
+      contract_addr: string;
+      funds: Coin[];
+      msg: Binary;
+      [k: string]: unknown;
     };
+  }
+  | {
+    instantiate: {
+      admin?: string | null;
+      code_id: number;
+      funds: Coin[];
+      label: string;
+      msg: Binary;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    migrate: {
+      contract_addr: string;
+      msg: Binary;
+      new_code_id: number;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    update_admin: {
+      admin: string;
+      contract_addr: string;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    clear_admin: {
+      contract_addr: string;
+      [k: string]: unknown;
+    };
+  };
 export type GovMsg = {
   vote: {
     proposal_id: number;
@@ -263,20 +263,20 @@ export type GovMsg = {
 export type VoteOption = 'yes' | 'no' | 'abstain' | 'no_with_veto';
 export type CoreSlot =
   | {
-      brand: {
-        [k: string]: unknown;
-      };
-    }
-  | {
-      creative: {
-        [k: string]: unknown;
-      };
-    }
-  | {
-      core_tech: {
-        [k: string]: unknown;
-      };
+    brand: {
+      [k: string]: unknown;
     };
+  }
+  | {
+    creative: {
+      [k: string]: unknown;
+    };
+  }
+  | {
+    core_tech: {
+      [k: string]: unknown;
+    };
+  };
 export interface Funding {
   amount: Uint128;
   duration_in_blocks: number;
@@ -342,24 +342,24 @@ export interface PeriodInfoResponse {
 }
 export type ProposalType =
   | {
-      text: {
-        [k: string]: unknown;
-      };
-    }
-  | {
-      feature_request: Feature;
-    }
-  | {
-      improvement: {
-        [k: string]: unknown;
-      };
-    }
-  | {
-      core_slot: CoreSlot;
-    }
-  | {
-      revoke_proposal: number;
+    text: {
+      [k: string]: unknown;
     };
+  }
+  | {
+    feature_request: Feature;
+  }
+  | {
+    improvement: {
+      [k: string]: unknown;
+    };
+  }
+  | {
+    core_slot: CoreSlot;
+  }
+  | {
+    revoke_proposal: number;
+  };
 export type ProposalStatus =
   | 'posted'
   | 'voting'
@@ -370,6 +370,7 @@ export type ProposalStatus =
 export interface ProposalResponse {
   coins_no: Uint128;
   coins_yes: Uint128;
+  coins_total: Uint128;
   concluded?: number | null;
   dao: Addr;
   deposit_amount: Uint128;
@@ -393,38 +394,38 @@ export interface ProposalsResponse {
 }
 export type QueryMsg =
   | {
-      config: {
-        [k: string]: unknown;
-      };
-    }
-  | {
-      period_info: {
-        [k: string]: unknown;
-      };
-    }
-  | {
-      proposal: {
-        id: number;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      proposals: {
-        limit?: number | null;
-        start?: number | null;
-        [k: string]: unknown;
-      };
-    }
-  | {
-      core_slots: {
-        [k: string]: unknown;
-      };
-    }
-  | {
-      winning_grants: {
-        [k: string]: unknown;
-      };
+    config: {
+      [k: string]: unknown;
     };
+  }
+  | {
+    period_info: {
+      [k: string]: unknown;
+    };
+  }
+  | {
+    proposal: {
+      id: number;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    proposals: {
+      limit?: number | null;
+      start?: number | null;
+      [k: string]: unknown;
+    };
+  }
+  | {
+    core_slots: {
+      [k: string]: unknown;
+    };
+  }
+  | {
+    winning_grants: {
+      [k: string]: unknown;
+    };
+  };
 export interface WinningGrantsResponse {
   winning_grants: WinningGrant[];
   [k: string]: unknown;
