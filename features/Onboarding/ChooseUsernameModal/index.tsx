@@ -5,7 +5,7 @@ import {
   SigningCosmWasmClient,
 } from '@cosmjs/cosmwasm-stargate';
 
-import { useEffect, useState, useDeferredValue, useMemo } from 'react';
+import { useState, useDeferredValue, useMemo } from 'react';
 import {
   IdentityserviceClient,
   IdentityserviceQueryClient,
@@ -26,6 +26,7 @@ import { useChain } from '@cosmos-kit/react';
 import { chainName } from '../../../config/defaults';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { daoNameSchema } from '../../../utils/dao';
+import { useSigningCosmWasmClientContext } from '../../../contexts/SigningCosmWasmClient';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -48,27 +49,13 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
   const [isIdentityNameAvailable, setIsIdentityNameAvailable] = useState(false);
   const [isCreatingIdentity, setIsCreatingIdentity] = useState(false);
   const { cosmWasmClient } = useCosmWasmClientContext();
-  const [signingClient, setSigningClient] =
-    useState<SigningCosmWasmClient | null>(null);
+  const { signingCosmWasmClient: signingClient } =
+    useSigningCosmWasmClientContext();
   const { refetchIdentity } = useIdentityContext();
 
-  const { disconnect, address, status, closeView, getSigningCosmWasmClient } =
-    useChain(chainName);
+  const { disconnect, address, status, closeView } = useChain(chainName);
 
   const toast = useToast();
-
-  useEffect(() => {
-    if (address) {
-      (async () => {
-        try {
-          const signingClient = await getSigningCosmWasmClient?.();
-          signingClient && setSigningClient(signingClient);
-        } catch (error) {
-          console.error(error);
-        }
-      })();
-    }
-  }, [address, getSigningCosmWasmClient]);
 
   const client: IdentityserviceQueryClient = useMemo(
     () =>

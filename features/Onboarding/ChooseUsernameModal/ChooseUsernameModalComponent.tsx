@@ -37,13 +37,13 @@ export const SearchResults = memo(
     setIsIdentityNameAvailable: Dispatch<SetStateAction<boolean>>;
     queryError: string;
   }) => {
-    const { data, isLoading, error } = useIdentityserviceGetIdentityByNameQuery(
-      {
+    const { data, isLoading, isFetching, error } =
+      useIdentityserviceGetIdentityByNameQuery({
         client,
         args: { name: query },
 
         options: {
-          enabled: !queryError,
+          enabled: false,
           staleTime: 1000,
           cacheTime: 1000,
           retry: 3,
@@ -57,9 +57,9 @@ export const SearchResults = memo(
             else setIsIdentityNameAvailable(false);
           },
         },
-      },
-    );
-    if (isLoading) {
+      });
+
+    if (isLoading || isFetching) {
       <Text> Loading... </Text>;
     }
     if (error) {
@@ -82,7 +82,7 @@ export const SearchResults = memo(
           <Text color="red">Name taken!</Text>
         )}
 
-        {query && !queryError && data?.identity?.name.toString() !== query && (
+        {query && !queryError && data?.identity?.name.toString() === query && (
           <Text color="green">Name is available!</Text>
         )}
       </Text>
