@@ -32,6 +32,7 @@ type BaseProps = {
   goToDaoDetail?: boolean;
   isAllInactive?: boolean;
   showPassingOrFailing?: boolean;
+  showPassedOrFailed?: boolean;
 };
 type Props =
   | (BaseProps & {
@@ -60,6 +61,7 @@ export const ProposalList = ({
   daoClient,
   isAllInactive,
   showPassingOrFailing,
+  showPassedOrFailed,
   ...rest
 }: Props) => {
   const router = useRouter();
@@ -145,10 +147,27 @@ export const ProposalList = ({
         };
 
         const isPassing = () => {
-          if (!showPassingOrFailing) {
+          if (
+            !showPassingOrFailing ||
+            thresholdPercent === undefined ||
+            yesPercentage === undefined
+          ) {
             return undefined;
           }
           return thresholdPercent <= yesPercentage ? 'Passing' : 'Failing';
+        };
+
+        const hasPassed = () => {
+          if (!showPassedOrFailed) {
+            return undefined;
+          }
+          if (proposal.status === 'passed' || proposal.status === 'executed') {
+            return 'Passed';
+          }
+          if (proposal.status === 'failed' || proposal.status === 'rejected') {
+            return 'Failed';
+          }
+          return undefined;
         };
 
         return (
@@ -159,8 +178,8 @@ export const ProposalList = ({
               proposal.status === 'success_concluded' ||
               proposal.status === 'expired_concluded'
             }
-            label={isPassing()}
-            labelSuccess={isPassing() === 'Passing'}
+            label={isPassing() || hasPassed()}
+            labelSuccess={isPassing() === 'Passing' || hasPassed() === 'Passed'}
             votingDuration={votingDuration ?? '-'}
             key={proposal.id + proposal.description}
             title={proposal.title}
@@ -207,6 +226,18 @@ export const ProposalList = ({
       const target = threshold ? threshold.weight : 0;
       const propsalType = getGovProposalType(proposal);
 
+      const hasPassed = () => {
+        if (!showPassedOrFailed) {
+          return undefined;
+        }
+        if (proposal.status === 'passed' || proposal.status === 'executed') {
+          return 'Passed';
+        }
+        if (proposal.status === 'failed' || proposal.status === 'rejected') {
+          return 'Failed';
+        }
+        return undefined;
+      };
       return (
         <DaoProposalListItem
           showIsPassing={true}
@@ -226,8 +257,12 @@ export const ProposalList = ({
           }
           navigateToProposal={id => navigateToProposal(id, !!isGovList)}
           largeSize={!!goToDaoDetail}
-          label={isAllInactive ? formatString(proposal.status) : undefined}
-          labelSuccess={proposal.status === 'passed'}
+          label={hasPassed()}
+          labelSuccess={
+            proposal.status === 'passed' ||
+            proposal.status === 'executed' ||
+            hasPassed() === 'Passed'
+          }
           daoAddress={daoAddress}
           proposalId={proposal.id}
           onClickListItem={onClickListItem}
@@ -374,11 +409,14 @@ export const DaoProposalListItem = ({
   }, [votesQuery?.data?.votes]);
 
   const passing = useMemo(() => {
+    if (!votesQuery.data) {
+      return undefined;
+    }
     if (showIsPassing) {
       return yesPercentage >= threshold ? 'Passing' : 'Failing';
     }
     return undefined;
-  }, [yesPercentage, threshold, showIsPassing]);
+  }, [votesQuery.data, showIsPassing, yesPercentage, threshold]);
 
   const passingSuccess = useMemo(() => {
     return passing === 'Passing';

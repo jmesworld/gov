@@ -46,6 +46,10 @@ export type Actions =
       payload: Partial<Member>;
     }
   | {
+      type: 'SET_BALANCE';
+      payload: Balance;
+    }
+  | {
       type: 'REMOVE_MEMBER';
       payload: string;
     }
@@ -203,6 +207,11 @@ export function DAOProposalReducer(state: State, action: Actions): State {
         },
       };
     }
+    case 'SET_BALANCE':
+      return {
+        ...state,
+        balance: action.payload,
+      };
     case 'RESET':
       return action.payload;
     default:

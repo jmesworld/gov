@@ -14,6 +14,7 @@ import {
 import { useClipboardTimeout } from '../../../../hooks/useClipboard';
 
 type Props = {
+  removeCopy?:boolean
   client: IdentityserviceQueryClient;
   isReadOnly: boolean;
   name?: string;
@@ -43,6 +44,7 @@ export const MemberUpdate = memo(
     onErrorChange,
     onVotingPowerChange,
     onRemove,
+    removeCopy
   }: Props) => {
     const [copied, onCopy] = useClipboardTimeout();
     const [value, setValue] = useState<string>(name ?? '');
@@ -136,7 +138,7 @@ export const MemberUpdate = memo(
                 {!!address && !error && address}
                 {address === null && 'Not Found'}
               </Text>
-              {address && (
+              {address && !removeCopy && (
                 <Flex>
                   <Image
                     onClick={() => {

@@ -166,6 +166,7 @@ export const UpdateDirectories = ({
       {isLoading && <Spinner />}
       {membersArr.map(daoMember => (
         <MemberUpdate
+          removeCopy
           isReadOnly={false}
           key={daoMember.id}
           id={daoMember.id}

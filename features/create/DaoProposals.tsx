@@ -1,18 +1,16 @@
 import { useRouter } from 'next/router';
+import { Text } from '@chakra-ui/react';
 import { useDAOContext } from '../../contexts/DAOContext';
 import { useIdentityContext } from '../../contexts/IdentityContext';
-import { DAOProposalPage, ProposalTypes } from '../../features/Dao/DAOProposal';
-import { useRedirectToHomeForNoWalletConnected } from '../../hooks/Redirect';
+import { DAOProposalPage, ProposalTypes } from '../Dao/DAOProposal';
 
-const DAOProposal = () => {
+export const DAOProposal = () => {
   const router = useRouter();
   const { selectedDAO, setSelectedDAOByAddress } = useDAOContext();
   const { getIdentityName, address } = useIdentityContext();
 
-  const [Redirect] = useRedirectToHomeForNoWalletConnected();
-  if (Redirect) return Redirect;
   if (!selectedDAO) {
-    return 'no DAO selected';
+    return <Text>no DAO selected </Text>;
   }
   const selectedTab = (router.query.tab as ProposalTypes) ?? undefined;
 
@@ -31,5 +29,3 @@ const DAOProposal = () => {
     />
   );
 };
-
-export default DAOProposal;

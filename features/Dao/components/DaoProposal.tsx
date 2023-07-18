@@ -90,6 +90,14 @@ export default function DaoProposal({
     });
   }, [data]);
 
+  const executed = useMemo(() => {
+    return isInActive?.filter(el => el.status === 'executed');
+  }, [isInActive]);
+
+  const expired = useMemo(() => {
+    return isInActive?.filter(el => el.status !== 'executed');
+  }, [isInActive]);
+
   const proposals = useMemo(() => {
     const gov: ProposalResponseForEmpty[] = [];
     const daoPropsal: ProposalResponseForEmpty[] = [];
@@ -181,7 +189,7 @@ export default function DaoProposal({
               <BalanceDisplay asCard={false} address={daoAddress} />
             </Flex>
             <Flex flexDir="row" flexWrap="wrap" gap="2">
-              <Link href="/dao/proposals">
+              <Link href={`/dao/create/${daoName}/daoproposal`}>
                 <Button
                   rounded="full"
                   bg="purple"
@@ -199,7 +207,7 @@ export default function DaoProposal({
                   DAO Proposal
                 </Button>
               </Link>
-              <Link href="/proposals/create">
+              <Link href={`/dao/create/${daoName}/govproposal`}>
                 <Button
                   rounded="full"
                   bg="purple"
@@ -221,7 +229,7 @@ export default function DaoProposal({
         </Flex>
       </Flex>
       <Flex>
-        <Box flexGrow={1} minWidth="700px">
+        <Box flexGrow={1} minWidth="700px" overflow="auto">
           <Flex height={'20px'} />
 
           {proposals?.gov?.length > 0 && (
@@ -274,7 +282,7 @@ export default function DaoProposal({
             </Flex>
           )}
 
-          {isInActive?.length > 0 && (
+          {executed?.length > 0 && (
             <Flex flexDir="column">
               <Text
                 my="4"
@@ -283,14 +291,43 @@ export default function DaoProposal({
                 color="textPrimary.100"
                 mb="4"
               >
-                INACTIVE
+                EXECUTED
               </Text>
               <ProposalList
+                showPassedOrFailed
+                client={goverrnanceQueryClient}
+                daoName={daoName}
+                totalSupply={supply as number}
+                proposals={executed}
+                isGov={false}
+                daoAddress={daoAddress}
+                onClickListItem={() => {
+                  setDaoProposalDetailOpen(true);
+                }}
+                setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+                setSelectedProposalId={setSelectedProposalId}
+              />
+            </Flex>
+          )}
+
+          {executed?.length > 0 && (
+            <Flex flexDir="column">
+              <Text
+                my="4"
+                fontSize="xs"
+                autoCapitalize="all"
+                color="textPrimary.100"
+                mb="4"
+              >
+                EXPIRED
+              </Text>
+              <ProposalList
+                showPassedOrFailed
                 isAllInactive
                 client={goverrnanceQueryClient}
                 daoName={daoName}
                 totalSupply={supply as number}
-                proposals={isInActive}
+                proposals={expired}
                 isGov={false}
                 daoAddress={daoAddress}
                 onClickListItem={() => {
