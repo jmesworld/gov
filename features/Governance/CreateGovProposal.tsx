@@ -289,7 +289,6 @@ export default function CreateGovProposal({
         <Box width={'100%'} marginRight={'52px'} position="relative">
           {selectedProposalType === 'core-slot' && coreSlotsDisabled && (
             <Alert
-              bg="#ffe2ec"
               status="error"
               variant="subtle"
               flexDirection="column"
@@ -299,7 +298,7 @@ export default function CreateGovProposal({
               p="8"
               textAlign="center"
             >
-              <AlertIcon color="red" boxSize="40px" mr={0} />
+              <AlertIcon boxSize="40px" mr={0} />
               <AlertTitle mt={4} mb={1} fontSize="lg">
                 Membership Violation!
               </AlertTitle>
