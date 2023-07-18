@@ -46,7 +46,8 @@ export const ProposalType = ({
         fontFamily="DM Sans"
         marginLeft={'10px'}
       >
-        {label || getLabel(type)} {proposalDetail ? 'Proposal' : ''}
+        {label || getLabelForProposalTypes(type)}{' '}
+        {proposalDetail ? 'Proposal' : ''}
       </Text>
       <Spacer />
       {isActive ? <CheckIcon color={'green'} /> : ''}
@@ -54,20 +55,26 @@ export const ProposalType = ({
   );
 };
 
-const getLabel = (type: string) => {
+export const getLabelForProposalTypes = (type: string) => {
   switch (type) {
     case 'text':
       return 'Text';
     case 'core-slot':
+    case 'core_slot':
       return 'Core Slot';
     case 'revoke-proposal':
-      return 'Revoke';
+    case 'revoke_proposal':
+      return 'Revoke Core Slot';
     case 'improvement':
       return 'Improvement';
     case 'spend-funds':
-      return 'spend-funds';
+    case 'spend_funds':
+      return 'Spend funds';
     case 'feature-request':
+    case 'feature_request':
       return 'Feature Request';
+    case 'update_directors':
+      return 'Update Directores';
     default:
       return type;
   }
@@ -86,7 +93,7 @@ const getImgSrc = (type: string) => {
     case 'improvement':
       return '/Improvement_Type.svg';
     case 'spend-dao-funds':
-      return '/Spend_key.svg';
+      return '/Spend_Key.svg';
     case 'feature-request':
       return '/feature_request.svg';
     default:

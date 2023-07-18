@@ -174,3 +174,36 @@ export const parseMsg = (msg: string) => {
   }
   throw new Error('Invalid msg');
 };
+
+export const getDaoProposalType = (proposal: ProposalResponseForEmpty) => {
+  const msgs = proposal.msgs;
+
+  if (!msgs) {
+    return null;
+  }
+
+  const msg = msgs[0];
+  if (!msg) {
+    return 'text';
+  }
+
+  if ('bank' in msg) {
+    return 'spend_funds';
+  }
+
+  if ('wasm' in msg) {
+    const wasm = msg.wasm;
+    if ('execute' in wasm) {
+      const execute = wasm.execute;
+      if ('msg' in execute) {
+        const msg = execute.msg;
+        const parsedMsg = fromBase64ToString<object>(msg);
+        if (parsedMsg && 'update_members' in parsedMsg) {
+          return 'update_directors';
+        }
+      }
+    }
+  }
+
+  return null;
+};

@@ -48,11 +48,12 @@ const fee: StdFee = {
   gas: '10000000',
 };
 
+const defaultThreshold = 100;
 const initialState: State = {
   ownerId: '',
   members: {},
   daoName: '',
-  threshold: 100,
+  threshold: defaultThreshold,
 };
 
 const leaveModalTitle =
@@ -78,9 +79,12 @@ const CreateDaoNewForm = ({
 
   const isDirty = useMemo(() => {
     return (
-      daoName !== '' || threshold !== 1 || Object.values(members).length > 1
+      daoName !== '' ||
+      threshold !== defaultThreshold ||
+      Object.values(members).length > 1
     );
   }, [daoName, members, threshold]);
+
   const [setRouterCheck, navigate] = useLeaveConfirm({
     preventNavigatingAway: isDirty && !isCreatingDao,
     title: leaveModalTitle,
@@ -217,20 +221,10 @@ const CreateDaoNewForm = ({
     [dispatch],
   );
 
-  const individualGreeterThanThreshold = useMemo(() => {
-    let thereIsError = false;
-    membersArr.forEach(member => {
-      if (thereIsError) {
-        return;
-      }
-      if (member?.votingPower && member.votingPower > threshold) {
-        thereIsError = true;
-      }
-    });
-    return thereIsError;
-  }, [membersArr, threshold]);
-
   const formHasErrors = useMemo(() => {
+    if (!daoName) {
+      return true;
+    }
     if (!threshold) {
       return true;
     }
@@ -255,7 +249,14 @@ const CreateDaoNewForm = ({
       }
     });
     return thereIsError || totalVotingPower < 100 || totalVotingPower > 100;
-  }, [daoNameError, duplicateNames, membersArr, threshold, totalVotingPower]);
+  }, [
+    daoName,
+    daoNameError,
+    duplicateNames,
+    membersArr,
+    threshold,
+    totalVotingPower,
+  ]);
   return (
     <Box width={'100%'} pb="4">
       <Box width="70%">
@@ -582,15 +583,6 @@ const CreateDaoNewForm = ({
         alignItems={'center'}
         width={'100%'}
       >
-        <Text
-          color="red"
-          fontFamily="DM Sans"
-          fontSize={14}
-          fontWeight="normal"
-        >
-          {individualGreeterThanThreshold &&
-            'Individual Share of Votes must not exceed % to Pass'}
-        </Text>
         <Spacer />
         <Button
           width={'99px'}

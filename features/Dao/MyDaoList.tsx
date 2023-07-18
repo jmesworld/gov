@@ -86,13 +86,7 @@ const MyDaoList = () => {
                       e.preventDefault();
                     }
                     if (router.route === '/dao/create/[...id]') {
-                      const queryKey = router.query.id;
-                      const proposalKey =
-                        Array.isArray(queryKey) && queryKey?.[1];
-                      if (proposalKey) {
-                        router.push(`/dao/create/${dao.name}/${proposalKey}`);
-                        e.preventDefault();
-                      }
+                      e.preventDefault();
                     }
                     if (router.route === '/proposals/create') {
                       e.preventDefault();

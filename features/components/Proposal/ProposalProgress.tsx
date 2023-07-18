@@ -45,6 +45,8 @@ export const ProposalProgress = ({
             width={'65px'}
             textOverflow="ellipsis"
             textAlign={'left'}
+            whiteSpace="pre"
+            overflow="hidden"
           >
             <Box as="span" display="inline-block" width="30px">
               Yes
@@ -77,6 +79,8 @@ export const ProposalProgress = ({
             opacity={yesPercent > noPercent ? '0.5' : '1'}
             width={'65px'}
             textAlign={'left'}
+            whiteSpace="pre"
+            overflow="hidden"
           >
             <Box as="span" display="inline-block" width="30px">
               No
