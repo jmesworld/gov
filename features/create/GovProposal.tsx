@@ -1,15 +1,12 @@
 import { useAppState } from '../../contexts/AppStateContext';
 import { useDAOContext } from '../../contexts/DAOContext';
-import CreateGovProposal from '../../features/Governance/CreateGovProposal';
-import { useRedirectToHomeForNoWalletConnected } from '../../hooks/Redirect';
+import CreateGovProposal from '../Governance/CreateGovProposal';
 
-const ProposalCreate = () => {
+export const GovProposalCreate = () => {
   const { setCreateGovProposalSelected } = useAppState();
 
   const { selectedDAO } = useDAOContext();
 
-  const [Redirect] = useRedirectToHomeForNoWalletConnected();
-  if (Redirect) return Redirect;
   return (
     <CreateGovProposal
       selectedDao={selectedDAO?.address}
@@ -18,5 +15,3 @@ const ProposalCreate = () => {
     />
   );
 };
-
-export default ProposalCreate;

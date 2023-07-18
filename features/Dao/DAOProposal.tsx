@@ -36,6 +36,7 @@ import { ConfigResponse } from '../../client/DaoMultisig.types';
 import * as MultisigClientType from '../../client/DaoMultisig.types';
 import { toBase64 } from '../../utils/identity';
 import { Link } from '../components/genial/Link';
+import { useAccountBalance } from '../../hooks/useAccountBalance';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -93,6 +94,7 @@ export const DAOProposalPage = ({
   daoAddress: string;
   selectedDaoName: string;
 }) => {
+  const { data: daoBalance } = useAccountBalance(daoAddress, 5 * 1000);
   const { address } = useIdentityContext();
   const [err, setErr] = useState<string[] | undefined>([]);
   const [creatingProposal, setIsCreatingProposal] = useState(false);
@@ -117,6 +119,19 @@ export const DAOProposalPage = ({
       ),
     [cosmWasmClient],
   );
+
+  useEffect(() => {
+    if (!daoBalance || !daoBalance.jmes) {
+      return;
+    }
+
+    dispatch({
+      type: 'SET_BALANCE',
+      payload: {
+        jmes: daoBalance.jmes.amount.dividedBy(1e6).toNumber().toString(),
+      },
+    });
+  }, [daoBalance]);
 
   const isDirty = useMemo(() => {
     const { title, description, members, spends } = state;

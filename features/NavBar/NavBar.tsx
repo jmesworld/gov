@@ -121,7 +121,8 @@ const NavBar = ({
           disabled={
             status !== WalletStatus.Connected ||
             !identityName ||
-            router.asPath === '/dao/create'
+            router.asPath === '/dao/create' ||
+            router.route === '/dao/create/[...id]'
           }
         />
       </Link>

@@ -8,6 +8,9 @@ import { useIdentityContext } from '../../contexts/IdentityContext';
 
 const MyDaoList = () => {
   const router = useRouter();
+  const queryId = router.query.id;
+  const daoName = Array.isArray(queryId) && queryId?.[0];
+
   const { daos, setSelectedDAOByName, loading, firstLoad, selectedDAO } =
     useDAOContext();
   const { address } = useIdentityContext();
@@ -33,57 +36,76 @@ const MyDaoList = () => {
 
   return (
     <>
-      {daos?.map(dao => (
-        <Tooltip
-          key={dao.name}
-          closeOnClick={true}
-          hasArrow={true}
-          shouldWrapChildren={true}
-          closeOnScroll={true}
-          closeOnEsc={true}
-          openDelay={500}
-          label={dao.name}
-        >
-          <Link.withStatus
+      {daos?.map(dao => {
+        return (
+          <Tooltip
             key={dao.name}
-            matchFunc={route => {
-              if (route.pathname === '/dao/view/[...id]') {
-                const ids = route.query?.id;
-                return ids?.[0] === dao.name;
-              }
-              if (route.pathname === '/proposals/create') {
-                return selectedDAO?.address === dao.address;
-              }
-              if (router.pathname === '/dao/proposals') {
-                return selectedDAO?.address === dao.address;
-              }
-              return false;
-            }}
-            href={`/dao/view/${dao.name}`}
+            closeOnClick={true}
+            hasArrow={true}
+            shouldWrapChildren={true}
+            closeOnScroll={true}
+            closeOnEsc={true}
+            openDelay={500}
+            label={dao.name}
           >
-            {({ isActive }) => (
-              <NavBarItem
-                inActive={router.route === '/dao/create'}
-                key={dao.name}
-                text={dao.name}
-                isSelected={isActive}
-                onClick={e => {
-                  if (router.route === '/dao/create') {
-                    e.preventDefault();
+            <Link.withStatus
+              key={dao.name}
+              matchFunc={route => {
+                if (route.pathname === '/dao/view/[...id]') {
+                  const ids = route.query?.id;
+                  return ids?.[0] === dao.name;
+                }
+                if (route.pathname === '/proposals/create') {
+                  return selectedDAO?.address === dao.address;
+                }
+                if (route.route === '/dao/create/[...id]') {
+                  const queryId = router.query.id;
+                  const daoName = Array.isArray(queryId) && queryId?.[0];
+                  if (daoName) {
+                    return daoName === dao.name;
                   }
-                  if (router.route === '/proposals/create') {
-                    e.preventDefault();
+                  return false;
+                }
+
+                return false;
+              }}
+              href={`/dao/view/${dao.name}`}
+            >
+              {({ isActive }) => (
+                <NavBarItem
+                  inActive={
+                    router.route === '/dao/create' ||
+                    (router.route === '/dao/create/[...id]' &&
+                      daoName !== dao.name)
                   }
-                  if (router.route === '/dao/proposals') {
-                    e.preventDefault();
-                  }
-                  setSelectedDAOByName(dao.name);
-                }}
-              />
-            )}
-          </Link.withStatus>
-        </Tooltip>
-      ))}
+                  key={dao.name}
+                  text={dao.name}
+                  isSelected={isActive}
+                  onClick={e => {
+                    if (router.route === '/dao/create') {
+                      e.preventDefault();
+                    }
+                    if (router.route === '/dao/create/[...id]') {
+                      const queryKey = router.query.id;
+                      const proposalKey =
+                        Array.isArray(queryKey) && queryKey?.[1];
+                      if (proposalKey) {
+                        router.push(`/dao/create/${dao.name}/${proposalKey}`);
+                        e.preventDefault();
+                      }
+                    }
+                    if (router.route === '/proposals/create') {
+                      e.preventDefault();
+                    }
+
+                    setSelectedDAOByName(dao.name);
+                  }}
+                />
+              )}
+            </Link.withStatus>
+          </Tooltip>
+        );
+      })}
       <Flex height={'20px'} />
     </>
   );

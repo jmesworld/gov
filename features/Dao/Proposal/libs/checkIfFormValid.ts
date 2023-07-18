@@ -52,6 +52,24 @@ export const validateForm = (
     const spendHasIssue = spendsArr.some(
       spend => !spend.amount || !spend.name || !spend.address || spend.error,
     );
+
+    const spendsTotal = spendsArr.reduce((acc, curr) => {
+      acc += curr.amount || 0;
+      return acc;
+    }, 0);
+    if (!state.balance || !state.balance.jmes) {
+      errors.push('No balance found');
+    }
+
+    if (
+      (state.balance &&
+        state.balance.jmes &&
+        spendsTotal > Number(state.balance.jmes)) ||
+      0
+    ) {
+      errors.push('No enough balance to send');
+    }
+
     if (spendHasIssue) {
       errors.push('Please correct Address field you want to send to');
     }

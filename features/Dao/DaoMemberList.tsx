@@ -17,6 +17,7 @@ import { IdentityserviceQueryClient } from '../../client/Identityservice.client'
 import { useIdentityserviceGetIdentityByOwnerQuery } from '../../client/Identityservice.react-query';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { useClipboardTimeout } from '../../hooks/useClipboard';
+import { VoterDetail } from '../../client/DaoMultisig.types';
 // FIXME: fix this
 
 const IDENTITY_SERVICE_CONTRACT = process.env
@@ -76,26 +77,25 @@ export const MembersList = ({
   setSelectedDaoMembersList,
 }: {
   // TODO: fix ts type
-  members: any;
+  members: VoterDetail[];
   setSelectedDaoMembersList: Function;
 }) => {
-  const totalWeight = members?.reduce(
-    (acc: any, o: any) => acc + parseInt(o.weight),
-    0,
-  );
+  const totalWeight = members?.reduce((acc, o) => acc + o.weight, 0);
 
-  const membersList = members?.map((member: any) => {
-    const weight = member.weight;
-    return (
-      <DaoMembersListItem
-        key={member.addr}
-        address={member.addr}
-        weightPercent={(weight / totalWeight) * 100}
-        members={members}
-        setSelectedDaoMembersList={setSelectedDaoMembersList}
-      />
-    );
-  });
+  const membersList = members
+    ?.sort((a, b) => a.weight - b.weight)
+    .map(member => {
+      const weight = member.weight;
+      return (
+        <DaoMembersListItem
+          key={member.addr}
+          address={member.addr}
+          weightPercent={(weight / totalWeight) * 100}
+          members={members}
+          setSelectedDaoMembersList={setSelectedDaoMembersList}
+        />
+      );
+    });
 
   return <ul>{membersList}</ul>;
 };

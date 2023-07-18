@@ -291,7 +291,9 @@ export default function CreateGovProposal({
                 Please change the DAO membership to comply with the membership
                 rules
               </Text>
-              <Link href="/dao/proposals?tab=update-directories">
+              <Link
+                href={`/dao/create/${selectedDaoName}/daoproposal?tab=update-directories`}
+              >
                 <Button variant="purple">Change</Button>
               </Link>
             </Flex>

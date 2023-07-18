@@ -1,5 +1,5 @@
 import { ReactElement } from 'react';
-import { Box, Container, Flex, useBreakpointValue } from '@chakra-ui/react';
+import { Box, Container, Flex } from '@chakra-ui/react';
 import MobileViewDisabled from '../features/Onboarding/components/MobileViewDisabled';
 import { Header, NavBar } from '../features';
 import { useChain } from '@cosmos-kit/react';
@@ -7,15 +7,15 @@ import { chainName } from '../config/defaults';
 import { useAppState } from '../contexts/AppStateContext';
 import { useIdentityContext } from '../contexts/IdentityContext';
 import { ErrorBoundary } from '../error/errorBondary';
+import { useIsViewportMobile } from '../hooks/useIsMobile';
 
 export const Layout = ({ children }: { children: ReactElement }) => {
-  const isMobileView = useBreakpointValue({ base: true, md: false });
+  const [isMobileView] = useIsViewportMobile();
   const { address, status } = useChain(chainName);
   const { getIdentityName } = useIdentityContext();
 
   const { selectedDao, setSelectedDao, selectedDaoName, setSelectedDaoName } =
     useAppState();
-
   if (isMobileView) {
     return <MobileViewDisabled />;
   }
