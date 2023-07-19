@@ -106,7 +106,9 @@ export const ProposalProgress = ({
       >
         <Box
           position={'absolute'}
-          left={'calc(' + targetPercentage + '% - 13px)'}
+          left={`calc( ${
+            targetPercentage > 100 ? 100 : targetPercentage
+          }% - 13px)`}
           top={0}
           bottom={0}
           width={'26px'}

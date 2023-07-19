@@ -126,7 +126,7 @@ export const ProposalList = ({
         } = calculateVotes({
           coin_Yes: proposal?.coins_yes,
           coin_no: proposal?.coins_no,
-          totalSupply: supply as number,
+          totalSupply: (Number(proposal?.coins_total) || 0) / 1e6 ?? 0,
         });
         const propType = JSON.stringify(proposal?.prop_type)
           ?.split(':')?.[0]
