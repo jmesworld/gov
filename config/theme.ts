@@ -4,7 +4,7 @@ const config: ThemeConfig = {
   initialColorMode: 'light',
   useSystemColorMode: false,
 };
-
+import { alertTheme } from './Alert';
 export const defaultThemeObject = {
   config,
 
@@ -61,6 +61,7 @@ export const defaultThemeObject = {
     largeSoft: 'rgba(60, 64, 67, 0.15) 0px 2px 10px 6px;',
   },
   components: {
+    Alert: alertTheme,
     Button: {
       variants: {
         purple: {

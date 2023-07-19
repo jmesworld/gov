@@ -87,28 +87,6 @@ const SpendDaoFundsForm = ({
   );
   const [proposalTitle, setProposalTitle] = useState('');
   const [proposalDescription, setProposalDescription] = useState('');
-  // useEffect(() => {
-  //   if (address) {
-  //     console.log("update");
-  //     getCosmWasmClient()
-  //       .then((cosmWasmClient) => {
-  //         if (!cosmWasmClient) {
-  //           return;
-  //         }
-  //         setCosmWasmClient(cosmWasmClient);
-  //       })
-  //       .catch((error) => console.log(error));
-
-  //     getSigningCosmWasmClient()
-  //       .then((signingClient) => {
-  //         if (!signingClient) {
-  //           return;
-  //         }
-  //         setSigningClient(signingClient);
-  //       })
-  //       .catch((error) => console.log(error));
-  //   }
-  // }, [address, getCosmWasmClient, getSigningCosmWasmClient]);
 
   const validationResult = validateName(daoName);
   const isDaoNameValid = !validationResult?.name;
@@ -520,12 +498,9 @@ const SpendDaoFundsForm = ({
                     description:
                       "We've created your Dao for you. You'll be able to access it shortly.",
                     status: 'success',
+                    variant: 'custom',
                     duration: 9000,
                     isClosable: true,
-                    containerStyle: {
-                      backgroundColor: 'darkPurple',
-                      borderRadius: 12,
-                    },
                   });
                 })
                 .catch(error => {
@@ -533,12 +508,9 @@ const SpendDaoFundsForm = ({
                     title: 'Dao creation error',
                     description: error.toString(),
                     status: 'error',
+                    variant: 'custom',
                     duration: 9000,
                     isClosable: true,
-                    containerStyle: {
-                      backgroundColor: 'red',
-                      borderRadius: 12,
-                    },
                   });
                 })
                 .finally(() => setIsCreatingDao(false));

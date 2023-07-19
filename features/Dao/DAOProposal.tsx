@@ -444,6 +444,8 @@ export const DAOProposalPage = ({
                   null;
                 toast({
                   status: 'success',
+                  variant: 'custom',
+                  isClosable: true,
                   title: 'Created Dao Proposal',
                 });
                 dispatch({
@@ -456,6 +458,8 @@ export const DAOProposalPage = ({
                 if (err instanceof Error) {
                   toast({
                     status: 'error',
+                    variant: 'custom',
+                    isClosable: true,
                     title: err.message,
                   });
                 }

@@ -545,12 +545,9 @@ const CreateDaoForm = ({
                   description:
                     "We've created your Dao for you. You'll be able to access it shortly.",
                   status: 'success',
+                  variant: 'custom',
                   duration: 9000,
                   isClosable: true,
-                  containerStyle: {
-                    backgroundColor: 'darkPurple',
-                    borderRadius: 12,
-                  },
                 });
               })
               .catch(error => {
@@ -558,12 +555,9 @@ const CreateDaoForm = ({
                   title: 'Dao creation error',
                   description: error.toString(),
                   status: 'error',
+                  variant: 'custom',
                   duration: 9000,
                   isClosable: true,
-                  containerStyle: {
-                    backgroundColor: 'red',
-                    borderRadius: 12,
-                  },
                 });
               })
               .finally(() => setIsCreatingDao(false));

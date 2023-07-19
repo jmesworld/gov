@@ -122,12 +122,9 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
           title: 'Identity created.',
           description: "We've created your Identity for you.",
           status: 'success',
+          variant: 'custom',
           duration: 9000,
           isClosable: true,
-          containerStyle: {
-            backgroundColor: 'darkPurple',
-            borderRadius: 12,
-          },
         });
         closeView?.();
       })
@@ -136,12 +133,9 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
           title: 'Identity creation error',
           description: error.toString(),
           status: 'error',
+          variant: 'custom',
           duration: 9000,
           isClosable: true,
-          containerStyle: {
-            backgroundColor: 'red',
-            borderRadius: 12,
-          },
         });
       })
       .finally(() => setIsCreatingIdentity(false));

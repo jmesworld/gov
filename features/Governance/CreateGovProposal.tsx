@@ -783,12 +783,9 @@ export default function CreateGovProposal({
                         title: 'Proposal created.',
                         description: "We've created your Proposal.",
                         status: 'success',
+                        variant: 'custom',
                         duration: 9000,
                         isClosable: true,
-                        containerStyle: {
-                          backgroundColor: 'darkPurple',
-                          borderRadius: 12,
-                        },
                       });
                       restForm();
                       navigate(`/dao/view/${selectedDaoName}`);
@@ -798,12 +795,9 @@ export default function CreateGovProposal({
                           title: 'Proposal creation error',
                           description: err.toString(),
                           status: 'error',
+                          variant: 'custom',
                           duration: 9000,
                           isClosable: true,
-                          containerStyle: {
-                            backgroundColor: 'red',
-                            borderRadius: 12,
-                          },
                         });
                       }
                     }

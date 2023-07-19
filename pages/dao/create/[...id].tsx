@@ -4,16 +4,18 @@ import { DAOProposal } from '../../../features/create/DaoProposals';
 import { GovProposalCreate } from '../../../features/create/GovProposal';
 import { useRedirectToHomeForNoWalletConnected } from '../../../hooks/Redirect';
 import { useDAOContext } from '../../../contexts/DAOContext';
+import { useIdentityContext } from '../../../contexts/IdentityContext';
 
 const CreateProposal = () => {
   const router = useRouter();
+  const { address } = useIdentityContext();
   const { setSelectedDAOByName, getSelectedDAOByName, firstLoad } =
     useDAOContext();
 
   const id = router?.query.id;
   const [Redirect] = useRedirectToHomeForNoWalletConnected();
   if (Redirect) return Redirect;
-  if (firstLoad) {
+  if (firstLoad && address) {
     return (
       <Flex alignItems="center" justifyContent="center" h="full" w="full">
         <Spinner size="lg" color="purple" mr="2" />
