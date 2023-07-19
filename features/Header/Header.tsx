@@ -1,4 +1,4 @@
-import { Flex, Skeleton, Spacer, Spinner } from '@chakra-ui/react';
+import { Flex, Spacer } from '@chakra-ui/react';
 
 import Wallet from '../Wallet/Wallet';
 import PeriodInfo from './components/PeriodInfo';

@@ -5,7 +5,6 @@ import {
   Text,
   Spacer,
   Image,
-  Spinner,
   Skeleton,
 } from '@chakra-ui/react';
 import { Dispatch, SetStateAction } from 'react';

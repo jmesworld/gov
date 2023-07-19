@@ -1,4 +1,4 @@
-import { Flex, Skeleton, Spinner, Text, Tooltip } from '@chakra-ui/react';
+import { Flex, Skeleton, Text, Tooltip } from '@chakra-ui/react';
 import {
   formatBalance,
   useAccountBalance,
