@@ -1,17 +1,23 @@
-import { Text, Box, Image, Spinner, Alert } from '@chakra-ui/react';
+import { Text, Box, Image, Spinner, Alert, Tooltip } from '@chakra-ui/react';
 import { Core } from 'jmes';
+import {
+  formatBalance,
+  formatBalanceWithComma,
+} from '../../hooks/useAccountBalance';
 
 interface ValidatorProps {
   validatorsData?: Core.Validator[];
   selectedValidator: string | null;
   onSelectValidator: (id: string | null) => void;
   error: Error | undefined;
+  validatorsMap: Map<string, Core.Validator> | null;
   loading: boolean;
 }
 export const DelegateValidatorTable = ({
   validatorsData,
   onSelectValidator,
   selectedValidator,
+  validatorsMap,
   error,
   loading,
 }: ValidatorProps) => {
@@ -81,6 +87,7 @@ export const DelegateValidatorTable = ({
       {loading && <Spinner size="sm" />}
       {validatorsData?.map(validator => {
         const id = validator.operator_address;
+        const validatorCoreData = validatorsMap?.get(id);
         return (
           <Box
             key={id}
@@ -115,16 +122,24 @@ export const DelegateValidatorTable = ({
                 .toString()}
               %
             </Text>
-            <Text
-              color="#fff"
-              fontFamily={'DM Sans'}
-              fontWeight="500"
-              fontSize={12}
-              lineHeight="20px"
-              width="30%"
+            <Tooltip
+              label={formatBalanceWithComma(
+                validatorCoreData?.tokens.dividedBy(1e6).toNumber() || 0,
+              )}
             >
-              {/* {validator.commission.}% */}
-            </Text>
+              <Text
+                color="#fff"
+                fontFamily={'DM Sans'}
+                fontWeight="500"
+                fontSize={12}
+                lineHeight="20px"
+                width="30%"
+              >
+                {formatBalance(
+                  validatorCoreData?.delegator_shares.dividedBy(1e6).toNumber(),
+                )}
+              </Text>
+            </Tooltip>
             {validator.description.website && (
               <Box width="4%">
                 <a

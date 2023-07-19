@@ -248,7 +248,6 @@ export const ProposalList = ({
       const propsalType = getGovProposalType(proposal);
       const daoProposalType = getDaoProposalType(proposal);
       const slotType = getSlotType({ proposal });
-      console.log('slotType', slotType, propsalType.proposalType);
       const hasPassed = () => {
         if (!showPassedOrFailed) {
           return undefined;

@@ -167,6 +167,7 @@ const AddTokensCard = () => {
                           title: 'Copied to clipboard',
                           description: '',
                           status: 'success',
+                          variant: 'custom',
                           duration: 1000,
                         });
                       }}

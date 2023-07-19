@@ -38,14 +38,6 @@ export const ProposalHeader = ({
         >
           Voting ends {convertTimestamp(proposalExpiry)} UTC
         </Text>
-        <Tooltip label="Info">
-          <Image
-            src="/tooltip.svg"
-            alt="Info"
-            width={'13.33px'}
-            height={'13.33px'}
-          ></Image>
-        </Tooltip>
       </HStack>
     </Flex>
   );

@@ -8,8 +8,14 @@ import {
   Td,
   Tbody,
   Spinner,
+  Tooltip,
 } from '@chakra-ui/react';
 import { UnbondingDelegation } from 'jmes/build/Client/providers/LCDClient/core';
+import {
+  formatBalance,
+  formatBalanceWithComma,
+} from '../../hooks/useAccountBalance';
+import moment from 'moment';
 
 type Props = {
   unBondingsData?: UnbondingDelegation[];
@@ -65,37 +71,40 @@ export const DelegateUnbondingTable = ({
         <Tbody>
           {isLoadingUnBondings && <Spinner size="sm" color="white" />}
           {unBondingsData?.map(el => (
-            <Tr
-              key={el.validator_address}
-              borderTop="1px solid rgba(255, 255, 255, 0.12)"
-            >
-              <Td paddingLeft={0}>
-                <Text
-                  fontFamily={'DM Sans'}
-                  fontWeight="500"
-                  fontSize={14}
-                  lineHeight="20px"
-                >
-                  {el.entries.map(a => (
-                    <p key={a.completion_time.toString()}>
-                      {' '}
-                      {a.balance.toString()}{' '}
-                    </p>
-                  ))}
-                </Text>
-              </Td>
-              <Td paddingRight={0}>
-                <Text
-                  fontFamily={'DM Sans'}
-                  fontWeight="500"
-                  fontSize={14}
-                  lineHeight="20px"
-                  textAlign="right"
-                >
-                  23h:34m
-                </Text>
-              </Td>
-            </Tr>
+            <>
+              {el.entries.map(a => (
+                <Tr key={a.creation_height}>
+                  <Td px="0">
+                    <Tooltip
+                      hasArrow
+                      label={formatBalanceWithComma(
+                        a.balance.dividedBy(1e6).toDecimalPlaces(6).toNumber(),
+                      )}
+                    >
+                      <Text
+                        fontFamily={'DM Sans'}
+                        fontWeight="500"
+                        fontSize={12}
+                        lineHeight="20px"
+                        key={a.completion_time.toString()}
+                      >
+                        {formatBalance(a.balance.dividedBy(1e6).toNumber())}
+                      </Text>
+                    </Tooltip>
+                  </Td>
+                  <Td textAlign="right" px="0">
+                    <Text
+                      fontFamily={'DM Sans'}
+                      fontWeight="500"
+                      fontSize={12}
+                      lineHeight="20px"
+                    >
+                      {moment(a.completion_time).fromNow()}
+                    </Text>
+                  </Td>
+                </Tr>
+              ))}
+            </>
           ))}
         </Tbody>
       </Table>

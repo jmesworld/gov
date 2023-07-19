@@ -146,6 +146,8 @@ export default function GovProposalDetail({
         title: 'Concluded Vote',
         description: "We've concluded the vote.",
         status: 'success',
+        variant: 'custom',
+        isClosable: true,
       });
       setConcluding(false);
     } catch (err) {
@@ -154,6 +156,8 @@ export default function GovProposalDetail({
           title: 'Error',
           description: err.message,
           status: 'error',
+          variant: 'custom',
+          isClosable: true,
         });
     }
     setConcluding(false);

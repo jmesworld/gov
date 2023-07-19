@@ -108,12 +108,13 @@ export const ConnectedWalletButton = ({
               whiteSpace="nowrap"
               overflow="hidden"
               textOverflow="ellipsis"
-              maxW={'100px'}
+              maxW={'120px'}
             >
               {identityName ? identityName : address}
             </Text>
           </Tooltip>
-          {(mouseEnter || copied) && (
+
+          {mouseEnter || copied ? (
             <Tooltip
               isOpen={copied || undefined}
               label={copied ? '✅ Copied Address' : 'Copy  address'}
@@ -139,6 +140,8 @@ export const ConnectedWalletButton = ({
                 }}
               />
             </Tooltip>
+          ) : (
+            <Flex width={'16px'} height={'16px'} marginLeft="4px" />
           )}
           <Spacer marginLeft={'13px'} />
           <Tooltip

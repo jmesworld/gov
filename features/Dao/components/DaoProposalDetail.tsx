@@ -80,7 +80,6 @@ export default function DaoProposalDetail({
       refetchInterval: 1000,
     },
   });
-
   const votesQuery = useDaoMultisigListVotesQuery({
     client: daoMultisigQueryClient,
     args: { proposalId: selectedDaoProposalId },
@@ -240,6 +239,7 @@ export default function DaoProposalDetail({
           </Box>
           <VStack width="330px" spacing="30px" align="flex-start">
             <ProposalMyVote
+              disableExcuteTooltip="To execute, please wait until the posting period starts."
               refetch={proposalDetailQuery.refetch}
               hideExecute={!(status !== 'executed' && target <= yesPercentage)}
               disableExecute={!!isGov && !isPostingPeriod}

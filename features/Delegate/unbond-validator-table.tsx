@@ -1,5 +1,9 @@
-import { Text, Box, Spinner, Alert } from '@chakra-ui/react';
+import { Text, Box, Spinner, Alert, Tooltip } from '@chakra-ui/react';
 import { Core } from 'jmes';
+import {
+  formatBalance,
+  formatBalanceWithComma,
+} from '../../hooks/useAccountBalance';
 
 interface ValidatorProps {
   validatorsMap: Map<string, Core.Validator> | null;
@@ -98,16 +102,28 @@ export const UnBondValidatorTable = ({
               {validatorsMap?.get(validator.validator_address)?.description
                 ?.moniker ?? validator.validator_address}
             </Text>
-            <Text
-              color="#fff"
-              fontFamily={'DM Sans'}
-              fontWeight="500"
-              fontSize={12}
-              lineHeight="20px"
-              width="46%"
+            <Tooltip
+              placement="bottom-start"
+              hasArrow
+              label={formatBalanceWithComma(
+                validator.balance.amount
+                  .dividedBy(1e6)
+                  .toDecimalPlaces(6)
+                  .toNumber(),
+              )}
             >
-              {validator.balance.toString()}
-            </Text>
+              <Text
+                color="#fff"
+                fontFamily={'DM Sans'}
+                fontWeight="500"
+                fontSize={12}
+                lineHeight="20px"
+              >
+                {formatBalance(
+                  validator.balance.amount.dividedBy(1e6).toNumber(),
+                )}
+              </Text>
+            </Tooltip>
             {/* {validator.description.website && (
               <Box width="4%">
                 <a

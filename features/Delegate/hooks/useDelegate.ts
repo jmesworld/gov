@@ -27,11 +27,11 @@ export const useDelegate = () => {
   const { signingCosmWasmClient } = useSigningCosmWasmClientContext();
   const { balance, refresh } = useBalanceContext();
   const totalJmes = useMemo(
-    () => Number(balance?.jmes.toFixed(0) ?? 0),
+    () => parseInt((balance?.jmes ?? 0).toString() ?? 0),
     [balance?.jmes],
   );
   const totalBondedJmes = useMemo(
-    () => Number((balance?.bJmes ?? 0).toFixed(0) ?? 0),
+    () => parseInt((balance?.bJmes ?? 0).toString() ?? 0),
     [balance?.bJmes],
   );
 
@@ -116,9 +116,9 @@ export const useDelegate = () => {
         : jmesValue - totalJmes;
       return {
         ...p,
-        jmesValue: Number(jmesValue.toFixed(0)),
-        bJmesValue: Number(bJmesValue.toFixed(0)),
-        valueToMove: Number(value.toFixed(0)),
+        jmesValue: parseInt(jmesValue.toString()),
+        bJmesValue: parseInt(bJmesValue.toString()),
+        valueToMove: parseInt(value.toString()),
         sliderValue,
       };
     });
@@ -203,6 +203,7 @@ export const useDelegate = () => {
         }, please fix the issues!`,
         duration: 4000,
         status: 'error',
+        variant: 'custom',
       });
       return;
     }
@@ -225,8 +226,10 @@ export const useDelegate = () => {
         );
 
         toast({
-          title: 'Delegated Token ',
+          title: 'Bonded Tokens',
           status: 'success',
+          variant: 'custom',
+          isClosable: true,
         });
       } else {
         if (!selectedUnBonding) {
@@ -241,8 +244,10 @@ export const useDelegate = () => {
           'auto',
         );
         toast({
-          title: 'UnDelegated Token ',
-          status: 'success'
+          title: 'Unbonded Tokens',
+          status: 'success',
+          isClosable: true,
+          variant: 'custom',
         });
       }
       await refetchMyUnBondingsValidators();
@@ -252,6 +257,8 @@ export const useDelegate = () => {
       if (err instanceof Error)
         toast({
           status: 'error',
+          variant: 'custom',
+          isClosable: true,
           title: err.message,
         });
     }

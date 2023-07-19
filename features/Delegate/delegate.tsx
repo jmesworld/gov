@@ -31,13 +31,15 @@ import { DelegateValidatorTable } from './delegate-validator-table';
 // import { validatorsData } from './mock/validator';
 import { useDelegate } from './hooks/useDelegate';
 import { UnBondValidatorTable } from './unbond-validator-table';
+import { useIdentityContext } from '../../contexts/IdentityContext';
 
 type Props = {
   onClose: () => void;
 };
 
 export const Delegate = ({ onClose }: Props) => {
-  const [tabIndex, setTabIndex] = useState<number>(1);
+  const { address } = useIdentityContext();
+  const [tabIndex, setTabIndex] = useState<number>(0);
   const {
     toggleBonding,
     onChangeSlider,
@@ -79,6 +81,10 @@ export const Delegate = ({ onClose }: Props) => {
   const handleTabsChange = (index: number) => {
     setTabIndex(index);
   };
+  if (!address) {
+    onClose();
+    return null;
+  }
 
   return (
     <>
@@ -127,7 +133,7 @@ export const Delegate = ({ onClose }: Props) => {
                       textAlign="center"
                       marginBottom="12px"
                     >
-                      {bonding ? 'From' : 'To'}
+                      {bonding ? 'from' : 'to'}
                     </Text>
                     <Box
                       width="200px"
@@ -192,8 +198,9 @@ export const Delegate = ({ onClose }: Props) => {
                   </Box>
                   <Box marginTop="44px">
                     <Tooltip
+                      hasArrow
                       label={
-                        'Click to change to ' + (bonding ? 'unBond' : 'Bond')
+                        'Click to change to ' + (bonding ? 'Unbond' : 'Bond')
                       }
                     >
                       <Flex
@@ -203,7 +210,10 @@ export const Delegate = ({ onClose }: Props) => {
                         background={bonding ? 'green' : 'lilac'}
                         justifyContent="center"
                         alignItems="center"
-                        onClick={toggleBonding}
+                        onClick={() => {
+                          toggleBonding();
+                          setTabIndex(0);
+                        }}
                       >
                         <Image
                           src="/arrow.svg"
@@ -228,7 +238,7 @@ export const Delegate = ({ onClose }: Props) => {
                       textAlign="center"
                       marginBottom="12px"
                     >
-                      {bonding ? 'To' : 'From'}
+                      {bonding ? 'to' : 'from'}
                     </Text>
 
                     <Box
@@ -251,7 +261,7 @@ export const Delegate = ({ onClose }: Props) => {
                         lineHeight="20px"
                         textAlign="center"
                       >
-                        {bonding ? 'JMES to Bond' : 'bJMES to UnBond'}
+                        {bonding ? 'JMES to Bond' : 'bJMES to unbond'}
                       </Text>
 
                       <Input
@@ -425,7 +435,7 @@ export const Delegate = ({ onClose }: Props) => {
                     fontWeight="medium"
                     fontSize={14}
                   >
-                    {bonding ? 'Bond' : 'UnBond'}
+                    {bonding ? 'Bond' : 'Unbond'}
                     <Image
                       src="/delegate-midnight.svg"
                       display="inline-block"
@@ -482,7 +492,7 @@ export const Delegate = ({ onClose }: Props) => {
                         fontWeight="500"
                         fontSize={16}
                       >
-                        My unbonding
+                        Select a validator
                       </Text>
                     </Tab>
                     <Tab
@@ -497,7 +507,7 @@ export const Delegate = ({ onClose }: Props) => {
                         fontWeight="500"
                         fontSize={16}
                       >
-                        Select a validator
+                        My unbonding
                       </Text>
                     </Tab>
                   </TabList>
@@ -509,32 +519,10 @@ export const Delegate = ({ onClose }: Props) => {
                     width="80%"
                   />
                   <TabPanels>
-                    <TabPanel padding={0} marginTop="30px">
-                      <DelegateUnbondingTable
-                        unBondingsData={unBondingsData}
-                        isLoadingUnBondings={isLoadingUnBondings}
-                        unBondingsError={unBondingsError as Error | undefined}
-                      />
-                      <Text
-                        color="lilac"
-                        fontFamily={'DM Sans'}
-                        fontWeight="400"
-                        fontSize={11}
-                        lineHeight="14px"
-                        textAlign="center"
-                        padding="0 41px"
-                        position="absolute"
-                        bottom="24px"
-                        left="0"
-                        width="100%"
-                      >
-                        Once unbonding bJMES is requested, it takes 21 days for
-                        them to become available as JMES again.
-                      </Text>
-                    </TabPanel>
                     <TabPanel padding={0}>
                       {bonding && (
                         <DelegateValidatorTable
+                          validatorsMap={validatorsMap}
                           error={validatorsError as Error | undefined}
                           selectedValidator={selectedValidator}
                           loading={isValidatorsLoading}
@@ -562,6 +550,29 @@ export const Delegate = ({ onClose }: Props) => {
                           }}
                         />
                       )}
+                    </TabPanel>
+                    <TabPanel padding={0} marginTop="30px">
+                      <DelegateUnbondingTable
+                        unBondingsData={unBondingsData}
+                        isLoadingUnBondings={isLoadingUnBondings}
+                        unBondingsError={unBondingsError as Error | undefined}
+                      />
+                      <Text
+                        color="lilac"
+                        fontFamily={'DM Sans'}
+                        fontWeight="400"
+                        fontSize={11}
+                        lineHeight="14px"
+                        textAlign="center"
+                        padding="0 41px"
+                        position="absolute"
+                        bottom="24px"
+                        left="0"
+                        width="100%"
+                      >
+                        Once unbonding bJMES is requested, it takes 21 days for
+                        them to become available as JMES again.
+                      </Text>
                     </TabPanel>
                   </TabPanels>
                 </Tabs>

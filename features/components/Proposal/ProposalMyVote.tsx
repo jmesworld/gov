@@ -6,6 +6,7 @@ import {
   useToast,
   CircularProgress,
   Flex,
+  Tooltip,
 } from '@chakra-ui/react';
 import { useChain } from '@cosmos-kit/react';
 
@@ -34,6 +35,7 @@ export interface ProposalMyVoteType {
   proposalId: number;
   hideExecute: boolean;
   disableExecute: boolean;
+  disableExcuteTooltip?: string;
   refetch: () => Promise<unknown>;
 }
 
@@ -128,12 +130,9 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                     title: 'Vote submitted.',
                     description: "We've submitted your Vote.",
                     status: 'success',
+                    variant: 'custom',
                     duration: 9000,
                     isClosable: true,
-                    containerStyle: {
-                      backgroundColor: 'darkPurple',
-                      borderRadius: 12,
-                    },
                   });
                 })
                 .catch(error => {
@@ -141,12 +140,9 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                     title: 'Vote creation error',
                     description: error.toString(),
                     status: 'error',
+                    variant: 'custom',
                     duration: 9000,
                     isClosable: true,
-                    containerStyle: {
-                      backgroundColor: 'red',
-                      borderRadius: 12,
-                    },
                   });
                 })
                 .finally(() => setSubmittingYesVote(false));
@@ -199,12 +195,9 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                     title: 'Vote submitted.',
                     description: "We've submitted your Vote.",
                     status: 'success',
+                    variant: 'custom',
                     duration: 9000,
                     isClosable: true,
-                    containerStyle: {
-                      backgroundColor: 'darkPurple',
-                      borderRadius: 12,
-                    },
                   });
                 })
                 .catch(error => {
@@ -212,12 +205,9 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                     title: 'Vote creation error',
                     description: error.toString(),
                     status: 'error',
+                    variant: 'custom',
                     duration: 9000,
                     isClosable: true,
-                    containerStyle: {
-                      backgroundColor: 'red',
-                      borderRadius: 12,
-                    },
                   });
                 })
                 .finally(() => setSubmittingNoVote(false));
@@ -243,65 +233,65 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
         </ButtonGroup>
       </Box>
       {!props.hideExecute && (
-        <Button
-          mt="37px"
-          as="button"
-          height="48px"
-          width="100%"
-          lineHeight="16px"
-          border="1px"
-          borderRadius="90px"
-          fontSize="14px"
-          fontWeight="medium"
-          bg="#A1F0C4"
-          borderColor="#91D8B0"
-          isLoading={isSubmittingExecuteVote}
-          disabled={props.disableExecute}
-          loadingText="Executing..."
-          color="#0F0056"
-          fontFamily="DM Sans"
-          onClick={() => {
-            setSubmittingExecuteVote(true);
-            executeMutation
-              .mutateAsync({
-                client: daoMultisigClient,
-                msg: {
-                  proposalId: props.proposalId,
-                },
-                args: { fee },
-              })
-              .then(() => props.refetch())
-              .then(() => {
-                toast({
-                  title: 'Proposal executed.',
-                  description: 'Proposal executed successfully.',
-                  status: 'success',
-                  duration: 9000,
-                  isClosable: true,
-                  containerStyle: {
-                    backgroundColor: 'darkPurple',
-                    borderRadius: 12,
-                  },
-                });
-              })
-              .catch(error => {
-                toast({
-                  title: 'Proposal execution error',
-                  description: error.toString(),
-                  status: 'error',
-                  duration: 9000,
-                  isClosable: true,
-                  containerStyle: {
-                    backgroundColor: 'red',
-                    borderRadius: 12,
-                  },
-                });
-              })
-              .finally(() => setSubmittingExecuteVote(false));
-          }}
+        <Tooltip
+          isDisabled={!props.disableExecute}
+          hasArrow
+          label={props.disableExcuteTooltip}
         >
-          Execute
-        </Button>
+          <Button
+            mt="37px"
+            as="button"
+            height="48px"
+            width="100%"
+            lineHeight="16px"
+            border="1px"
+            borderRadius="90px"
+            fontSize="14px"
+            fontWeight="medium"
+            bg="#A1F0C4"
+            borderColor="#91D8B0"
+            isLoading={isSubmittingExecuteVote}
+            disabled={props.disableExecute}
+            loadingText="Executing..."
+            color="#0F0056"
+            fontFamily="DM Sans"
+            onClick={() => {
+              setSubmittingExecuteVote(true);
+              executeMutation
+                .mutateAsync({
+                  client: daoMultisigClient,
+                  msg: {
+                    proposalId: props.proposalId,
+                  },
+                  args: { fee },
+                })
+                .then(() => props.refetch())
+                .then(() => {
+                  toast({
+                    title: 'Proposal executed.',
+                    description: 'Proposal executed successfully.',
+                    status: 'success',
+                    variant: 'custom',
+                    duration: 9000,
+                    isClosable: true,
+                  });
+                })
+                .catch(error => {
+                  toast({
+                    title: 'Proposal execution error',
+                    description: error.toString(),
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                    variant: 'custom',
+                  });
+                })
+                .finally(() => setSubmittingExecuteVote(false));
+            }}
+          >
+            Execute
+          </Button>
+        </Tooltip>
       )}
     </Box>
   );

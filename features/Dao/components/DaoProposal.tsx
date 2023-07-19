@@ -75,7 +75,6 @@ export default function DaoProposal({
       refetchInterval: 10000,
     },
   });
-
   const isInActive = useMemo(() => {
     if (!data) {
       return [];
