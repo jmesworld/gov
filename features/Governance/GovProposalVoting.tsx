@@ -37,7 +37,7 @@ const GovProposalVoting = ({
           target={target}
         />
         {label && (
-          <Flex alignItems="center" w="full">
+          <Flex pl="3" alignItems="center" w="full">
             <Badge
               fontWeight="normal"
               color="black"

@@ -17,6 +17,7 @@ type VotingPeriodContextType = {
   period: string | null;
   nextPeriodTimeLeft: string | null;
   data?: PeriodInfoResponse | null;
+  loading: boolean;
 };
 
 const initialState: VotingPeriodContextType = {
@@ -25,6 +26,7 @@ const initialState: VotingPeriodContextType = {
   period: null,
   nextPeriodTimeLeft: null,
   data: null,
+  loading: false,
 };
 
 const VotingPeriodContext =
@@ -44,7 +46,7 @@ const VotingPeriodContextProvider = ({ children }: Props) => {
       ),
     [cosmWasmClient],
   );
-  const { data } = useGovernancePeriodInfoQuery({
+  const { data, isLoading, isFetching } = useGovernancePeriodInfoQuery({
     client: governanceQueryClient ?? undefined,
     options: {
       enabled: false || governanceQueryClient !== null, // The query will only run when governanceQueryClient is not null
@@ -73,6 +75,7 @@ const VotingPeriodContextProvider = ({ children }: Props) => {
     postingPeriod: currentPeriod as ProposalPeriod,
     nextPeriodTimeLeft: nextTimePeriod(),
     data,
+    loading: isFetching || isLoading,
   };
 
   return (

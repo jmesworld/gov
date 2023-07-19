@@ -13,6 +13,7 @@ import {
   ModalBody,
   ModalContent,
   Spacer,
+  Spinner,
   Text,
 } from '@chakra-ui/react';
 import { z } from 'zod';
@@ -60,7 +61,7 @@ export const SearchResults = memo(
       });
 
     if (isLoading || isFetching) {
-      <Text> Loading... </Text>;
+      <Spinner size="md" />;
     }
     if (error) {
       <Text> Error: {error.message} </Text>;
@@ -240,7 +241,7 @@ export const ChooseUsernameCardComponent = ({
                     {showInputCheckIcon && <CheckIcon color={'green'} />}
                   </InputRightElement>
                 </InputGroup>
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<Spinner size="sm" />}>
                   {searchComponent}
                 </Suspense>
               </Box>

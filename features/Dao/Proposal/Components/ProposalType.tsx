@@ -3,6 +3,7 @@ import { ProposalType } from '../../../components/Proposal/ProposalType';
 import { ProposalResponseForEmpty } from '../../../../client/DaoMultisig.types';
 import { Flex, Text } from '@chakra-ui/react';
 import { formatString } from '../../../../lib/strings';
+import { getFormattedSlotType } from '../../../../utils/coreSlotType';
 
 type Props = {
   proposal?: ProposalResponseForEmpty;
@@ -24,6 +25,19 @@ export const GovProposalType = ({ proposal }: Props) => {
       />
     </div>
   );
+};
+
+export const getSlotType = ({ proposal }: Props) => {
+  if (!proposal) return null;
+  let slotType: null | string = null;
+  const { excuteMsg } = getGovProposalType(proposal);
+  if (!excuteMsg || !excuteMsg.propose) return null;
+
+  if ('core_slot' in excuteMsg.propose) {
+    const brand = excuteMsg.propose.core_slot.slot;
+    slotType = Object.keys(brand)[0];
+  }
+  return getFormattedSlotType(slotType ?? undefined);
 };
 
 export const GetProposalDetail = ({ proposal }: Props) => {
@@ -51,7 +65,7 @@ export const GetProposalDetail = ({ proposal }: Props) => {
         color={'purple'}
       >
         <Text color="purple">Slot Type:</Text>
-        <Text ml="15px">{formatString(slotType)}</Text>
+        <Text ml="15px">{getFormattedSlotType(slotType)}</Text>
       </Flex>
     );
   }

@@ -1,4 +1,4 @@
-import { Box, Flex, Spinner, Text, Tooltip } from '@chakra-ui/react';
+import { Box, Flex, Skeleton, Spinner, Text, Tooltip } from '@chakra-ui/react';
 
 import { NavBarItem } from '../NavBar/NavBarItem';
 import { Link } from '../components/genial/Link';
@@ -19,17 +19,16 @@ const MyDaoList = () => {
   }
   if (firstLoad && loading && !daos.length) {
     return (
-      <Box marginLeft="25px">
-        <Text
-          alignItems="center"
-          fontSize="sm"
-          size="sm"
-          display="flex"
-          color="white"
-        >
-          <Spinner color="white" size="xs" mr="2" />
-          <span>loading ...</span>
-        </Text>
+      <Box>
+        {Array.from({ length: 3 }, (_, i) => (
+          <Skeleton
+            startColor="darkPurple"
+            endColor="primary.500"
+            my="2"
+            key={i}
+            height="30px"
+          />
+        ))}
       </Box>
     );
   }

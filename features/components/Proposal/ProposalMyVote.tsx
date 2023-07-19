@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react';
 import { useChain } from '@cosmos-kit/react';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 
 import { StdFee } from '@cosmjs/amino';
@@ -19,6 +19,7 @@ import {
   useDaoMultisigExecuteMutation,
 } from '../../../client/DaoMultisig.react-query';
 import { chainName } from '../../../config/defaults';
+import { useSigningCosmWasmClientContext } from '../../../contexts/SigningCosmWasmClient';
 
 const fee: StdFee = {
   amount: [{ amount: '30000', denom: 'ujmes' }],
@@ -38,25 +39,12 @@ export interface ProposalMyVoteType {
 
 export const ProposalMyVote = (props: ProposalMyVoteType) => {
   const toast = useToast();
-  const { address, getSigningCosmWasmClient } = useChain(chainName);
+  const { address } = useChain(chainName);
   const [isSubmittingYesVote, setSubmittingYesVote] = useState(false);
   const [isSubmittingNoVote, setSubmittingNoVote] = useState(false);
   const [isSubmittingExecuteVote, setSubmittingExecuteVote] = useState(false);
-
-  const [signingClient, setSigningClient] =
-    useState<SigningCosmWasmClient | null>(null);
-  useEffect(() => {
-    if (address) {
-      getSigningCosmWasmClient()
-        .then(signingClient => {
-          if (!signingClient) {
-            return;
-          }
-          setSigningClient(signingClient);
-        })
-        .catch(error => console.error(error));
-    }
-  }, [address, getSigningCosmWasmClient]);
+  const { signingCosmWasmClient: signingClient } =
+    useSigningCosmWasmClientContext();
 
   const daoMultisigClient = new DaoMultisigClient(
     signingClient as SigningCosmWasmClient,

@@ -5,13 +5,14 @@ interface LoadingComponentProps {
 }
 
 export const LoadingComponent = ({ message }: LoadingComponentProps) => (
-  <Box display="flex" alignItems="center" justifyContent="flex-start">
-    <Spinner color="purple" size="sm" />
-    {message && (
-      <Text ml={4} color="gray.600">
-        {message}
-      </Text>
-    )}
+  <Box
+    display="flex"
+    w="full"
+    h="full"
+    alignItems="center"
+    justifyContent="center"
+  >
+    <Spinner color="purple" size="lg" />
   </Box>
 );
 

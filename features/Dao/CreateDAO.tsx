@@ -108,7 +108,7 @@ const CreateDaoNewForm = ({
         id,
         name: daoOwner.name,
         address: daoOwner.address,
-        votingPower: 0,
+        votingPower: 100,
       },
     });
   }, [daoOwner, members]);

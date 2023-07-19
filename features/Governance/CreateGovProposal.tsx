@@ -543,7 +543,7 @@ export default function CreateGovProposal({
                     >
                       <Stack direction="row" spacing={'35px'}>
                         <Radio value="brand">Brand</Radio>
-                        <Radio value="core-tech">Core Tech</Radio>
+                        <Radio value="core-tech">Tech</Radio>
                         <Radio value="creative">Creative</Radio>
                       </Stack>
                     </RadioGroup>

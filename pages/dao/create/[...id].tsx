@@ -16,7 +16,7 @@ const CreateProposal = () => {
   if (firstLoad) {
     return (
       <Flex alignItems="center" justifyContent="center" h="full" w="full">
-        <Spinner size="sm" mr="2" />
+        <Spinner size="lg" color="purple" mr="2" />
       </Flex>
     );
   }

@@ -7,6 +7,7 @@ import {
   Menu,
   MenuButton,
   MenuList,
+  Skeleton,
   Spacer,
   Text,
 } from '@chakra-ui/react';
@@ -18,7 +19,7 @@ const NEXT_PUBLIC_GOVERNANCE_CONTRACT =
   process.env.NEXT_PUBLIC_GOVERNANCE_CONTRACT;
 
 export default function PeriodInfo() {
-  const { data, nextPeriodTimeLeft } = useVotingPeriodContext();
+  const { data, nextPeriodTimeLeft, loading } = useVotingPeriodContext();
   if (!NEXT_PUBLIC_GOVERNANCE_CONTRACT) {
     throw new Error('Public Governance Contract not found!');
   }
@@ -40,6 +41,10 @@ export default function PeriodInfo() {
   const voting_period_length = formatDuration(
     data?.voting_period_length as number,
   );
+
+  if (loading && !data) {
+    return <Skeleton width="380px" height="48px" borderRadius="90px" />;
+  }
 
   return (
     <Menu>
