@@ -12,7 +12,7 @@ export const useRedirectToHomeForNoWalletConnected = () => {
       return 'Redirecting...';
     }
     if (loadingIdentity) {
-      return <LoadingComponent message="Loading..." />;
+      return <LoadingComponent />;
     }
     return undefined;
   }, [address, loadingIdentity]);

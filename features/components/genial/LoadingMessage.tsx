@@ -1,10 +1,6 @@
-import { Box, Spinner, Text } from '@chakra-ui/react';
+import { Box, Spinner } from '@chakra-ui/react';
 
-interface LoadingComponentProps {
-  message?: string;
-}
-
-export const LoadingComponent = ({ message }: LoadingComponentProps) => (
+export const LoadingComponent = () => (
   <Box
     display="flex"
     w="full"
