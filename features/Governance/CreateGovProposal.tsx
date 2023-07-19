@@ -471,7 +471,7 @@ export default function CreateGovProposal({
                       fontFamily="DM Sans"
                       marginRight={'52px'}
                     >
-                      Select feature type::
+                      Feature type:
                     </Text>
                     <RadioGroup value="art-dealer" textColor={'darkPurple'}>
                       <Stack direction="row" spacing={'35px'}>
