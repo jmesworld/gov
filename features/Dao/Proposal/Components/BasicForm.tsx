@@ -57,7 +57,7 @@ export const BasicForm = ({
             },
           });
         }}
-        placeholder={'Title:'}
+        placeholder={'Title'}
       />
       <Text fontSize="xs" mt="2" height="15px" color="red">
         {titleError}
@@ -90,7 +90,7 @@ export const BasicForm = ({
             },
           });
         }}
-        placeholder={'Description:'}
+        placeholder={'Description'}
       />
       <Text fontSize="xs" mt="2" height="15px" color="red">
         {descriptionError}
