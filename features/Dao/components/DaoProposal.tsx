@@ -150,7 +150,6 @@ export default function DaoProposal({
           </Text>
           <Flex w="full" alignItems="center" justifyContent="space-between">
             <Flex
-              mt="2"
               py={2}
               alignItems="center"
               bg="white"
@@ -180,7 +179,7 @@ export default function DaoProposal({
                   width="18px"
                   height="18px"
                   marginLeft="2px"
-                  alt="Dao Address"
+                  alt="DAO Address"
                   onClick={() => {
                     copyToClipboard(daoAddress);
                   }}
@@ -188,7 +187,7 @@ export default function DaoProposal({
               </Tooltip>
               <BalanceDisplay asCard={false} address={daoAddress} />
             </Flex>
-            <Flex flexDir="row" flexWrap="wrap" gap="2">
+            <Flex alignItems="center" flexDir="row" gap="2">
               <Link href={`/dao/create/${daoName}/daoproposal`}>
                 <Button
                   rounded="full"
@@ -237,6 +236,7 @@ export default function DaoProposal({
               <ProposalHeader
                 proposalTitle=" GOVERNANCE PROPOSAL/S"
                 isGov={true}
+                minWidth="800px"
               />
               <Flex height={'9px'} />
               <ProposalList
@@ -261,7 +261,11 @@ export default function DaoProposal({
 
           {proposals?.daoPropsal?.length > 0 && (
             <Flex flexDir="column" mb="25px">
-              <ProposalHeader proposalTitle=" DAO PROPOSAL/S" isGov={false} />
+              <ProposalHeader
+                minWidth="800px"
+                proposalTitle=" DAO PROPOSAL/S"
+                isGov={false}
+              />
               <Flex height={'9px'} />
               <ProposalList
                 showPassingOrFailing

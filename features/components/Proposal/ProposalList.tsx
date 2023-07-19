@@ -22,12 +22,13 @@ import {
 import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { ProposalResponse } from '../../../client/Governance.types';
 import { ProposalResponseForEmpty } from '../../../client/DaoMultisig.types';
-import { formatString } from '../../../lib/strings';
 import { formatBalanceWithComma } from '../../../hooks/useAccountBalance';
 import { convertBlockToMonth } from '../../../utils/block';
 import { useDaoMultisigListVotesQuery } from '../../../client/DaoMultisig.react-query';
 import { DaoMultisigQueryClient } from '../../../client/DaoMultisig.client';
 import { getLabelForProposalTypes } from './ProposalType';
+import { getFormattedSlotType } from '../../../utils/coreSlotType';
+import { getSlotType } from '../../Dao/Proposal/Components/ProposalType';
 
 type BaseProps = {
   totalSupply: number;
@@ -195,11 +196,7 @@ export const ProposalList = ({
                 ? String(fundingPerMonth)
                 : undefined
             }
-            inActive={
-              isAllInactive ||
-              proposal.status === 'success_concluded' ||
-              proposal.status === 'expired_concluded'
-            }
+            inActive={isAllInactive}
             label={isPassing() || hasPassed()}
             labelSuccess={isPassing() === 'Passing' || hasPassed() === 'Passed'}
             votingDuration={votingDuration ?? '-'}
@@ -215,7 +212,7 @@ export const ProposalList = ({
             totalCount={totalSupply}
             threshold={Number(threshold)}
             type={`${getLabelForProposalTypes(type)}${
-              coreSlotType ? ` - ${formatString(coreSlotType)}` : ''
+              coreSlotType ? ` - ${getFormattedSlotType(coreSlotType)}` : ''
             } `}
             navigateToProposal={id => navigateToProposal(id, isGovList)}
             largeSize={isGovList ? true : false}
@@ -250,6 +247,8 @@ export const ProposalList = ({
       const target = threshold ? threshold.weight : 0;
       const propsalType = getGovProposalType(proposal);
       const daoProposalType = getDaoProposalType(proposal);
+      const slotType = getSlotType({ proposal });
+      console.log('slotType', slotType, propsalType.proposalType);
       const hasPassed = () => {
         if (!showPassedOrFailed) {
           return undefined;
@@ -276,9 +275,13 @@ export const ProposalList = ({
           inActive={isAllInactive}
           type={
             propsalType.proposalType
-              ? getLabelForProposalTypes(propsalType.proposalType)
+              ? `${getLabelForProposalTypes(propsalType.proposalType)}${
+                  slotType ? ` - ${slotType}` : ''
+                }`
               : daoProposalType
-              ? getLabelForProposalTypes(daoProposalType)
+              ? `${getLabelForProposalTypes(daoProposalType)}${
+                  slotType ? ` - ${slotType}` : ''
+                }`
               : ''
           }
           navigateToProposal={id => navigateToProposal(id, !!isGovList)}
@@ -309,12 +312,15 @@ export const ProposalList = ({
 export const ProposalHeader = ({
   isGov,
   proposalTitle,
+  minWidth,
 }: {
   isGov: boolean;
   proposalTitle?: string;
+  minWidth?: string;
 }) => {
+  const minWidthGov = isGov ? '1000px' : '800px';
   return (
-    <Flex flex={1} minWidth={isGov ? '1000px' : '500px'} width="100%">
+    <Flex flex={1} minWidth={minWidth || minWidthGov} width="100%">
       <Flex width={isGov ? '70%' : '90%'}>
         <Box width="30%">
           <Text
@@ -338,7 +344,11 @@ export const ProposalHeader = ({
               fontFamily={'DM Sans'}
               fontWeight="medium"
               fontSize={12}
-              width={'155px'}
+              width="full"
+              whiteSpace="pre"
+              overflow="hidden"
+              textOverflow="ellipsis"
+              title={isGov ? 'FUNDING PER MONTH' : 'FUNDING P/M'}
             >
               {isGov ? 'FUNDING PER MONTH' : 'FUNDING P/M'}
             </Text>
@@ -350,7 +360,11 @@ export const ProposalHeader = ({
               fontWeight="medium"
               fontSize={12}
               textAlign={'left'}
-              width={'124px'}
+              width="full"
+              whiteSpace="pre"
+              overflow="hidden"
+              textOverflow="ellipsis"
+              title={isGov ? 'FUNDING DURATION' : 'FUNDING DURATION'}
             >
               {isGov ? 'FUNDING DURATION' : 'FUNDING DURATION'}
             </Text>
@@ -451,7 +465,7 @@ export const DaoProposalListItem = ({
   return (
     <>
       <Flex
-        minWidth={'1000px'}
+        minWidth={'800px'}
         opacity={inActive ? '0.5' : '1'}
         flex={1}
         height={'89px'}
@@ -563,24 +577,36 @@ export const DaoProposalListItem = ({
                 -
               </Text>
             )}
-            {largeSize && (
-              <>
-                <Image
-                  src="/JMES_Icon_white.svg"
-                  alt="JMES Icon"
-                  width={'9px'}
-                  mr="1"
-                  height={'10.98px'}
-                />
-                <Text
-                  color="white"
-                  fontWeight="normal"
-                  fontSize={14}
-                  fontFamily="DM Sans"
-                >
-                  {formatBalanceWithComma(Number(fundingPerMonth ?? 0) || 0)}
-                </Text>
-              </>
+            {largeSize && fundingPerMonth !== undefined && (
+              <Tooltip
+                zIndex={333}
+                label={formatBalanceWithComma(
+                  Number(fundingPerMonth ?? 0) || 0,
+                )}
+                isDisabled={fundingPerMonth === undefined}
+                hasArrow
+              >
+                <Flex alignItems="center">
+                  <Image
+                    src="/JMES_Icon_white.svg"
+                    alt="JMES Icon"
+                    width={'9px'}
+                    mr="1"
+                    height={'10.98px'}
+                  />
+                  <Text
+                    color="white"
+                    fontWeight="normal"
+                    fontSize={14}
+                    fontFamily="DM Sans"
+                  >
+                    {formatBalanceWithComma(
+                      Number(fundingPerMonth ?? 0) || 0,
+                      0,
+                    )}
+                  </Text>
+                </Flex>
+              </Tooltip>
             )}
           </Flex>
           <Box width="15%" justifyContent={'center'}>
@@ -764,23 +790,35 @@ export const ProposalListItem = ({
                 </Text>
               )}
               {fundingPerMonth !== undefined && (
-                <>
-                  <Image
-                    src="/JMES_Icon_white.svg"
-                    alt="JMES Icon"
-                    width={'9px'}
-                    mr="1"
-                    height={'10.98px'}
-                  />
-                  <Text
-                    color="white"
-                    fontWeight="normal"
-                    fontSize={14}
-                    fontFamily="DM Sans"
-                  >
-                    {formatBalanceWithComma(Number(fundingPerMonth ?? 0) || 0)}
-                  </Text>
-                </>
+                <Tooltip
+                  zIndex={333}
+                  label={formatBalanceWithComma(
+                    Number(fundingPerMonth ?? 0) || 0,
+                  )}
+                  isDisabled={fundingPerMonth === undefined}
+                  hasArrow
+                >
+                  <Flex alignItems="center">
+                    <Image
+                      src="/JMES_Icon_white.svg"
+                      alt="JMES Icon"
+                      width={'9px'}
+                      mr="1"
+                      height={'10.98px'}
+                    />
+                    <Text
+                      color="white"
+                      fontWeight="normal"
+                      fontSize={14}
+                      fontFamily="DM Sans"
+                    >
+                      {formatBalanceWithComma(
+                        Number(fundingPerMonth ?? 0) || 0,
+                        0,
+                      )}
+                    </Text>
+                  </Flex>
+                </Tooltip>
               )}
             </Flex>
             <Box width="15%" justifyContent={'center'}>

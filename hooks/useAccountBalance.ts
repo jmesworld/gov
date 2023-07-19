@@ -66,10 +66,16 @@ const formatWithSuffix = (value: number, decimalPlaces = 2) => {
   return `${formattedValue}${suffix}`;
 };
 
-export function formatBalanceWithComma(balance: number, decimalPlaces = 2) {
+export function formatBalanceWithComma(balance: number, decimalPlaces = 6) {
+  if (balance === 0) return '0';
   const coin = new Core.Coin(JMES_DENOM, balance);
   return (
-    coin.amount.toDecimalPlaces(decimalPlaces).toNumber().toLocaleString() ??
-    '0'
+    coin.amount
+      .toDecimalPlaces(decimalPlaces)
+      .toNumber()
+      .toLocaleString(undefined, {
+        maximumFractionDigits: decimalPlaces,
+        minimumFractionDigits: decimalPlaces,
+      }) ?? '0'
   );
 }

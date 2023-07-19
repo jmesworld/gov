@@ -6,6 +6,7 @@ import {
   Spacer,
   Image,
   Spinner,
+  Skeleton,
 } from '@chakra-ui/react';
 import { Dispatch, SetStateAction } from 'react';
 import { WalletStatus } from '@cosmos-kit/core';
@@ -106,10 +107,13 @@ const NavBar = ({
         </Text>
       </Flex>
       {afterCreate !== '' && (
-        <Flex alignItems="center" px="4">
-          <Spinner mr="2" size="xs" />
-          <Text>Loading ...</Text>
-        </Flex>
+        <Box w="full">
+          <Skeleton
+            startColor="darkPurple"
+            endColor="primary.500"
+            height="30px"
+          />
+        </Box>
       )}
       <MyDaoList />
 

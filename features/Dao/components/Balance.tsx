@@ -1,4 +1,4 @@
-import { Flex, Spinner, Text, Tooltip } from '@chakra-ui/react';
+import { Flex, Skeleton, Spinner, Text, Tooltip } from '@chakra-ui/react';
 import {
   formatBalance,
   useAccountBalance,
@@ -25,7 +25,7 @@ export const BalanceDisplay = ({ address, asCard }: Props) => {
     <>
       {(fetchingBalance || loadingBalance) && !balance && (
         <Flex>
-          <Spinner size="sm" />
+          <Skeleton h="30px" w="100px" />
         </Flex>
       )}
       {balance && (

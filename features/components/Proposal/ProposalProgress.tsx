@@ -1,5 +1,8 @@
 import { Box, Flex, Progress, Text, Tooltip } from '@chakra-ui/react';
-import { formatBalance } from '../../../hooks/useAccountBalance';
+import {
+  formatBalance,
+  formatBalanceWithComma,
+} from '../../../hooks/useAccountBalance';
 
 interface ProposalProgressType {
   yesPercent: number;
@@ -34,7 +37,11 @@ export const ProposalProgress = ({
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Tooltip hasArrow label={formatBalance(yesCount, 2)}>
+        <Tooltip
+          hasArrow
+          label={formatBalanceWithComma(yesCount)}
+          isDisabled={yesCount < 1000 && yesCount % 1 === 0}
+        >
           <Text
             color="white"
             fontWeight="normal"
@@ -68,7 +75,11 @@ export const ProposalProgress = ({
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Tooltip hasArrow label={formatBalance(noCount, 2)}>
+        <Tooltip
+          hasArrow
+          label={formatBalanceWithComma(noCount)}
+          isDisabled={noCount < 1000 && noCount % 1 === 0}
+        >
           <Text
             color="white"
             fontWeight="normal"
@@ -116,23 +127,32 @@ export const ProposalProgress = ({
           <Box
             position={'absolute'}
             top={'-10px'}
-            left="calc(50% - 16px)"
+            left="calc(50% - 20px)"
             height={'20px'}
-            width="32px"
+            width="40px"
             backgroundColor={'white'}
             zIndex={2}
             borderRadius={'10px'}
           >
-            <Text
-              color="rgba(81, 54, 194, 1)"
-              fontWeight="500"
-              fontSize={'14px'}
-              fontFamily="DM Sans"
-              letterSpacing={'-0.05em'}
-              textAlign={'center'}
+            <Tooltip
+              hasArrow
+              label={formatBalanceWithComma(target)}
+              isDisabled={target < 100 && target % 1 === 0}
             >
-              {formatBalance(target, 2)}
-            </Text>
+              <Text
+                color="rgba(81, 54, 194, 1)"
+                fontWeight="500"
+                fontSize={'14px'}
+                overflow="hidden"
+                whiteSpace="pre"
+                fontFamily="DM Sans"
+                letterSpacing={'-0.05em'}
+                textAlign={'center'}
+                textOverflow={'ellipsis'}
+              >
+                {formatBalance(target, 2)}
+              </Text>
+            </Tooltip>
           </Box>
           <Flex
             position="absolute"

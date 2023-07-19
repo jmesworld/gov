@@ -105,18 +105,25 @@ const BalanceContextProvider = ({ children }: Props) => {
     if (!data) {
       return undefined;
     }
+
     const jmes =
       data.jmes?.amount
         .dividedBy(1e6)
         .toDecimalPlaces(6)
         .toNumber()
-        .toLocaleString() ?? '0';
+        .toLocaleString(undefined, {
+          minimumFractionDigits: 6,
+          maximumFractionDigits: 6,
+        }) ?? '0';
     const bJmes =
       data.bJmes?.amount
         .dividedBy(1e6)
         .toDecimalPlaces(6)
         .toNumber()
-        .toLocaleString() ?? '0';
+        .toLocaleString(undefined, {
+          minimumFractionDigits: 6,
+          maximumFractionDigits: 6,
+        }) ?? '0';
     return {
       jmes,
       bJmes,

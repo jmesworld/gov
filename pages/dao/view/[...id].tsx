@@ -56,9 +56,8 @@ const DAODetail = () => {
   if (Array.isArray(id) && id.length === 1) {
     if ((afterCreate !== '' && !selectedDAO) || firstLoad) {
       return (
-        <Flex alignItems="center">
-          <Spinner size="sm" mr="2" />
-          <Text>Loading DAO ...</Text>
+        <Flex alignItems="center" justifyContent="center" w="full" h="full">
+          <Spinner color="purple" size="lg" mr="2" />
         </Flex>
       );
     }

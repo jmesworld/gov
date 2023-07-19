@@ -12,7 +12,6 @@ const Home: NextPageWithLayout = () => {
 
   return (
     <CoinSupplyContextProvider>
-      {!cosmWasmClient && 'loading ...'}
       {cosmWasmClient && (
         <GovernanceProposal
           cosmWasmClient={cosmWasmClient}

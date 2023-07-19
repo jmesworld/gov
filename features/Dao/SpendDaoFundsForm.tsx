@@ -41,6 +41,8 @@ import { StdFee } from '@cosmjs/amino';
 
 import { useAccountBalance } from '../../hooks/useAccountBalance';
 import { ProposalType } from '../components/Proposal/ProposalType';
+import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
+import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -63,8 +65,7 @@ const SpendDaoFundsForm = ({
   selectedDao: string;
   selectedDaoName: string;
 }) => {
-  const { address, status, getCosmWasmClient, getSigningCosmWasmClient } =
-    useChain(chainName);
+  const { address } = useChain(chainName);
   const [daoName, setDaoName] = useState('');
   const [daoMembers, setDaoMembers] = useState([daoOwner]);
   const [threshold, setThreshold] = useState(50);
@@ -74,12 +75,10 @@ const SpendDaoFundsForm = ({
   const [doubleCounts, setDoubleCounts] = useState(0);
 
   const toast = useToast();
-  const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
-    null,
-  );
-  const [signingClient, setSigningClient] =
-    useState<SigningCosmWasmClient | null>(null);
-  const balance = useAccountBalance(address as string);
+  const { cosmWasmClient } = useCosmWasmClientContext();
+  const { signingCosmWasmClient: signingClient } =
+    useSigningCosmWasmClientContext();
+
   const [bal, setBal] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const proposalTypes = ['spend-funds'];
@@ -110,20 +109,6 @@ const SpendDaoFundsForm = ({
   //       .catch((error) => console.log(error));
   //   }
   // }, [address, getCosmWasmClient, getSigningCosmWasmClient]);
-
-  useEffect(() => {
-    if (address) {
-      console.log('update');
-      getCosmWasmClient()
-        .then(cosmWasmClient => {
-          if (!cosmWasmClient) {
-            return;
-          }
-          setCosmWasmClient(cosmWasmClient);
-        })
-        .catch(error => console.log(error));
-    }
-  }, [address, getCosmWasmClient]);
 
   const validationResult = validateName(daoName);
   const isDaoNameValid = !validationResult?.name;

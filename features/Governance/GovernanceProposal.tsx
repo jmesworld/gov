@@ -193,6 +193,7 @@ export default function GovernanceProposal({
           <ProposalHeader proposalTitle="EXPIRED " isGov={true} />
           <Flex height={'9px'} />
           <ProposalList
+            isAllInactive
             isGovList
             client={governanceQueryClient}
             totalSupply={supply as number}

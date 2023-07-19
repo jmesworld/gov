@@ -2,9 +2,9 @@ import {
   Box,
   Button,
   Center,
-  CircularProgress,
   Flex,
   HStack,
+  Spinner,
   Text,
   Tooltip,
   VStack,
@@ -26,7 +26,6 @@ import GovProposalVoting from './GovProposalVoting';
 import { ProposalHeader } from '../components/Proposal/ProposalHeader';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { calculateVotes } from '../../lib/calculateVotes';
-import { useCoinSupplyContext } from '../../contexts/CoinSupply';
 import { useVotingPeriodContext } from '../../contexts/VotingPeriodContext';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 
@@ -41,7 +40,6 @@ export default function GovProposalDetail({
   const toast = useToast();
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { signingCosmWasmClient } = useSigningCosmWasmClientContext();
-  const { supply } = useCoinSupplyContext();
   const { isPostingPeriod, nextPeriodTimeLeft } = useVotingPeriodContext();
   const { address } = useChain(chainName);
   const [concluding, setConcluding] = useState(false);
@@ -56,6 +54,7 @@ export default function GovProposalDetail({
       id: proposalId,
     },
     options: {
+      enabled: !!cosmWasmClient && !!proposalId && !!govQueryClient,
       refetchInterval: 10000,
     },
   });
@@ -87,9 +86,9 @@ export default function GovProposalDetail({
       calculateVotes({
         coin_Yes: data?.coins_yes,
         coin_no: data?.coins_no,
-        totalSupply: supply as number,
+        totalSupply: (Number(data?.coins_total) || 0) / 1e6,
       }),
-    [data?.coins_no, data?.coins_yes, supply],
+    [data?.coins_no, data?.coins_total, data?.coins_yes],
   );
 
   const isPassing = useMemo(() => {
@@ -292,8 +291,8 @@ export default function GovProposalDetail({
           </VStack>
         </HStack>
       ) : (
-        <Center marginTop={'80px'}>
-          <CircularProgress isIndeterminate color="darkPurple" />
+        <Center w="full" h="full" marginTop={'80px'}>
+          <Spinner size="lg" />
         </Center>
       )}
     </>
