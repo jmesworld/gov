@@ -37,7 +37,7 @@ export const SpendDaoFunds = ({ client, state, dispatch }: Props) => {
   }, [spendArr]);
 
   const onAmountChange = useCallback(
-    (id: string, value: number) => {
+    (id: string, value: number | '') => {
       dispatch({
         type: 'SET_SPEND_VALUE',
         payload: {

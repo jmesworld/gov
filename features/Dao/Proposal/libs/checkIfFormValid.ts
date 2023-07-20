@@ -23,7 +23,7 @@ export const validateForm = (
       member =>
         member.error ||
         !(member.name && member.address) ||
-        (member.votingPower !== undefined && member.votingPower <= 0),
+        (member.votingPower !== undefined && Number(member.votingPower) <= 0),
     );
     const votingPowerHasChanged = membersArr.some(
       member => member.votingPower !== member.ogWeight || member.isRemoved,
@@ -37,7 +37,7 @@ export const validateForm = (
     }
     const memberVoteAddition = membersArr.reduce((acc, curr) => {
       if (curr.isRemoved) return acc;
-      acc += curr.votingPower ?? 0;
+      acc += Number(curr.votingPower ?? 0);
       return acc;
     }, 0);
     if (memberVoteAddition !== 100) {

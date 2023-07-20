@@ -79,7 +79,8 @@ const GovProposalMyVote = (props: Props) => {
             label="Please connect your wallet to participate in governance"
           >
             <Button
-              disabled={!address}
+              disabled={ props.voted || !address}
+              isDisabled={props.voted}
               as="button"
               height="42px"
               width="50%"
@@ -157,7 +158,8 @@ const GovProposalMyVote = (props: Props) => {
             label="Please connect your wallet to participate in governance"
           >
             <Button
-              disabled={!address}
+              isDisabled={props.voted}
+              disabled={ props.voted || !address}
               as="button"
               height="42px"
               width="50%"

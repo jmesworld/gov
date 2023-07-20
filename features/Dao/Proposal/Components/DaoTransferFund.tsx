@@ -20,9 +20,9 @@ type Props = {
   id: string;
   address?: string | null;
   error?: string;
-  amount?: number;
+  amount?: number | '';
   notCancelable?: boolean;
-  onAmountChange: (id: string, value: number) => void;
+  onAmountChange: (id: string, value: number | '') => void;
   onNameChange: (id: string, value: string) => void;
   onAddress: (id: string, value?: string | null) => void;
   onErrorChange: (id: string, error?: string) => void;
@@ -191,7 +191,8 @@ export const DaoTransferFund = memo(
               value={amount}
               type={'number'}
               onChange={e => {
-                const power = Number(e.target.value) ?? 0;
+                const power =
+                  e.target.value !== '' ? Number(e.target.value) ?? 0 : '';
                 onAmountChange(id, power);
               }}
             />

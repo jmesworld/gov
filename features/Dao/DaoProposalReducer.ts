@@ -9,7 +9,7 @@ type Spend = {
   name: string;
   address?: string | null;
   error?: string;
-  amount: number;
+  amount: number | '';
 };
 
 // TODO: remove this

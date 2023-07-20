@@ -3,7 +3,7 @@ export type Member = {
   name: string;
   address?: string | null;
   error?: string;
-  votingPower?: number;
+  votingPower?: number | '';
 };
 
 export type State = {
