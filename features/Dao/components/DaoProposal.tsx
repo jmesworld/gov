@@ -239,6 +239,7 @@ export default function DaoProposal({
               />
               <Flex height={'9px'} />
               <ProposalList
+                showPassedOrFailed
                 showPassingOrFailing
                 daoClient={daoQueryClient}
                 client={goverrnanceQueryClient}
@@ -267,6 +268,7 @@ export default function DaoProposal({
               />
               <Flex height={'9px'} />
               <ProposalList
+                showPassedOrFailed
                 showPassingOrFailing
                 daoClient={daoQueryClient}
                 client={goverrnanceQueryClient}

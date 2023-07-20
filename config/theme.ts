@@ -68,6 +68,16 @@ export const defaultThemeObject = {
     Alert: alertTheme,
     Button: {
       variants: {
+        purpleText: {
+          bg: 'transparent',
+          borderColor: 'transparent',
+          color: 'purple',
+          _hover: {
+            bg: 'transparent',
+            color: 'darkPurple',
+          },
+          fontWeight: 'normal',
+        },
         purple: {
           bg: 'purple',
           borderColor: 'purple',

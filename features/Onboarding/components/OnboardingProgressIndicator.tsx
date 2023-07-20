@@ -6,8 +6,8 @@ const OnboardingProgressIndicator = ({
   activeCard: string;
 }) => {
   return (
-    <Center>
-      <Flex width={'88px'} alignItems="center">
+    <Center w="full">
+      <Flex alignItems="center">
         <OnboardingProgressIndicatorItem
           checked={activeCard === 'choose-username-card'}
           isActive={activeCard === 'add-tokens-card'}

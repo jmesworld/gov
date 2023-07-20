@@ -13,6 +13,7 @@ export const timestampToDateTime = (timestamp: number) => {
     year: 'numeric',
   };
   const formatTimeOptions: Intl.DateTimeFormatOptions = {
+    hour12: false,
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
@@ -21,8 +22,7 @@ export const timestampToDateTime = (timestamp: number) => {
   const epoch = timestamp * 1000;
   const date = new Date(epoch).toLocaleDateString('us', formatDateOptions);
   const time = new Date(epoch).toLocaleTimeString('us', formatTimeOptions);
-  const period = parseInt(time.substring(0, 2)) >= 12 ? 'PM' : 'AM';
-  return `${date.toUpperCase()} ${time} ${period}`;
+  return `${date.toUpperCase()} ${time}  `;
 };
 
 export const formatDuration = (durationInSeconds: number) => {

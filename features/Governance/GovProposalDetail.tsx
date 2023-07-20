@@ -37,6 +37,7 @@ export default function GovProposalDetail({
 }: {
   proposalId: number;
 }) {
+  const { data: periodData } = useVotingPeriodContext();
   const toast = useToast();
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { signingCosmWasmClient } = useSigningCosmWasmClientContext();
@@ -69,6 +70,16 @@ export default function GovProposalDetail({
         : null,
     [signingCosmWasmClient, address],
   );
+  // TODO: finish this
+  const proposalExpired = useMemo(() => {
+    if (!periodData || !data?.start_block) {
+      return false;
+    }
+    return (
+      periodData.current_block + periodData.voting_period_length / 5 >=
+      data?.start_block + periodData.cycle_length / 5
+    );
+  }, [periodData, data?.start_block]);
 
   const proposalDescription = data?.description ?? '';
   const expiryDate = data?.voting_end ?? 0;
@@ -219,26 +230,8 @@ export default function GovProposalDetail({
               voted={!!voted}
               proposalId={proposalId}
             >
-              {voted && (status === 'voting' || status === 'posted') && (
-                <Box
-                  backdropFilter="auto"
-                  backdropBlur="3px"
-                  p="4"
-                  width="full"
-                  h="full"
-                  m="auto"
-                  zIndex="3"
-                  bg="rgba(255,255,255,.5)"
-                  pos="absolute"
-                >
-                  <Text fontSize="xl" textAlign="center">
-                    {votedYes
-                      ? 'Thank you for your Yes Vote.'
-                      : 'You you for your No Vote.'}
-                  </Text>
-                </Box>
-              )}
-              {isPostingPeriod &&
+              {voted &&
+                !proposalExpired &&
                 (status === 'voting' || status === 'posted') && (
                   <Box
                     backdropFilter="auto"
@@ -248,8 +241,39 @@ export default function GovProposalDetail({
                     h="full"
                     m="auto"
                     zIndex="3"
-                    bg="rgba(255,255,255,.5)"
+                    bg="purple"
                     pos="absolute"
+                    color="white"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Text fontSize="xl" textAlign="center">
+                      {votedYes
+                        ? 'Thank you for your Yes Vote.'
+                        : 'You you for your No Vote.'}
+                    </Text>
+                  </Box>
+                )}
+
+              {isPostingPeriod &&
+                !proposalExpired &&
+                (status === 'voting' || status === 'posted') && (
+                  <Box
+                    backdropFilter="auto"
+                    backdropBlur="3px"
+                    p="4"
+                    width="full"
+                    h="full"
+                    m="auto"
+                    zIndex="3"
+                    bg="purple"
+                    pos="absolute"
+                    color="white"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    flexDir="column"
                   >
                     <Text fontSize="xl" textAlign="center">
                       Please wait until the voting starts.
@@ -257,7 +281,30 @@ export default function GovProposalDetail({
                     <Text textAlign="center">{nextPeriodTimeLeft}</Text>
                   </Box>
                 )}
-
+              {(status === 'voting' || status === 'posted') &&
+                proposalExpired &&
+                isPostingPeriod && (
+                  <Box
+                    backdropFilter="auto"
+                    backdropBlur="3px"
+                    p="4"
+                    width="full"
+                    h="full"
+                    m="auto"
+                    zIndex="3"
+                    bg="purple"
+                    pos="absolute"
+                    color="white"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    flexDir="column"
+                  >
+                    <Text fontSize="xl" textAlign="center">
+                      Proposal expired
+                    </Text>
+                  </Box>
+                )}
               {!(status === 'voting' || status === 'posted') && (
                 <Box
                   backdropFilter="auto"

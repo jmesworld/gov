@@ -18,7 +18,7 @@ export const getLabel = ({ proposal, yesVotes, threshold }: Args) => {
   }
 
   if (proposal.status === 'executed' || proposal.status === 'passed') {
-    label = expired ? 'Executed' : 'Passing';
+    label = expired ? 'Executed' : 'Passed';
     labelSuccess = true;
   }
 

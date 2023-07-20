@@ -12,7 +12,6 @@ import { MouseEventHandler, useMemo } from 'react';
 import { ProposalProgress } from './ProposalProgress';
 import { useRouter } from 'next/router';
 import { calculateVotes } from '../../../lib/calculateVotes';
-import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
 import {
   getDaoProposalType,
   getFunding,
@@ -60,7 +59,6 @@ type Props =
 export const ProposalList = ({
   proposals,
   daoName,
-  largeSize,
   onClickListItem,
   setSelectedDaoProposalTitle,
   setSelectedProposalId,
@@ -73,10 +71,8 @@ export const ProposalList = ({
   isAllInactive,
   showPassingOrFailing,
   showPassedOrFailed,
-  ...rest
 }: Props) => {
   const router = useRouter();
-  const { supply } = useCoinSupplyContext();
 
   const navigateToProposal = (proposalId: string, isGov: boolean) => {
     if (isGov && !goToDaoDetail) {
@@ -260,6 +256,7 @@ export const ProposalList = ({
         }
         return undefined;
       };
+
       return (
         <DaoProposalListItem
           showIsPassing={true}
@@ -286,6 +283,9 @@ export const ProposalList = ({
           navigateToProposal={id => navigateToProposal(id, !!isGovList)}
           largeSize={!!goToDaoDetail}
           label={hasPassed()}
+          passed={
+            hasPassed() !== undefined ? hasPassed() === 'Passed' : undefined
+          }
           labelSuccess={
             proposal.status === 'passed' ||
             proposal.status === 'executed' ||
@@ -513,7 +513,7 @@ export const DaoProposalListItem = ({
             >
               {type.length > 26 ? type.substring(0, 26) + '...' : type}
             </Text>
-            {!passing && passed !== undefined && !label && (
+            {passed !== undefined && !label && (
               <Badge
                 w="60px"
                 py="2px"

@@ -130,7 +130,7 @@ export const ProposalProgress = ({
             left="calc(50% - 20px)"
             height={'20px'}
             width="40px"
-            backgroundColor={'white'}
+            backgroundColor={targetPercentage <= 100 ? 'white' : 'red'}
             zIndex={2}
             borderRadius={'10px'}
           >
@@ -140,7 +140,9 @@ export const ProposalProgress = ({
               isDisabled={target < 100 && target % 1 === 0}
             >
               <Text
-                color="rgba(81, 54, 194, 1)"
+                color={
+                  targetPercentage <= 100 ? 'rgba(81, 54, 194, 1)' : 'white'
+                }
                 fontWeight="500"
                 fontSize={'14px'}
                 overflow="hidden"
@@ -166,7 +168,11 @@ export const ProposalProgress = ({
               height={'100%'}
               backgroundColor={'rgba(116, 83, 253, .5)'}
             />
-            <Box width={'2px'} height={'100%'} backgroundColor={'white'} />
+            <Box
+              width={'2px'}
+              height={'100%'}
+              backgroundColor={targetPercentage <= 100 ? 'white' : 'red'}
+            />
             <Box
               width={'2px'}
               height={'100%'}

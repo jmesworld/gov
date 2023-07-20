@@ -280,6 +280,7 @@ const CreateDaoNewForm = ({
             DAO NAME
           </Text>
           <DaoName
+            disabled={isCreatingDao}
             daoName={daoName}
             daoNameError={daoNameError}
             dispatch={dispatch}
