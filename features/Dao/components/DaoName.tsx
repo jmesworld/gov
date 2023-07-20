@@ -15,8 +15,15 @@ type Props = {
   daoNameError?: string | null;
   dispatch: Dispatch<Actions>;
   client: IdentityserviceQueryClient;
+  disabled?: boolean;
 };
-export const DaoName = ({ daoName, dispatch, daoNameError, client }: Props) => {
+export const DaoName = ({
+  daoName,
+  dispatch,
+  daoNameError,
+  client,
+  disabled,
+}: Props) => {
   const daoNameDebounced = useDebounce({
     value: daoName,
     delay: 300,
@@ -24,7 +31,10 @@ export const DaoName = ({ daoName, dispatch, daoNameError, client }: Props) => {
 
   const { data } = useQuery({
     enabled:
-      daoNameDebounced === daoName && daoNameDebounced !== '' && !daoNameError,
+      (daoNameDebounced === daoName &&
+        daoNameDebounced !== '' &&
+        !daoNameError) ||
+      disabled,
     queryKey: ['members', daoNameDebounced],
     queryFn: ({ queryKey }) => client.getIdentityByName({ name: queryKey[1] }),
     retry: 1,

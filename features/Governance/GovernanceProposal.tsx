@@ -1,4 +1,4 @@
-import { Flex } from '@chakra-ui/react';
+import { Button, Flex } from '@chakra-ui/react';
 import { GovernanceQueryClient } from '../../client/Governance.client';
 import { useGovernanceProposalsQuery } from '../../client/Governance.react-query';
 
@@ -9,11 +9,14 @@ import { ProposalHeader } from '../components/Proposal/ProposalList';
 import { ProposalList } from '../components/Proposal/ProposalList';
 import { useAppState } from '../../contexts/AppStateContext';
 import { useCoinSupplyContext } from '../../contexts/CoinSupply';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { getProposalTypeForGovPublicProposals } from '../../utils/proposalUti';
 import { ProposalResponse } from '../../client/Governance.types';
 import { useVotingPeriodContext } from '../../contexts/VotingPeriodContext';
+import { usePagination } from '../Delegate/hooks/usePagination';
+import Pagination from 'rc-pagination';
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -52,14 +55,25 @@ export default function GovernanceProposal({
     cosmWasmClient as CosmWasmClient,
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   );
+  const { setTotal, total, limit, offset, page, setPage } = usePagination({});
 
-  const { data } = useGovernanceProposalsQuery({
+  const { data, isLoading, isFetching } = useGovernanceProposalsQuery({
     client: governanceQueryClient,
-    args: {},
+    args: {
+      limit,
+      start: offset,
+    },
     options: {
       refetchInterval: 10000,
     },
   });
+
+  useEffect(() => {
+    if (!data || !data?.proposal_count) return;
+    if (data.proposal_count && total !== data.proposal_count) {
+      setTotal(data?.proposal_count);
+    }
+  }, [data, setTotal, total]);
 
   const currentCycleProposals = useMemo(() => {
     if (!data) return [];
@@ -202,6 +216,54 @@ export default function GovernanceProposal({
             isGov={true}
             setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
             setSelectedProposalId={setSelectedProposalId}
+          />
+        </Flex>
+      )}
+      {total > limit && (
+        <Flex justifyContent="flex-end">
+          <Pagination
+            disabled={isLoading || isFetching}
+            style={{
+              listStyle: 'none',
+              display: 'flex',
+              gap: 5,
+              justifyContent: 'flex-end',
+            }}
+            onChange={page => {
+              setPage(page);
+            }}
+            total={total}
+            itemRender={(current, type, element) => {
+              if (type === 'prev' || type === 'next') {
+                return (
+                  <Button
+                    size="sm"
+                    listStyleType="none"
+                    ml={2}
+                    mr={2}
+                    display="inline-block"
+                  >
+                    {type === 'prev' && <ChevronLeftIcon />}
+                    {type === 'next' && <ChevronRightIcon />}
+                  </Button>
+                );
+              }
+
+              if (type === 'page') {
+                return (
+                  <Button
+                    size="sm"
+                    variant={current === page ? 'purple' : 'purpleText'}
+                    listStyleType="none"
+                    display="inline-block"
+                  >
+                    {current}
+                  </Button>
+                );
+              }
+              return element;
+            }}
+            pageSize={limit}
           />
         </Flex>
       )}

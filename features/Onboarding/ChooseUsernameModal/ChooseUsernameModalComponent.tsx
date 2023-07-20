@@ -9,7 +9,6 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Modal,
   ModalBody,
   ModalContent,
   Spacer,
@@ -60,12 +59,6 @@ export const SearchResults = memo(
         },
       });
 
-    if (isLoading || isFetching) {
-      <Spinner size="md" />;
-    }
-    if (error) {
-      <Text> Error: {error.message} </Text>;
-    }
     return (
       <Text
         marginBottom={'8px'}
@@ -77,8 +70,14 @@ export const SearchResults = memo(
         marginLeft={'18px'}
         marginTop={'8px'}
       >
+        {!queryError && !(isLoading || isFetching) && error && (
+          <Text color="red">{error?.message}</Text>
+        )}
         {queryError && <Text color="red">{queryError}</Text>}
-
+        {!queryError && (isLoading || isFetching) && query !== '' && (
+          <Text>Checking name availability...</Text>
+        )}
+        {}
         {data?.identity?.name.toString() === query && !queryError && (
           <Text color="red">Name taken!</Text>
         )}
@@ -96,20 +95,18 @@ type ChooseUsernameCardComponentProps = {
   usernameInputDisabled: boolean;
   usernameInput: string;
   onUsernameChange: (username: string) => void;
-  onUsernameInputBlur: () => void;
   showInputCheckIcon: boolean;
   isCreatingIdentity: boolean;
   searchComponent: ReactNode;
   createIdentityDisabled: boolean;
   onIdentityCreateClick: () => void;
 };
-
+// TODO: refactor this element we don't need to use modal body or content here
 export const ChooseUsernameCardComponent = ({
   onDisconnect,
   usernameInputDisabled,
   usernameInput,
   onUsernameChange,
-  onUsernameInputBlur,
   showInputCheckIcon,
   searchComponent,
   createIdentityDisabled,
@@ -117,138 +114,127 @@ export const ChooseUsernameCardComponent = ({
   isCreatingIdentity,
 }: ChooseUsernameCardComponentProps) => {
   return (
-    <Modal
-      isOpen={true}
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      onClose={() => {}}
-      isCentered={true}
-      closeOnOverlayClick={false}
-      closeOnEsc={false}
+    <ModalContent
+      maxW="500px"
+      maxH="675px"
+      alignItems={'center'}
+      borderRadius={'12px'}
     >
-      <ModalContent
-        maxW="500px"
-        maxH="675px"
-        alignItems={'center'}
+      <ModalBody
+        backgroundColor={'#704FF7'}
+        width={'500px'}
+        height={'500px'}
         borderRadius={'12px'}
       >
-        <ModalBody
-          backgroundColor={'#704FF7'}
-          width={'500px'}
-          height={'500px'}
-          borderRadius={'12px'}
+        <Box
+          width={'full'}
+          height={'590px'}
+          alignItems={'center'}
+          marginTop={'-52.75px'}
         >
-          <Box
-            width={'500px'}
-            height={'590px'}
-            alignItems={'center'}
-            marginTop={'-52.75px'}
-          >
-            <Flex>
-              <Flex
-                width={'100%'}
-                justifyContent={'space-between'}
-                marginRight={'40px'}
-              >
-                <Spacer />
-                <Image
-                  src="/Computer.svg"
-                  alt="icon"
-                  width={'288px'}
-                  height={'275.8px'}
-                  justifySelf={'center'}
-                />
-                <Spacer />
-                <IconButton
-                  aria-label=""
-                  background={'transparent'}
-                  color={'white'}
-                  icon={<CloseIcon height={'24px'} />}
-                  marginTop={'62.75px'}
-                  marginRight={'8px'}
-                  _hover={{ backgroundColor: 'transparent' }}
-                  onClick={() => {
-                    onDisconnect();
-                  }}
-                />
-              </Flex>
-
+          <Flex>
+            <Flex width={'100%'} justifyContent={'space-between'}>
               <Spacer />
-            </Flex>
-            <Flex marginRight={'40px'}>
+              <Image
+                src="/Computer.svg"
+                alt="icon"
+                width={'288px'}
+                height={'275.8px'}
+                justifySelf={'center'}
+              />
               <Spacer />
-              <Text
+              <IconButton
+                aria-label=""
+                background={'transparent'}
                 color={'white'}
-                fontWeight={'bold'}
-                fontSize={28}
-                marginTop={'4px'}
-                fontFamily="DM Sans"
-              >
-                Choose a username
-              </Text>
-              <Spacer />
+                icon={<CloseIcon height={'24px'} />}
+                marginTop={'62.75px'}
+                marginRight={'8px'}
+                _hover={{ backgroundColor: 'transparent' }}
+                onClick={() => {
+                  onDisconnect();
+                }}
+              />
             </Flex>
-            <Flex marginTop={'24px'} marginRight={'40px'}>
-              <Spacer />
-              <Box>
-                <InputGroup justifyItems={'center'}>
-                  <Input
-                    autoFocus
-                    placeholder="Username"
-                    disabled={usernameInputDisabled}
-                    width={'398px'}
-                    height={'49px'}
-                    backgroundColor="#5136C2"
-                    borderColor="#5136C2"
-                    borderRadius={12}
-                    alignItems="center"
-                    justifyContent="center"
-                    color="white"
-                    fontFamily="DM Sans"
-                    fontSize={'16px'}
-                    fontWeight="normal"
-                    value={usernameInput}
-                    onKeyDown={e => {
-                      const character = e.key;
-                      if (character === 'Backspace') {
-                        return;
-                      }
-                      if (character === ' ' || character === 'Spacebar') {
-                        e.preventDefault();
-                      }
 
-                      if (character === 'Enter') {
-                        onIdentityCreateClick();
-                      }
+            <Spacer />
+          </Flex>
+          <Flex>
+            <Spacer />
+            <Text
+              color={'white'}
+              fontWeight={'bold'}
+              fontSize={28}
+              marginTop={'4px'}
+              fontFamily="DM Sans"
+            >
+              Choose a username
+            </Text>
+            <Spacer />
+          </Flex>
+          <Flex marginTop={'24px'}>
+            <Spacer />
+            <Box>
+              <InputGroup justifyItems={'center'}>
+                <Input
+                  autoFocus
+                  placeholder="Username"
+                  disabled={usernameInputDisabled}
+                  width={'398px'}
+                  height={'49px'}
+                  backgroundColor="#5136C2"
+                  borderColor="#5136C2"
+                  borderRadius={12}
+                  alignItems="center"
+                  justifyContent="center"
+                  color="white"
+                  fontFamily="DM Sans"
+                  fontSize={'16px'}
+                  fontWeight="normal"
+                  value={usernameInput}
+                  onKeyDown={e => {
+                    const character = e.key;
+                    if (character === 'Backspace') {
+                      return;
+                    }
+                    if (character === ' ' || character === 'Spacebar') {
+                      e.preventDefault();
+                    }
 
-                      const name = nameSchemaForEachChar.safeParse(character);
-                      const capitalName =
-                        capitalNameSchema.safeParse(character);
+                    if (character === 'Enter') {
+                      onIdentityCreateClick();
+                    }
 
-                      if (capitalName.success) {
-                        e.preventDefault();
-                        onUsernameChange(
-                          usernameInput + character.toLowerCase(),
-                        );
-                      }
-                      if (!name.success) {
-                        e.preventDefault();
-                      }
-                    }}
-                    onChange={e => onUsernameChange(e.target.value)}
-                    onBlur={onUsernameInputBlur}
-                  />
-                  <InputRightElement marginTop={'4px'}>
-                    {showInputCheckIcon && <CheckIcon color={'green'} />}
-                  </InputRightElement>
-                </InputGroup>
-                <Suspense fallback={<Spinner size="sm" />}>
-                  {searchComponent}
-                </Suspense>
-              </Box>
-              <Spacer />
-            </Flex>
-            <Flex marginTop={'11px'} marginBottom={'25px'} marginRight={'40px'}>
-              <Spacer />
+                    const name = nameSchemaForEachChar.safeParse(character);
+                    const capitalName = capitalNameSchema.safeParse(character);
+
+                    if (capitalName.success) {
+                      e.preventDefault();
+                      onUsernameChange(usernameInput + character.toLowerCase());
+                    }
+                    if (!name.success) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onChange={e => onUsernameChange(e.target.value)}
+                />
+                <InputRightElement marginTop={'4px'}>
+                  {showInputCheckIcon && <CheckIcon color={'green'} />}
+                </InputRightElement>
+              </InputGroup>
+              <Suspense fallback={<Spinner size="sm" />}>
+                {searchComponent}
+              </Suspense>
+            </Box>
+            <Spacer />
+          </Flex>
+          <Flex flexDir="column" w="full" justifyContent="center">
+            <Flex
+              marginTop={'11px'}
+              w="full"
+              justifyContent="center"
+              marginBottom={'25px'}
+            >
               <Button
                 disabled={createIdentityDisabled}
                 // onClick={async () => await handleCreateIdentity()}
@@ -281,15 +267,12 @@ export const ChooseUsernameCardComponent = ({
                   />
                 )}
               </Button>
-              <Spacer />
             </Flex>
-            <Spacer />
-            <Box marginRight={'40px'}>
-              <OnboardingProgressIndicator activeCard="choose-username-card" />
-            </Box>
-          </Box>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+
+            <OnboardingProgressIndicator activeCard="choose-username-card" />
+          </Flex>
+        </Box>
+      </ModalBody>
+    </ModalContent>
   );
 };

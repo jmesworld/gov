@@ -12,10 +12,7 @@ import {
 } from '../../../client/Identityservice.client';
 import { StdFee } from '@cosmjs/stargate';
 import { WalletStatus } from '@cosmos-kit/core';
-import {
-  useIdentityserviceGetIdentityByNameQuery,
-  useIdentityserviceRegisterUserMutation,
-} from '../../../client/Identityservice.react-query';
+import { useIdentityserviceRegisterUserMutation } from '../../../client/Identityservice.react-query';
 import {
   ChooseUsernameCardComponent,
   SearchResults,
@@ -45,7 +42,6 @@ interface ChooseUsernameCardProps {
 }
 
 const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
-  const [identityNameInput] = useState(identityName ?? '');
   const [isIdentityNameAvailable, setIsIdentityNameAvailable] = useState(false);
   const [isCreatingIdentity, setIsCreatingIdentity] = useState(false);
   const { cosmWasmClient } = useCosmWasmClientContext();
@@ -72,23 +68,6 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
     IDENTITY_SERVICE_CONTRACT,
   );
   const identityMutation = useIdentityserviceRegisterUserMutation();
-  const identityNameQuery = useIdentityserviceGetIdentityByNameQuery({
-    client,
-    args: { name: identityNameInput },
-    options: {
-      onSuccess: data => {
-        if (!data?.identity?.name.toString()) {
-          setIsIdentityNameAvailable(true);
-        }
-      },
-      onError: error => {
-        console.error(error); //this error
-      },
-
-      cacheTime: 0,
-      enabled: identityNameInput?.length > 2,
-    },
-  });
 
   const [query, setQuery] = useState('');
   const [usernameError, setUsernameError] = useState('');
@@ -102,9 +81,7 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
     disconnect?.();
   };
 
-  const showInputCheckIcon =
-    !!identityName &&
-    identityNameQuery?.data?.identity?.name.toString() !== identityName;
+  const showInputCheckIcon = !!identityName;
 
   const onIdentityCreateClick = () => {
     setIsCreatingIdentity(true);
@@ -157,9 +134,8 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
         setUsernameError('');
         setQuery(val);
       }}
-      onUsernameInputBlur={() => identityNameQuery.refetch()}
       showInputCheckIcon={showInputCheckIcon}
-      createIdentityDisabled={!isIdentityNameAvailable}
+      createIdentityDisabled={!isIdentityNameAvailable || usernameError !== ''}
       searchComponent={
         <SearchResults
           queryError={usernameError}

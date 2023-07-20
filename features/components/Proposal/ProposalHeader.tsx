@@ -1,5 +1,6 @@
-import { Flex, HStack, Text, Tooltip, Image, Box } from '@chakra-ui/react';
+import { Flex, HStack, Text, Box } from '@chakra-ui/react';
 import { Link } from '../genial/Link';
+import { timestampToDateTime } from '../../../utils/time';
 
 export const ProposalHeader = ({
   title,
@@ -36,21 +37,9 @@ export const ProposalHeader = ({
           fontWeight="medium"
           fontFamily="DM Sans"
         >
-          Voting ends {convertTimestamp(proposalExpiry)} UTC
+          Voting ends {timestampToDateTime(proposalExpiry / 1e3)}
         </Text>
       </HStack>
     </Flex>
   );
-};
-
-const convertTimestamp = (timestamp: number) => {
-  const date = new Date(timestamp);
-  return date.toLocaleString('en-US', {
-    timeZone: 'UTC',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  });
 };
