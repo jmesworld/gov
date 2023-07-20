@@ -148,7 +148,7 @@ const CreateDaoNewForm = ({
   }, [membersArr]);
 
   const onVotingPowerChange = useCallback(
-    (id: string, value: number) => {
+    (id: string, value: number | '') => {
       dispatch({
         type: 'SET_VALUE',
         payload: {
@@ -386,7 +386,9 @@ const CreateDaoNewForm = ({
               name={daoMember.name}
               address={daoMember.address}
               error={daoMember.error}
-              votingPower={daoMember.votingPower}
+              votingPower={
+                daoMember.votingPower === '' ? undefined : daoMember.votingPower
+              }
               client={client}
               onVotingPowerChange={onVotingPowerChange}
               onNameChange={onNameChange}

@@ -14,7 +14,7 @@ import {
 import { useClipboardTimeout } from '../../../../hooks/useClipboard';
 
 type Props = {
-  removeCopy?:boolean
+  removeCopy?: boolean;
   client: IdentityserviceQueryClient;
   isReadOnly: boolean;
   name?: string;
@@ -22,7 +22,7 @@ type Props = {
   address?: string | null;
   error?: string;
   votingPower?: number;
-  onVotingPowerChange: (id: string, value: number) => void;
+  onVotingPowerChange: (id: string, value: number | '') => void;
   onNameChange: (id: string, value: string) => void;
   onAddress: (id: string, value?: string | null) => void;
   onErrorChange: (id: string, error?: string) => void;
@@ -44,7 +44,7 @@ export const MemberUpdate = memo(
     onErrorChange,
     onVotingPowerChange,
     onRemove,
-    removeCopy
+    removeCopy,
   }: Props) => {
     const [copied, onCopy] = useClipboardTimeout();
     const [value, setValue] = useState<string>(name ?? '');
@@ -169,8 +169,11 @@ export const MemberUpdate = memo(
             value={votingPower}
             type={'number'}
             onChange={e => {
-              const power = Number(e.target.value) ?? 0;
-              onVotingPowerChange(id, Math.abs(power));
+              const power =
+                e.target.value !== ''
+                  ? Math.abs(Number(e.target.value))
+                  : ('' as const);
+              onVotingPowerChange(id, power);
             }}
           />
 

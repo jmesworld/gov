@@ -125,11 +125,17 @@ export default function GovProposalDetail({
     return undefined;
   }, [passed, isPassing]);
 
-  const voted =
-    (data?.yes_voters?.includes(address as string) ||
-      data?.no_voters?.includes(address as string)) ??
-    false;
+  const votedYes = useMemo(() => {
+    return data?.yes_voters?.includes(address as string);
+  }, [data?.yes_voters, address]);
 
+  const votedNo = useMemo(() => {
+    return data?.no_voters?.includes(address as string);
+  }, [data?.no_voters, address]);
+
+  const voted = useMemo(() => {
+    return votedYes || votedNo;
+  }, [votedYes, votedNo]);
   const concludeVote = async () => {
     try {
       setConcluding(true);
@@ -207,9 +213,28 @@ export default function GovProposalDetail({
           >
             <GovProposalMyVote
               refetch={refetch}
-              voted={voted}
+              voted={!!voted}
               proposalId={proposalId}
             >
+              {voted && (status === 'voting' || status === 'posted') && (
+                <Box
+                  backdropFilter="auto"
+                  backdropBlur="3px"
+                  p="4"
+                  width="full"
+                  h="full"
+                  m="auto"
+                  zIndex="3"
+                  bg="rgba(255,255,255,.5)"
+                  pos="absolute"
+                >
+                  <Text fontSize="xl" textAlign="center">
+                    {votedYes
+                      ? 'Thank you for your Yes Vote.'
+                      : 'You you for your No Vote.'}
+                  </Text>
+                </Box>
+              )}
               {isPostingPeriod &&
                 (status === 'voting' || status === 'posted') && (
                   <Box

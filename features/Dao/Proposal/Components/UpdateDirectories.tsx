@@ -34,12 +34,12 @@ export const UpdateDirectories = ({
   dispatch,
 }: Props) => {
   const onVotingPowerChange = useCallback(
-    (id: string, value: number) => {
+    (id: string, value: number | '') => {
       dispatch({
         type: 'SET_MEMBER_VALUE',
         payload: {
           id,
-          votingPower: value,
+          votingPower: value === '' ? undefined : value,
         },
       });
     },
@@ -173,7 +173,9 @@ export const UpdateDirectories = ({
           name={daoMember.name}
           address={daoMember.address}
           error={daoMember.error}
-          votingPower={daoMember.votingPower}
+          votingPower={
+            daoMember.votingPower === '' ? undefined : daoMember.votingPower
+          }
           client={client}
           onVotingPowerChange={onVotingPowerChange}
           onNameChange={onNameChange}
