@@ -541,9 +541,9 @@ const CreateDaoForm = ({
               })
               .then(() => {
                 toast({
-                  title: 'Dao created.',
+                  title: 'DAO created.',
                   description:
-                    "We've created your Dao for you. You'll be able to access it shortly.",
+                    "We've created your DAO for you. You'll be able to access it shortly.",
                   status: 'success',
                   variant: 'custom',
                   duration: 9000,
@@ -552,7 +552,7 @@ const CreateDaoForm = ({
               })
               .catch(error => {
                 toast({
-                  title: 'Dao creation error',
+                  title: 'DAO creation error',
                   description: error.toString(),
                   status: 'error',
                   variant: 'custom',

@@ -446,7 +446,7 @@ export const DAOProposalPage = ({
                   status: 'success',
                   variant: 'custom',
                   isClosable: true,
-                  title: 'Created Dao Proposal',
+                  title: 'Created DAO Proposal',
                 });
                 dispatch({
                   type: 'RESET',
