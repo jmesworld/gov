@@ -60,6 +60,7 @@ export default function GovernanceProposal({
       refetchInterval: 10000,
     },
   });
+
   const currentCycleProposals = useMemo(() => {
     if (!data) return [];
     return data.proposals

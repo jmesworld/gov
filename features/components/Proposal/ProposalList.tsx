@@ -496,7 +496,7 @@ export const DaoProposalListItem = ({
                 width={'100%'}
                 marginLeft={'14px'}
                 whiteSpace="pre-wrap"
-                noOfLines={3}
+                noOfLines={1}
                 textOverflow="ellipsis"
               >
                 {title.length > 20 ? title.substring(0, 20) + '...' : title}
@@ -707,7 +707,7 @@ export const ProposalListItem = ({
                 width={'100%'}
                 marginLeft={'14px'}
                 whiteSpace="pre-wrap"
-                noOfLines={3}
+                noOfLines={1}
                 textOverflow="ellipsis"
               >
                 {title.length > 20 ? title.substring(0, 20) + '...' : title}

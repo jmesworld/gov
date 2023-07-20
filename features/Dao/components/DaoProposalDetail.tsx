@@ -239,7 +239,7 @@ export default function DaoProposalDetail({
           </Box>
           <VStack width="330px" spacing="30px" align="flex-start">
             <ProposalMyVote
-              disableExcuteTooltip="To execute, please wait until the posting period starts."
+              disableExcuteTooltip="Please wait until the posting period"
               refetch={proposalDetailQuery.refetch}
               hideExecute={!(status !== 'executed' && target <= yesPercentage)}
               disableExecute={!!isGov && !isPostingPeriod}
