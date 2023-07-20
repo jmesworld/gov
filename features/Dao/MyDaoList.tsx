@@ -1,6 +1,6 @@
-import { Box, Flex, Skeleton, Spinner, Text, Tooltip } from '@chakra-ui/react';
+import { Flex, Tooltip } from '@chakra-ui/react';
 
-import { NavBarItem } from '../NavBar/NavBarItem';
+import { NavBarItem, NavBarSkeleton } from '../NavBar/NavBarItem';
 import { Link } from '../components/genial/Link';
 import { useRouter } from 'next/router';
 import { useDAOContext } from '../../contexts/DAOContext';
@@ -8,8 +8,6 @@ import { useIdentityContext } from '../../contexts/IdentityContext';
 
 const MyDaoList = () => {
   const router = useRouter();
-  const queryId = router.query.id;
-  const daoName = Array.isArray(queryId) && queryId?.[0];
 
   const { daos, setSelectedDAOByName, loading, firstLoad, selectedDAO } =
     useDAOContext();
@@ -19,17 +17,11 @@ const MyDaoList = () => {
   }
   if (firstLoad && loading && !daos.length) {
     return (
-      <Box>
+      <Flex justifyContent="flex-end" flexDir="column" alignItems="flex-end">
         {Array.from({ length: 3 }, (_, i) => (
-          <Skeleton
-            startColor="darkPurple"
-            endColor="primary.500"
-            my="2"
-            key={i}
-            height="30px"
-          />
+          <NavBarSkeleton key={i} />
         ))}
-      </Box>
+      </Flex>
     );
   }
 
@@ -75,7 +67,7 @@ const MyDaoList = () => {
                   key={dao.name}
                   text={dao.name}
                   isSelected={isActive}
-                  onClick={e => {
+                  onClick={() => {
                     setSelectedDAOByName(dao.name);
                   }}
                 />

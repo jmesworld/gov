@@ -13,6 +13,10 @@ export const defaultThemeObject = {
     heading: `DM Sans, ${theme.fonts.heading}`,
   },
   colors: {
+    skeleton: {
+      100: '#e1dafe',
+      200: '#afa9c6',
+    },
     primary: {
       100: 'gba(112,79,247,0.1)',
       500: 'rgba(112,79,247,0.5)',
