@@ -4,9 +4,10 @@ import {
   Box,
   Button,
   Flex,
+  Image,
   Input,
   InputGroup,
-  InputRightElement,
+  InputLeftElement,
   Spacer,
   Text,
 } from '@chakra-ui/react';
@@ -14,7 +15,6 @@ import { v4 as uuid } from 'uuid';
 import { AddIcon } from '@chakra-ui/icons';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
 import { DaoTransferFund } from './DaoTransferFund';
-import Image from 'next/image';
 
 type Props = {
   state: State;
@@ -96,7 +96,7 @@ export const SpendDaoFunds = ({ client, state, dispatch }: Props) => {
 
   return (
     <Flex flexDir="column">
-      <Flex width={'798px'} marginTop={'38px'} marginBottom={'19px'}>
+      <Flex width={'798px'} marginTop={'10px'} marginBottom={'25px'}>
         <Button
           variant={'outline'}
           borderColor={'purple'}
@@ -159,7 +159,7 @@ export const SpendDaoFunds = ({ client, state, dispatch }: Props) => {
         width={'100%'}
         justifyContent="flex-end"
       >
-        <InputGroup width={'235'} height={'48px'} marginRight={'34px'}>
+        <InputGroup width={'202px'} height={'48px'} marginRight={'34px'}>
           <Input
             variant={'outline'}
             width={'202px'}
@@ -173,21 +173,14 @@ export const SpendDaoFunds = ({ client, state, dispatch }: Props) => {
             value={totalAmount}
           />
 
-          <InputRightElement height={'100%'}>
-            <Text
-              color={'white'}
-              fontFamily="DM Sans"
-              fontSize={16}
-              fontWeight="normal"
-            >
-              <Image
-                src="/JMES_Icon.svg"
-                alt="JMES Icon"
-                width={4}
-                height={4}
-              />
-            </Text>
-          </InputRightElement>
+          <InputLeftElement height={'100%'}>
+            <Image
+              src="/JMES_Icon_white.svg"
+              alt="JMES Icon"
+              width={4}
+              height={4}
+            />
+          </InputLeftElement>
         </InputGroup>
       </Flex>
     </Flex>
