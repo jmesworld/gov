@@ -49,7 +49,7 @@ export const ProposalProgress = ({
             fontFamily="DM Sans"
             textTransform="uppercase"
             opacity={yesPercent > noPercent ? '1' : '0.5'}
-            width={'65px'}
+            width={'69px'}
             textOverflow="ellipsis"
             textAlign={'left'}
             whiteSpace="pre"
@@ -58,7 +58,7 @@ export const ProposalProgress = ({
             <Box as="span" display="inline-block" width="30px">
               Yes
             </Box>
-            <span>{formatBalance(yesCount, 1)}</span>
+            <span>{formatBalance(yesCount, 0)}</span>
           </Text>
         </Tooltip>
         <Progress
@@ -88,7 +88,7 @@ export const ProposalProgress = ({
             textTransform="uppercase"
             textOverflow="ellipsis"
             opacity={yesPercent > noPercent ? '0.5' : '1'}
-            width={'65px'}
+            width={'69px'}
             textAlign={'left'}
             whiteSpace="pre"
             overflow="hidden"
@@ -96,7 +96,7 @@ export const ProposalProgress = ({
             <Box as="span" display="inline-block" width="30px">
               No
             </Box>
-            <span>{formatBalance(noCount, 1)}</span>
+            <span>{formatBalance(noCount, 0)}</span>
           </Text>
         </Tooltip>
         <Progress
@@ -152,7 +152,7 @@ export const ProposalProgress = ({
                 textAlign={'center'}
                 textOverflow={'ellipsis'}
               >
-                {formatBalance(target, 2)}
+                {formatBalance(target, 0)}
               </Text>
             </Tooltip>
           </Box>

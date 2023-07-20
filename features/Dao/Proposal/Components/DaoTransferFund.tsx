@@ -1,4 +1,4 @@
-import { useEffect, useState, memo } from 'react';
+import { useEffect, useState, memo, useMemo } from 'react';
 import { useDebounce } from '../../../../hooks/useDebounce';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
 import { useQuery } from '@tanstack/react-query';
@@ -10,7 +10,6 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Text,
 } from '@chakra-ui/react';
 import { TwoInputs } from '../../../components/genial/TwoInputs';
 
@@ -78,7 +77,6 @@ export const DaoTransferFund = memo(
         return;
       }
       if (address && address !== value) {
-        onAddress(id, '');
         name && onNameChange(id, '');
       }
 
@@ -164,12 +162,44 @@ export const DaoTransferFund = memo(
       onErrorChange(id, undefined);
     }, [err, addressErr, id, onErrorChange]);
 
+    const notFoundError = useMemo(() => {
+      if (
+        !address &&
+        nameValue &&
+        !error &&
+        !(isFetching || isFetchingAddress)
+      ) {
+        return 'Not found';
+      }
+      if (
+        addressValue !== address &&
+        address &&
+        nameValue === '' &&
+        !(isFetching || isFetchingAddress)
+      ) {
+        return 'Address not found';
+      }
+      return null;
+    }, [
+      address,
+      addressValue,
+      error,
+      isFetching,
+      isFetchingAddress,
+      nameValue,
+    ]);
+
     return (
       <Box>
         <Flex key={id} marginBottom={'3px'}>
           <Flex mr={2} flexGrow={1}>
             <TwoInputs
-              value={[name || nameValue, address || addressValue]}
+              isLoading={isFetching || isFetchingAddress}
+              error={(error || notFoundError) ?? undefined}
+              value={[
+                name || nameValue || addressValue,
+                name || nameValue ? address || addressValue : '',
+              ]}
               onchange={[onNameValueChange, onChangeAddress]}
             />
           </Flex>
@@ -218,23 +248,6 @@ export const DaoTransferFund = memo(
             />
           )}
         </Flex>
-        <Text
-          mb="3px"
-          height="22px"
-          fontSize="small"
-          color={'purple'}
-          fontFamily="DM Sans"
-          fontWeight="normal"
-        >
-          {(isFetching || isFetchingAddress) &&
-            address === undefined &&
-            'loading...'}
-          {error}
-          {!address &&
-            !error &&
-            !(isFetching || isFetchingAddress) &&
-            'Not Found'}
-        </Text>
       </Box>
     );
   },
