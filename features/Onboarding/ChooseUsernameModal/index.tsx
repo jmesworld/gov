@@ -138,6 +138,7 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
       createIdentityDisabled={!isIdentityNameAvailable || usernameError !== ''}
       searchComponent={
         <SearchResults
+          isIdentityNameAvailable={isIdentityNameAvailable}
           queryError={usernameError}
           client={client}
           setIsIdentityNameAvailable={setIsIdentityNameAvailable}
