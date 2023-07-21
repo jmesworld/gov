@@ -6,6 +6,7 @@ import {
   Spacer,
   Image,
   Skeleton,
+  Tooltip,
 } from '@chakra-ui/react';
 import { Dispatch, SetStateAction } from 'react';
 import { WalletStatus } from '@cosmos-kit/core';
@@ -73,21 +74,119 @@ const NavBar = ({
           GOVERNANCE
         </Text>
       </Flex>
-      <Link.withStatus
-        href="/"
-        activePattern={[/^\/$/, /^\/proposals\/\[[^\]]+\]$/]}
-      >
-        {({ isActive }) => (
-          <NavBarItem
-            text="Proposals"
-            isSelected={isActive}
-            onClick={() => {
-              setSelectedDao('');
-              setSelectedDaoName('');
+      <Flex flexDir="column" w="full">
+        <Tooltip
+          openDelay={500}
+          w="full"
+          shouldWrapChildren
+          hasArrow
+          label="All proposals"
+        >
+          <Link.withStatus
+            href="/"
+            matchFunc={route => {
+              if (router.route === '/') {
+                return true;
+              }
+              if (router.route !== '/proposals/[id]') {
+                return false;
+              }
+
+              const query = route.query.tab;
+              if (query === 'funded') {
+                return false;
+              }
+              if (query === 'core-slots') {
+                return false;
+              }
+              return true;
             }}
-          />
-        )}
-      </Link.withStatus>
+          >
+            {({ isActive }) => (
+              <NavBarItem
+                text="Proposals"
+                isSelected={isActive}
+                onClick={() => {
+                  setSelectedDao('');
+                  setSelectedDaoName('');
+                }}
+              />
+            )}
+          </Link.withStatus>
+        </Tooltip>
+        <Tooltip
+          openDelay={500}
+          w="full"
+          shouldWrapChildren
+          hasArrow
+          label="Funded proposals"
+        >
+          <Link.withStatus
+            matchFunc={route => {
+              if (router.route === '/funded') {
+                return true;
+              }
+              if (router.route !== '/proposals/[id]') {
+                return false;
+              }
+
+              const query = route.query.tab;
+              if (query !== 'funded') {
+                return false;
+              }
+              return true;
+            }}
+            href="/funded"
+          >
+            {({ isActive }) => (
+              <NavBarItem
+                text="Funded"
+                isSelected={isActive}
+                onClick={() => {
+                  setSelectedDao('');
+                  setSelectedDaoName('');
+                }}
+              />
+            )}
+          </Link.withStatus>
+        </Tooltip>
+        <Tooltip
+          openDelay={500}
+          w="full"
+          shouldWrapChildren
+          hasArrow
+          label="Core-slot proposals"
+        >
+          <Link.withStatus
+            matchFunc={route => {
+              if (router.route === '/core-slots') {
+                return true;
+              }
+              if (router.route !== '/proposals/[id]') {
+                return false;
+              }
+
+              const query = route.query.tab;
+              if (query !== 'core-slots') {
+                return false;
+              }
+              return true;
+            }}
+            href="/core-slots"
+          >
+            {({ isActive }) => (
+              <NavBarItem
+                text="Core-Slots"
+                isSelected={isActive}
+                onClick={() => {
+                  setSelectedDao('');
+                  setSelectedDaoName('');
+                }}
+              />
+            )}
+          </Link.withStatus>
+        </Tooltip>
+      </Flex>
       <Box height={'27px'} />
       <Flex
         width="full"

@@ -1,34 +1,72 @@
-import { Flex, HStack, Text, Box } from '@chakra-ui/react';
+import {
+  Flex,
+  HStack,
+  Text,
+  Box,
+  Breadcrumb,
+  BreadcrumbItem,
+} from '@chakra-ui/react';
 import { Link } from '../genial/Link';
 import { timestampToDateTime } from '../../../utils/time';
+import { ChevronRightIcon } from '@chakra-ui/icons';
 
 export const ProposalHeader = ({
   title,
   daoName,
   proposalTitle,
   proposalExpiry,
+  tab,
 }: {
   title?: string;
   daoName?: string;
   proposalTitle: string;
   proposalExpiry: number;
+  tab?: string;
 }) => {
   return (
     <Flex direction="column">
-      <Box
+      <Breadcrumb
+        separator={<ChevronRightIcon color="#7453FD" fontSize={'28px'} />}
+      >
+        <BreadcrumbItem>
+          <Link href={daoName ? `/dao/view/${daoName}` : `/${tab ?? ''}`}>
+            <Text
+              color="purple"
+              fontFamily="DM Sans"
+              fontWeight="thin"
+              fontSize={28}
+              display="inline-block"
+              cursor="pointer"
+            >
+              {title}
+            </Text>
+          </Link>
+        </BreadcrumbItem>
+        <BreadcrumbItem>
+          <Text
+            color="darkPurple"
+            fontFamily="DM Sans"
+            fontSize={28}
+            fontWeight="bold"
+          >
+            {proposalTitle}
+          </Text>
+        </BreadcrumbItem>
+      </Breadcrumb>
+      {/* <Box
         color={'#5136C2'}
         fontFamily="DM Sans"
         fontWeight="medium"
         fontSize={28}
       >
-        <Link href={daoName ? `/dao/view/${daoName}` : '/'}>
+        <Link href={daoName ? `/dao/view/${daoName}` : `/${tab ?? ''}`}>
           <Text decoration="underline" display="inline-block" cursor="pointer">
             {title}
           </Text>
         </Link>
-        &nbsp;&#x2022;&nbsp;
+        <ChevronRightIcon color="purple" />
         {proposalTitle}
-      </Box>
+      </Box> */}
       <HStack hidden={proposalExpiry <= 0} marginTop="38px" marginBottom="16px">
         <Text
           textTransform="uppercase"
