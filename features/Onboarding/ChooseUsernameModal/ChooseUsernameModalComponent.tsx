@@ -30,20 +30,22 @@ export const SearchResults = memo(
     query,
     client,
     setIsIdentityNameAvailable,
+    isIdentityNameAvailable,
     queryError,
   }: {
     query: string;
     client: IdentityserviceQueryClient;
     setIsIdentityNameAvailable: Dispatch<SetStateAction<boolean>>;
     queryError: string;
+    isIdentityNameAvailable: boolean;
   }) => {
-    const { data, isLoading, isFetching, error } =
+    const { data, isFetching, error } =
       useIdentityserviceGetIdentityByNameQuery({
         client,
         args: { name: query },
 
         options: {
-          enabled: false,
+          enabled: !queryError && query !== '',
           staleTime: 1000,
           cacheTime: 1000,
           retry: 3,
@@ -59,6 +61,80 @@ export const SearchResults = memo(
         },
       });
 
+    const isLoadingOrFetching = isFetching;
+
+    if (isLoadingOrFetching) {
+      return (
+        <Text
+          marginBottom={'8px'}
+          color="white"
+          fontFamily={'DM Sans'}
+          fontWeight="normal"
+          fontSize={12}
+          height={'16px'}
+          marginLeft={'18px'}
+          marginTop={'8px'}
+        >
+          <Text>Checking name availability...</Text>
+        </Text>
+      );
+    }
+
+    if (error || queryError) {
+      return (
+        <Text
+          marginBottom={'8px'}
+          color="white"
+          fontFamily={'DM Sans'}
+          fontWeight="normal"
+          fontSize={12}
+          height={'16px'}
+          marginLeft={'18px'}
+          marginTop={'8px'}
+        >
+          <Text color="red"> {queryError || error?.message}</Text>
+        </Text>
+      );
+    }
+
+    if (
+      data?.identity?.name.toString() === query &&
+      !isLoadingOrFetching &&
+      !queryError
+    ) {
+      return (
+        <Text
+          marginBottom={'8px'}
+          color="white"
+          fontFamily={'DM Sans'}
+          fontWeight="normal"
+          fontSize={12}
+          height={'16px'}
+          marginLeft={'18px'}
+          marginTop={'8px'}
+        >
+          <Text color="red">Name taken!</Text>
+        </Text>
+      );
+    }
+
+    if (isIdentityNameAvailable) {
+      return (
+        <Text
+          marginBottom={'8px'}
+          color="white"
+          fontFamily={'DM Sans'}
+          fontWeight="normal"
+          fontSize={12}
+          height={'16px'}
+          marginLeft={'18px'}
+          marginTop={'8px'}
+        >
+          <Text color="green">Name is available!</Text>
+        </Text>
+      );
+    }
+
     return (
       <Text
         marginBottom={'8px'}
@@ -69,23 +145,7 @@ export const SearchResults = memo(
         height={'16px'}
         marginLeft={'18px'}
         marginTop={'8px'}
-      >
-        {!queryError && !(isLoading || isFetching) && error && (
-          <Text color="red">{error?.message}</Text>
-        )}
-        {queryError && <Text color="red">{queryError}</Text>}
-        {!queryError && (isLoading || isFetching) && query !== '' && (
-          <Text>Checking name availability...</Text>
-        )}
-        {}
-        {data?.identity?.name.toString() === query && !queryError && (
-          <Text color="red">Name taken!</Text>
-        )}
-
-        {query && !queryError && data?.identity?.name.toString() === query && (
-          <Text color="green">Name is available!</Text>
-        )}
-      </Text>
+      ></Text>
     );
   },
 );
