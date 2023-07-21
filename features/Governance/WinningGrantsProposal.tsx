@@ -4,7 +4,7 @@ import { useAppState } from '../../contexts/AppStateContext';
 import { useCoinSupplyContext } from '../../contexts/CoinSupply';
 import { getProposalTypeForGovPublicProposals } from '../../utils/proposalUti';
 import { ProposalResponse } from '../../client/Governance.types';
-import { useGovernanceProposals } from './useGovernance';
+import { useGovernanceWinningGrants } from './useGovernance';
 import GovernanceProposalComponent from './GovernanceProposalComponent';
 import { useMemo } from 'react';
 
@@ -44,7 +44,7 @@ export default function GovernanceProposal({
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   );
 
-  const { data, isLoading, isFetching, pagination } = useGovernanceProposals({
+  const { data, isLoading, isFetching } = useGovernanceWinningGrants({
     governanceQueryClient,
   });
 
@@ -55,12 +55,12 @@ export default function GovernanceProposal({
 
   return (
     <GovernanceProposalComponent
+      tab="funded"
       setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
       governanceQueryClient={governanceQueryClient}
       setSelectedProposalId={setSelectedProposalId}
       supply={supply as number}
-      pagination={pagination}
-      proposalTitle={'ALL PROPOSALS'}
+      proposalTitle={'FUNDED PROPOSALS'}
       data={sorted}
       isLoading={isLoading}
       isFetching={isFetching}

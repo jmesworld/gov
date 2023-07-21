@@ -43,6 +43,7 @@ type BaseProps = {
   isAllInactive?: boolean;
   showPassingOrFailing?: boolean;
   showPassedOrFailed?: boolean;
+  tab?: string;
 };
 type Props =
   | (BaseProps & {
@@ -71,12 +72,13 @@ export const ProposalList = ({
   isAllInactive,
   showPassingOrFailing,
   showPassedOrFailed,
+  tab,
 }: Props) => {
   const router = useRouter();
 
   const navigateToProposal = (proposalId: string, isGov: boolean) => {
     if (isGov && !goToDaoDetail) {
-      router.push(`/proposals/${proposalId}`);
+      router.push(`/proposals/${proposalId}${tab ? `?tab=${tab}` : ''}`);
       return;
     }
     router.push(`/dao/view/${daoName}/proposals/${proposalId}`);
@@ -162,6 +164,9 @@ export const ProposalList = ({
         };
 
         const isPassing = () => {
+          if (statusSuccess() !== undefined) {
+            return undefined;
+          }
           if (
             !showPassingOrFailing ||
             thresholdPercent === undefined ||

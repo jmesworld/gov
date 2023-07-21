@@ -28,6 +28,7 @@ import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { calculateVotes } from '../../lib/calculateVotes';
 import { useVotingPeriodContext } from '../../contexts/VotingPeriodContext';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
+import { useRouter } from 'next/router';
 
 const GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -37,6 +38,7 @@ export default function GovProposalDetail({
 }: {
   proposalId: number;
 }) {
+  const { query } = useRouter();
   const { data: periodData } = useVotingPeriodContext();
   const toast = useToast();
   const { cosmWasmClient } = useCosmWasmClientContext();
@@ -48,6 +50,8 @@ export default function GovProposalDetail({
     cosmWasmClient as CosmWasmClient,
     GOVERNANCE_CONTRACT,
   );
+
+  const tab = query.tab;
 
   const { data, refetch } = useGovernanceProposalQuery({
     client: govQueryClient,
@@ -70,7 +74,7 @@ export default function GovProposalDetail({
         : null,
     [signingCosmWasmClient, address],
   );
-  // TODO: finish this
+  // TODO: make sure this works
   const proposalExpired = useMemo(() => {
     if (!periodData || !data?.start_block) {
       return false;
@@ -177,11 +181,33 @@ export default function GovProposalDetail({
   const status = useMemo(() => {
     return data?.status;
   }, [data?.status]);
+
+  const proposalTitle = useMemo(() => {
+    if (tab === 'core-slots') {
+      return 'Core Slot Proposal';
+    }
+    if (tab === 'funded') {
+      return 'Funded Proposal';
+    }
+    return 'Governance Proposal';
+  }, [tab]);
+
+  const tabLink = useMemo(() => {
+    if (tab === 'core-slots') {
+      return '/core-slots';
+    }
+    if (tab === 'funded') {
+      return '/funded';
+    }
+    return undefined;
+  }, [tab]);
+
   return (
     <>
       <Flex height={'47px'} />
       <ProposalHeader
-        title="Governance Proposal"
+        tab={tabLink}
+        title={proposalTitle}
         proposalTitle={data?.title ?? ''}
         proposalExpiry={expiryDateTimestamp}
       />

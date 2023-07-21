@@ -31,11 +31,11 @@ const MyDaoList = () => {
         return (
           <Tooltip
             key={dao.name}
-            closeOnClick={true}
-            hasArrow={true}
-            shouldWrapChildren={true}
-            closeOnScroll={true}
-            closeOnEsc={true}
+            closeOnClick
+            hasArrow
+            shouldWrapChildren
+            closeOnScroll
+            closeOnEsc
             openDelay={500}
             label={dao.name}
           >
