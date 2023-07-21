@@ -37,6 +37,7 @@ import * as MultisigClientType from '../../client/DaoMultisig.types';
 import { toBase64 } from '../../utils/identity';
 import { Link } from '../components/genial/Link';
 import { useAccountBalance } from '../../hooks/useAccountBalance';
+import { ClosePageButton } from '../components/genial/ClosePageButton';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -346,11 +347,16 @@ export const DAOProposalPage = ({
             />
           )}
           {activeTab === 'spend-dao-funds' && (
-            <SpendDaoFunds client={client} state={state} dispatch={dispatch} />
+            <SpendDaoFunds
+              isDirty={!!isDirty}
+              client={client}
+              state={state}
+              dispatch={dispatch}
+            />
           )}
         </Flex>
       </Flex>
-      <Flex flexDir="column">
+      <Flex flexDir="column" mb="25px">
         {err?.map(el => (
           <Text color="red" key={el}>
             {el}
@@ -358,6 +364,7 @@ export const DAOProposalPage = ({
         ))}
       </Flex>
       <Box marginLeft={'270px'}>
+        <ClosePageButton showCloseButton={false} />
         <Flex
           marginTop={'12px'}
           marginBottom={'93px'}

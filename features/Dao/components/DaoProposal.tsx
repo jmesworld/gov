@@ -24,6 +24,7 @@ import { ProposalResponseForEmpty } from '../../../client/DaoMultisig.types';
 import { useDAOContext } from '../../../contexts/DAOContext';
 import Link from 'next/link';
 import { AddIcon } from '@chakra-ui/icons';
+import { CopiedText } from '../../components/genial/CopiedText';
 
 export default function DaoProposal({
   daoAddress,
@@ -167,7 +168,13 @@ export default function DaoProposal({
                 // show tooltip after copy
                 isOpen={copied || undefined}
                 hasArrow
-                label={copied ? '✅ Copied Address' : 'Copy DAO address'}
+                label={
+                  copied ? (
+                    <CopiedText text="Copied DAO Address" />
+                  ) : (
+                    'Copy DAO address'
+                  )
+                }
                 placement="top"
               >
                 <Image

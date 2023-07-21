@@ -78,6 +78,7 @@ export default function DaoProposalDetail({
       ),
     [cosmWasmClient],
   );
+
   const daoMultisigQueryClient = new DaoMultisigQueryClient(
     cosmWasmClient as CosmWasmClient,
     selectedDao as string,
@@ -110,6 +111,7 @@ export default function DaoProposalDetail({
   });
 
   const proposalDescription = proposalDetailQuery?.data?.description ?? '';
+  // TODO: check if this is correct
   /// @ts-ignore
   const expiryDate = proposalDetailQuery?.data?.expires?.at_height ?? 0;
   const averageBlockTime = 5; // Average block time in seconds
@@ -243,7 +245,7 @@ export default function DaoProposalDetail({
               height="300px"
             >
               <Text
-                color="midnight"
+                color="purple"
                 ml="10px"
                 fontSize="16px"
                 fontWeight="normal"

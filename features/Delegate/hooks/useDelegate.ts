@@ -250,6 +250,8 @@ export const useDelegate = () => {
           variant: 'custom',
         });
       }
+      await refetchUnBondValidators();
+      await refetchBondValidators();
       await refetchMyUnBondingsValidators();
       await refresh();
       onChangeSlider(sliderDefaultValue);
@@ -279,8 +281,11 @@ export const useDelegate = () => {
     address,
     toast,
     bonding,
-    refresh,
+    refetchUnBondValidators,
+    refetchBondValidators,
     refetchMyUnBondingsValidators,
+    refresh,
+    onChangeSlider,
     selectedValidator,
     signingCosmWasmClient,
     valueToMove,

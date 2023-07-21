@@ -23,6 +23,7 @@ import { useLeaveConfirmContext } from '../../../hooks/useLeaveConfirm';
 import { PromiseModal } from '../../components/genial/PromiseModal';
 import { useBalanceContext } from '../../../contexts/balanceContext';
 import { useClipboardTimeout } from '../../../hooks/useClipboard';
+import { CopiedText } from '../../components/genial/CopiedText';
 
 export const ConnectedWalletButton = ({
   identityName,
@@ -117,7 +118,9 @@ export const ConnectedWalletButton = ({
           {mouseEnter || copied ? (
             <Tooltip
               isOpen={copied || undefined}
-              label={copied ? '✅ Copied Address' : 'Copy  address'}
+              label={
+                copied ? <CopiedText text="Copied address" /> : 'Copy  address'
+              }
               hasArrow
               onClick={e => {
                 e.preventDefault();

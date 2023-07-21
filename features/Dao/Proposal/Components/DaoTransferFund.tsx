@@ -71,11 +71,15 @@ export const DaoTransferFund = memo(
     });
 
     const onNameValueChange = (value: string) => {
+      if (value === '') {
+        setAddressValue('');
+        address && rest.onAddress && rest.onAddress(id, '');
+      }
       if (name === value && value === nameValue) {
         return;
       }
       setNameValue(value);
-
+      setAddressValue('');
       if (addressValue) {
         setAddressValue('');
       }
@@ -104,7 +108,6 @@ export const DaoTransferFund = memo(
         onNameValueChange('');
       }
     };
-
     // fetch by name
     const {
       data,
@@ -132,6 +135,7 @@ export const DaoTransferFund = memo(
         client.getIdentityByOwner({ owner: queryKey[1] }),
       retry: 1,
       refetchOnMount: true,
+      refetchOnWindowFocus: false,
     });
     useEffect(() => {
       if (!data) {
@@ -190,6 +194,9 @@ export const DaoTransferFund = memo(
       ) {
         return 'Not found';
       }
+      if (!name && !address) {
+        return 'Not found';
+      }
       if (
         addressValue !== address &&
         address &&
@@ -205,6 +212,7 @@ export const DaoTransferFund = memo(
       error,
       isFetching,
       isFetchingAddress,
+      name,
       nameValue,
     ]);
 
@@ -224,7 +232,7 @@ export const DaoTransferFund = memo(
 
     return (
       <Box>
-        <Flex key={id} marginBottom={'3px'} mb={readonly ? '10px' : 0}>
+        <Flex key={id} marginBottom={'3px'} mb={readonly ? '10px' : '10px'}>
           <Flex mr={2} flexGrow={1}>
             <TwoInputs
               isLoading={isFetching || isFetchingAddress}

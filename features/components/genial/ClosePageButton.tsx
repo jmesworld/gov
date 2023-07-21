@@ -1,9 +1,10 @@
 import { Button, Divider, Flex } from '@chakra-ui/react';
 
 type Props = {
-  onClose: () => void;
+  onClose?: () => void;
+  showCloseButton?: boolean;
 };
-export const ClosePageButton = ({ onClose }: Props) => {
+export const ClosePageButton = ({ onClose, showCloseButton = true }: Props) => {
   return (
     <Flex
       mb="25px"
@@ -16,21 +17,23 @@ export const ClosePageButton = ({ onClose }: Props) => {
       w="full"
     >
       <Divider height="1px" bg="purple" w="full" />
-      <div>
-        <Button
-          rounded="full"
-          colorScheme="purple"
-          onClick={onClose}
-          appearance="button"
-          variant="outline"
-          fontWeight="normal"
-          px="40px"
-          py="23px"
-          borderColor="purple"
-        >
-          Close
-        </Button>
-      </div>
+      {showCloseButton && (
+        <div>
+          <Button
+            rounded="full"
+            colorScheme="purple"
+            onClick={onClose}
+            appearance="button"
+            variant="outline"
+            fontWeight="normal"
+            px="40px"
+            py="23px"
+            borderColor="purple"
+          >
+            Close
+          </Button>
+        </div>
+      )}
     </Flex>
   );
 };
