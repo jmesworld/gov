@@ -16,6 +16,7 @@ import { useIdentityserviceGetIdentityByOwnerQuery } from '../../../../client/Id
 import { useCosmWasmClientContext } from '../../../../contexts/CosmWasmClient';
 import { useClipboardTimeout } from '../../../../hooks/useClipboard';
 import { useMemo, useState } from 'react';
+import { CopiedText } from '../../../components/genial/CopiedText';
 // FIXME: fix this
 
 const IDENTITY_SERVICE_CONTRACT = process.env
@@ -167,7 +168,11 @@ export const DaoMembersListItem = ({
                 <Tooltip
                   isOpen={copied || undefined}
                   label={
-                    copied ? '✅ Copied Wallet Address' : 'Copy wallet address'
+                    copied ? (
+                      <CopiedText text="Copied Wallet Address" />
+                    ) : (
+                      'Copy wallet address'
+                    )
                   }
                   hasArrow
                   placement="top"

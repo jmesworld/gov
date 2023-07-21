@@ -20,9 +20,10 @@ type Props = {
   state: State;
   dispatch: Dispatch<Actions>;
   client: IdentityserviceQueryClient;
+  isDirty: boolean;
 };
 
-export const SpendDaoFunds = ({ client, state, dispatch }: Props) => {
+export const SpendDaoFunds = ({ isDirty, client, state, dispatch }: Props) => {
   const spendArr = useMemo(() => Object.values(state.spends), [state.spends]);
 
   const totalAmount = useMemo(() => {
@@ -93,6 +94,8 @@ export const SpendDaoFunds = ({ client, state, dispatch }: Props) => {
     },
     [dispatch],
   );
+
+  const jmesBalance = useMemo(() => Number(state.balance.jmes), [state]);
 
   return (
     <Flex flexDir="column">
@@ -176,7 +179,9 @@ export const SpendDaoFunds = ({ client, state, dispatch }: Props) => {
             width={'202px'}
             height={'100%'}
             borderColor={'primary.500'}
-            background={totalAmount > 0 ? 'purple' : 'red'}
+            background={
+              totalAmount <= jmesBalance || !isDirty ? 'purple' : 'red'
+            }
             focusBorderColor="darkPurple"
             borderRadius={12}
             color={'white'}
@@ -193,6 +198,20 @@ export const SpendDaoFunds = ({ client, state, dispatch }: Props) => {
             />
           </InputLeftElement>
         </InputGroup>
+      </Flex>
+      <Flex justifyContent="flex-end" width="100%">
+        <Box width={'202px'} marginRight={'34px'}>
+          <Text
+            pl="2px"
+            textAlign="left"
+            mr="35px"
+            height="12px"
+            color="red"
+            fontSize="sm"
+          >
+            {totalAmount > jmesBalance && isDirty ? 'Insufficient funds' : ''}
+          </Text>
+        </Box>
       </Flex>
     </Flex>
   );

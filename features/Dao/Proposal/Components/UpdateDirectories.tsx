@@ -190,46 +190,35 @@ export const UpdateDirectories = ({
         alignItems={'center'}
         width={'100%'}
       >
-        <QuestionOutlineIcon
-          width={'16px'}
-          height={'16px'}
-          color={'rgba(0,0,0,0.4)'}
-        />
-        <Text
-          color={'rgba(0,0,0,0.7)'}
-          fontFamily="DM Sans"
-          fontSize={14}
-          fontWeight="normal"
-          marginLeft={'12px'}
-        >
-          Total Share of Votes must equal 100%
-        </Text>
-        <Spacer />
-        <InputGroup width={'102px'} height={'48px'} marginRight={'34px'}>
-          <Input
-            variant={'outline'}
-            width={'102px'}
-            height={'100%'}
-            borderColor={'primary.500'}
-            background={totalVotingPower === 100 ? 'purple' : 'red'}
-            focusBorderColor="darkPurple"
-            borderRadius={12}
-            color={'white'}
-            fontWeight={'normal'}
-            value={totalVotingPower}
-          />
-
-          <InputRightElement height={'100%'}>
-            <Text
+        <Flex width={'85%'} />
+        <Flex width={'13%'}>
+          <InputGroup paddingLeft={'10px'} width={'full'} height={'48px'}>
+            <Input
+              variant={'outline'}
+              width={'100%'}
+              height={'100%'}
+              borderColor={'primary.500'}
+              background={totalVotingPower === 100 ? 'purple' : 'red'}
+              focusBorderColor="darkPurple"
+              borderRadius={12}
               color={'white'}
-              fontFamily="DM Sans"
-              fontSize={16}
-              fontWeight="normal"
-            >
-              %
-            </Text>
-          </InputRightElement>
-        </InputGroup>
+              fontWeight={'normal'}
+              value={totalVotingPower}
+            />
+
+            <InputRightElement height={'100%'}>
+              <Text
+                color={'white'}
+                fontFamily="DM Sans"
+                fontSize={16}
+                fontWeight="normal"
+              >
+                %
+              </Text>
+            </InputRightElement>
+          </InputGroup>
+        </Flex>
+        <Flex marginLeft="5px" width={'24px'} />
       </Flex>
       {/* <Text
         marginTop={'73px'}

@@ -28,7 +28,7 @@ export const ProposalProgress = ({
       height={'60px'}
       borderRadius={'30px'}
       width={width ? `${width}px` : '100%'}
-      backgroundColor={'rgba(81, 54, 194, 1)'}
+      backgroundColor="darkPurple"
       padding={'10px 20px'}
       position={'relative'}
     >

@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Divider,
   Flex,
   Input,
   Radio,
@@ -44,6 +43,7 @@ import { convertMonthToBlock } from '../../utils/block';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { VoterDetail } from '../../client/DaoMultisig.types';
 import { useRouter } from 'next/router';
+import { ClosePageButton } from '../components/genial/ClosePageButton';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -430,7 +430,7 @@ export default function CreateGovProposal({
               />
             ))}
         </Box>
-        <Box width={'100%'} marginRight={'52px'} position="relative">
+        <Box width={'100%'} position="relative">
           {selectedProposalType === 'core-slot' && coreSlotsDisabled && (
             <Alert
               status="error"
@@ -465,7 +465,7 @@ export default function CreateGovProposal({
               </Text>
               <Input
                 variant={'outline'}
-                width={'874px'}
+                width={'full'}
                 height={'48px'}
                 borderColor={'primary.500'}
                 background={'primary.100'}
@@ -502,7 +502,7 @@ export default function CreateGovProposal({
               <Box height={'12px'} />
               <Textarea
                 variant={'outline'}
-                width={'874px'}
+                width={'full'}
                 height={'320px'}
                 borderColor={'primary.500'}
                 background={'primary.100'}
@@ -540,17 +540,9 @@ export default function CreateGovProposal({
               </Text>
               {selectedProposalType === 'revoke-proposal' && (
                 <Box marginTop={'10px'} width={'872px'}>
-                  <Divider
-                    width={'872px'}
-                    color={'red'}
-                    orientation="horizontal"
-                    height={'2px'}
-                    p={0}
-                    borderColor={'lilac'}
-                  />
                   <Input
                     variant={'outline'}
-                    width={'874px'}
+                    width={'full'}
                     height={'50px'}
                     type={'number'}
                     borderColor={'primary.500'}
@@ -565,15 +557,7 @@ export default function CreateGovProposal({
                 </Box>
               )}
               {isImprovementRequired && (
-                <Box marginTop={'10px'} width={'872px'}>
-                  <Divider
-                    width={'872px'}
-                    color={'red'}
-                    orientation="horizontal"
-                    height={'2px'}
-                    p={0}
-                    borderColor={'lilac'}
-                  />
+                <Box marginTop={'10px'} mb="25px" width={'full'}>
                   <Flex
                     mt="4"
                     background="rgba(112, 79, 247, 0.1)"
@@ -606,18 +590,23 @@ export default function CreateGovProposal({
                 </Box>
               )}
               {isFeatureRequestRequired && (
-                <Box marginTop={'25px'} width={'872px'}>
+                <Box marginTop={'25px'} width={'full'}>
                   <Flex marginBottom={'17px'} alignItems="center">
                     <Text
                       color={'darkPurple'}
                       fontWeight="normal"
                       fontSize={16}
+                      minWidth={'100px'}
                       fontFamily="DM Sans"
                       marginRight={'52px'}
                     >
                       Feature type:
                     </Text>
-                    <RadioGroup value="art-dealer" textColor={'darkPurple'}>
+                    <RadioGroup
+                      minWidth="100px"
+                      value="art-dealer"
+                      textColor={'darkPurple'}
+                    >
                       <Stack direction="row" spacing={'35px'}>
                         <Radio value="art-dealer">Art Dealer</Radio>
                       </Stack>
@@ -626,17 +615,19 @@ export default function CreateGovProposal({
                       marginLeft={'28px'}
                       alignItems="center"
                       height={'41px'}
+                      w="full"
                     >
                       <Text
                         color={'darkPurple'}
                         fontWeight="normal"
                         fontSize={16}
                         fontFamily="DM Sans"
+                        minWidth="100px"
                       >
                         Number of NFT’s to Mint
                       </Text>
                       <Input
-                        width={'106px'}
+                        width={'100px'}
                         height={'41px'}
                         borderColor={'primary.500'}
                         background={'transparent'}
@@ -658,18 +649,10 @@ export default function CreateGovProposal({
                       />
                     </Flex>
                   </Flex>
-                  <Divider
-                    width={'872px'}
-                    color={'red'}
-                    orientation="horizontal"
-                    height={'2px'}
-                    p={0}
-                    borderColor={'lilac'}
-                  />
                 </Box>
               )}
               {isSlotTypeRequired && (
-                <Box marginTop={'25px'} width={'872px'}>
+                <Box marginTop={'25px'} width={'full'}>
                   <Flex marginBottom={'17px'}>
                     <Text
                       color={'darkPurple'}
@@ -692,18 +675,11 @@ export default function CreateGovProposal({
                       </Stack>
                     </RadioGroup>
                   </Flex>
-                  <Divider
-                    width={'872px'}
-                    color={'red'}
-                    orientation="horizontal"
-                    height={'2px'}
-                    p={0}
-                    borderColor={'lilac'}
-                  />
                 </Box>
               )}
+
               {isFundigRequired ? (
-                <Box width={'872px'}>
+                <Box width={'full'}>
                   <Flex
                     marginBottom={'17px'}
                     height={'41px'}
@@ -738,97 +714,94 @@ export default function CreateGovProposal({
                       </Flex>
                     )}
                     {(isFundingNeeded || selectedProposalType !== 'text') && (
-                      <Flex height={'41px'} align={'flex-end'}>
-                        <Text
-                          color={'darkPurple'}
-                          fontWeight="normal"
-                          fontSize={16}
-                          fontFamily="DM Sans"
-                        >
-                          Please pay me
-                        </Text>
-                        <Input
-                          width={'106px'}
-                          height={'41px'}
-                          borderColor={'primary.500'}
-                          background={'transparent'}
-                          color={'purple'}
-                          value={fundingAmount}
-                          onChange={e =>
-                            setFundingAmount(parseInt(e.target.value))
-                          }
-                          border="none"
-                          borderBottom="1px solid"
-                          borderRadius="0"
-                          px="0px"
-                          mx="10px"
-                          textAlign={'center'}
-                          type={'number'}
-                          _focus={{
-                            boxShadow: 'none',
-                            borderBottom: '1px solid',
-                          }}
-                        />
-                        <Text
-                          color={'darkPurple'}
-                          fontWeight="normal"
-                          fontSize={16}
-                          fontFamily="DM Sans"
-                        >
-                          tokens over
-                        </Text>
-                        <Input
-                          width={'106px'}
-                          height={'41px'}
-                          value={fundingPeriod}
-                          borderColor={'primary.500'}
-                          background={'transparent'}
-                          focusBorderColor="darkPurple"
-                          color={'purple'}
-                          onChange={
-                            e => setFundingPeriod(parseInt(e.target.value)) // convert period in months to blocks
-                          }
-                          border="none"
-                          borderBottom="1px solid"
-                          borderRadius="0"
-                          px="0"
-                          mx="10px"
-                          textAlign={'center'}
-                          type={'number'}
-                          _focus={{
-                            boxShadow: 'none',
-                            borderBottom: '1px solid',
-                          }}
-                        />
-                        <Text
-                          color={'darkPurple'}
-                          fontWeight="normal"
-                          fontSize={16}
-                          fontFamily="DM Sans"
-                        >
-                          months.
-                        </Text>
-                      </Flex>
+                      <Box w="full" mb="10px">
+                        <Flex height={'41px'} w="full" align={'flex-end'}>
+                          <Text
+                            color={'darkPurple'}
+                            fontWeight="normal"
+                            fontSize={16}
+                            fontFamily="DM Sans"
+                            minWidth={'150px'}
+                          >
+                            Please pay me
+                          </Text>
+                          <Input
+                            width={'100px'}
+                            height={'41px'}
+                            borderColor={'primary.500'}
+                            background={'transparent'}
+                            color={'purple'}
+                            value={fundingAmount}
+                            onChange={e =>
+                              setFundingAmount(parseInt(e.target.value))
+                            }
+                            border="none"
+                            borderBottom="1px solid"
+                            borderRadius="0"
+                            px="0px"
+                            mx="10px"
+                            textAlign={'center'}
+                            type={'number'}
+                            _focus={{
+                              boxShadow: 'none',
+                              borderBottom: '1px solid',
+                            }}
+                          />
+                          <Text
+                            color={'darkPurple'}
+                            fontWeight="normal"
+                            fontSize={16}
+                            minWidth={'100px'}
+                            fontFamily="DM Sans"
+                          >
+                            tokens over
+                          </Text>
+                          <Input
+                            width={'100px'}
+                            height={'41px'}
+                            value={fundingPeriod}
+                            borderColor={'primary.500'}
+                            background={'transparent'}
+                            focusBorderColor="darkPurple"
+                            color={'purple'}
+                            onChange={
+                              e => setFundingPeriod(parseInt(e.target.value)) // convert period in months to blocks
+                            }
+                            border="none"
+                            borderBottom="1px solid"
+                            borderRadius="0"
+                            px="0"
+                            mx="10px"
+                            textAlign={'center'}
+                            type={'number'}
+                            _focus={{
+                              boxShadow: 'none',
+                              borderBottom: '1px solid',
+                            }}
+                          />
+                          <Text
+                            color={'darkPurple'}
+                            fontWeight="normal"
+                            fontSize={16}
+                            fontFamily="DM Sans"
+                          >
+                            months.
+                          </Text>
+                        </Flex>
+                      </Box>
                     )}
                   </Flex>
-                  <Divider
-                    width={'872px'}
-                    color={'red'}
-                    orientation="horizontal"
-                    height={'2px'}
-                    p={0}
-                    borderColor={'lilac'}
-                  />
                 </Box>
               ) : (
                 ''
               )}
+              <ClosePageButton showCloseButton={false} />
               <Flex
                 marginTop={'42px'}
                 marginBottom={'93px'}
                 height={'48px'}
                 alignItems={'center'}
-                width={'874px'}
+                width={'full'}
               >
                 <Spacer />
                 <Button

@@ -3,6 +3,9 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Tag,
+  TagCloseButton,
+  TagLabel,
   Text,
 } from '@chakra-ui/react';
 import { useState } from 'react';
@@ -25,36 +28,59 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
       borderStyle="solid"
       variant={'outline'}
       overflow="hidden"
+      display="flex"
+      alignItems="center"
     >
-      <Input
-        onFocus={() => {
-          setIsFocused(true);
-        }}
-        onBlur={() => {
-          setIsFocused(false);
-        }}
-        border={0}
-        width="30%"
-        outline="0"
-        height={'100%'}
-        borderColor={'primary.500'}
-        background={'primary.100'}
-        borderRadius={0}
-        focusBorderColor="darkPurple"
-        color={'purple'}
-        placeholder="Name or Address"
-        fontWeight={'normal'}
-        value={value[0]}
-        type="text"
-        onChange={e => {
-          const value = e.target.value;
-          if (value.length > 20) {
-            onchange[1](value);
-            return;
-          }
-          onchange[0](value);
-        }}
-      />
+      {value[0] === value[1] && value.join('') !== '' && (
+        <Tag
+          ml="4"
+          px="4"
+          height="33px"
+          size="md"
+          borderRadius="full"
+          bg="purple"
+          color="white"
+        >
+          <TagLabel> Address </TagLabel>
+          <TagCloseButton
+            onClick={() => {
+              onchange[1]('');
+            }}
+            color={'white'}
+          />
+        </Tag>
+      )}
+      {(value[0] !== value[1] || value.join('') === '') && (
+        <Input
+          onFocus={() => {
+            setIsFocused(true);
+          }}
+          onBlur={() => {
+            setIsFocused(false);
+          }}
+          border={0}
+          width="30%"
+          outline="0"
+          height={'100%'}
+          borderColor={'primary.500'}
+          background={'primary.100'}
+          borderRadius={0}
+          focusBorderColor="darkPurple"
+          color={'purple'}
+          placeholder="Name or Address"
+          fontWeight={'normal'}
+          value={value[0]}
+          type="text"
+          onChange={e => {
+            const value = e.target.value;
+            if (value.length > 20) {
+              onchange[1](value);
+              return;
+            }
+            onchange[0](value);
+          }}
+        />
+      )}
       <InputRightElement display="flex" flexDir="row" height="100%" width="70%">
         <Flex
           h="full"
@@ -77,7 +103,7 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
             height={'100%'}
             background={'primary.100'}
             borderRadius={0}
-            color={error ? 'red' : 'purple'}
+            color={error && !isLoading ? 'red' : 'purple'}
             fontWeight={'normal'}
             display="flex"
             alignItems="center"
@@ -85,7 +111,7 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
             fontSize="16px"
           >
             {isLoading && 'Loading...'}
-            {(!isLoading && value[1]) || error}
+            {(!isLoading && error) || (!isLoading && value[1])}
           </Text>
         </Flex>
       </InputRightElement>
