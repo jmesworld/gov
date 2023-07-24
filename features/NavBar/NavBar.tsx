@@ -155,7 +155,7 @@ const NavBar = ({
           w="full"
           shouldWrapChildren
           hasArrow
-          label="Core-slot proposals"
+          label="Core Slot proposals"
         >
           <Link.withStatus
             matchFunc={route => {
@@ -176,7 +176,7 @@ const NavBar = ({
           >
             {({ isActive }) => (
               <NavBarItem
-                text="Core-Slots"
+                text="Core Slots"
                 isSelected={isActive}
                 onClick={() => {
                   setSelectedDao('');

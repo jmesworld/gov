@@ -1,6 +1,7 @@
 import { Flex, Skeleton, Text, Tooltip } from '@chakra-ui/react';
 import {
   formatBalance,
+  formatBalanceWithComma,
   useAccountBalance,
 } from '../../../hooks/useAccountBalance';
 import { Image } from '@chakra-ui/react';
@@ -47,7 +48,11 @@ export const BalanceDisplay = ({ address, asCard }: Props) => {
               mr="3"
               alt="Wallet Icon"
             />
-            <Tooltip hasArrow placement="top" label={balanceInJmes}>
+            <Tooltip
+              hasArrow
+              placement="top"
+              label={formatBalanceWithComma(balanceInJmes)}
+            >
               <Flex alignItems="center">
                 <Image
                   src="/JMES_Icon.svg"

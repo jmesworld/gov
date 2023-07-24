@@ -23,6 +23,7 @@ export const defaultThemeObject = {
     },
     bg: '#e1dafe',
     purple: '#7453FD',
+    brand: '#7453FD',
     darkPurple: '#5136C2',
     midnight: '#0F0056',
     green: '#A1F0C4',

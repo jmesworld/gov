@@ -173,6 +173,9 @@ export function countObjectsWithDuplicateNames(
 export function toBase64(obj: any) {
   return Buffer.from(JSON.stringify(obj)).toString('base64');
 }
+export function toBase64String(obj: any) {
+  return Buffer.from(JSON.stringify(obj)).toString('base64');
+}
 
 export function fromBase64ToString<T>(base64: string): T {
   const json = Buffer.from(base64, 'base64').toString('utf8');

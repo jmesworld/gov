@@ -26,7 +26,7 @@ import {
   DaoMultisigQueryClient,
 } from '../../client/DaoMultisig.client';
 import { useDaoMultisigProposeMutation } from '../../client/DaoMultisig.react-query';
-import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import type { CosmWasmClient, JsonObject } from '@cosmjs/cosmwasm-stargate';
 
 import { ProposalType } from '../components/Proposal/ProposalType';
 import { toBase64 } from '../../utils/identity';
@@ -43,7 +43,6 @@ import {
 import { convertMonthToBlock } from '../../utils/block';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { VoterDetail } from '../../client/DaoMultisig.types';
-import { parseMsg } from '../../utils/proposalUti';
 import { useRouter } from 'next/router';
 
 // TODO: DEEP- refactor needed for the whole page
@@ -83,6 +82,7 @@ export default function CreateGovProposal({
   setCreateGovProposalSelected: Function;
 }) {
   const { cosmWasmClient } = useCosmWasmClientContext();
+
   const daoQueryClient = useMemo(
     () =>
       new DaoMultisigQueryClient(
@@ -219,6 +219,133 @@ export default function CreateGovProposal({
   const isImprovementRequired = selectedProposalType === 'improvement';
 
   const createGovProposalMutation = useDaoMultisigProposeMutation();
+
+  const onSubmit = async () => {
+    try {
+      if (selectedProposalType === 'improvement') {
+        const parsedArr = JSON.parse(improvementMsgs) as {
+          wasm: Governance.WasmMsg;
+        }[];
+        if (!Array.isArray(parsedArr)) {
+          throw new Error('Improvement message is not valid');
+        }
+
+        setCheck(false);
+        setCreatingGovProposal(true);
+        const result = await createGovProposalMutation.mutateAsync({
+          client: daoClient,
+          msg: {
+            title: proposalTitle.value,
+            description: proposalDescription.value,
+            msgs: parsedArr,
+          },
+        });
+        toast({
+          title: 'Proposal created!',
+          status: 'success',
+          variant: 'custom',
+          duration: 9000,
+          isClosable: true,
+        });
+        const id = result.events
+          .find(e => e.type === 'wasm')
+          ?.attributes.find(el => el.key === 'proposal_id')?.value;
+        if (!id) {
+          throw new Error('Proposal id not found');
+        }
+        restForm();
+        navigate(`/dao/view/${selectedDaoName}`);
+        return;
+      }
+      const proposalMsg = {
+        propose: getProposalExecuteMsg({
+          improvementMsgs: improvementMsgs,
+          type: selectedProposalType,
+          featureApproved: numberOfNFTToMint,
+
+          isFundingRequired: isFundingNeeded,
+          // convert to blocks
+          amount: fundingAmount,
+          title: proposalTitle.value,
+          description: proposalDescription.value,
+          duration: convertMonthToBlock(fundingPeriod), // months to seconds
+          slot: getSlot(slotType) as Governance.CoreSlot,
+          revoke_proposal_id: revokeProposalId,
+          msgs: [
+            {
+              bank: {
+                send: {
+                  amount: [
+                    {
+                      denom: 'ujmes',
+                      amount: '10000000',
+                    },
+                  ],
+                  to_address: selectedDao as string,
+                },
+              },
+            },
+          ],
+        }),
+      };
+      setCheck(false);
+      setCreatingGovProposal(true);
+      const wasmMsg: Governance.WasmMsg = {
+        execute: {
+          contract_addr: NEXT_PUBLIC_GOVERNANCE_CONTRACT,
+          funds: [{ amount: '10000000', denom: 'ujmes' }],
+          msg: toBase64(proposalMsg),
+        },
+      };
+
+      const result = await createGovProposalMutation.mutateAsync({
+        client: daoClient,
+        msg: {
+          title: proposalTitle.value,
+          description: proposalDescription.value,
+          msgs: [
+            {
+              wasm: wasmMsg,
+            },
+          ],
+        },
+        args: {
+          fee,
+          funds: [{ amount: '10000000', denom: 'ujmes' }],
+        },
+      });
+
+      const id = result.events
+        .find(e => e.type === 'wasm')
+        ?.attributes.find(el => el.key === 'proposal_id')?.value;
+      if (!id) {
+        throw new Error('Proposal id not found');
+      }
+      toast({
+        title: 'Proposal created!',
+        status: 'success',
+        variant: 'custom',
+        duration: 9000,
+        isClosable: true,
+      });
+      restForm();
+      navigate(`/dao/view/${selectedDaoName}`);
+    } catch (err) {
+      if (err instanceof Error) {
+        toast({
+          title: 'Proposal creation error',
+          description: err.toString(),
+          status: 'error',
+          variant: 'custom',
+          duration: 9000,
+          isClosable: true,
+        });
+      }
+    }
+
+    setCreatingGovProposal(false);
+    setCheck(true);
+  };
 
   const isFormValid =
     proposalTitle.value.length > 1 &&
@@ -709,102 +836,7 @@ export default function CreateGovProposal({
                 <Box width={'12px'} />
                 <Button
                   disabled={!isFormValid}
-                  onClick={async () => {
-                    try {
-                      //
-                      const proposalMsg = {
-                        propose: getProposalExecuteMsg({
-                          improvementMsgs,
-                          type: selectedProposalType,
-                          featureApproved: numberOfNFTToMint,
-
-                          isFundingRequired: isFundingNeeded,
-                          // convert to blocks
-                          amount: fundingAmount,
-                          title: proposalTitle.value,
-                          description: proposalDescription.value,
-                          duration: convertMonthToBlock(fundingPeriod), // months to seconds
-                          slot: getSlot(slotType) as Governance.CoreSlot,
-                          revoke_proposal_id: revokeProposalId,
-                          msgs: [
-                            {
-                              bank: {
-                                send: {
-                                  amount: [
-                                    {
-                                      denom: 'ujmes',
-                                      amount: '10000000',
-                                    },
-                                  ],
-                                  to_address: selectedDao as string,
-                                },
-                              },
-                            },
-                          ],
-                        }),
-                      };
-                      setCheck(false);
-                      setCreatingGovProposal(true);
-                      const wasmMsg: Governance.WasmMsg = {
-                        execute: {
-                          contract_addr: NEXT_PUBLIC_GOVERNANCE_CONTRACT,
-                          funds: [{ amount: '10000000', denom: 'ujmes' }],
-                          msg: toBase64(proposalMsg),
-                        },
-                      };
-
-                      const result =
-                        await createGovProposalMutation.mutateAsync({
-                          client: daoClient,
-                          msg: {
-                            title: proposalTitle.value,
-                            description: proposalDescription.value,
-                            msgs: [
-                              {
-                                wasm: wasmMsg,
-                              },
-                            ],
-                          },
-                          args: {
-                            fee,
-                            funds: [{ amount: '10000000', denom: 'ujmes' }],
-                          },
-                        });
-
-                      const id = result.events
-                        .find(e => e.type === 'wasm')
-                        ?.attributes.find(
-                          el => el.key === 'proposal_id',
-                        )?.value;
-                      if (!id) {
-                        throw new Error('Proposal id not found');
-                      }
-                      toast({
-                        title: 'Proposal created.',
-                        description: "We've created your Proposal.",
-                        status: 'success',
-                        variant: 'custom',
-                        duration: 9000,
-                        isClosable: true,
-                      });
-                      restForm();
-                      navigate(`/dao/view/${selectedDaoName}`);
-                    } catch (err) {
-                      if (err instanceof Error) {
-                        toast({
-                          title: 'Proposal creation error',
-                          description: err.toString(),
-                          status: 'error',
-                          variant: 'custom',
-                          duration: 9000,
-                          isClosable: true,
-                        });
-                      }
-                    }
-
-                    setCreatingGovProposal(false);
-                    setCheck(true);
-                  }}
+                  onClick={onSubmit}
                   backgroundColor={'green'}
                   borderRadius={90}
                   alignContent="end"
@@ -904,14 +936,11 @@ const getProposalExecuteMsg = ({
       return msg;
     case 'improvement': {
       try {
-        const impMsg = parseMsg(
-          improvementMsgs,
-        ) as Governance.CosmosMsgForEmpty[];
         msg = {
           improvement: {
             description,
             title,
-            msgs: impMsg as Governance.CosmosMsgForEmpty[],
+            msgs: improvementMsgs,
           },
         };
         return msg;
