@@ -541,9 +541,7 @@ const CreateDaoForm = ({
               })
               .then(() => {
                 toast({
-                  title: 'DAO created.',
-                  description:
-                    "We've created your DAO for you. You'll be able to access it shortly.",
+                  title: 'DAO created!',
                   status: 'success',
                   variant: 'custom',
                   duration: 9000,

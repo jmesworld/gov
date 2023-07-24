@@ -60,7 +60,7 @@ export default function GovernanceProposal({
       governanceQueryClient={governanceQueryClient}
       setSelectedProposalId={setSelectedProposalId}
       supply={supply as number}
-      proposalTitle={'FUNDED PROPOSALS'}
+      proposalTitle={'CORE SLOT PROPOSALS'}
       data={sorted}
       isLoading={isLoading}
       isFetching={isFetching}

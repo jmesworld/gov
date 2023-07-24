@@ -96,8 +96,7 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
       .then(() => refetchIdentity())
       .then(() => {
         toast({
-          title: 'Identity created.',
-          description: "We've created your Identity for you.",
+          title: 'Identity created!',
           status: 'success',
           variant: 'custom',
           duration: 9000,
@@ -107,7 +106,7 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
       })
       .catch(error => {
         toast({
-          title: 'Identity creation error',
+          title: 'Identity creation error!',
           description: error.toString(),
           status: 'error',
           variant: 'custom',

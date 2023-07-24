@@ -268,8 +268,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                 .then(() => props.refetch())
                 .then(() => {
                   toast({
-                    title: 'Proposal executed.',
-                    description: 'Proposal executed successfully.',
+                    title: 'Proposal executed!',
                     status: 'success',
                     variant: 'custom',
                     duration: 9000,
