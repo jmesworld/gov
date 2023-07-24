@@ -223,21 +223,38 @@ export default function CreateGovProposal({
   const onSubmit = async () => {
     try {
       if (selectedProposalType === 'improvement') {
-        const parsedArr = JSON.parse(improvementMsgs) as {
-          wasm: Governance.WasmMsg;
-        }[];
+        const parsedArr = JSON.parse(
+          improvementMsgs,
+        ) as Governance.CosmosMsgForEmpty[];
         if (!Array.isArray(parsedArr)) {
           throw new Error('Improvement message is not valid');
         }
 
         setCheck(false);
         setCreatingGovProposal(true);
+
+        const proposalMsg = {
+          propose: {
+            title: proposalTitle.value,
+            description: proposalDescription.value,
+            msgs: [parsedArr],
+          },
+        };
+
+        const wasmMsg: Governance.WasmMsg = {
+          execute: {
+            contract_addr: NEXT_PUBLIC_GOVERNANCE_CONTRACT,
+            funds: [{ amount: '10000000', denom: 'ujmes' }],
+            msg: toBase64(proposalMsg),
+          },
+        };
+
         const result = await createGovProposalMutation.mutateAsync({
           client: daoClient,
           msg: {
             title: proposalTitle.value,
             description: proposalDescription.value,
-            msgs: parsedArr,
+            msgs: [{ wasm: wasmMsg }],
           },
         });
         toast({
@@ -895,7 +912,7 @@ const getProposalExecuteMsg = ({
   amount?: number;
   duration?: number;
   featureApproved: number;
-  improvementMsgs: string;
+  improvementMsgs: Governance.CosmosMsgForEmpty[];
 }) => {
   // "text", "core-slot", "revoke-core-slot", "improvement"
   let msg: Governance.ProposalMsg;
