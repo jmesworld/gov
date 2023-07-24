@@ -1,12 +1,17 @@
 import { ProposalResponseForEmpty } from '../client/DaoMultisig.types';
 import { GovernanceQueryClient } from '../client/Governance.client';
-import { ProposalMsg, ProposalResponse } from '../client/Governance.types';
+import {
+  BankMsg,
+  ProposalMsg,
+  ProposalResponse,
+} from '../client/Governance.types';
 import { fromBase64ToString } from './identity';
 import { z } from 'zod';
 
 export const getProposalExcuteMsg = (
-  proposal: ProposalResponseForEmpty,
+  proposal: ProposalResponseForEmpty | ProposalResponse,
 ): {
+  bankMsg: BankMsg[] | null;
   excuteMsg: { propose: ProposalMsg } | null;
   excuteMsgs: ProposalResponseForEmpty['msgs'];
   contractAddr: string | null;
@@ -14,9 +19,14 @@ export const getProposalExcuteMsg = (
 } => {
   const excuteMsgs: ProposalResponseForEmpty['msgs'] = [];
   let excuteMsg: { propose: ProposalMsg } | null = null;
+  const bankMsg: BankMsg[] = [];
   let contractAddr: null | string = null;
   proposal?.msgs?.forEach(msg => {
     if (!msg) {
+      return;
+    }
+    if ('bank' in msg) {
+      bankMsg.push(msg.bank);
       return;
     }
     if (!('wasm' in msg)) {
@@ -55,6 +65,7 @@ export const getProposalExcuteMsg = (
   });
 
   return {
+    bankMsg: bankMsg.length > 0 ? bankMsg : null,
     excuteMsg,
     excuteMsgs,
     contractAddr,
@@ -83,13 +94,15 @@ export const getGovProposalType = (
 ): {
   proposalType: string | null;
   excuteMsg: ProposalMessageType | null;
+  bankMsg: BankMsg[] | null;
 } => {
   let proposalType: null | string = null;
-  const { excuteMsg } = getProposalExcuteMsg(proposal);
+  const { excuteMsg, bankMsg } = getProposalExcuteMsg(proposal);
   if (!excuteMsg || !('propose' in excuteMsg)) {
     return {
       proposalType,
       excuteMsg,
+      bankMsg,
     };
   }
   if (excuteMsg && 'text_proposal' in excuteMsg.propose) {
@@ -111,6 +124,7 @@ export const getGovProposalType = (
   }
 
   return {
+    bankMsg,
     proposalType,
     excuteMsg,
   };

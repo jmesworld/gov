@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { useChain } from '@cosmos-kit/react';
 import {
+  IDENTITY_SERVICE_CONTRACT,
   NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   chainName,
 } from '../../../config/defaults';
@@ -37,6 +38,7 @@ import { isProposalGov } from '../../../utils/proposalUti';
 import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { useVotingPeriodContext } from '../../../contexts/VotingPeriodContext';
 import { getLabel } from '../../../utils/daoProposalUtil';
+import { IdentityserviceQueryClient } from '../../../client/Identityservice.client';
 
 type Props = {
   selectedDao: string;
@@ -58,6 +60,15 @@ export default function DaoProposalDetail({
   useEffect(() => {
     setSelectedDAOByAddress(selectedDao);
   }, [selectedDao, setSelectedDAOByAddress]);
+
+  const client: IdentityserviceQueryClient = useMemo(
+    () =>
+      new IdentityserviceQueryClient(
+        cosmWasmClient as CosmWasmClient,
+        IDENTITY_SERVICE_CONTRACT,
+      ),
+    [cosmWasmClient],
+  );
 
   const goverrnanceQueryClient = useMemo(
     () =>
@@ -210,10 +221,16 @@ export default function DaoProposalDetail({
                   : undefined
               }
             >
-              <GovProposalType proposal={proposalDetailQuery?.data} />
+              <GovProposalType
+                client={client}
+                proposal={proposalDetailQuery?.data}
+              />
             </ProposalVoting>
 
-            <GetProposalDetail proposal={proposalDetailQuery.data} />
+            <GetProposalDetail
+              client={client}
+              proposal={proposalDetailQuery.data}
+            />
             <Text color="purple" mt="4">
               Description
             </Text>

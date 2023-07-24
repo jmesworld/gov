@@ -26,7 +26,7 @@ import {
   DaoMultisigQueryClient,
 } from '../../client/DaoMultisig.client';
 import { useDaoMultisigProposeMutation } from '../../client/DaoMultisig.react-query';
-import type { CosmWasmClient, JsonObject } from '@cosmjs/cosmwasm-stargate';
+import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 
 import { ProposalType } from '../components/Proposal/ProposalType';
 import { toBase64 } from '../../utils/identity';

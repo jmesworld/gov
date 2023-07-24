@@ -3,11 +3,12 @@ import { Box, Flex, Switch, Text } from '@chakra-ui/react';
 import { getProposalExcuteMsg } from '../../../../utils/proposalUti';
 import dynamic from 'next/dynamic';
 import { ProposalResponseForEmpty } from '../../../../client/DaoMultisig.types';
+import { ProposalResponse } from '../../../../client/Governance.types';
 const CodeEditor = dynamic(import('../../../components/genial/CodeEditor'), {
   ssr: false,
 });
 type Props = {
-  proposal: ProposalResponseForEmpty;
+  proposal: ProposalResponseForEmpty | ProposalResponse;
 };
 
 export const ProposalExcuteRawData = ({ proposal }: Props) => {

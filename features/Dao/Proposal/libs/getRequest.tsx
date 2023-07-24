@@ -48,7 +48,7 @@ export const getRequest = (state: State, activeProposalType: ProposalTypes) => {
               amount: [
                 {
                   denom: 'ujmes',
-                  amount: String(spend.amount),
+                  amount: (Number(spend.amount) * 1e6).toString(),
                 } as DaoMultisig.Coin,
               ],
 
