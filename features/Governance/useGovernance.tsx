@@ -79,9 +79,10 @@ export const useGovernanceWinningGrants = ({
       refetchInterval: 10000,
     },
   });
+
   const result = useQueries({
     queries: (data?.winning_grants || []).map(grant => ({
-      queryKey: ['funded', 'proposal', grant.id],
+      queryKey: ['funded', 'proposal', grant.proposal_id],
       queryFn: () => governanceQueryClient.proposal({ id: grant.proposal_id }),
       enabled: !!grant.proposal_id,
     })),

@@ -59,7 +59,6 @@ export default function GovernanceProposal({
       governanceQueryClient={governanceQueryClient}
       setSelectedProposalId={setSelectedProposalId}
       supply={supply as number}
-      tab="funded"
       pagination={pagination}
       proposalTitle={'ALL PROPOSALS'}
       data={sorted}

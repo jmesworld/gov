@@ -29,6 +29,7 @@ import { calculateVotes } from '../../lib/calculateVotes';
 import { useVotingPeriodContext } from '../../contexts/VotingPeriodContext';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 import { useRouter } from 'next/router';
+import { ProposalExcuteRawData } from '../Dao/Proposal/Components/ProposalRawData';
 
 const GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;

@@ -235,9 +235,11 @@ export default function CreateGovProposal({
 
         const proposalMsg = {
           propose: {
-            title: proposalTitle.value,
-            description: proposalDescription.value,
-            msgs: [parsedArr],
+            improvement: {
+              title: proposalTitle.value,
+              description: proposalDescription.value,
+              msgs: parsedArr,
+            },
           },
         };
 
@@ -276,10 +278,8 @@ export default function CreateGovProposal({
       }
       const proposalMsg = {
         propose: getProposalExecuteMsg({
-          improvementMsgs: improvementMsgs,
           type: selectedProposalType,
           featureApproved: numberOfNFTToMint,
-
           isFundingRequired: isFundingNeeded,
           // convert to blocks
           amount: fundingAmount,
@@ -900,7 +900,6 @@ const getProposalExecuteMsg = ({
   amount,
   duration,
   featureApproved,
-  improvementMsgs,
 }: {
   type: ProposalTypes;
   title: string;
@@ -912,7 +911,6 @@ const getProposalExecuteMsg = ({
   amount?: number;
   duration?: number;
   featureApproved: number;
-  improvementMsgs: Governance.CosmosMsgForEmpty[];
 }) => {
   // "text", "core-slot", "revoke-core-slot", "improvement"
   let msg: Governance.ProposalMsg;
@@ -951,20 +949,6 @@ const getProposalExecuteMsg = ({
         },
       };
       return msg;
-    case 'improvement': {
-      try {
-        msg = {
-          improvement: {
-            description,
-            title,
-            msgs: improvementMsgs,
-          },
-        };
-        return msg;
-      } catch (err) {
-        throw new Error('Improvement message is not valid');
-      }
-    }
     case 'feature-request':
       msg = {
         request_feature: {
