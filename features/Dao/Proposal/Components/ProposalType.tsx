@@ -1,12 +1,23 @@
 import { getGovProposalType } from '../../../../utils/proposalUti';
 import { ProposalType } from '../../../components/Proposal/ProposalType';
 import { ProposalResponseForEmpty } from '../../../../client/DaoMultisig.types';
-import { Flex, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  Image,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Text,
+} from '@chakra-ui/react';
 import { formatString } from '../../../../lib/strings';
 import { getFormattedSlotType } from '../../../../utils/coreSlotType';
+import { DaoTransferFund } from './DaoTransferFund';
+import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
 
 type Props = {
   proposal?: ProposalResponseForEmpty;
+  client: IdentityserviceQueryClient;
 };
 
 export const GovProposalType = ({ proposal }: Props) => {
@@ -40,11 +51,96 @@ export const getSlotType = ({ proposal }: Props) => {
   return getFormattedSlotType(slotType ?? undefined);
 };
 
-export const GetProposalDetail = ({ proposal }: Props) => {
+export const GetProposalDetail = ({ proposal, client }: Props) => {
   if (!proposal) return null;
-  const { excuteMsg } = getGovProposalType(proposal);
-  if (!excuteMsg || !excuteMsg.propose) return null;
+  const { excuteMsg, bankMsg } = getGovProposalType(proposal);
 
+  if (bankMsg) {
+    let total = 0;
+    const SpendFunds = bankMsg.map((msg, i) => {
+      if (!('send' in msg)) {
+        return null;
+      }
+      const amountInUjmes = msg.send.amount.reduce(
+        (a, b) => a + Number(b.amount),
+        0,
+      );
+      total += amountInUjmes;
+      const address = msg.send.to_address;
+      return (
+        <DaoTransferFund
+          client={client}
+          readonly
+          id={String(i)}
+          key={i}
+          name=""
+          address={address}
+          amount={amountInUjmes / 1e6}
+        />
+      );
+    });
+
+    return (
+      <Flex mt="20px" flexDir="column">
+        <Flex mb="15px">
+          <Text display="flex" flex="1" fontSize="12px">
+            RECEIVERS
+          </Text>
+          <Text width="202px" fontSize={'12px'} color="midnight">
+            AMOUNT
+          </Text>
+        </Flex>
+        {SpendFunds}
+
+        <Flex
+          marginTop={'16px'}
+          height={'14px'}
+          alignItems={'center'}
+          width={'100%'}
+          justifyContent="flex-end"
+        >
+          <Box width={'202px'} height={'18px'}>
+            <Text color="midnight" fontSize={12}>
+              TOTAL
+            </Text>
+          </Box>
+        </Flex>
+        <Flex
+          marginTop={'16px'}
+          height={'48px'}
+          alignItems={'center'}
+          width={'100%'}
+          justifyContent="flex-end"
+        >
+          <InputGroup width={'202px'} height={'48px'}>
+            <Input
+              variant={'outline'}
+              width={'202px'}
+              height={'100%'}
+              borderColor={'primary.500'}
+              background={total / 1e6 > 0 ? 'purple' : 'red'}
+              focusBorderColor="darkPurple"
+              borderRadius={12}
+              color={'white'}
+              fontWeight={'normal'}
+              value={total / 1e6}
+            />
+
+            <InputLeftElement height={'100%'}>
+              <Image
+                src="/JMES_Icon_white.svg"
+                alt="JMES Icon"
+                width={4}
+                height={4}
+              />
+            </InputLeftElement>
+          </InputGroup>
+        </Flex>
+      </Flex>
+    );
+  }
+
+  if (!excuteMsg || !excuteMsg.propose) return null;
   if ('core_slot' in excuteMsg.propose) {
     const brand = excuteMsg.propose.core_slot.slot;
     const slotType = Object.keys(brand)[0];

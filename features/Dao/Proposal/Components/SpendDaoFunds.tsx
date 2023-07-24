@@ -154,6 +154,17 @@ export const SpendDaoFunds = ({ client, state, dispatch }: Props) => {
       ))}
       <Flex
         marginTop={'16px'}
+        height={'14px'}
+        alignItems={'center'}
+        width={'100%'}
+        justifyContent="flex-end"
+      >
+        <Box width={'202px'} height={'18px'}>
+          <Text fontSize={12}>TOTAL</Text>
+        </Box>
+      </Flex>
+      <Flex
+        marginTop={'16px'}
         height={'48px'}
         alignItems={'center'}
         width={'100%'}

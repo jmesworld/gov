@@ -385,6 +385,7 @@ export interface ProposalResponse {
   voting_end: number;
   voting_start: number;
   yes_voters: Addr[];
+  msgs: CosmosMsgForEmpty[];
   [k: string]: unknown;
 }
 export interface ProposalsResponse {

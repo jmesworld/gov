@@ -227,23 +227,28 @@ export default function GovProposalDetail({
               label={label}
             />
 
+            <Text mt="15px" color="purple">
+              Description
+            </Text>
+
             <Box
               background="rgba(112, 79, 247, 0.1)"
               borderRadius="12px"
               border="1px solid rgba(112, 79, 247, 0.5)"
               padding="14px 16px"
-              marginTop="20px"
+              marginTop="10px"
               height="300px"
             >
               <Text
                 fontSize="16px"
                 fontWeight="normal"
-                color="rgba(81, 54, 194, 1)"
+                color="purple"
                 fontFamily="DM Sans"
               >
                 {proposalDescription}
               </Text>
             </Box>
+            <ProposalExcuteRawData proposal={data} />
           </Box>
           <VStack
             width="330px"

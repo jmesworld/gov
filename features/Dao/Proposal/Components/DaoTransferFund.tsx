@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { TwoInputs } from '../../../components/genial/TwoInputs';
 
-type Props = {
+type BaseProps = {
   client: IdentityserviceQueryClient;
   name?: string;
   id: string;
@@ -21,12 +21,25 @@ type Props = {
   error?: string;
   amount?: number | '';
   notCancelable?: boolean;
-  onAmountChange: (id: string, value: number | '') => void;
-  onNameChange: (id: string, value: string) => void;
-  onAddress: (id: string, value?: string | null) => void;
-  onErrorChange: (id: string, error?: string) => void;
-  onRemove: (id: string) => void;
+  readonly?: true;
 };
+type Props =
+  | (BaseProps & {
+      readonly?: false;
+      onAmountChange: (id: string, value: number | '') => void;
+      onNameChange: (id: string, value: string) => void;
+      onAddress: (id: string, value?: string | null) => void;
+      onErrorChange: (id: string, error?: string) => void;
+      onRemove: (id: string) => void;
+    })
+  | ({
+      onAmountChange: never;
+      onNameChange: never;
+      onAddress: never;
+      onErrorChange: never;
+      onRemove: never;
+      readonly: true;
+    } & BaseProps);
 
 // eslint-disable-next-line react/display-name
 export const DaoTransferFund = memo(
@@ -38,11 +51,8 @@ export const DaoTransferFund = memo(
     client,
     error,
     amount,
-    onAddress,
-    onNameChange,
-    onErrorChange,
-    onAmountChange,
-    onRemove,
+    readonly,
+    ...rest
   }: Props) => {
     const [nameValue, setNameValue] = useState<string>(name ?? '');
 
@@ -62,28 +72,35 @@ export const DaoTransferFund = memo(
       if (name === value && value === nameValue) {
         return;
       }
-      if (name && name !== value) {
-        onNameChange(id, '');
-        address && onAddress(id, '');
-      }
+      setNameValue(value);
+
       if (addressValue) {
         setAddressValue('');
       }
-      setNameValue(value);
+      if (readonly) {
+        return;
+      }
+      if (name && name !== value) {
+        rest.onNameChange(id, '');
+        address && rest.onAddress(id, '');
+      }
     };
 
     const onChangeAddress = (value: string) => {
       if (address === value && value === addressValue) {
         return;
       }
+      setAddressValue(value);
+      if (readonly) {
+        return;
+      }
       if (address && address !== value) {
-        name && onNameChange(id, '');
+        name && rest.onNameChange(id, '');
       }
 
       if (nameValue) {
         onNameValueChange('');
       }
-      setAddressValue(value);
     };
 
     // fetch by name
@@ -114,7 +131,6 @@ export const DaoTransferFund = memo(
       retry: 1,
       refetchOnMount: true,
     });
-
     useEffect(() => {
       if (!data) {
         return;
@@ -125,12 +141,19 @@ export const DaoTransferFund = memo(
       if (!data.identity) {
         return;
       }
-      onNameChange(id, data.identity.name);
-      onAddress(id, data.identity.owner);
-    }, [data, debouncedValue, id, onAddress, nameValue, onNameChange]);
+      if (readonly) {
+        return;
+      }
+      rest.onNameChange(id, data.identity.name);
+      rest.onAddress(id, data.identity.owner);
+    }, [data, debouncedValue, id, nameValue, readonly, rest]);
 
     useEffect(() => {
       if (!addressData) {
+        return;
+      }
+      if (readonly) {
+        setNameValue(addressData?.identity?.name || '');
         return;
       }
       if (debouncedAddressValue !== addressValue) {
@@ -139,28 +162,22 @@ export const DaoTransferFund = memo(
       if (!addressData.identity) {
         return;
       }
-      onNameChange(id, addressData.identity.name);
-      onAddress(id, addressData.identity.owner);
-    }, [
-      addressData,
-      addressValue,
-      debouncedAddressValue,
-      id,
-      onAddress,
-      onNameChange,
-    ]);
+
+      rest.onNameChange(id, addressData.identity.name);
+      rest.onAddress(id, addressData.identity.owner);
+    }, [addressData, addressValue, debouncedAddressValue, id, readonly, rest]);
 
     useEffect(() => {
-      if (err instanceof Error) {
-        onErrorChange(err.message);
+      if (err instanceof Error && !readonly) {
+        rest.onErrorChange(err.message);
         return;
       }
-      if (addressErr instanceof Error) {
-        onErrorChange(addressErr.message);
+      if (addressErr instanceof Error && !readonly) {
+        rest.onErrorChange(addressErr.message);
         return;
       }
-      onErrorChange(id, undefined);
-    }, [err, addressErr, id, onErrorChange]);
+      !readonly && rest.onErrorChange(id, undefined);
+    }, [err, addressErr, id, readonly, rest]);
 
     const notFoundError = useMemo(() => {
       if (
@@ -189,24 +206,35 @@ export const DaoTransferFund = memo(
       nameValue,
     ]);
 
+    const nameMemo = useMemo(() => {
+      if (readonly) {
+        return nameValue;
+      }
+      return name || nameValue || addressValue;
+    }, [name, nameValue, addressValue, readonly]);
+
+    const addressMemo = useMemo(() => {
+      if (readonly) {
+        return addressValue;
+      }
+      return name || nameValue ? (address || addressValue) ?? '' : '';
+    }, [readonly, name, nameValue, address, addressValue]);
+
     return (
       <Box>
-        <Flex key={id} marginBottom={'3px'}>
+        <Flex key={id} marginBottom={'3px'} mb={readonly ? '10px' : 0}>
           <Flex mr={2} flexGrow={1}>
             <TwoInputs
               isLoading={isFetching || isFetchingAddress}
               error={(error || notFoundError) ?? undefined}
-              value={[
-                name || nameValue || addressValue,
-                name || nameValue ? address || addressValue : '',
-              ]}
+              value={[nameMemo, addressMemo]}
               onchange={[onNameValueChange, onChangeAddress]}
             />
           </Flex>
           <InputGroup
             width={'202px'}
             height={'48px'}
-            marginRight={notCancelable ? '34px' : '16px'}
+            marginRight={notCancelable ? '34px' : readonly ? '0px' : '16px'}
           >
             <Input
               variant={'outline'}
@@ -223,7 +251,7 @@ export const DaoTransferFund = memo(
               onChange={e => {
                 const power =
                   e.target.value !== '' ? Number(e.target.value) ?? 0 : '';
-                onAmountChange(id, power);
+                !readonly && rest.onAmountChange(id, power);
               }}
             />
 
@@ -237,13 +265,13 @@ export const DaoTransferFund = memo(
               />
             </InputLeftElement>
           </InputGroup>
-          {!notCancelable && (
+          {!notCancelable && !readonly && (
             <CloseButton
               size={'24px'}
               _hover={{ backgroundColor: 'transparent' }}
               color={'rgba(15,0,86,0.3)'}
               onClick={() => {
-                onRemove(id);
+                !readonly && rest.onRemove(id);
               }}
             />
           )}
