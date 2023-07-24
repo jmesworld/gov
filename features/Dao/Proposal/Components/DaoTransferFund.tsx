@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { TwoInputs } from '../../../components/genial/TwoInputs';
 
-type BaseProps = {
+interface BaseProps {
   client: IdentityserviceQueryClient;
   name?: string;
   id: string;
@@ -21,25 +21,27 @@ type BaseProps = {
   error?: string;
   amount?: number | '';
   notCancelable?: boolean;
-  readonly?: true;
-};
-type Props =
-  | (BaseProps & {
-      readonly?: false;
-      onAmountChange: (id: string, value: number | '') => void;
-      onNameChange: (id: string, value: string) => void;
-      onAddress: (id: string, value?: string | null) => void;
-      onErrorChange: (id: string, error?: string) => void;
-      onRemove: (id: string) => void;
-    })
-  | ({
-      onAmountChange: never;
-      onNameChange: never;
-      onAddress: never;
-      onErrorChange: never;
-      onRemove: never;
-      readonly: true;
-    } & BaseProps);
+}
+
+interface ReadOnlyProps extends BaseProps {
+  readonly?: undefined;
+  onAmountChange: (id: string, value: number | '') => void;
+  onNameChange: (id: string, value: string) => void;
+  onAddress: (id: string, value?: string | null) => void;
+  onErrorChange: (id: string, error?: string) => void;
+  onRemove: (id: string) => void;
+}
+
+interface NotReadOnlyProps extends BaseProps {
+  readonly: true;
+  onAmountChange?: never;
+  onNameChange?: never;
+  onAddress?: never;
+  onErrorChange?: never;
+  onRemove?: never;
+}
+
+type Props = ReadOnlyProps | NotReadOnlyProps;
 
 // eslint-disable-next-line react/display-name
 export const DaoTransferFund = memo(
@@ -81,8 +83,8 @@ export const DaoTransferFund = memo(
         return;
       }
       if (name && name !== value) {
-        rest.onNameChange(id, '');
-        address && rest.onAddress(id, '');
+        rest.onNameChange && rest.onNameChange(id, '');
+        address && rest.onAddress && rest.onAddress(id, '');
       }
     };
 
@@ -95,7 +97,7 @@ export const DaoTransferFund = memo(
         return;
       }
       if (address && address !== value) {
-        name && rest.onNameChange(id, '');
+        name && rest.onNameChange && rest.onNameChange(id, '');
       }
 
       if (nameValue) {
@@ -144,8 +146,8 @@ export const DaoTransferFund = memo(
       if (readonly) {
         return;
       }
-      rest.onNameChange(id, data.identity.name);
-      rest.onAddress(id, data.identity.owner);
+      rest.onNameChange && rest.onNameChange(id, data.identity.name);
+      rest.onAddress && rest.onAddress(id, data.identity.owner);
     }, [data, debouncedValue, id, nameValue, readonly, rest]);
 
     useEffect(() => {
@@ -163,20 +165,20 @@ export const DaoTransferFund = memo(
         return;
       }
 
-      rest.onNameChange(id, addressData.identity.name);
-      rest.onAddress(id, addressData.identity.owner);
+      rest.onNameChange && rest.onNameChange(id, addressData.identity.name);
+      rest.onAddress && rest.onAddress(id, addressData.identity.owner);
     }, [addressData, addressValue, debouncedAddressValue, id, readonly, rest]);
 
     useEffect(() => {
       if (err instanceof Error && !readonly) {
-        rest.onErrorChange(err.message);
+        rest.onErrorChange && rest.onErrorChange(err.message);
         return;
       }
       if (addressErr instanceof Error && !readonly) {
-        rest.onErrorChange(addressErr.message);
+        rest.onErrorChange && rest.onErrorChange(addressErr.message);
         return;
       }
-      !readonly && rest.onErrorChange(id, undefined);
+      !readonly && rest.onErrorChange && rest.onErrorChange(id, undefined);
     }, [err, addressErr, id, readonly, rest]);
 
     const notFoundError = useMemo(() => {
@@ -251,7 +253,9 @@ export const DaoTransferFund = memo(
               onChange={e => {
                 const power =
                   e.target.value !== '' ? Number(e.target.value) ?? 0 : '';
-                !readonly && rest.onAmountChange(id, power);
+                !readonly &&
+                  rest.onAmountChange &&
+                  rest.onAmountChange(id, power);
               }}
             />
 
@@ -271,7 +275,7 @@ export const DaoTransferFund = memo(
               _hover={{ backgroundColor: 'transparent' }}
               color={'rgba(15,0,86,0.3)'}
               onClick={() => {
-                !readonly && rest.onRemove(id);
+                !readonly && rest.onRemove && rest.onRemove(id);
               }}
             />
           )}

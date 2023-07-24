@@ -69,7 +69,7 @@ export const getProposalExcuteMsg = (
     excuteMsg,
     excuteMsgs,
     contractAddr,
-    msgs: proposal.msgs,
+    msgs: proposal.msgs as ProposalResponseForEmpty['msgs'],
   };
 };
 

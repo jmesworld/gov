@@ -38,7 +38,7 @@ export const GovProposalType = ({ proposal }: Props) => {
   );
 };
 
-export const getSlotType = ({ proposal }: Props) => {
+export const getSlotType = ({ proposal }: Omit<Props, 'client'>) => {
   if (!proposal) return null;
   let slotType: null | string = null;
   const { excuteMsg } = getGovProposalType(proposal);
