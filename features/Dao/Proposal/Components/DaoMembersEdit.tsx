@@ -1,4 +1,4 @@
-import { useEffect, useState, memo } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import { useDebounce } from '../../../../hooks/useDebounce';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
 import { useQuery } from '@tanstack/react-query';
@@ -12,6 +12,10 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useClipboardTimeout } from '../../../../hooks/useClipboard';
+import {
+  numberWithNoDecimals,
+  onNumberWithNoDecimalKeyDown,
+} from '../../../../utils/numberValidators';
 
 type Props = {
   removeCopy?: boolean;
@@ -84,6 +88,19 @@ export const MemberUpdate = memo(
       }
       onErrorChange(id, undefined);
     }, [err, id, onErrorChange]);
+
+    const onChangeVotingPower = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      if (numberWithNoDecimals.safeParse(value).success) {
+        onVotingPowerChange(id, Number(value));
+        return;
+      }
+      if (value === '') {
+        onVotingPowerChange(id, '');
+        return;
+      }
+      e.preventDefault();
+    };
 
     return (
       <Flex key={id} w="full" marginBottom={'16px'}>
@@ -167,14 +184,9 @@ export const MemberUpdate = memo(
             color={'purple'}
             fontWeight={'normal'}
             value={votingPower}
+            onKeyDown={onNumberWithNoDecimalKeyDown}
             type={'number'}
-            onChange={e => {
-              const power =
-                e.target.value !== ''
-                  ? Math.abs(Number(e.target.value))
-                  : ('' as const);
-              onVotingPowerChange(id, power);
-            }}
+            onChange={onChangeVotingPower}
           />
 
           <InputRightElement width="30%" height={'100%'}>

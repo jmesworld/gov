@@ -7,7 +7,7 @@ type Props = {
 export const ClosePageButton = ({ onClose, showCloseButton = true }: Props) => {
   return (
     <Flex
-      mb="25px"
+      pb="25px"
       gap="4"
       alignItems="flex-end"
       justifyContent="center"

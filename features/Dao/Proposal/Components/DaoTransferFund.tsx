@@ -1,4 +1,4 @@
-import { useEffect, useState, memo, useMemo } from 'react';
+import { useEffect, useState, ChangeEvent, memo, useMemo } from 'react';
 import { useDebounce } from '../../../../hooks/useDebounce';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
 import { useQuery } from '@tanstack/react-query';
@@ -12,6 +12,7 @@ import {
   InputLeftElement,
 } from '@chakra-ui/react';
 import { TwoInputs } from '../../../components/genial/TwoInputs';
+import { numberWithDecimals } from '../../../../utils/numberValidators';
 
 interface BaseProps {
   client: IdentityserviceQueryClient;
@@ -230,6 +231,18 @@ export const DaoTransferFund = memo(
       return name || nameValue ? (address || addressValue) ?? '' : '';
     }, [readonly, name, nameValue, address, addressValue]);
 
+    const onChangeAmount = (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      if (numberWithDecimals(6).safeParse(value).success) {
+        !readonly &&
+          rest.onAmountChange &&
+          rest.onAmountChange(id, Number(value));
+      }
+      if (value === '') {
+        !readonly && rest.onAmountChange && rest.onAmountChange(id, '');
+      }
+    };
+
     return (
       <Box>
         <Flex key={id} marginBottom={'3px'} mb={readonly ? '10px' : '10px'}>
@@ -258,13 +271,7 @@ export const DaoTransferFund = memo(
               fontWeight={'normal'}
               value={amount}
               type={'number'}
-              onChange={e => {
-                const power =
-                  e.target.value !== '' ? Number(e.target.value) ?? 0 : '';
-                !readonly &&
-                  rest.onAmountChange &&
-                  rest.onAmountChange(id, power);
-              }}
+              onChange={onChangeAmount}
             />
 
             <InputLeftElement height={'100%'}>

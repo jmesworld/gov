@@ -6,6 +6,7 @@ import { Actions } from '../createDAOReducer';
 import { useDebounce } from '../../../hooks/useDebounce';
 import { IdentityserviceQueryClient } from '../../../client/Identityservice.client';
 import { daoNameSchema } from '../../../utils/dao';
+import { allowedCharacters } from '../../../utils/numberValidators';
 
 const nameSchemaForEachChar = z.string().regex(/^[a-z0-9]+$/);
 const capitalNameSchema = z.string().regex(/^[A-Z]+$/);
@@ -78,19 +79,19 @@ export const DaoName = ({
         borderRadius={12}
         color={'purple'}
         onKeyDown={e => {
-          const character = e.key;
-          if (character === 'Backspace') {
+          const { key } = e;
+          if (allowedCharacters.includes(key)) {
             return;
           }
-          const name = nameSchemaForEachChar.safeParse(character);
-          const capitalName = capitalNameSchema.safeParse(character);
+          const name = nameSchemaForEachChar.safeParse(key);
+          const capitalName = capitalNameSchema.safeParse(key);
           if (capitalName.success) {
             // fire with lowercase
             e.preventDefault();
             dispatch({
               type: 'SET_DAO_NAME',
               payload: {
-                value: daoName + character.toLowerCase(),
+                value: daoName + key.toLowerCase(),
                 error: null,
               },
             });
