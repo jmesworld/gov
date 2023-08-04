@@ -24,14 +24,14 @@ import {
   Spinner,
   Input,
 } from '@chakra-ui/react';
-import { useMemo, useState } from 'react';
-
+import { useMemo, useState, ChangeEvent } from 'react';
 import { DelegateUnbondingTable } from './delegate-unbonding-table';
 import { DelegateValidatorTable } from './delegate-validator-table';
 // import { validatorsData } from './mock/validator';
 import { useDelegate } from './hooks/useDelegate';
 import { UnBondValidatorTable } from './unbond-validator-table';
 import { useIdentityContext } from '../../contexts/IdentityContext';
+import { numberWithDecimals } from '../../utils/numberValidators';
 
 type Props = {
   onClose: () => void;
@@ -85,6 +85,16 @@ export const Delegate = ({ onClose }: Props) => {
     onClose();
     return null;
   }
+
+  const onValueToMoveChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (numberWithDecimals(6).safeParse(value).success) {
+      onValueChange(e.target.value);
+    }
+    if (value === '') {
+      onValueChange('');
+    }
+  };
 
   return (
     <>
@@ -272,7 +282,7 @@ export const Delegate = ({ onClose }: Props) => {
                         }
                         errorBorderColor="red"
                         type="number"
-                        onChange={e => onValueChange(e.target.value)}
+                        onChange={onValueToMoveChange}
                         bg="transparent"
                         color="white"
                         value={valueToMove}

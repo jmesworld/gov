@@ -18,7 +18,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { StdFee } from '@cosmjs/amino';
 import {
   DaoMultisigClient,
@@ -44,6 +44,10 @@ import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { VoterDetail } from '../../client/DaoMultisig.types';
 import { useRouter } from 'next/router';
 import { ClosePageButton } from '../components/genial/ClosePageButton';
+import {
+  numberWithDecimals,
+  onNumberWithDecimalKeyDown,
+} from '../../utils/numberValidators';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -114,8 +118,10 @@ export default function CreateGovProposal({
   const [improvementMsgs, setImprovementMsgs] = useState<string>('');
   const [slotType, setSlotType] = useState('brand');
   const [isFundingNeeded, setFundingNeeded] = useState(false);
-  const [fundingAmount, setFundingAmount] = useState(0);
-  const [fundingPeriod, setFundingPeriod] = useState(default_funding_duration);
+  const [fundingAmount, setFundingAmount] = useState<'' | number>(0);
+  const [fundingPeriod, setFundingPeriod] = useState<'' | number>(
+    default_funding_duration,
+  );
   const [isCreatingGovProposal, setCreatingGovProposal] = useState(false);
   const [revokeProposalId, setRevokeId] = useState(-1);
   const [daoMembers, setDaoMembers] = useState<VoterDetail[]>([]);
@@ -153,7 +159,7 @@ export default function CreateGovProposal({
     );
   }, [daoMembers, daoThreshold, selectedProposalType]);
 
-  const [numberOfNFTToMint, setNumberOfNFTToMint] = useState(0);
+  const [numberOfNFTToMint, setNumberOfNFTToMint] = useState<'' | number>(0);
   const { signingCosmWasmClient: signingClient } =
     useSigningCosmWasmClientContext();
 
@@ -279,13 +285,13 @@ export default function CreateGovProposal({
       const proposalMsg = {
         propose: getProposalExecuteMsg({
           type: selectedProposalType,
-          featureApproved: numberOfNFTToMint,
+          featureApproved: Number(numberOfNFTToMint),
           isFundingRequired: isFundingNeeded,
           // convert to blocks
-          amount: fundingAmount,
+          amount: Number(fundingAmount),
           title: proposalTitle.value,
           description: proposalDescription.value,
-          duration: convertMonthToBlock(fundingPeriod), // months to seconds
+          duration: convertMonthToBlock(Number(fundingPeriod)), // months to seconds
           slot: getSlot(slotType) as Governance.CoreSlot,
           revoke_proposal_id: revokeProposalId,
           msgs: [
@@ -369,6 +375,43 @@ export default function CreateGovProposal({
     proposalTitle.error === '' &&
     proposalDescription.value.length > 1 &&
     proposalDescription.error === '';
+
+  const onFundingPeriodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (numberWithDecimals(1).safeParse(value).success) {
+      setFundingPeriod(Number(value));
+    }
+
+    if (value === '') {
+      setFundingPeriod('');
+    }
+    e.preventDefault();
+  };
+
+  const onNumberOfNFTToMintChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = e.target.value;
+    if (numberWithDecimals(6).safeParse(value).success) {
+      setNumberOfNFTToMint(Number(value));
+    }
+    if (value === '') {
+      setNumberOfNFTToMint('');
+    }
+    e.stopPropagation;
+    e.preventDefault();
+  };
+
+  const onFundingAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (numberWithDecimals(6).safeParse(value).success) {
+      setFundingAmount(Number(value));
+    }
+    if (value === '') {
+      setFundingAmount('');
+    }
+    e.preventDefault();
+  };
 
   return (
     <>
@@ -633,9 +676,8 @@ export default function CreateGovProposal({
                         background={'transparent'}
                         type="number"
                         color={'purple'}
-                        onChange={e =>
-                          setNumberOfNFTToMint(parseInt(e.target.value))
-                        }
+                        value={numberOfNFTToMint}
+                        onChange={onNumberOfNFTToMintChange}
                         border="none"
                         borderBottom="1px solid"
                         borderRadius="0"
@@ -732,9 +774,7 @@ export default function CreateGovProposal({
                             background={'transparent'}
                             color={'purple'}
                             value={fundingAmount}
-                            onChange={e =>
-                              setFundingAmount(parseInt(e.target.value))
-                            }
+                            onChange={onFundingAmountChange}
                             border="none"
                             borderBottom="1px solid"
                             borderRadius="0"
@@ -764,9 +804,7 @@ export default function CreateGovProposal({
                             background={'transparent'}
                             focusBorderColor="darkPurple"
                             color={'purple'}
-                            onChange={
-                              e => setFundingPeriod(parseInt(e.target.value)) // convert period in months to blocks
-                            }
+                            onChange={onFundingPeriodChange}
                             border="none"
                             borderBottom="1px solid"
                             borderRadius="0"

@@ -20,6 +20,7 @@ import { Suspense, Dispatch, SetStateAction, ReactNode, memo } from 'react';
 import { IdentityserviceQueryClient } from '../../../client/Identityservice.client';
 import OnboardingProgressIndicator from '../components/OnboardingProgressIndicator';
 import { useIdentityserviceGetIdentityByNameQuery } from '../../../client/Identityservice.react-query';
+import { allowedCharacters } from '../../../utils/numberValidators';
 
 const nameSchemaForEachChar = z.string().regex(/^[a-z0-9]+$/);
 const capitalNameSchema = z.string().regex(/^[A-Z]+$/);
@@ -254,7 +255,7 @@ export const ChooseUsernameCardComponent = ({
                   value={usernameInput}
                   onKeyDown={e => {
                     const character = e.key;
-                    if (character === 'Backspace') {
+                    if (allowedCharacters.includes('Backspace')) {
                       return;
                     }
                     if (character === ' ' || character === 'Spacebar') {
