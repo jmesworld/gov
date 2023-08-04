@@ -1,3 +1,4 @@
+// TD: [proposalList](3) - needs to be refactored
 /* eslint-disable @typescript-eslint/ban-types */
 import {
   Badge,

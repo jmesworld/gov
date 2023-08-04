@@ -7,6 +7,7 @@ export interface Props {
   noPercentage: number;
   target: number;
   children?: ReactNode;
+  childrenAtTheBottom?: ReactNode;
   label?: {
     label: string;
     success: boolean;
@@ -15,6 +16,7 @@ export interface Props {
 
 export const ProposalVoting = ({
   children,
+  childrenAtTheBottom,
   yesPercentage,
   noPercentage,
   target,
@@ -44,6 +46,7 @@ export const ProposalVoting = ({
             {label.label}
           </Badge>
         )}
+        {childrenAtTheBottom}
       </Flex>
     </Box>
   );

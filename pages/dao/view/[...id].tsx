@@ -66,16 +66,14 @@ const DAODetail = () => {
     }
 
     return (
-      <>
-        <DaoProposal
-          daoAddress={selectedDAO.address}
-          daoName={selectedDAO.name}
-          setDaoProposalDetailOpen={setDaoProposalDetailOpen}
-          setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-          setSelectedDaoMembersList={setSelectedDaoMembersList}
-          setSelectedProposalId={setSelectedProposalId}
-        />
-      </>
+      <DaoProposal
+        daoAddress={selectedDAO.address}
+        daoName={selectedDAO.name}
+        setDaoProposalDetailOpen={setDaoProposalDetailOpen}
+        setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+        setSelectedDaoMembersList={setSelectedDaoMembersList}
+        setSelectedProposalId={setSelectedProposalId}
+      />
     );
   }
   return null;

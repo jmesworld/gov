@@ -21,6 +21,7 @@ export const defaultThemeObject = {
       100: 'gba(112,79,247,0.1)',
       500: 'rgba(112,79,247,0.5)',
     },
+    white: '#fff',
     bg: '#e1dafe',
     purple: '#7453FD',
     brand: '#7453FD',

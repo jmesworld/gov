@@ -8,7 +8,6 @@ const GovProposalDetail = dynamic(() => import('./GovProposalDetail'));
 
 const GovProposalVotes = dynamic(() => import('./GovProposalVotes'));
 const GovProposalMyVote = dynamic(() => import('./GovProposalMyVote'));
-const GovProposalVoting = dynamic(() => import('./GovProposalVoting'));
 const GovHeader = dynamic(() => import('./GovHeader'));
 
 const Governance = {
@@ -17,7 +16,6 @@ const Governance = {
   CreateGovProposal,
   GovProposalVotes,
   GovProposalDetail,
-  GovProposalVoting,
   GovProposalMyVote,
   WinningGrantProposals,
   CoreSlotProposals,

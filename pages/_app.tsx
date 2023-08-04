@@ -46,6 +46,9 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
+// a day
+const keplerSessionDuration = 60 * 60 * 24 * 1000;
+
 function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter();
   const signerOptions: SignerOptions = {
@@ -65,6 +68,9 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
     <ChakraProvider theme={defaultTheme}>
       <QueryClientProvider client={queryClient}>
         <ChainProvider
+          sessionOptions={{
+            duration: keplerSessionDuration,
+          }}
           chains={chains}
           assetLists={assets}
           wallets={[...keplrWallets]}

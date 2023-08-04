@@ -202,6 +202,7 @@ export const DaoMembersListItem = ({
             {address.slice(0, 20)}...{address.slice(-6) ?? ''}
           </Text>
         </Flex>
+
         {isYes !== undefined && (
           <Badge
             fontWeight="normal"

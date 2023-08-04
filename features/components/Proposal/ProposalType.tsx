@@ -1,5 +1,5 @@
 import { CheckIcon } from '@chakra-ui/icons';
-import { Flex, Image, Spacer, Text } from '@chakra-ui/react';
+import { Box, Flex, Image, Spacer, Text } from '@chakra-ui/react';
 import { MouseEventHandler } from 'react';
 
 export const ProposalType = ({
@@ -10,6 +10,7 @@ export const ProposalType = ({
   mb = '14px',
   proposalDetail = false,
   fullWidth = false,
+  daoName,
 }: {
   label?: string;
   type: string;
@@ -18,6 +19,7 @@ export const ProposalType = ({
   mb?: string;
   proposalDetail?: boolean;
   fullWidth?: boolean;
+  daoName?: string;
 }) => {
   return (
     <Flex
@@ -45,9 +47,22 @@ export const ProposalType = ({
         fontSize={14}
         fontFamily="DM Sans"
         marginLeft={'10px'}
+        display={'flex'}
+        alignItems={'center'}
       >
-        {label || getLabelForProposalTypes(type)}{' '}
-        {proposalDetail ? 'Proposal' : ''}
+        {label || getLabelForProposalTypes(type)}
+        {proposalDetail ? ' Proposal' : ''}
+        {daoName && (
+          <Box
+            bg="white"
+            display="inline-block"
+            w="4px"
+            h="4px"
+            mx="2"
+            rounded="full"
+          ></Box>
+        )}
+        {daoName && <span> {daoName}</span>}
       </Text>
       <Spacer />
       {isActive ? <CheckIcon color={'green'} /> : ''}
@@ -86,14 +101,17 @@ const getImgSrc = (type: string) => {
       return '/Text_Type.svg';
     case 'update-directories':
       return '/update-directories.svg';
+    case 'core_slot':
     case 'core-slot':
       return '/CoreSlot_Type.svg';
+    case 'revoke_proposal':
     case 'revoke-proposal':
       return '/RevokeCoreSlot_Type.svg';
     case 'improvement':
       return '/Improvement_Type.svg';
     case 'spend-dao-funds':
       return '/Spend_Key.svg';
+    case 'feature_request':
     case 'feature-request':
       return '/feature_request.svg';
     default:
@@ -120,8 +138,11 @@ export const getImgSrcHeight = (type: string) => {
   switch (type) {
     case 'text':
       return '18.01px';
+    case 'core_slot':
     case 'core-slot':
       return '31px';
+    case 'revoke_proposal':
+    case 'revoke-proposal':
     case 'revoke-core-slot':
       return '27px';
     case 'improvement':
