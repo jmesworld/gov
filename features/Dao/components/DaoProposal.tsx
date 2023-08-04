@@ -165,7 +165,6 @@ export default function DaoProposal({
 
               <Tooltip
                 ref={tooltipRef}
-                // show tooltip after copy
                 isOpen={copied || undefined}
                 hasArrow
                 label={

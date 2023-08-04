@@ -39,6 +39,7 @@ import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { useVotingPeriodContext } from '../../../contexts/VotingPeriodContext';
 import { getLabel } from '../../../utils/daoProposalUtil';
 import { IdentityserviceQueryClient } from '../../../client/Identityservice.client';
+import { DaoProposalFunding } from '../../Governance/ProposalFunding';
 
 type Props = {
   selectedDao: string;
@@ -217,6 +218,9 @@ export default function DaoProposalDetail({
               noPercentage={noPercentage}
               yesPercentage={yesPercentage}
               target={target}
+              childrenAtTheBottom={
+                <DaoProposalFunding proposal={proposalDetailQuery?.data} />
+              }
               label={
                 label
                   ? { label: label.label, success: label.labelSuccess }

@@ -22,7 +22,10 @@ import { useGovernanceProposalQuery } from '../../client/Governance.react-query'
 
 import { chainName } from '../../config/defaults';
 import GovProposalMyVote from './GovProposalMyVote';
-import GovProposalVoting from './GovProposalVoting';
+import {
+  ProposalHeadingContainer,
+  ProposalVotingWithStatus,
+} from './GovProposalVoting';
 import { ProposalHeader } from '../components/Proposal/ProposalHeader';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { calculateVotes } from '../../lib/calculateVotes';
@@ -30,6 +33,10 @@ import { useVotingPeriodContext } from '../../contexts/VotingPeriodContext';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
 import { useRouter } from 'next/router';
 import { ProposalExcuteRawData } from '../Dao/Proposal/Components/ProposalRawData';
+import { ProposalFunding } from './ProposalFunding';
+import { GetSlotType, GovProposalType } from '../Governance/ProposalType';
+import { useDao, useDaoMemberList } from '../../hooks/dao';
+import DirectoresList from '../Dao/Proposal/Components/DirectorsList';
 
 const GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -64,6 +71,11 @@ export default function GovProposalDetail({
       refetchInterval: 10000,
     },
   });
+
+  const { data: daoInfo } = useDao(data?.dao);
+  const { voters: memberListWithVote, isFetching: daoMemberListLoading } =
+    useDaoMemberList(data?.dao, data?.id);
+
   const govMutationClient = useMemo(
     () =>
       signingCosmWasmClient && address
@@ -215,18 +227,23 @@ export default function GovProposalDetail({
       {data ? (
         <HStack spacing="54px" align="flex-start">
           <Box flexGrow={1}>
-            <GovProposalVoting
-              yesCount={coinYes}
-              noCount={coinNo}
-              yesPercent={yesPercentage}
-              noPercent={noPercentage}
-              targetPercentage={thresholdPercent}
-              target={Number(threshold) || 0}
-              yesVotesPercentage={yesPercentage}
-              noVotesPercentage={noPercentage}
-              label={label}
-            />
+            <ProposalHeadingContainer>
+              <GovProposalType daoName={daoInfo?.dao_name} proposal={data} />
+              <ProposalVotingWithStatus
+                yesCount={coinYes}
+                noCount={coinNo}
+                yesPercent={yesPercentage}
+                noPercent={noPercentage}
+                targetPercentage={thresholdPercent}
+                target={Number(threshold) || 0}
+                yesVotesPercentage={yesPercentage}
+                noVotesPercentage={noPercentage}
+                label={label}
+              />
 
+              <ProposalFunding proposal={data} />
+            </ProposalHeadingContainer>
+            <GetSlotType proposal={data} />
             <Text mt="15px" color="purple">
               Description
             </Text>
@@ -396,6 +413,11 @@ export default function GovProposalDetail({
                 </Button>
               </Tooltip>
             )}
+
+            <DirectoresList
+              voters={memberListWithVote ?? []}
+              loading={daoMemberListLoading}
+            />
           </VStack>
         </HStack>
       ) : (

@@ -44,10 +44,7 @@ import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { VoterDetail } from '../../client/DaoMultisig.types';
 import { useRouter } from 'next/router';
 import { ClosePageButton } from '../components/genial/ClosePageButton';
-import {
-  numberWithDecimals,
-  onNumberWithDecimalKeyDown,
-} from '../../utils/numberValidators';
+import { numberWithDecimals } from '../../utils/numberValidators';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
