@@ -1,8 +1,4 @@
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
   Box,
   Button,
   CircularProgress,
@@ -10,6 +6,7 @@ import {
   Input,
   Radio,
   RadioGroup,
+  Skeleton,
   Spacer,
   Stack,
   Switch,
@@ -45,6 +42,7 @@ import { VoterDetail } from '../../client/DaoMultisig.types';
 import { useRouter } from 'next/router';
 import { ClosePageButton } from '../components/genial/ClosePageButton';
 import { numberWithDecimals } from '../../utils/numberValidators';
+import { useCoreSlotProposalsContext } from '../../contexts/CoreSlotProposalsContext';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -83,7 +81,7 @@ export default function CreateGovProposal({
   setCreateGovProposalSelected: Function;
 }) {
   const { cosmWasmClient } = useCosmWasmClientContext();
-
+  const { coreSlotDaoIds } = useCoreSlotProposalsContext();
   const daoQueryClient = useMemo(
     () =>
       new DaoMultisigQueryClient(
@@ -121,7 +119,7 @@ export default function CreateGovProposal({
   );
   const [isCreatingGovProposal, setCreatingGovProposal] = useState(false);
   const [revokeProposalId, setRevokeId] = useState(-1);
-  const [daoMembers, setDaoMembers] = useState<VoterDetail[]>([]);
+  const [daoMembers, setDaoMembers] = useState<VoterDetail[] | null>(null);
   const [daoThreshold, setDaoThreshold] = useState<number | string>(0);
 
   useEffect(() => {
@@ -148,13 +146,13 @@ export default function CreateGovProposal({
   }, [daoQueryClient]);
 
   const coreSlotsDisabled = useMemo(() => {
+    if (daoMembers === null) return true;
     return (
-      selectedProposalType === 'core-slot' &&
       daoMembers.length > 0 &&
       (daoMembers.length < 3 ||
-        daoMembers.some(member => member.weight > Number(daoThreshold) ?? 0))
+        daoMembers.some(member => member.weight >= Number(daoThreshold) ?? 0))
     );
-  }, [daoMembers, daoThreshold, selectedProposalType]);
+  }, [daoMembers, daoThreshold]);
 
   const [numberOfNFTToMint, setNumberOfNFTToMint] = useState<'' | number>(0);
   const { signingCosmWasmClient: signingClient } =
@@ -165,7 +163,25 @@ export default function CreateGovProposal({
     address as string,
     selectedDao ?? '',
   );
-
+  const proposalList = useMemo(
+    () =>
+      allowedProposalTypes.filter(el => {
+        if (
+          el === 'improvement' &&
+          !coreSlotDaoIds?.includes(selectedDao ?? '')
+        ) {
+          return false;
+        }
+        if (el === 'core-slot' && coreSlotsDisabled) {
+          return false;
+        }
+        if (el === 'revoke-proposal' && advancedOption !== '1') {
+          return false;
+        }
+        return true;
+      }),
+    [advancedOption, coreSlotDaoIds, coreSlotsDisabled, selectedDao],
+  );
   const isDirty = useMemo(() => {
     return (
       proposalTitle.value ||
@@ -354,7 +370,7 @@ export default function CreateGovProposal({
       if (err instanceof Error) {
         toast({
           title: 'Proposal creation error',
-          description: err.toString(),
+          description: err.message,
           status: 'error',
           variant: 'custom',
           duration: 9000,
@@ -455,13 +471,36 @@ export default function CreateGovProposal({
           >
             SELECT PROPOSAL TYPE
           </Text>
-          {allowedProposalTypes
-            .filter(
-              el =>
-                el !== 'revoke-proposal' ||
-                (el === 'revoke-proposal' && advancedOption === '1'),
-            )
-            .map(proposalType => (
+          {daoMembers === null && (
+            <Flex flexDir="column" width={'220px'}>
+              <Skeleton
+                height="15px"
+                startColor="skeleton.100"
+                endColor="skeleton.200"
+                rounded="full"
+                width="100%"
+                mb="30px"
+              />
+              <Skeleton
+                height="15px"
+                startColor="skeleton.100"
+                endColor="skeleton.200"
+                rounded="full"
+                width="100%"
+                mb="30px"
+              />
+              <Skeleton
+                height="15px"
+                startColor="skeleton.100"
+                endColor="skeleton.200"
+                rounded="full"
+                width="100%"
+                mb="30px"
+              />
+            </Flex>
+          )}
+          {daoMembers !== null &&
+            proposalList.map(proposalType => (
               <ProposalType
                 key={proposalType}
                 type={proposalType}
@@ -471,428 +510,401 @@ export default function CreateGovProposal({
             ))}
         </Box>
         <Box width={'100%'} position="relative">
-          {selectedProposalType === 'core-slot' && coreSlotsDisabled && (
-            <Alert
-              status="error"
-              variant="subtle"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              rounded="xl"
-              p="8"
-              textAlign="center"
+          <>
+            <Text
+              color={'rgba(15,0,86,0.8)'}
+              fontWeight="medium"
+              fontSize={12}
+              fontFamily="DM Sans"
+              marginBottom={'17px'}
             >
-              <AlertIcon boxSize="40px" mr={0} />
-              <AlertTitle mt={4} mb={1} fontSize="lg">
-                Membership Violation!
-              </AlertTitle>
-              <AlertDescription maxWidth="lg">
-                Your current DAO structure is in violation of the Core Slot
-                membership rules
-              </AlertDescription>
-            </Alert>
-          )}
-          {!(selectedProposalType === 'core-slot' && coreSlotsDisabled) && (
-            <>
-              <Text
-                color={'rgba(15,0,86,0.8)'}
-                fontWeight="medium"
-                fontSize={12}
-                fontFamily="DM Sans"
-                marginBottom={'17px'}
-              >
-                DETAILS
-              </Text>
-              <Input
-                variant={'outline'}
-                width={'full'}
-                height={'48px'}
-                borderColor={'primary.500'}
-                background={'primary.100'}
-                focusBorderColor={proposalTitle.error ? 'red' : 'darkPurple'}
-                borderRadius={12}
-                color={'purple'}
-                isInvalid={proposalTitle.error !== ''}
-                errorBorderColor="red"
-                onChange={e => {
-                  const parsedTitle = proposalTitleValidator.safeParse(
-                    e.target.value,
-                  );
-                  setProposalTitle({
-                    value: e.target.value,
-                    error: parsedTitle.success
-                      ? ''
-                      : parsedTitle.error.errors[0].message,
-                  });
-                }}
-                placeholder={'Title'}
-              />
-              <Text
-                color={'red'}
-                fontWeight="normal"
-                fontSize={12}
-                height={'13px'}
-                w="Full"
-                fontFamily="DM Sans"
-                mt="5px"
-                mb={'10px'}
-              >
-                {proposalTitle.error}
-              </Text>
-              <Box height={'12px'} />
-              <Textarea
-                variant={'outline'}
-                width={'full'}
-                height={'320px'}
-                borderColor={'primary.500'}
-                background={'primary.100'}
-                isInvalid={proposalDescription.error !== ''}
-                value={proposalDescription.value}
-                errorBorderColor="red"
-                focusBorderColor={
-                  proposalDescription.error ? 'red' : 'darkPurple'
-                }
-                borderRadius={12}
-                color={'purple'}
-                onChange={e => {
-                  const parsedDescription =
-                    proposalDescriptionValidator.safeParse(e.target.value);
-                  setProposalDescription({
-                    value: e.target.value,
-                    error: parsedDescription.success
-                      ? ''
-                      : parsedDescription.error.errors[0].message,
-                  });
-                }}
-                placeholder={'Description'}
-              />
-              <Text
-                color={'red'}
-                fontWeight="normal"
-                fontSize={12}
-                height={'13px'}
-                w="Full"
-                fontFamily="DM Sans"
-                mt="5px"
-                mb={'10px'}
-              >
-                {proposalDescription.error}
-              </Text>
-              {selectedProposalType === 'revoke-proposal' && (
-                <Box marginTop={'10px'} width={'872px'}>
-                  <Input
-                    variant={'outline'}
-                    width={'full'}
-                    height={'50px'}
-                    type={'number'}
-                    borderColor={'primary.500'}
-                    background={'primary.100'}
-                    focusBorderColor="darkPurple"
-                    borderRadius={12}
-                    marginTop={'12px'}
-                    color={'purple'}
-                    onChange={e => setRevokeId(parseInt(e.target.value))}
-                    placeholder={'Proposal ID'}
+              DETAILS
+            </Text>
+            <Input
+              variant={'outline'}
+              width={'full'}
+              height={'48px'}
+              borderColor={'primary.500'}
+              background={'primary.100'}
+              focusBorderColor={proposalTitle.error ? 'red' : 'darkPurple'}
+              borderRadius={12}
+              color={'purple'}
+              isInvalid={proposalTitle.error !== ''}
+              errorBorderColor="red"
+              onChange={e => {
+                const parsedTitle = proposalTitleValidator.safeParse(
+                  e.target.value,
+                );
+                setProposalTitle({
+                  value: e.target.value,
+                  error: parsedTitle.success
+                    ? ''
+                    : parsedTitle.error.errors[0].message,
+                });
+              }}
+              placeholder={'Title'}
+            />
+            <Text
+              color={'red'}
+              fontWeight="normal"
+              fontSize={12}
+              height={'13px'}
+              w="Full"
+              fontFamily="DM Sans"
+              mt="5px"
+              mb={'10px'}
+            >
+              {proposalTitle.error}
+            </Text>
+            <Box height={'12px'} />
+            <Textarea
+              variant={'outline'}
+              width={'full'}
+              height={'320px'}
+              borderColor={'primary.500'}
+              background={'primary.100'}
+              isInvalid={proposalDescription.error !== ''}
+              value={proposalDescription.value}
+              errorBorderColor="red"
+              focusBorderColor={
+                proposalDescription.error ? 'red' : 'darkPurple'
+              }
+              borderRadius={12}
+              color={'purple'}
+              onChange={e => {
+                const parsedDescription =
+                  proposalDescriptionValidator.safeParse(e.target.value);
+                setProposalDescription({
+                  value: e.target.value,
+                  error: parsedDescription.success
+                    ? ''
+                    : parsedDescription.error.errors[0].message,
+                });
+              }}
+              placeholder={'Description'}
+            />
+            <Text
+              color={'red'}
+              fontWeight="normal"
+              fontSize={12}
+              height={'13px'}
+              w="Full"
+              fontFamily="DM Sans"
+              mt="5px"
+              mb={'10px'}
+            >
+              {proposalDescription.error}
+            </Text>
+            {selectedProposalType === 'revoke-proposal' && (
+              <Box marginTop={'10px'} width={'872px'}>
+                <Input
+                  variant={'outline'}
+                  width={'full'}
+                  height={'50px'}
+                  type={'number'}
+                  borderColor={'primary.500'}
+                  background={'primary.100'}
+                  focusBorderColor="darkPurple"
+                  borderRadius={12}
+                  marginTop={'12px'}
+                  color={'purple'}
+                  onChange={e => setRevokeId(parseInt(e.target.value))}
+                  placeholder={'Proposal ID'}
+                />
+              </Box>
+            )}
+            {isImprovementRequired && (
+              <Box marginTop={'10px'} mb="25px" width={'full'}>
+                <Flex
+                  mt="4"
+                  background="rgba(112, 79, 247, 0.1)"
+                  borderRadius="12px"
+                  border="1px solid rgba(112, 79, 247, 0.5)"
+                  padding="14px 16px"
+                  marginTop="20px"
+                  overflowY="auto"
+                >
+                  <CodeEditor
+                    width="100%"
+                    style={{
+                      backgroundColor: 'transparent',
+                      height: '300px',
+                    }}
+                    placeholder="Improvements"
+                    setOptions={{
+                      highlightActiveLine: true,
+                      highlightGutterLine: true,
+                      showPrintMargin: false,
+                      hScrollBarAlwaysVisible: true,
+                    }}
+                    editorProps={{
+                      $blockScrolling: false,
+                    }}
+                    value={improvementMsgs}
+                    onChange={setImprovementMsgs}
                   />
-                </Box>
-              )}
-              {isImprovementRequired && (
-                <Box marginTop={'10px'} mb="25px" width={'full'}>
-                  <Flex
-                    mt="4"
-                    background="rgba(112, 79, 247, 0.1)"
-                    borderRadius="12px"
-                    border="1px solid rgba(112, 79, 247, 0.5)"
-                    padding="14px 16px"
-                    marginTop="20px"
-                    overflowY="auto"
+                </Flex>
+              </Box>
+            )}
+            {isFeatureRequestRequired && (
+              <Box marginTop={'25px'} width={'full'}>
+                <Flex marginBottom={'17px'} alignItems="center">
+                  <Text
+                    color={'darkPurple'}
+                    fontWeight="normal"
+                    fontSize={16}
+                    minWidth={'100px'}
+                    fontFamily="DM Sans"
+                    marginRight={'52px'}
                   >
-                    <CodeEditor
-                      width="100%"
-                      style={{
-                        backgroundColor: 'transparent',
-                        height: '300px',
-                      }}
-                      placeholder="Improvements"
-                      setOptions={{
-                        highlightActiveLine: true,
-                        highlightGutterLine: true,
-                        showPrintMargin: false,
-                        hScrollBarAlwaysVisible: true,
-                      }}
-                      editorProps={{
-                        $blockScrolling: false,
-                      }}
-                      value={improvementMsgs}
-                      onChange={setImprovementMsgs}
-                    />
-                  </Flex>
-                </Box>
-              )}
-              {isFeatureRequestRequired && (
-                <Box marginTop={'25px'} width={'full'}>
-                  <Flex marginBottom={'17px'} alignItems="center">
+                    Feature type:
+                  </Text>
+                  <RadioGroup
+                    minWidth="100px"
+                    value="art-dealer"
+                    textColor={'darkPurple'}
+                  >
+                    <Stack direction="row" spacing={'35px'}>
+                      <Radio value="art-dealer">Art Dealer</Radio>
+                    </Stack>
+                  </RadioGroup>
+                  <Flex
+                    marginLeft={'28px'}
+                    alignItems="center"
+                    height={'41px'}
+                    w="full"
+                  >
                     <Text
                       color={'darkPurple'}
                       fontWeight="normal"
                       fontSize={16}
-                      minWidth={'100px'}
                       fontFamily="DM Sans"
-                      marginRight={'52px'}
-                    >
-                      Feature type:
-                    </Text>
-                    <RadioGroup
                       minWidth="100px"
-                      value="art-dealer"
-                      textColor={'darkPurple'}
                     >
-                      <Stack direction="row" spacing={'35px'}>
-                        <Radio value="art-dealer">Art Dealer</Radio>
-                      </Stack>
-                    </RadioGroup>
-                    <Flex
-                      marginLeft={'28px'}
-                      alignItems="center"
+                      Number of NFT’s to Mint
+                    </Text>
+                    <Input
+                      width={'100px'}
                       height={'41px'}
-                      w="full"
-                    >
+                      borderColor={'primary.500'}
+                      background={'transparent'}
+                      type="number"
+                      color={'purple'}
+                      value={numberOfNFTToMint}
+                      onChange={onNumberOfNFTToMintChange}
+                      border="none"
+                      borderBottom="1px solid"
+                      borderRadius="0"
+                      px="0px"
+                      mx="10px"
+                      textAlign={'center'}
+                      _focus={{
+                        boxShadow: 'none',
+                        borderBottom: '1px solid',
+                      }}
+                    />
+                  </Flex>
+                </Flex>
+              </Box>
+            )}
+            {isSlotTypeRequired && (
+              <Box marginTop={'25px'} width={'full'}>
+                <Flex marginBottom={'17px'}>
+                  <Text
+                    color={'darkPurple'}
+                    fontWeight="normal"
+                    fontSize={16}
+                    fontFamily="DM Sans"
+                    marginRight={'52px'}
+                  >
+                    Select Slot type:
+                  </Text>
+                  <RadioGroup
+                    onChange={setSlotType}
+                    value={slotType}
+                    textColor={'darkPurple'}
+                  >
+                    <Stack direction="row" spacing={'35px'}>
+                      <Radio value="brand">Brand</Radio>
+                      <Radio value="core-tech">Tech</Radio>
+                      <Radio value="creative">Creative</Radio>
+                    </Stack>
+                  </RadioGroup>
+                </Flex>
+              </Box>
+            )}
+
+            {isFundigRequired ? (
+              <Box width={'full'}>
+                <Flex marginBottom={'17px'} height={'41px'} align={'flex-end'}>
+                  {selectedProposalType === 'text' && (
+                    <Flex mr={'28px'}>
                       <Text
                         color={'darkPurple'}
                         fontWeight="normal"
                         fontSize={16}
                         fontFamily="DM Sans"
-                        minWidth="100px"
+                        marginRight={'52px'}
                       >
-                        Number of NFT’s to Mint
+                        Do you need funding?
                       </Text>
-                      <Input
-                        width={'100px'}
-                        height={'41px'}
-                        borderColor={'primary.500'}
-                        background={'transparent'}
-                        type="number"
-                        color={'purple'}
-                        value={numberOfNFTToMint}
-                        onChange={onNumberOfNFTToMintChange}
-                        border="none"
-                        borderBottom="1px solid"
-                        borderRadius="0"
-                        px="0px"
-                        mx="10px"
-                        textAlign={'center'}
-                        _focus={{
-                          boxShadow: 'none',
-                          borderBottom: '1px solid',
-                        }}
-                      />
-                    </Flex>
-                  </Flex>
-                </Box>
-              )}
-              {isSlotTypeRequired && (
-                <Box marginTop={'25px'} width={'full'}>
-                  <Flex marginBottom={'17px'}>
-                    <Text
-                      color={'darkPurple'}
-                      fontWeight="normal"
-                      fontSize={16}
-                      fontFamily="DM Sans"
-                      marginRight={'52px'}
-                    >
-                      Select Slot type:
-                    </Text>
-                    <RadioGroup
-                      onChange={setSlotType}
-                      value={slotType}
-                      textColor={'darkPurple'}
-                    >
-                      <Stack direction="row" spacing={'35px'}>
-                        <Radio value="brand">Brand</Radio>
-                        <Radio value="core-tech">Tech</Radio>
-                        <Radio value="creative">Creative</Radio>
-                      </Stack>
-                    </RadioGroup>
-                  </Flex>
-                </Box>
-              )}
 
-              {isFundigRequired ? (
-                <Box width={'full'}>
-                  <Flex
-                    marginBottom={'17px'}
-                    height={'41px'}
-                    align={'flex-end'}
-                  >
-                    {selectedProposalType === 'text' && (
-                      <Flex mr={'28px'}>
+                      <Switch
+                        id="funding-option"
+                        isChecked={isFundingNeeded}
+                        onChange={() => setFundingNeeded(!isFundingNeeded)}
+                      />
+                      <Text
+                        color={'darkPurple'}
+                        fontWeight="normal"
+                        fontSize={16}
+                        fontFamily="DM Sans"
+                        marginLeft={'8px'}
+                      >
+                        Yes
+                      </Text>
+                    </Flex>
+                  )}
+                  {(isFundingNeeded || selectedProposalType !== 'text') && (
+                    <Box w="full" mb="10px">
+                      <Flex height={'41px'} w="full" align={'flex-end'}>
                         <Text
                           color={'darkPurple'}
                           fontWeight="normal"
                           fontSize={16}
                           fontFamily="DM Sans"
-                          marginRight={'52px'}
+                          minWidth={'150px'}
                         >
-                          Do you need funding?
+                          Please pay me
                         </Text>
-
-                        <Switch
-                          id="funding-option"
-                          isChecked={isFundingNeeded}
-                          onChange={() => setFundingNeeded(!isFundingNeeded)}
+                        <Input
+                          width={'100px'}
+                          height={'41px'}
+                          borderColor={'primary.500'}
+                          background={'transparent'}
+                          color={'purple'}
+                          value={fundingAmount}
+                          onChange={onFundingAmountChange}
+                          border="none"
+                          borderBottom="1px solid"
+                          borderRadius="0"
+                          px="0px"
+                          mx="10px"
+                          textAlign={'center'}
+                          type={'number'}
+                          _focus={{
+                            boxShadow: 'none',
+                            borderBottom: '1px solid',
+                          }}
+                        />
+                        <Text
+                          color={'darkPurple'}
+                          fontWeight="normal"
+                          fontSize={16}
+                          minWidth={'100px'}
+                          fontFamily="DM Sans"
+                        >
+                          tokens over
+                        </Text>
+                        <Input
+                          width={'100px'}
+                          height={'41px'}
+                          value={fundingPeriod}
+                          borderColor={'primary.500'}
+                          background={'transparent'}
+                          focusBorderColor="darkPurple"
+                          color={'purple'}
+                          onChange={onFundingPeriodChange}
+                          border="none"
+                          borderBottom="1px solid"
+                          borderRadius="0"
+                          px="0"
+                          mx="10px"
+                          textAlign={'center'}
+                          type={'number'}
+                          _focus={{
+                            boxShadow: 'none',
+                            borderBottom: '1px solid',
+                          }}
                         />
                         <Text
                           color={'darkPurple'}
                           fontWeight="normal"
                           fontSize={16}
                           fontFamily="DM Sans"
-                          marginLeft={'8px'}
                         >
-                          Yes
+                          months.
                         </Text>
                       </Flex>
-                    )}
-                    {(isFundingNeeded || selectedProposalType !== 'text') && (
-                      <Box w="full" mb="10px">
-                        <Flex height={'41px'} w="full" align={'flex-end'}>
-                          <Text
-                            color={'darkPurple'}
-                            fontWeight="normal"
-                            fontSize={16}
-                            fontFamily="DM Sans"
-                            minWidth={'150px'}
-                          >
-                            Please pay me
-                          </Text>
-                          <Input
-                            width={'100px'}
-                            height={'41px'}
-                            borderColor={'primary.500'}
-                            background={'transparent'}
-                            color={'purple'}
-                            value={fundingAmount}
-                            onChange={onFundingAmountChange}
-                            border="none"
-                            borderBottom="1px solid"
-                            borderRadius="0"
-                            px="0px"
-                            mx="10px"
-                            textAlign={'center'}
-                            type={'number'}
-                            _focus={{
-                              boxShadow: 'none',
-                              borderBottom: '1px solid',
-                            }}
-                          />
-                          <Text
-                            color={'darkPurple'}
-                            fontWeight="normal"
-                            fontSize={16}
-                            minWidth={'100px'}
-                            fontFamily="DM Sans"
-                          >
-                            tokens over
-                          </Text>
-                          <Input
-                            width={'100px'}
-                            height={'41px'}
-                            value={fundingPeriod}
-                            borderColor={'primary.500'}
-                            background={'transparent'}
-                            focusBorderColor="darkPurple"
-                            color={'purple'}
-                            onChange={onFundingPeriodChange}
-                            border="none"
-                            borderBottom="1px solid"
-                            borderRadius="0"
-                            px="0"
-                            mx="10px"
-                            textAlign={'center'}
-                            type={'number'}
-                            _focus={{
-                              boxShadow: 'none',
-                              borderBottom: '1px solid',
-                            }}
-                          />
-                          <Text
-                            color={'darkPurple'}
-                            fontWeight="normal"
-                            fontSize={16}
-                            fontFamily="DM Sans"
-                          >
-                            months.
-                          </Text>
-                        </Flex>
-                      </Box>
-                    )}
-                  </Flex>
-                </Box>
-              ) : (
-                ''
-              )}
-              <ClosePageButton showCloseButton={false} />
-              <Flex
-                marginTop={'42px'}
-                marginBottom={'93px'}
-                height={'48px'}
-                alignItems={'center'}
-                width={'full'}
-              >
-                <Spacer />
-                <Button
-                  width={'99px'}
-                  height={'42px'}
-                  variant={'link'}
-                  onClick={() => {
-                    navigate(`/dao/view/${selectedDaoName}`);
-                    setCreateGovProposalSelected(false);
-                  }}
-                >
-                  <Text
-                    color={'darkPurple'}
-                    fontFamily="DM Sans"
-                    fontSize={14}
-                    fontWeight="medium"
-                    style={{ textDecoration: 'underline' }}
-                  >
-                    Cancel
-                  </Text>
-                </Button>
-                <Box width={'12px'} />
-                <Button
-                  disabled={!isFormValid}
-                  onClick={onSubmit}
-                  backgroundColor={'green'}
-                  borderRadius={90}
-                  alignContent="end"
-                  width={'148px'}
-                  height={'42px'}
-                  alignSelf="center"
-                  _hover={{ bg: 'green' }}
-                  variant={'outline'}
-                  borderWidth={'1px'}
-                  borderColor={'rgba(0,0,0,0.1)'}
-                >
-                  {!isCreatingGovProposal ? (
-                    <Text
-                      color="midnight"
-                      fontFamily={'DM Sans'}
-                      fontWeight="medium"
-                      fontSize={14}
-                    >
-                      Create
-                    </Text>
-                  ) : (
-                    <CircularProgress
-                      isIndeterminate
-                      size={'24px'}
-                      color="midnight"
-                    />
+                    </Box>
                   )}
-                </Button>
-              </Flex>
-            </>
-          )}
+                </Flex>
+              </Box>
+            ) : (
+              ''
+            )}
+            <ClosePageButton showCloseButton={false} />
+            <Flex
+              marginTop={'42px'}
+              marginBottom={'93px'}
+              height={'48px'}
+              alignItems={'center'}
+              width={'full'}
+            >
+              <Spacer />
+              <Button
+                width={'99px'}
+                height={'42px'}
+                variant={'link'}
+                onClick={() => {
+                  navigate(`/dao/view/${selectedDaoName}`);
+                  setCreateGovProposalSelected(false);
+                }}
+              >
+                <Text
+                  color={'darkPurple'}
+                  fontFamily="DM Sans"
+                  fontSize={14}
+                  fontWeight="medium"
+                  style={{ textDecoration: 'underline' }}
+                >
+                  Cancel
+                </Text>
+              </Button>
+              <Box width={'12px'} />
+              <Button
+                disabled={!isFormValid}
+                onClick={onSubmit}
+                backgroundColor={'green'}
+                borderRadius={90}
+                alignContent="end"
+                width={'148px'}
+                height={'42px'}
+                alignSelf="center"
+                _hover={{ bg: 'green' }}
+                variant={'outline'}
+                borderWidth={'1px'}
+                borderColor={'rgba(0,0,0,0.1)'}
+              >
+                {!isCreatingGovProposal ? (
+                  <Text
+                    color="midnight"
+                    fontFamily={'DM Sans'}
+                    fontWeight="medium"
+                    fontSize={14}
+                  >
+                    Create
+                  </Text>
+                ) : (
+                  <CircularProgress
+                    isIndeterminate
+                    size={'24px'}
+                    color="midnight"
+                  />
+                )}
+              </Button>
+            </Flex>
+          </>
         </Box>
       </Flex>
     </>

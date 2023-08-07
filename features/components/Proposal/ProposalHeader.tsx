@@ -5,6 +5,7 @@ import {
   Box,
   Breadcrumb,
   BreadcrumbItem,
+  Tooltip,
 } from '@chakra-ui/react';
 import { Link } from '../genial/Link';
 import { timestampToDateTime } from '../../../utils/time';
@@ -43,14 +44,18 @@ export const ProposalHeader = ({
           </Link>
         </BreadcrumbItem>
         <BreadcrumbItem>
-          <Text
-            color="darkPurple"
-            fontFamily="DM Sans"
-            fontSize={28}
-            fontWeight="bold"
-          >
-            {proposalTitle}
-          </Text>
+          <Tooltip hasArrow label={proposalTitle} aria-label="A tooltip">
+            <Text
+              color="darkPurple"
+              fontFamily="DM Sans"
+              fontSize={28}
+              wordBreak={'break-all'}
+              noOfLines={1}
+              fontWeight="bold"
+            >
+              {proposalTitle}
+            </Text>
+          </Tooltip>
         </BreadcrumbItem>
       </Breadcrumb>
       {/* <Box

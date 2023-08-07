@@ -17,10 +17,10 @@ type Props = {
 
 // ORDER OF PROPOSAL TYPES
 const proposalTypeOrder = {
-  revoke_proposal: 1,
-  core_slot: 2,
-  text: 3,
-  improvement: 4,
+  improvement: 1,
+  revoke_proposal: 2,
+  core_slot: 3,
+  text: 4,
   feature_request: 5,
 };
 const sortProposalsByType = (a: ProposalResponse, b: ProposalResponse) => {

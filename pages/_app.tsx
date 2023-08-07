@@ -37,6 +37,7 @@ import { VotingPeriodContextProvider } from '../contexts/VotingPeriodContext';
 import { ValidatorContextProvider } from '../contexts/validatorsContext';
 import { LeaveConfirmContextProvider } from '../hooks/useLeaveConfirm';
 import { useRouter } from 'next/router';
+import { CoreSlotProposalsContextProvider } from '../contexts/CoreSlotProposalsContext';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   Layout?: ({ children }: { children: ReactElement }) => ReactElement;
@@ -97,12 +98,14 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
                             <LeaveConfirmContextProvider>
                               <Layout>
                                 <ErrorBoundary>
-                                  <ModalContainer />
-                                  <Component
-                                    key={router.asPath}
-                                    {...pageProps}
-                                  />
-                                  <OnboardingModal />
+                                  <CoreSlotProposalsContextProvider>
+                                    <ModalContainer />
+                                    <Component
+                                      key={router.asPath}
+                                      {...pageProps}
+                                    />
+                                    <OnboardingModal />
+                                  </CoreSlotProposalsContextProvider>
                                 </ErrorBoundary>
                               </Layout>
                             </LeaveConfirmContextProvider>

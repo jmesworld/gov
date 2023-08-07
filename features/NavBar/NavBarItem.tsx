@@ -18,8 +18,12 @@ export const NavBarItem = ({ text, isSelected, onClick, inActive }: Props) => {
       <Flex
         py="8px"
         width={'100%'}
+        pr="2"
         height={'100%'}
         backgroundColor={isSelected ? '#5136C2' : '#7453FD'}
+        borderLeftWidth={'3px'}
+        borderLeftStyle={'solid'}
+        borderLeftColor={isSelected ? 'green' : 'transparent'}
       >
         <Text
           noOfLines={1}
@@ -28,7 +32,7 @@ export const NavBarItem = ({ text, isSelected, onClick, inActive }: Props) => {
           fontWeight="medium"
           fontSize={14}
           alignSelf={'center'}
-          marginLeft={'25px'}
+          marginLeft={'22px'}
         >
           {text}
         </Text>

@@ -110,9 +110,11 @@ export const useCoreSlotProposals = ({
   governanceQueryClient,
 }: GovernanceProps) => {
   const {
+    error: coreSlotError,
     data,
     isLoading: loadingCoreSlot,
     isFetching: fetchingCoreSlot,
+    refetch: refetchCoreSlot,
   } = useGovernanceCoreSlotsQuery({
     client: governanceQueryClient,
 
@@ -150,12 +152,27 @@ export const useCoreSlotProposals = ({
     .map(query => query.data)
     .filter(assertNullOrUndefined);
 
+  const refetch = async () => {
+    await refetchCoreSlot();
+    await Promise.all(
+      listOfCoreSlotProposals.map(proposal =>
+        governanceQueryClient.proposal({ id: proposal }),
+      ),
+    );
+  };
+
+  const error =
+    coreSlotError ||
+    result
+      .map(query => query.error as Error | null)
+      .filter(assertNullOrUndefined);
   return {
     data: {
       proposal_count: governanceData.length,
       proposals: governanceData,
     },
-    isLoading,
-    isFetching,
+    isLoading: isLoading || isFetching,
+    refetch,
+    error,
   };
 };

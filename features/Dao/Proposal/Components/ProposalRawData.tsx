@@ -27,23 +27,25 @@ export const ProposalExcuteRawData = ({ proposal }: Props) => {
         padding="14px 16px"
         pos="relative"
       >
-        <Flex
-          pos="absolute"
-          right={0}
-          display="flex"
-          alignItems="center"
-          gap="3"
-          mr="3"
-          zIndex={99}
-        >
-          <Text color="purple"> {isJson ? 'JSON' : 'Base64'} </Text>
-          <Switch
-            color="purple"
-            size="sm"
-            onChange={() => setIsJson(!isJson)}
-            isChecked={isJson}
-          />
-        </Flex>
+        {excuteMsgs.length > 0 && (
+          <Flex
+            pos="absolute"
+            right={0}
+            display="flex"
+            alignItems="center"
+            gap="3"
+            mr="3"
+            zIndex={99}
+          >
+            <Text color="purple"> {isJson ? 'JSON' : 'Base64'} </Text>
+            <Switch
+              color="purple"
+              size="sm"
+              onChange={() => setIsJson(!isJson)}
+              isChecked={isJson}
+            />
+          </Flex>
+        )}
 
         <Flex flexGrow={1} w="full">
           <CodeEditor
@@ -66,7 +68,7 @@ export const ProposalExcuteRawData = ({ proposal }: Props) => {
               $blockScrolling: true,
             }}
             value={
-              isJson
+              isJson && excuteMsgs.length > 0
                 ? JSON.stringify(excuteMsgs, null, 2)
                 : JSON.stringify(msgs, null, 2)
             }

@@ -9,6 +9,7 @@ import {
   Text,
   Tooltip,
 } from '@chakra-ui/react';
+import { CloseIcon, CheckIcon, TimeIcon } from '@chakra-ui/icons';
 import { MouseEventHandler, useMemo } from 'react';
 import { ProposalProgress } from './ProposalProgress';
 import { useRouter } from 'next/router';
@@ -29,6 +30,7 @@ import { DaoMultisigQueryClient } from '../../../client/DaoMultisig.client';
 import { getLabelForProposalTypes } from './ProposalType';
 import { getFormattedSlotType } from '../../../utils/coreSlotType';
 import { getSlotType } from '../../Dao/Proposal/Components/ProposalType';
+import { useDao } from '../../../hooks/dao';
 
 type BaseProps = {
   totalSupply: number;
@@ -193,6 +195,7 @@ export const ProposalList = ({
 
         return (
           <ProposalListItem
+            daoId={proposal?.dao}
             fundingPerMonth={
               fundingPerMonth !== undefined
                 ? String(fundingPerMonth)
@@ -318,15 +321,17 @@ export const ProposalHeader = ({
   isGov,
   proposalTitle,
   minWidth,
+  funding,
 }: {
   isGov: boolean;
   proposalTitle?: string;
   minWidth?: string;
+  funding?: boolean;
 }) => {
   const minWidthGov = isGov ? '1000px' : '800px';
   return (
     <Flex flex={1} minWidth={minWidth || minWidthGov} width="100%">
-      <Flex width={isGov ? '70%' : '90%'}>
+      <Flex width={isGov ? '80%' : '70%'}>
         <Box width="30%">
           <Text
             color="rgba(15,0,86,0.8)"
@@ -341,9 +346,9 @@ export const ProposalHeader = ({
         </Box>
         <Box width={'70%'}></Box>
       </Flex>
-      {isGov && (
+      {(funding || isGov) && (
         <>
-          <Box width={'15%'}>
+          <Box width={funding ? '15%' : '10%'}>
             <Text
               color="rgba(15,0,86,0.8)"
               fontFamily={'DM Sans'}
@@ -353,12 +358,12 @@ export const ProposalHeader = ({
               whiteSpace="pre"
               overflow="hidden"
               textOverflow="ellipsis"
-              title={isGov ? 'FUNDING PER MONTH' : 'FUNDING P/M'}
+              title="FUNDING P/M"
             >
-              {isGov ? 'FUNDING PER MONTH' : 'FUNDING P/M'}
+              FUNDING P/M
             </Text>
           </Box>
-          <Flex width={'15%'}>
+          <Flex width={funding ? '15%' : '10%'}>
             <Text
               color="rgba(15,0,86,0.8)"
               fontFamily={'DM Sans'}
@@ -369,9 +374,9 @@ export const ProposalHeader = ({
               whiteSpace="pre"
               overflow="hidden"
               textOverflow="ellipsis"
-              title={isGov ? 'FUNDING DURATION' : 'FUNDING DURATION'}
+              title="FUNDING DURATION"
             >
-              {isGov ? 'FUNDING DURATION' : 'FUNDING DURATION'}
+              FUNDING DURATION
             </Text>
           </Flex>
         </>
@@ -467,6 +472,32 @@ export const DaoProposalListItem = ({
     return passing === 'Passing';
   }, [passing]);
 
+  const labelColor = useMemo(() => {
+    if (passed || passing === 'Passing') {
+      return 'green';
+    }
+    if (passing === 'Failing') {
+      return 'yellow';
+    }
+    if (passed === false) {
+      return 'red';
+    }
+    return 'red';
+  }, [passed, passing]);
+
+  const labelText = useMemo(() => {
+    if (passed || passing === 'Passing') {
+      return 'Passed';
+    }
+    if (passing === 'Failing') {
+      return 'Pending';
+    }
+    if (passed === false) {
+      return 'Failed';
+    }
+    return 'Failed';
+  }, [passed, passing]);
+
   return (
     <>
       <Flex
@@ -493,65 +524,55 @@ export const DaoProposalListItem = ({
             flexDirection={'column'}
             justifyContent={'center'}
           >
-            <Tooltip hasArrow isDisabled={title.length < 20} label={title}>
-              <Text
-                color="white"
-                fontFamily={'DM Sans'}
-                fontWeight="normal"
-                fontSize={18}
-                width={'100%'}
-                marginLeft={'14px'}
-                whiteSpace="pre-wrap"
-                noOfLines={1}
-                textOverflow="ellipsis"
-              >
-                {title.length > 20 ? title.substring(0, 20) + '...' : title}
-              </Text>
-            </Tooltip>
-            <Text
-              width={largeSize ? '281px' : '268px'}
-              color="white"
-              fontFamily={'DM Sans'}
-              fontWeight="normal"
-              fontSize={14}
-              marginLeft={'14px'}
-              opacity={'70%'}
-            >
-              {type.length > 26 ? type.substring(0, 26) + '...' : type}
-            </Text>
-            {passed !== undefined && !label && (
-              <Badge
-                w="60px"
-                py="2px"
-                rounded="full"
-                ml="3"
-                bg={passed ? 'green' : 'red'}
-                fontSize="10px"
-                fontWeight="normal"
-                color="black"
-                textAlign="center"
-              >
-                {passed ? 'Passed' : 'Failed'}
-              </Badge>
-            )}
-            {(label || passing) && (
-              <Box>
-                <Badge
-                  w="auto"
-                  px="6px"
-                  py="2px"
-                  rounded="full"
-                  ml="3"
-                  fontWeight="normal"
-                  bg={labelSuccess || passingSuccess ? 'green' : 'red'}
-                  fontSize="10px"
-                  color="black"
-                  textAlign="center"
-                >
-                  {label || passing}
-                </Badge>
-              </Box>
-            )}
+            <Flex alignItems="center" pl="4" w="full">
+              <Flex flexDir="column" alignItems="center" w="85%">
+                <Tooltip hasArrow isDisabled={title.length < 20} label={title}>
+                  <Text
+                    color="white"
+                    fontFamily={'DM Sans'}
+                    fontWeight="normal"
+                    fontSize={18}
+                    width={'100%'}
+                    whiteSpace="pre-wrap"
+                    noOfLines={1}
+                    textOverflow="ellipsis"
+                  >
+                    {title}
+                  </Text>
+                </Tooltip>
+                <Flex w="100%">
+                  <Text
+                    width={largeSize ? '281px' : '268px'}
+                    color="white"
+                    fontFamily={'DM Sans'}
+                    fontWeight="normal"
+                    fontSize={14}
+                    opacity={'70%'}
+                  >
+                    {type}
+                  </Text>
+                </Flex>
+              </Flex>
+              {passing !== undefined && (
+                <Tooltip label={labelText} hasArrow>
+                  <Flex
+                    mt="3px"
+                    py="2px"
+                    p="1"
+                    rounded="full"
+                    fontWeight="normal"
+                    bg={labelColor}
+                    fontSize="10px"
+                    color="black"
+                    textAlign="center"
+                  >
+                    {passed === false && <CloseIcon />}
+                    {passing === 'Passing' && <CheckIcon />}
+                    {passing === 'Failing' && <TimeIcon />}
+                  </Flex>
+                </Tooltip>
+              )}
+            </Flex>
           </Flex>
           <Flex
             width={'70%'}
@@ -652,6 +673,7 @@ export const ProposalListItem = ({
   passed,
   label,
   labelSuccess,
+  daoId,
 }: {
   title: string;
   threshold: number;
@@ -676,7 +698,35 @@ export const ProposalListItem = ({
   passed?: boolean;
   label?: string;
   labelSuccess?: boolean;
+  daoId?: string;
 }) => {
+  const { data: daoInfo } = useDao(daoId);
+  const labelColor = useMemo(() => {
+    if (passed || label === 'Passing') {
+      return 'green';
+    }
+    if (label === 'Failing') {
+      return 'yellow';
+    }
+    if (passed === false) {
+      return 'red';
+    }
+    return 'red';
+  }, [label, passed]);
+
+  const labelText = useMemo(() => {
+    if (passed || label === 'Passing') {
+      return 'Passed';
+    }
+    if (label === 'Failing') {
+      return 'Pending';
+    }
+    if (passed === false) {
+      return 'Failed';
+    }
+    return 'Failed';
+  }, [label, passed]);
+
   return (
     <>
       <Flex
@@ -696,77 +746,89 @@ export const ProposalListItem = ({
         }}
         cursor={'pointer'}
       >
-        <Flex width={largeSize ? '70%' : '90%'}>
+        <Flex width={largeSize ? '80%' : '90%'}>
           <Flex
             flexWrap="wrap"
-            width={'30%'}
+            width={'45%'}
             flexDirection={'column'}
             align="flex-start"
             justifyContent="space-around"
           >
-            <Tooltip isDisabled={title.length < 20} label={title}>
-              <Text
-                color="white"
-                fontFamily={'DM Sans'}
-                fontWeight="normal"
-                fontSize={18}
-                width={'100%'}
-                marginLeft={'14px'}
-                whiteSpace="pre-wrap"
-                noOfLines={1}
-                textOverflow="ellipsis"
-              >
-                {title.length > 20 ? title.substring(0, 20) + '...' : title}
-              </Text>
-            </Tooltip>
-            <Text
-              width={largeSize ? '281px' : '268px'}
-              color="white"
-              fontFamily={'DM Sans'}
-              fontWeight="normal"
-              fontSize={14}
-              marginLeft={'14px'}
-              opacity={'70%'}
-            >
-              {type.length > 26 ? type.substring(0, 26) + '...' : type}
-            </Text>
-            {passed !== undefined && !label && (
-              <Badge
-                mt="3px"
-                w="60px"
-                py="2px"
-                rounded="full"
-                ml="3"
-                fontWeight="normal"
-                bg={passed ? 'green' : 'red'}
-                fontSize="10px"
-                color="black"
-                textAlign="center"
-              >
-                {passed ? 'Passed' : 'Failed'}
-              </Badge>
-            )}
-            {label && (
-              <Box>
-                <Badge
-                  w="auto"
-                  px="6px"
-                  py="2px"
-                  fontWeight="normal"
-                  rounded="full"
-                  ml="3"
-                  bg={labelSuccess ? 'green' : 'red'}
-                  fontSize="10px"
-                  color="black"
-                  textAlign="center"
-                >
-                  {label}
-                </Badge>
-              </Box>
-            )}
+            <Flex alignItems="center" pl="4" w="full">
+              <Flex flexDir="column" alignItems="center" w="full">
+                <Tooltip hasArrow isDisabled={title.length < 20} label={title}>
+                  <Text
+                    color="white"
+                    fontFamily={'DM Sans'}
+                    fontWeight="normal"
+                    fontSize={18}
+                    width={'100%'}
+                    wordBreak={'break-all'}
+                    noOfLines={1}
+                    textOverflow="ellipsis"
+                  >
+                    {title}
+                  </Text>
+                </Tooltip>
+
+                <Flex w="100%">
+                  <Text
+                    noOfLines={1}
+                    color="white"
+                    fontFamily={'DM Sans'}
+                    fontWeight="normal"
+                    fontSize={14}
+                    whiteSpace={'nowrap'}
+                    overflow="visible"
+                    opacity={'70%'}
+                  >
+                    {type}
+                  </Text>
+                  {daoInfo?.dao_name && (
+                    <Tooltip hasArrow label={daoInfo?.dao_name}>
+                      <Text
+                        width="auto"
+                        color="white"
+                        fontFamily={'DM Sans'}
+                        fontWeight="normal"
+                        fontSize={14}
+                        noOfLines={1}
+                        marginLeft={'4px'}
+                        wordBreak={'break-all'}
+                        textOverflow="ellipsis"
+                      >
+                        by {daoInfo?.dao_name}
+                      </Text>
+                    </Tooltip>
+                  )}
+                </Flex>
+              </Flex>
+              {(passed !== undefined || label !== undefined) && (
+                <Tooltip label={labelText} hasArrow>
+                  <Flex
+                    mt="3px"
+                    py="2px"
+                    p="1"
+                    mr="2"
+                    rounded="full"
+                    ml="3"
+                    fontWeight="normal"
+                    bg={labelColor}
+                    fontSize="10px"
+                    color="black"
+                    textAlign="center"
+                  >
+                    {passed && <CheckIcon />}
+                    {passed === false && <CloseIcon />}
+                    {label === 'Passing' && <CheckIcon />}
+                    {label === 'Failing' && <TimeIcon />}
+                  </Flex>
+                </Tooltip>
+              )}
+            </Flex>
           </Flex>
           <Flex
-            width={'70%'}
+            width={'60%'}
             pr="6"
             alignItems={'center'}
             justifyContent={'space-around'}
@@ -783,7 +845,7 @@ export const ProposalListItem = ({
         </Flex>
         {largeSize && (
           <>
-            <Flex width="15%" alignItems="center" justifyContent="flex-start">
+            <Flex width="10%" alignItems="center" justifyContent="flex-start">
               {fundingPerMonth === undefined && (
                 <Text
                   color="white"
@@ -826,7 +888,7 @@ export const ProposalListItem = ({
                 </Tooltip>
               )}
             </Flex>
-            <Box width="15%" justifyContent={'center'}>
+            <Box width="10%" justifyContent={'center'}>
               <Text
                 color="white"
                 fontWeight="normal"

@@ -30,7 +30,7 @@ export const ProposalType = ({
       paddingLeft={'10.16PX'}
       paddingRight={'12PX'}
       backgroundColor={isActive ? 'darkPurple' : 'purple'}
-      cursor={'pointer'}
+      cursor={onClick ? 'pointer' : 'auto'}
       onClick={onClick}
       mb={mb ?? 0}
     >

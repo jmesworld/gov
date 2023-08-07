@@ -204,8 +204,9 @@ export default function DaoProposal({
                   _hover={{
                     bg: 'purple',
                   }}
+                  borderWidth={1}
                   variant="solid"
-                  borderColor="darKPurple"
+                  borderColor="green.200"
                 >
                   <AddIcon boxSize={'10px'} mr="2" color="brand" />
                   DAO Proposal
@@ -221,8 +222,9 @@ export default function DaoProposal({
                   _hover={{
                     bg: 'purple',
                   }}
+                  borderWidth={1}
                   variant="solid"
-                  borderColor="darkPurple"
+                  borderColor="green.200"
                 >
                   <AddIcon boxSize={'10px'} mr="2" color="brand" />
                   GOV Proposal
@@ -240,7 +242,8 @@ export default function DaoProposal({
             <Flex flexDir="column" mb="25px">
               <ProposalHeader
                 proposalTitle=" GOVERNANCE PROPOSAL/S"
-                isGov={true}
+                isGov={false}
+                funding
                 minWidth="800px"
               />
               <Flex height={'9px'} />
