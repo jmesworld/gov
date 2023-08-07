@@ -4,9 +4,9 @@ import { useAppState } from '../../contexts/AppStateContext';
 import { useCoinSupplyContext } from '../../contexts/CoinSupply';
 import { getProposalTypeForGovPublicProposals } from '../../utils/proposalUti';
 import { ProposalResponse } from '../../client/Governance.types';
-import { useCoreSlotProposals } from './useGovernance';
 import GovernanceProposalComponent from './GovernanceProposalComponent';
 import { useMemo } from 'react';
+import { useCoreSlotProposalsContext } from '../../contexts/CoreSlotProposalsContext';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -44,9 +44,7 @@ export default function GovernanceProposal({
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   );
 
-  const { data, isLoading, isFetching } = useCoreSlotProposals({
-    governanceQueryClient,
-  });
+  const { data, isLoading } = useCoreSlotProposalsContext();
 
   const sorted = useMemo(() => {
     if (!data) return [];
@@ -63,7 +61,7 @@ export default function GovernanceProposal({
       proposalTitle={'CORE SLOT PROPOSALS'}
       data={sorted}
       isLoading={isLoading}
-      isFetching={isFetching}
+      isFetching={isLoading}
     />
   );
 }

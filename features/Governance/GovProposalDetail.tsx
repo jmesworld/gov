@@ -10,7 +10,7 @@ import {
   VStack,
   useToast,
 } from '@chakra-ui/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useChain } from '@cosmos-kit/react';
 
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
@@ -37,6 +37,7 @@ import { ProposalFunding } from './ProposalFunding';
 import { GetSlotType, GovProposalType } from '../Governance/ProposalType';
 import { useDao, useDaoMemberList } from '../../hooks/dao';
 import DirectoresList from '../Dao/Proposal/Components/DirectorsList';
+import { getAttribute } from '../../utils/tx';
 
 const GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -54,6 +55,9 @@ export default function GovProposalDetail({
   const { isPostingPeriod, nextPeriodTimeLeft } = useVotingPeriodContext();
   const { address } = useChain(chainName);
   const [concluding, setConcluding] = useState(false);
+  const [daoProposalId, setDaoProposalId] = useState<number | undefined>(
+    undefined,
+  );
   const govQueryClient = new GovernanceQueryClient(
     cosmWasmClient as CosmWasmClient,
     GOVERNANCE_CONTRACT,
@@ -71,10 +75,29 @@ export default function GovProposalDetail({
       refetchInterval: 10000,
     },
   });
+  useEffect(() => {
+    cosmWasmClient
+      ?.searchTx({
+        tags: [
+          {
+            key: 'wasm.gov_proposal_id',
+            value: proposalId.toString(),
+          },
+        ],
+      })
+      .then(res => {
+        const daoProposalId = getAttribute(res[0], 'wasm', 'proposal_id');
+
+        if (daoProposalId === undefined) {
+          return;
+        }
+        setDaoProposalId(Number(daoProposalId));
+      });
+  }, [address, cosmWasmClient, proposalId]);
 
   const { data: daoInfo } = useDao(data?.dao);
   const { voters: memberListWithVote, isFetching: daoMemberListLoading } =
-    useDaoMemberList(data?.dao, data?.id);
+    useDaoMemberList(data?.dao, daoProposalId);
 
   const govMutationClient = useMemo(
     () =>

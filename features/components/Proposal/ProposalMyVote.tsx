@@ -265,6 +265,10 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                   },
                   args: { fee },
                 })
+                .then(res => {
+                  console.log('RESPONSE >>', res);
+                  return res;
+                })
                 .then(() => props.refetch())
                 .then(() => {
                   toast({

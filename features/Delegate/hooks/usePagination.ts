@@ -9,7 +9,6 @@ export const usePagination = ({
   const [total, setTotal] = useState(defaultTotal);
 
   const offset = useMemo(() => (page - 1) * limit, [page, limit]);
-
   const pagination = useMemo(
     () => ({
       page,

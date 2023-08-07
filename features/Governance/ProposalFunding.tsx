@@ -73,7 +73,7 @@ const ProposalFundingComponent = ({
   durationFormatted: string;
 }) => {
   return (
-    <Flex gap="4" pl="3" py="4">
+    <Flex gap="12" pl="3" py="4">
       <Flex flexDir="column">
         <Text fontFamily="DM Sans" fontSize={12} color="lilac">
           FUNDING PER MONTH
@@ -82,7 +82,7 @@ const ProposalFundingComponent = ({
           <Image
             cursor="pointer"
             display="inline-block"
-            src="/JMES_Icon_White.svg"
+            src="/JMES_Icon_white.svg"
             width="12px"
             height="12px"
             marginRight="4px"
