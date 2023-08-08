@@ -36,6 +36,7 @@ import { useIdentityserviceRegisterDaoMutation } from '../../client/Identityserv
 import { StdFee } from '@cosmjs/amino';
 import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
+import { handleError } from '../../error/hanldeErrors';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -549,14 +550,7 @@ const CreateDaoForm = ({
                 });
               })
               .catch(error => {
-                toast({
-                  title: 'DAO creation error',
-                  description: error.toString(),
-                  status: 'error',
-                  variant: 'custom',
-                  duration: 9000,
-                  isClosable: true,
-                });
+                handleError(error, 'Unable to create DAO.', toast);
               })
               .finally(() => setIsCreatingDao(false));
           }}

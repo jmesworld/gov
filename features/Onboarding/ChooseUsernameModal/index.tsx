@@ -24,6 +24,7 @@ import { chainName } from '../../../config/defaults';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { daoNameSchema } from '../../../utils/dao';
 import { useSigningCosmWasmClientContext } from '../../../contexts/SigningCosmWasmClient';
+import { handleError } from '../../../error/hanldeErrors';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -105,14 +106,7 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
         closeView?.();
       })
       .catch(error => {
-        toast({
-          title: 'Identity creation error!',
-          description: error.toString(),
-          status: 'error',
-          variant: 'custom',
-          duration: 9000,
-          isClosable: true,
-        });
+        handleError(error, 'Unable to create identity.', toast);
       })
       .finally(() => setIsCreatingIdentity(false));
   };
