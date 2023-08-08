@@ -14,7 +14,7 @@ type Props = {
 export const ProposalExcuteRawData = ({ proposal }: Props) => {
   const { excuteMsgs, msgs } = getProposalExcuteMsg(proposal);
   const [isJson, setIsJson] = React.useState(true);
-
+  if (!msgs) return null;
   return (
     <Box mt="4">
       <Text color="purple">Raw Proposal Data</Text>
@@ -39,8 +39,9 @@ export const ProposalExcuteRawData = ({ proposal }: Props) => {
           >
             <Text color="purple"> {isJson ? 'JSON' : 'Base64'} </Text>
             <Switch
-              color="purple"
-              size="sm"
+              variant="secondary"
+              color="primary"
+              size="md"
               onChange={() => setIsJson(!isJson)}
               isChecked={isJson}
             />

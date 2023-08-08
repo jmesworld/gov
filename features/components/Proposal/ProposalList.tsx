@@ -331,7 +331,7 @@ export const ProposalHeader = ({
   const minWidthGov = isGov ? '1000px' : '800px';
   return (
     <Flex flex={1} minWidth={minWidth || minWidthGov} width="100%">
-      <Flex width={isGov ? '80%' : '70%'}>
+      <Flex width={isGov ? '70%' : '70%'}>
         <Box width="30%">
           <Text
             color="rgba(15,0,86,0.8)"
@@ -348,7 +348,7 @@ export const ProposalHeader = ({
       </Flex>
       {(funding || isGov) && (
         <>
-          <Box width={funding ? '15%' : '10%'}>
+          <Box width={funding ? '15%' : '15%'}>
             <Text
               color="rgba(15,0,86,0.8)"
               fontFamily={'DM Sans'}
@@ -363,7 +363,7 @@ export const ProposalHeader = ({
               FUNDING P/M
             </Text>
           </Box>
-          <Flex width={funding ? '15%' : '10%'}>
+          <Flex width={funding ? '15%' : '15%'}>
             <Text
               color="rgba(15,0,86,0.8)"
               fontFamily={'DM Sans'}
@@ -524,8 +524,8 @@ export const DaoProposalListItem = ({
             flexDirection={'column'}
             justifyContent={'center'}
           >
-            <Flex alignItems="center" pl="4" w="full">
-              <Flex flexDir="column" alignItems="center" w="85%">
+            <Flex alignItems="center" px="4" w="full">
+              <Flex flexDir="column" alignItems="center" w="full">
                 <Tooltip hasArrow isDisabled={title.length < 20} label={title}>
                   <Text
                     color="white"
@@ -533,7 +533,7 @@ export const DaoProposalListItem = ({
                     fontWeight="normal"
                     fontSize={18}
                     width={'100%'}
-                    whiteSpace="pre-wrap"
+                    wordBreak="break-all"
                     noOfLines={1}
                     textOverflow="ellipsis"
                   >
@@ -553,25 +553,6 @@ export const DaoProposalListItem = ({
                   </Text>
                 </Flex>
               </Flex>
-              {passing !== undefined && (
-                <Tooltip label={labelText} hasArrow>
-                  <Flex
-                    mt="3px"
-                    py="2px"
-                    p="1"
-                    rounded="full"
-                    fontWeight="normal"
-                    bg={labelColor}
-                    fontSize="10px"
-                    color="black"
-                    textAlign="center"
-                  >
-                    {passed === false && <CloseIcon />}
-                    {passing === 'Passing' && <CheckIcon />}
-                    {passing === 'Failing' && <TimeIcon />}
-                  </Flex>
-                </Tooltip>
-              )}
             </Flex>
           </Flex>
           <Flex
@@ -636,14 +617,35 @@ export const DaoProposalListItem = ({
             )}
           </Flex>
           <Box width="15%" justifyContent={'center'}>
-            <Text
-              color="white"
-              fontWeight="normal"
-              fontSize={14}
-              fontFamily="DM Sans"
-            >
-              {votingDuration}
-            </Text>
+            <Flex pr="3" justifyContent="space-between">
+              <Text
+                color="white"
+                fontWeight="normal"
+                fontSize={14}
+                fontFamily="DM Sans"
+              >
+                {votingDuration}
+              </Text>
+              {passing !== undefined && (
+                <Tooltip label={labelText} hasArrow>
+                  <Flex
+                    mt="3px"
+                    py="2px"
+                    p="1"
+                    rounded="full"
+                    fontWeight="normal"
+                    bg={labelColor}
+                    fontSize="10px"
+                    color="black"
+                    textAlign="center"
+                  >
+                    {passed === false && <CloseIcon />}
+                    {passing === 'Passing' && <CheckIcon />}
+                    {passing === 'Failing' && <TimeIcon />}
+                  </Flex>
+                </Tooltip>
+              )}
+            </Flex>
           </Box>
         </>
       </Flex>
@@ -746,15 +748,15 @@ export const ProposalListItem = ({
         }}
         cursor={'pointer'}
       >
-        <Flex width={largeSize ? '80%' : '90%'}>
+        <Flex width={largeSize ? '70%' : '90%'}>
           <Flex
             flexWrap="wrap"
-            width={'45%'}
+            width={'30%'}
             flexDirection={'column'}
             align="flex-start"
             justifyContent="space-around"
           >
-            <Flex alignItems="center" pl="4" w="full">
+            <Flex alignItems="center" px="4"  w="full">
               <Flex flexDir="column" alignItems="center" w="full">
                 <Tooltip hasArrow isDisabled={title.length < 20} label={title}>
                   <Text
@@ -771,7 +773,7 @@ export const ProposalListItem = ({
                   </Text>
                 </Tooltip>
 
-                <Flex w="100%">
+                <Flex flexDir="column" w="100%">
                   <Text
                     noOfLines={1}
                     color="white"
@@ -785,7 +787,11 @@ export const ProposalListItem = ({
                     {type}
                   </Text>
                   {daoInfo?.dao_name && (
-                    <Tooltip hasArrow label={daoInfo?.dao_name}>
+                    <Tooltip
+                      shouldWrapChildren
+                      hasArrow
+                      label={daoInfo?.dao_name}
+                    >
                       <Text
                         width="auto"
                         color="white"
@@ -793,7 +799,6 @@ export const ProposalListItem = ({
                         fontWeight="normal"
                         fontSize={14}
                         noOfLines={1}
-                        marginLeft={'4px'}
                         wordBreak={'break-all'}
                         textOverflow="ellipsis"
                       >
@@ -803,32 +808,10 @@ export const ProposalListItem = ({
                   )}
                 </Flex>
               </Flex>
-              {(passed !== undefined || label !== undefined) && (
-                <Tooltip label={labelText} hasArrow>
-                  <Flex
-                    mt="3px"
-                    py="2px"
-                    p="1"
-                    mr="2"
-                    rounded="full"
-                    ml="3"
-                    fontWeight="normal"
-                    bg={labelColor}
-                    fontSize="10px"
-                    color="black"
-                    textAlign="center"
-                  >
-                    {passed && <CheckIcon />}
-                    {passed === false && <CloseIcon />}
-                    {label === 'Passing' && <CheckIcon />}
-                    {label === 'Failing' && <TimeIcon />}
-                  </Flex>
-                </Tooltip>
-              )}
             </Flex>
           </Flex>
           <Flex
-            width={'60%'}
+            width={'70%'}
             pr="6"
             alignItems={'center'}
             justifyContent={'space-around'}
@@ -845,7 +828,7 @@ export const ProposalListItem = ({
         </Flex>
         {largeSize && (
           <>
-            <Flex width="10%" alignItems="center" justifyContent="flex-start">
+            <Flex width="15%" alignItems="center" justifyContent="flex-start">
               {fundingPerMonth === undefined && (
                 <Text
                   color="white"
@@ -888,15 +871,39 @@ export const ProposalListItem = ({
                 </Tooltip>
               )}
             </Flex>
-            <Box width="10%" justifyContent={'center'}>
-              <Text
-                color="white"
-                fontWeight="normal"
-                fontSize={14}
-                fontFamily="DM Sans"
-              >
-                {votingDuration}
-              </Text>
+            <Box width="15%" justifyContent={'center'}>
+              <Flex pr="2" justifyContent="space-between">
+                <Text
+                  color="white"
+                  fontWeight="normal"
+                  fontSize={14}
+                  fontFamily="DM Sans"
+                >
+                  {votingDuration}
+                </Text>
+                {(passed !== undefined || label !== undefined) && (
+                  <Tooltip label={labelText} hasArrow>
+                    <Flex
+                      mt="3px"
+                      py="2px"
+                      p="1"
+                      mr="2"
+                      rounded="full"
+                      ml="3"
+                      fontWeight="normal"
+                      bg={labelColor}
+                      fontSize="10px"
+                      color="black"
+                      textAlign="center"
+                    >
+                      {passed && <CheckIcon />}
+                      {passed === false && <CloseIcon />}
+                      {label === 'Passing' && <CheckIcon />}
+                      {label === 'Failing' && <TimeIcon />}
+                    </Flex>
+                  </Tooltip>
+                )}
+              </Flex>
             </Box>
           </>
         )}

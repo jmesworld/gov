@@ -1,5 +1,5 @@
 import { CheckIcon } from '@chakra-ui/icons';
-import { Box, Flex, Image, Spacer, Text } from '@chakra-ui/react';
+import { Flex, Image, Spacer, Text } from '@chakra-ui/react';
 import { MouseEventHandler } from 'react';
 
 export const ProposalType = ({
@@ -48,22 +48,23 @@ export const ProposalType = ({
         fontFamily="DM Sans"
         marginLeft={'10px'}
         display={'flex'}
+        opacity={daoName ? 0.7 : 1}
         alignItems={'center'}
       >
         {label || getLabelForProposalTypes(type)}
         {proposalDetail ? ' Proposal' : ''}
-        {daoName && (
-          <Box
-            bg="white"
-            display="inline-block"
-            w="4px"
-            h="4px"
-            mx="2"
-            rounded="full"
-          ></Box>
-        )}
-        {daoName && <span> {daoName}</span>}
       </Text>
+      {daoName && (
+        <Text
+          color={'white'}
+          fontWeight="medium"
+          fontSize={14}
+          fontFamily="DM Sans"
+          marginLeft={'10px'}
+        >
+          by {daoName}
+        </Text>
+      )}
       <Spacer />
       {isActive ? <CheckIcon color={'green'} /> : ''}
     </Flex>

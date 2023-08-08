@@ -1,5 +1,7 @@
 import {
   Box,
+  Breadcrumb,
+  BreadcrumbItem,
   Button,
   CircularProgress,
   Flex,
@@ -43,6 +45,7 @@ import { useRouter } from 'next/router';
 import { ClosePageButton } from '../components/genial/ClosePageButton';
 import { numberWithDecimals } from '../../utils/numberValidators';
 import { useCoreSlotProposalsContext } from '../../contexts/CoreSlotProposalsContext';
+import { ChevronRightIcon } from '@chakra-ui/icons';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -430,34 +433,34 @@ export default function CreateGovProposal({
     <>
       <Flex height={'47px'} />
       <Flex>
-        <Link href={`/dao/view/${selectedDaoName}`}>
-          <Text
-            color={'darkPurple'}
-            cursor="pointer"
-            fontWeight="bold"
-            fontSize={30}
-            fontFamily="DM Sans"
-            style={{ textDecoration: 'underline' }}
-          >
-            {selectedDaoName}
-          </Text>
-        </Link>
-        <Box
-          width={'6px'}
-          height={'6px'}
-          backgroundColor={'darkPurple'}
-          mx={'18px'}
-          alignSelf={'center'}
-          borderRadius={100}
-        />
-        <Text
-          color={'darkPurple'}
-          fontWeight="normal"
-          fontSize={28}
-          fontFamily="DM Sans"
+        <Breadcrumb
+          separator={<ChevronRightIcon color="#7453FD" fontSize={'28px'} />}
         >
-          Create Governance Proposal
-        </Text>
+          <BreadcrumbItem>
+            <Link href={`/dao/view/${selectedDaoName}`}>
+              <Text
+                color={'darkPurple'}
+                cursor="pointer"
+                fontWeight="bold"
+                fontSize={30}
+                fontFamily="DM Sans"
+                style={{ textDecoration: 'underline' }}
+              >
+                {selectedDaoName}
+              </Text>
+            </Link>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
+            <Text
+              color={'darkPurple'}
+              fontWeight="normal"
+              fontSize={28}
+              fontFamily="DM Sans"
+            >
+              Create Governance Proposal
+            </Text>
+          </BreadcrumbItem>
+        </Breadcrumb>
       </Flex>
       <Flex height={'46px'} />
       <Flex>

@@ -69,6 +69,26 @@ export const defaultThemeObject = {
   },
   components: {
     Alert: alertTheme,
+    Switch: {
+      variants: {
+        secondary: {
+          container: {
+            borderRadius: 'full',
+            borderWidth: '1px',
+            borderColor: 'purple',
+          },
+          track: {
+            bg: 'gray.100',
+            _checked: {
+              bg: 'green',
+            },
+          },
+          thumb: {
+            bg: 'purple',
+          },
+        },
+      },
+    },
     Button: {
       variants: {
         purpleText: {
