@@ -1,5 +1,7 @@
 import {
   Box,
+  Breadcrumb,
+  BreadcrumbItem,
   Button,
   CircularProgress,
   Flex,
@@ -38,6 +40,7 @@ import { toBase64 } from '../../utils/identity';
 import { Link } from '../components/genial/Link';
 import { useAccountBalance } from '../../hooks/useAccountBalance';
 import { ClosePageButton } from '../components/genial/ClosePageButton';
+import { ChevronRightIcon } from '@chakra-ui/icons';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -277,34 +280,34 @@ export const DAOProposalPage = ({
     <Box pb="2">
       <Flex height={'47px'} />
       <Flex mb={'47px'}>
-        <Link href={`/dao/view/${selectedDaoName}`}>
-          <Text
-            color={'darkPurple'}
-            cursor="pointer"
-            fontWeight="bold"
-            fontSize={30}
-            fontFamily="DM Sans"
-            style={{ textDecoration: 'underline' }}
-          >
-            {selectedDaoName}
-          </Text>
-        </Link>
-        <Box
-          width={'6px'}
-          height={'6px'}
-          backgroundColor={'darkPurple'}
-          mx={'18px'}
-          alignSelf={'center'}
-          borderRadius={100}
-        />
-        <Text
-          color={'darkPurple'}
-          fontWeight="normal"
-          fontSize={28}
-          fontFamily="DM Sans"
+        <Breadcrumb
+          separator={<ChevronRightIcon color="#7453FD" fontSize={'28px'} />}
         >
-          Create DAO Proposal
-        </Text>
+          <BreadcrumbItem>
+            <Link href={`/dao/view/${selectedDaoName}`}>
+              <Text
+                color={'darkPurple'}
+                cursor="pointer"
+                fontWeight="bold"
+                fontSize={30}
+                fontFamily="DM Sans"
+                style={{ textDecoration: 'underline' }}
+              >
+                {selectedDaoName}
+              </Text>
+            </Link>
+          </BreadcrumbItem>
+          <BreadcrumbItem>
+            <Text
+              color={'darkPurple'}
+              fontWeight="normal"
+              fontSize={28}
+              fontFamily="DM Sans"
+            >
+              Create DAO Proposal
+            </Text>
+          </BreadcrumbItem>
+        </Breadcrumb>
       </Flex>
       <Flex flexGrow={1} width={'full'} height={'26px'} />
       <Flex flexGrow={1} width="full">
