@@ -16,6 +16,7 @@ import { StdFee } from '@cosmjs/amino';
 import { GovernanceClient } from '../../client/Governance.client';
 import { useGovernanceVoteMutation } from '../../client/Governance.react-query';
 import { useSigningCosmWasmClientContext } from '../../contexts/SigningCosmWasmClient';
+import { handleError } from '../../error/hanldeErrors';
 
 const fee: StdFee = {
   amount: [{ amount: '30000', denom: 'ujmes' }],
@@ -79,7 +80,7 @@ const GovProposalMyVote = (props: Props) => {
             label="Please connect your wallet to participate in governance"
           >
             <Button
-              disabled={ props.voted || !address}
+              disabled={props.voted || !address}
               isDisabled={props.voted}
               as="button"
               height="42px"
@@ -116,14 +117,7 @@ const GovProposalMyVote = (props: Props) => {
                     });
                   })
                   .catch(error => {
-                    toast({
-                      title: 'Vote creation error',
-                      description: error.toString(),
-                      status: 'error',
-                      variant: 'custom',
-                      duration: 9000,
-                      isClosable: true,
-                    });
+                    handleError(error, 'Unable to submit vote.', toast);
                   })
                   .finally(() => setSubmittingYesVote(false));
               }}
@@ -153,7 +147,7 @@ const GovProposalMyVote = (props: Props) => {
           >
             <Button
               isDisabled={props.voted}
-              disabled={ props.voted || !address}
+              disabled={props.voted || !address}
               as="button"
               height="42px"
               width="50%"
@@ -189,14 +183,7 @@ const GovProposalMyVote = (props: Props) => {
                     });
                   })
                   .catch(error => {
-                    toast({
-                      title: 'Vote creation error',
-                      description: error.toString(),
-                      status: 'error',
-                      variant: 'custom',
-                      duration: 9000,
-                      isClosable: true,
-                    });
+                    handleError(error, 'Unable to submit vote.', toast);
                   })
                   .finally(() => setSubmittingNoVote(false));
               }}

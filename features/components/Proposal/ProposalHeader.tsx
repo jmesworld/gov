@@ -80,7 +80,7 @@ export const ProposalHeader = ({
           fontWeight="medium"
           fontFamily="DM Sans"
         >
-          Voting ends {timestampToDateTime(proposalExpiry / 1e3)}
+          Voting ends {timestampToDateTime(proposalExpiry)}
         </Text>
       </HStack>
     </Flex>

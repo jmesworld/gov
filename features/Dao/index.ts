@@ -8,7 +8,6 @@ const DaoProposalDetail = dynamic(
 );
 const DaoMemberList = dynamic(() => import('./DaoMemberList'));
 const CreateDaoForm = dynamic(() => import('./CreateDaoForm'));
-const SpendDaoFundsForm = dynamic(() => import('./SpendDaoFundsForm'));
 const Dao = {
   MyDaoList,
   DaoProposal,
@@ -16,7 +15,6 @@ const Dao = {
   DaoProposalDetail,
   DaoMemberList,
   CreateDaoForm,
-  SpendDaoFundsForm,
 };
 
 export { Dao };

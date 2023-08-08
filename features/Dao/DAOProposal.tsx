@@ -41,6 +41,7 @@ import { Link } from '../components/genial/Link';
 import { useAccountBalance } from '../../hooks/useAccountBalance';
 import { ClosePageButton } from '../components/genial/ClosePageButton';
 import { ChevronRightIcon } from '@chakra-ui/icons';
+import { handleError } from '../../error/hanldeErrors';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -464,15 +465,7 @@ export const DAOProposalPage = ({
                 });
                 navigate(`/dao/view/${selectedDaoName}/proposals/${id}`);
               } catch (err) {
-                console.error(err);
-                if (err instanceof Error) {
-                  toast({
-                    status: 'error',
-                    variant: 'custom',
-                    isClosable: true,
-                    title: err.message,
-                  });
-                }
+                handleError(err, 'Unable to create proposal.', toast);
               }
               setRouteCheck(true);
               setIsCreatingProposal(false);

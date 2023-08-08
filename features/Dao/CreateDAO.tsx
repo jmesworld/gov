@@ -39,6 +39,7 @@ import { MemberUpdate } from './Proposal/Components/DaoMembersEdit';
 import { useBalanceContext } from '../../contexts/balanceContext';
 import { AutoDistributeAsInt } from '../../utils/autoDistribute';
 import { DaoName } from '../Dao/components/DaoName';
+import { handleError } from '../../error/hanldeErrors';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -660,14 +661,7 @@ const CreateDaoNewForm = ({
                 navigate(`/dao/view/${daoName.trim()}`);
               })
               .catch(error => {
-                toast({
-                  title: 'DAO creation error',
-                  description: error.toString(),
-                  status: 'error',
-                  variant: 'custom',
-                  duration: 9000,
-                  isClosable: true,
-                });
+                handleError(error, 'Unable to create DAO.', toast);
               })
               .finally(() => {
                 setIsCreatingDao(false);

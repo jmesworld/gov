@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   Center,
@@ -38,6 +39,7 @@ import { GetSlotType, GovProposalType } from '../Governance/ProposalType';
 import { useDao, useDaoMemberList } from '../../hooks/dao';
 import DirectoresList from '../Dao/Proposal/Components/DirectorsList';
 import { getAttribute } from '../../utils/tx';
+import { handleError } from '../../error/hanldeErrors';
 
 const GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -115,15 +117,19 @@ export default function GovProposalDetail({
     if (!periodData || !data?.start_block) {
       return false;
     }
+    if (periodData.current_period === 'posting') {
+      return (
+        periodData.current_block >=
+        data?.start_block + periodData?.posting_period_length / 5
+      );
+    }
     return (
-      periodData.current_block + periodData.voting_period_length / 5 >=
+      periodData.current_block >=
       data?.start_block + periodData.cycle_length / 5
     );
   }, [periodData, data?.start_block]);
-
   const proposalDescription = data?.description ?? '';
-  const expiryDate = data?.voting_end ?? 0;
-  const expiryDateTimestamp = data ? expiryDate * 1000 : -1;
+  const expiryDateTimestamp = data?.voting_end ?? 0;
 
   const {
     coinYes,
@@ -146,7 +152,7 @@ export default function GovProposalDetail({
     if (thresholdPercent === undefined || yesPercentage === undefined) {
       return undefined;
     }
-    return thresholdPercent <= yesPercentage ? 'Passing' : 'Failing';
+    return thresholdPercent <= yesPercentage ? 'Passing' : 'pending';
   }, [thresholdPercent, yesPercentage]);
 
   const passed = useMemo(() => {
@@ -195,21 +201,13 @@ export default function GovProposalDetail({
       await refetch();
       toast({
         title: 'Concluded Vote',
-        description: "We've concluded the vote.",
         status: 'success',
         variant: 'custom',
         isClosable: true,
       });
       setConcluding(false);
     } catch (err) {
-      if (err instanceof Error)
-        toast({
-          title: 'Error',
-          description: err.message,
-          status: 'error',
-          variant: 'custom',
-          isClosable: true,
-        });
+      handleError(err, 'Error concluding vote.', toast);
     }
     setConcluding(false);
   };
@@ -237,7 +235,6 @@ export default function GovProposalDetail({
     }
     return undefined;
   }, [tab]);
-
   return (
     <>
       <Flex height={'47px'} />
@@ -245,7 +242,7 @@ export default function GovProposalDetail({
         tab={tabLink}
         title={proposalTitle}
         proposalTitle={data?.title ?? ''}
-        proposalExpiry={expiryDateTimestamp}
+        proposalExpiry={expiryDateTimestamp * 1e3}
       />
       {data ? (
         <HStack spacing="54px" align="flex-start">
@@ -321,9 +318,19 @@ export default function GovProposalDetail({
                     justifyContent="center"
                   >
                     <Text fontSize="xl" textAlign="center">
-                      {votedYes
-                        ? 'Thank you for your Yes Vote.'
-                        : 'You you for your No Vote.'}
+                      Thank you for your
+                      <Badge
+                        backgroundColor={votedYes ? 'green' : 'red'}
+                        mx="5px"
+                        rounded="full"
+                        color="black"
+                        px="3"
+                        py="1"
+                        fontSize={12}
+                      >
+                        {votedYes ? 'Yes' : 'No'}
+                      </Badge>
+                      Vote.
                     </Text>
                   </Box>
                 )}

@@ -459,14 +459,14 @@ export const DaoProposalListItem = ({
   }, [votesQuery?.data?.votes]);
 
   const passing = useMemo(() => {
-    if (!votesQuery.data) {
+    if (!votesQuery.data || passed !== undefined) {
       return undefined;
     }
     if (showIsPassing) {
       return yesPercentage >= threshold ? 'Passing' : 'Failing';
     }
     return undefined;
-  }, [votesQuery.data, showIsPassing, yesPercentage, threshold]);
+  }, [votesQuery.data, passed, showIsPassing, yesPercentage, threshold]);
 
   const passingSuccess = useMemo(() => {
     return passing === 'Passing';
@@ -626,25 +626,25 @@ export const DaoProposalListItem = ({
               >
                 {votingDuration}
               </Text>
-              {passing !== undefined && (
-                <Tooltip label={labelText} hasArrow>
-                  <Flex
-                    mt="3px"
-                    py="2px"
-                    p="1"
-                    rounded="full"
-                    fontWeight="normal"
-                    bg={labelColor}
-                    fontSize="10px"
-                    color="black"
-                    textAlign="center"
-                  >
-                    {passed === false && <CloseIcon />}
-                    {passing === 'Passing' && <CheckIcon />}
-                    {passing === 'Failing' && <TimeIcon />}
-                  </Flex>
-                </Tooltip>
-              )}
+
+              <Tooltip label={labelText} hasArrow>
+                <Flex
+                  mt="3px"
+                  py="2px"
+                  p="1"
+                  rounded="full"
+                  fontWeight="normal"
+                  bg={labelColor}
+                  fontSize="10px"
+                  color="black"
+                  textAlign="center"
+                >
+                  {passed === true && <CheckIcon />}
+                  {passed === false && <CloseIcon />}
+                  {passing === 'Passing' && <CheckIcon />}
+                  {passing === 'Failing' && <TimeIcon />}
+                </Flex>
+              </Tooltip>
             </Flex>
           </Box>
         </>
@@ -717,7 +717,10 @@ export const ProposalListItem = ({
   }, [label, passed]);
 
   const labelText = useMemo(() => {
-    if (passed || label === 'Passing') {
+    if (label === 'Passing') {
+      return 'Passing';
+    }
+    if (passed) {
       return 'Passed';
     }
     if (label === 'Failing') {
@@ -756,7 +759,7 @@ export const ProposalListItem = ({
             align="flex-start"
             justifyContent="space-around"
           >
-            <Flex alignItems="center" px="4"  w="full">
+            <Flex alignItems="center" pl="4" pr={2} w="full">
               <Flex flexDir="column" alignItems="center" w="full">
                 <Tooltip hasArrow isDisabled={title.length < 20} label={title}>
                   <Text

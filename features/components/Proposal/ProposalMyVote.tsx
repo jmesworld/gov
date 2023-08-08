@@ -7,6 +7,7 @@ import {
   CircularProgress,
   Flex,
   Tooltip,
+  Badge,
 } from '@chakra-ui/react';
 import { useChain } from '@cosmos-kit/react';
 
@@ -21,6 +22,7 @@ import {
 } from '../../../client/DaoMultisig.react-query';
 import { chainName } from '../../../config/defaults';
 import { useSigningCosmWasmClientContext } from '../../../contexts/SigningCosmWasmClient';
+import { handleError } from '../../../error/hanldeErrors';
 
 const fee: StdFee = {
   amount: [{ amount: '30000', denom: 'ujmes' }],
@@ -29,10 +31,11 @@ const fee: StdFee = {
 
 export interface ProposalMyVoteType {
   myVotingPower: number;
-  voted: boolean;
+  voted?: boolean;
   passed: boolean;
   dao: string;
   proposalId: number;
+  executed: boolean;
   hideExecute: boolean;
   disableExecute: boolean;
   disableExcuteTooltip?: string;
@@ -64,7 +67,62 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
         backgroundColor="#7453FD"
         padding="14px 16px"
         width="100%"
+        pos="relative"
       >
+        {props.executed && (
+          <Flex
+            position="absolute"
+            zIndex={1}
+            bg="purple"
+            w="90%"
+            h="90%"
+            display="flex"
+            justifyContent="center"
+            alignItems={'center'}
+          >
+            <Text
+              color="#fff"
+              fontSize={18}
+              fontWeight="medium"
+              fontFamily="DM Sans"
+            >
+              Proposal Executed
+            </Text>
+          </Flex>
+        )}
+        {!props.executed && props.voted !== undefined && (
+          <Flex
+            position="absolute"
+            zIndex={1}
+            bg="purple"
+            w="90%"
+            h="90%"
+            display="flex"
+            justifyContent="center"
+            alignItems={'center'}
+          >
+            <Text
+              color="#fff"
+              fontSize={18}
+              fontWeight="medium"
+              fontFamily="DM Sans"
+            >
+              Thank you for your
+              <Badge
+                mx="5px"
+                rounded="full"
+                color="black"
+                px="3"
+                py="1"
+                fontSize={12}
+                bg={props.voted ? 'green' : 'red'}
+              >
+                {props.voted ? 'Yes' : 'No'}
+              </Badge>
+              Vote
+            </Text>
+          </Flex>
+        )}
         <Text
           color="#fff"
           fontSize={16}
@@ -98,7 +156,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
           width="100%"
           marginTop="20px"
           marginBottom="10px"
-          isDisabled={props.voted}
+          isDisabled={props.voted !== undefined}
         >
           <Button
             as="button"
@@ -136,14 +194,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                   });
                 })
                 .catch(error => {
-                  toast({
-                    title: 'Vote creation error',
-                    description: error.toString(),
-                    status: 'error',
-                    variant: 'custom',
-                    duration: 9000,
-                    isClosable: true,
-                  });
+                  handleError(error, 'Unable to submit vote.', toast);
                 })
                 .finally(() => setSubmittingYesVote(false));
             }}
@@ -201,14 +252,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                   });
                 })
                 .catch(error => {
-                  toast({
-                    title: 'Vote creation error',
-                    description: error.toString(),
-                    status: 'error',
-                    variant: 'custom',
-                    duration: 9000,
-                    isClosable: true,
-                  });
+                  handleError(error, 'Unable to submit vote.', toast);
                 })
                 .finally(() => setSubmittingNoVote(false));
             }}
@@ -265,10 +309,6 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                   },
                   args: { fee },
                 })
-                .then(res => {
-                  console.log('RESPONSE >>', res);
-                  return res;
-                })
                 .then(() => props.refetch())
                 .then(() => {
                   toast({
@@ -280,14 +320,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                   });
                 })
                 .catch(error => {
-                  toast({
-                    title: 'Proposal execution error',
-                    description: error.toString(),
-                    status: 'error',
-                    duration: 9000,
-                    isClosable: true,
-                    variant: 'custom',
-                  });
+                  handleError(error, 'Proposal execution error.', toast);
                 })
                 .finally(() => setSubmittingExecuteVote(false));
             }}

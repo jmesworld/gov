@@ -7,6 +7,7 @@ import { useBalanceContext } from '../../../contexts/balanceContext';
 import { useSigningCosmWasmClientContext } from '../../../contexts/SigningCosmWasmClient';
 import { coin } from '@cosmjs/amino';
 import { useValidatorContext } from '../../../contexts/validatorsContext';
+import { handleError } from '../../../error/hanldeErrors';
 
 type TransferFormType = {
   jmesValue: number;
@@ -256,13 +257,11 @@ export const useDelegate = () => {
       await refresh();
       onChangeSlider(sliderDefaultValue);
     } catch (err) {
-      if (err instanceof Error)
-        toast({
-          status: 'error',
-          variant: 'custom',
-          isClosable: true,
-          title: err.message,
-        });
+      handleError(
+        err,
+        `Error  ${bonding ? 'delegating' : 'undelegating'} Tokens.`,
+        toast,
+      );
     }
     setTransferForm(p => ({
       ...p,

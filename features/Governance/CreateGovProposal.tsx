@@ -46,6 +46,7 @@ import { ClosePageButton } from '../components/genial/ClosePageButton';
 import { numberWithDecimals } from '../../utils/numberValidators';
 import { useCoreSlotProposalsContext } from '../../contexts/CoreSlotProposalsContext';
 import { ChevronRightIcon } from '@chakra-ui/icons';
+import { handleError } from '../../error/hanldeErrors';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -370,16 +371,7 @@ export default function CreateGovProposal({
       restForm();
       navigate(`/dao/view/${selectedDaoName}`);
     } catch (err) {
-      if (err instanceof Error) {
-        toast({
-          title: 'Proposal creation error',
-          description: err.message,
-          status: 'error',
-          variant: 'custom',
-          duration: 9000,
-          isClosable: true,
-        });
-      }
+      handleError(err, 'Proposal creation error', toast);
     }
 
     setCreatingGovProposal(false);

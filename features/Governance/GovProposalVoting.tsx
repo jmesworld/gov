@@ -40,6 +40,13 @@ export const ProposalVotingWithStatus = ({
   target,
   label,
 }: Props) => {
+  const getBg = () => {
+    if (label?.label === 'pending') {
+      return 'yellow';
+    }
+    return label?.success ? 'green' : 'red';
+  };
+
   return (
     <>
       <ProposalProgress
@@ -57,7 +64,7 @@ export const ProposalVotingWithStatus = ({
             color="black"
             rounded="full"
             px="2"
-            bg={label.success ? 'green' : 'red'}
+            bg={getBg()}
           >
             {label.label}
           </Badge>

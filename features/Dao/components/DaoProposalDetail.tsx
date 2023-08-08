@@ -112,14 +112,21 @@ export default function DaoProposalDetail({
   });
 
   const proposalDescription = proposalDetailQuery?.data?.description ?? '';
-  // TODO: check if this is correct
-  /// @ts-ignore
-  const expiryDate = proposalDetailQuery?.data?.expires?.at_height ?? 0;
-  const averageBlockTime = 5; // Average block time in seconds
-  const genesisTimestamp = 1684768989000; // Genesis timestamp
-  const expiryDateTimestamp = proposalDetailQuery?.data
-    ? genesisTimestamp + expiryDate * averageBlockTime * 1000
-    : -1;
+
+  const expiryDateTimestamp = useMemo(() => {
+    if (!proposalDetailQuery.data) {
+      return 0;
+    }
+    let timestamp = 0;
+    if ('at_time' in proposalDetailQuery.data.expires) {
+      timestamp = Number(proposalDetailQuery.data.expires.at_time) / 1e6;
+    }
+    if ('at_height' in proposalDetailQuery.data.expires) {
+      timestamp = Number(proposalDetailQuery.data.expires.at_height * 5);
+    }
+
+    return timestamp;
+  }, [proposalDetailQuery.data]);
   const threshold = useMemo(() => {
     /// @ts-ignore
     return proposalDetailQuery?.data?.threshold?.absolute_count;
@@ -162,11 +169,24 @@ export default function DaoProposalDetail({
   const myVotingPower = myVotingInfo[0]?.weight;
 
   const passed = proposalDetailQuery?.data?.status === 'passed';
-  const myVotes =
-    votesQuery?.data?.votes.filter(
-      vote => vote.voter === (address as string),
-    ) ?? [];
+  const myVote = useMemo(() => {
+    const myVote =
+      votesQuery?.data?.votes.filter(
+        vote => vote.voter === (address as string),
+      ) ?? [];
+    if (myVote.length === 0) {
+      return undefined;
+    }
+    return myVote[0]?.vote === 'yes';
+  }, [votesQuery?.data?.votes, address]);
 
+  const refetchData = async () => {
+    return Promise.all([
+      proposalDetailQuery.refetch(),
+      votesQuery.refetch(),
+      votersQuery.refetch(),
+    ]);
+  };
   const voters = useMemo(() => {
     const members = daoMembers?.data?.voters ?? [];
     const memberVoted = votesQuery?.data?.votes ?? [];
@@ -263,12 +283,13 @@ export default function DaoProposalDetail({
           <VStack width="330px" spacing="30px" align="flex-start">
             <ProposalMyVote
               disableExcuteTooltip="Please wait until the posting period"
-              refetch={proposalDetailQuery.refetch}
+              refetch={refetchData}
+              executed={status === 'executed'}
               hideExecute={!(status !== 'executed' && target <= yesPercentage)}
               disableExecute={!!isGov && !isPostingPeriod}
               myVotingPower={myVotingPower}
               passed={passed}
-              voted={myVotes.length > 0}
+              voted={myVote}
               dao={selectedDao}
               proposalId={selectedDaoProposalId}
             />
