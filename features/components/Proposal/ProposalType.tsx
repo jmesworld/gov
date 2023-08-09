@@ -91,7 +91,7 @@ export const getLabelForProposalTypes = (type: string) => {
       return 'Feature Request';
 
     case 'update_directors':
-      return 'Update Directores';
+      return 'Update Directors';
     default:
       return type;
   }
