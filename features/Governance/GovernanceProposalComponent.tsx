@@ -10,16 +10,13 @@ type Props = {
   governanceQueryClient: GovernanceQueryClient;
   setSelectedProposalId: (id: number) => void;
   data: ProposalResponse[];
-  isLoading: boolean;
-  isFetching: boolean;
+  fetched: boolean;
   setSelectedDaoProposalTitle: (title: string) => void;
   supply: number;
   pagination?: {
     limit: number;
-    offset: number;
     page: number;
     setPage: (page: number) => void;
-    total: number;
   };
   proposalTitle?: string;
   tab?: string;
@@ -32,8 +29,7 @@ export default function GovernanceProposalComponent({
   supply,
   pagination,
   proposalTitle,
-  isLoading,
-  isFetching,
+  fetched,
   data,
   tab,
 }: Props) {
@@ -41,26 +37,22 @@ export default function GovernanceProposalComponent({
     <Flex flexDir="column" pb="4">
       <ProposalHeader proposalTitle={proposalTitle} isGov={true} />
       <Flex height={'9px'} />
-      {!data.length &&
-        pagination &&
-        !pagination?.total &&
-        (isLoading || isFetching) && (
-          <Flex flexDir="column" justifyContent="center" alignItems="center">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton
-                startColor="skeleton.200"
-                endColor="lilac"
-                rounded="lg"
-                key={i}
-                height="89px"
-                width="100%"
-                mb="10px"
-              />
-            ))}
-          </Flex>
-        )}
-      {((!data.length && pagination?.page) ||
-        (!data.length && !pagination)) && (
+      {!fetched && !data.length && (
+        <Flex flexDir="column" justifyContent="center" alignItems="center">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton
+              startColor="skeleton.200"
+              endColor="lilac"
+              rounded="lg"
+              key={i}
+              height="89px"
+              width="100%"
+              mb="10px"
+            />
+          ))}
+        </Flex>
+      )}
+      {fetched && !data.length && (
         <Flex
           flexDir="column"
           justifyContent="center"
@@ -71,6 +63,7 @@ export default function GovernanceProposalComponent({
           <Text color="lilac">No proposals found</Text>
         </Flex>
       )}
+
       {data.length > 0 && (
         <Flex flexDir="column" mb="25px">
           <ProposalList
@@ -88,7 +81,7 @@ export default function GovernanceProposalComponent({
         </Flex>
       )}
 
-      {pagination && pagination.total > pagination.limit && (
+      {pagination && (
         <Flex justifyContent="flex-end">
           <SimplePagination
             enabled={pagination.page !== 1 || data.length === pagination.limit}

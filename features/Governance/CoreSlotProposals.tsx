@@ -46,13 +46,12 @@ export default function GovernanceProposal({
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   );
 
-  const { data, isLoading } = useCoreSlotProposalsContext();
+  const { data, isFetched } = useCoreSlotProposalsContext();
 
   const sorted = useMemo(() => {
     if (!data) return [];
     return data.proposals.sort(sortProposalsByType);
   }, [data]);
-console.log('sorted', sorted)
   return (
     <>
       <Flex height={'35px'} />
@@ -66,8 +65,7 @@ console.log('sorted', sorted)
         supply={supply as number}
         proposalTitle={'CORE SLOT PROPOSALS'}
         data={sorted}
-        isLoading={isLoading}
-        isFetching={isLoading}
+        fetched={!!isFetched}
       />
     </>
   );
