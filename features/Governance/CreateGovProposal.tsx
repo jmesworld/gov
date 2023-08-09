@@ -420,7 +420,7 @@ export default function CreateGovProposal({
     }
     e.preventDefault();
   };
-
+console.log('Funding duration', fundingPeriod)
   return (
     <>
       <Flex height={'47px'} />

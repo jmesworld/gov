@@ -6,6 +6,7 @@ import {
 } from '../../../hooks/useAccountBalance';
 import { Image } from '@chakra-ui/react';
 import { useMemo } from 'react';
+import JMESIcon from '../../../assets/icons/JMES_Icon.svg';
 
 type Props = {
   address: string;
@@ -45,7 +46,7 @@ export const BalanceDisplay = ({ address, asCard }: Props) => {
               src="/Wallet.svg"
               width={'16px'}
               height={'16px'}
-              mr="3"
+              mr="2"
               alt="Wallet Icon"
             />
             <Tooltip
@@ -53,15 +54,9 @@ export const BalanceDisplay = ({ address, asCard }: Props) => {
               placement="top"
               label={formatBalanceWithComma(balanceInJmes)}
             >
-              <Flex alignItems="center">
-                <Image
-                  src="/JMES_Icon.svg"
-                  alt="JMES Icon"
-                  width={'10px'}
-                  mr={1}
-                  height={'10px'}
-                />
-                <Text mr="2">{formatBalance(balanceInJmes)}</Text>
+              <Flex alignItems="center" gap="1">
+                <JMESIcon width={'13px'} height={'13px'} />
+                <Text>{formatBalance(balanceInJmes)}</Text>
               </Flex>
             </Tooltip>
           </Flex>

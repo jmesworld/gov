@@ -2,7 +2,6 @@ import {
   Flex,
   HStack,
   Text,
-  Box,
   Breadcrumb,
   BreadcrumbItem,
   Tooltip,

@@ -18,9 +18,10 @@ export const ProposalFunding = ({ proposal }: ProposalFundingProps) => {
   const duration = convertBlockToMonth(
     (proposal?.funding as Funding)?.duration_in_blocks,
   );
-  const durationFormatted = `${duration.toFixed(0)} month${
-    duration > 1 ? 's' : ''
-  }`;
+  const durationFormatted = `${duration.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  })} month${duration > 1 ? 's' : ''}`;
 
   const fundingPerMonth =
     (proposal?.funding as Funding)?.amount !== undefined
@@ -48,10 +49,11 @@ export const DaoProposalFunding = ({ proposal }: DaoProposalFundingProps) => {
 
   const durationInBlock = Number(fund?.duration_in_blocks);
   const duration = convertBlockToMonth(durationInBlock);
-  const votingDurationNum = duration.toFixed(0);
-  const votingDuration = `${duration.toFixed(0)} month${
-    duration > 1 ? 's' : ''
-  }`;
+  const votingDurationNum = duration.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  });
+  const votingDuration = `${votingDurationNum} month${duration > 1 ? 's' : ''}`;
 
   const fundingPerMonth = (
     Number(fund?.amount || 0) / (Number(votingDurationNum) || 1)

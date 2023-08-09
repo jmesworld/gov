@@ -1,4 +1,4 @@
-import { CopyIcon } from '@chakra-ui/icons';
+import { CloseIcon, CopyIcon } from '@chakra-ui/icons';
 import {
   Box,
   Flex,
@@ -13,7 +13,6 @@ import {
   ModalContent,
 } from '@chakra-ui/react';
 import OnboardingProgressIndicator from './OnboardingProgressIndicator';
-import { useAccountBalance } from '../../../hooks/useAccountBalance';
 import { useChain } from '@cosmos-kit/react';
 import { chainName } from '../../../config/defaults';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
@@ -67,6 +66,15 @@ const AddTokensCard = () => {
                 </Flex>
                 <Spacer />
               </Flex>
+
+              <CloseIcon
+                color="white"
+                cursor="pointer"
+                onClick={disconnect}
+                position="absolute"
+                top="20px"
+                right="20px"
+              />
               <Flex>
                 <Spacer />
                 <Text

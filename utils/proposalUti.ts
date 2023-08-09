@@ -193,7 +193,7 @@ export const getDaoProposalType = (proposal: ProposalResponseForEmpty) => {
   const msgs = proposal.msgs;
 
   if (!msgs) {
-    return null;
+    return 'text';
   }
 
   const msg = msgs[0];

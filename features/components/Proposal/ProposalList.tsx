@@ -113,8 +113,11 @@ export const ProposalList = ({
           const duration = convertBlockToMonth(
             proposal?.funding?.duration_in_blocks,
           );
-          votingDurationNum = duration.toFixed(0);
-          votingDuration = `${duration.toFixed(0)} month${
+          votingDurationNum = duration.toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 1,
+          });
+          votingDuration = `${votingDurationNum} month${
             duration > 1 ? 's' : ''
           }`;
         }
@@ -236,10 +239,11 @@ export const ProposalList = ({
       if (fund?.duration_in_blocks) {
         const durationInBlock = Number(fund?.duration_in_blocks);
         const duration = convertBlockToMonth(durationInBlock);
-        votingDurationNum = duration.toFixed(0);
-        votingDuration = `${duration.toFixed(0)} month${
-          duration > 1 ? 's' : ''
-        }`;
+        votingDurationNum = duration.toLocaleString(undefined, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 1,
+        });
+        votingDuration = `${votingDurationNum} month${duration > 1 ? 's' : ''}`;
       }
 
       if (fund?.amount) {
