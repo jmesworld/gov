@@ -407,13 +407,13 @@ export default function GovProposalDetail({
                     </Text>
                   )}
 
-                  {(proposalExpired && yesPercentage >= thresholdPercent) ||
-                    ((status === 'success' ||
-                      status === 'success_concluded') && (
-                      <Text fontSize="xl" textAlign="center">
-                        Proposal passed
-                      </Text>
-                    ))}
+                  {((proposalExpired && yesPercentage >= thresholdPercent) ||
+                    status === 'success' ||
+                    status === 'success_concluded') && (
+                    <Text fontSize="xl" textAlign="center">
+                      Proposal passed
+                    </Text>
+                  )}
                 </Box>
               )}
             </GovProposalMyVote>

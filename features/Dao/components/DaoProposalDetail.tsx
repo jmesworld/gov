@@ -180,7 +180,7 @@ export default function DaoProposalDetail({
     return myVote[0]?.vote === 'yes';
   }, [votesQuery?.data?.votes, address]);
 
-  const refetchData = async () => {
+  const refetchData = () => {
     return Promise.all([
       proposalDetailQuery.refetch(),
       votesQuery.refetch(),
