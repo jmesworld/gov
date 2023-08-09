@@ -89,6 +89,7 @@ export const getLabelForProposalTypes = (type: string) => {
     case 'feature-request':
     case 'feature_request':
       return 'Feature Request';
+
     case 'update_directors':
       return 'Update Directores';
     default:
@@ -100,6 +101,7 @@ const getImgSrc = (type: string) => {
   switch (type) {
     case 'text':
       return '/Text_Type.svg';
+    case 'update_directors':
     case 'update-directories':
       return '/update-directories.svg';
     case 'core_slot':
@@ -110,6 +112,7 @@ const getImgSrc = (type: string) => {
       return '/RevokeCoreSlot_Type.svg';
     case 'improvement':
       return '/Improvement_Type.svg';
+    case 'spend_funds':
     case 'spend-dao-funds':
       return '/Spend_Key.svg';
     case 'feature_request':

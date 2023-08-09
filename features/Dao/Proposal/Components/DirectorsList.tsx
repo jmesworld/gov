@@ -9,6 +9,7 @@ import {
   Image,
   Text,
   Tooltip,
+  useToken,
 } from '@chakra-ui/react';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
@@ -17,6 +18,9 @@ import { useCosmWasmClientContext } from '../../../../contexts/CosmWasmClient';
 import { useClipboardTimeout } from '../../../../hooks/useClipboard';
 import { useMemo, useState } from 'react';
 import { CopiedText } from '../../../components/genial/CopiedText';
+import CopyIcon from '../../../../assets/icons/copy.svg';
+import CheckIcon from '../../../../assets/icons/CheckFilled.svg';
+
 // FIXME: fix this
 
 const IDENTITY_SERVICE_CONTRACT = process.env
@@ -109,6 +113,8 @@ export const DaoMembersListItem = ({
   const [mouseEnter, setOnMouseEnter] = useState(false);
   const { cosmWasmClient } = useCosmWasmClientContext();
   const [copied, copyToClipbaord] = useClipboardTimeout();
+  const [green, purple] = useToken('colors', ['green', 'purple']);
+
   const identityserviceQueryClient = useMemo(
     () =>
       new IdentityserviceQueryClient(
@@ -163,7 +169,7 @@ export const DaoMembersListItem = ({
                 ? identityQuery.data?.identity?.name
                 : `${address?.substring(0, 10)}...`}
             </Text>
-            <div>
+            <Flex alignItems="center">
               {(mouseEnter || copied) && (
                 <Tooltip
                   isOpen={copied || undefined}
@@ -177,21 +183,34 @@ export const DaoMembersListItem = ({
                   hasArrow
                   placement="top"
                 >
-                  <Image
-                    cursor="pointer"
-                    display="inline-block"
-                    src="/copy.svg"
-                    width="16px"
-                    height="16px"
-                    marginLeft="4px"
-                    alt="bjmes"
-                    onClick={() => {
-                      copyToClipbaord(address);
-                    }}
-                  />
+                  <Flex>
+                    {!copied && (
+                      <CopyIcon
+                        width={'16px'}
+                        height={'16px'}
+                        color={purple}
+                        onClick={() => {
+                          copyToClipbaord(address);
+                        }}
+                        style={{
+                          marginLeft: '4px',
+                        }}
+                      />
+                    )}
+                    {copied && (
+                      <CheckIcon
+                        width={'14px'}
+                        height={'14px'}
+                        color={green}
+                        style={{
+                          marginLeft: '4px',
+                        }}
+                      />
+                    )}
+                  </Flex>
                 </Tooltip>
               )}
-            </div>
+            </Flex>
           </Flex>
           <Text
             color="midnight"

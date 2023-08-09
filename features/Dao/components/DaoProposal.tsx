@@ -1,5 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Box, Button, Flex, Image, Text, Tooltip } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Flex,
+  Image,
+  Text,
+  Tooltip,
+  useToken,
+} from '@chakra-ui/react';
 import { useRef } from 'react';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import DaoMembersList from '../DaoMemberList';
@@ -25,6 +33,8 @@ import { useDAOContext } from '../../../contexts/DAOContext';
 import Link from 'next/link';
 import { AddIcon } from '@chakra-ui/icons';
 import { CopiedText } from '../../components/genial/CopiedText';
+import CopyIcon from '../../../assets/icons/copy.svg';
+import CheckIcon from '../../../assets/icons/CheckFilled.svg';
 
 export default function DaoProposal({
   daoAddress,
@@ -44,6 +54,7 @@ export default function DaoProposal({
 }) {
   const { setSelectedDAOByAddress } = useDAOContext();
   const tooltipRef = useRef(null);
+  const [green, purple] = useToken('colors', ['green', 'purple']);
   useEffect(() => {
     setSelectedDAOByAddress(daoAddress);
   }, [daoAddress, setSelectedDAOByAddress]);
@@ -159,9 +170,11 @@ export default function DaoProposal({
               borderColor="primary.100"
               px="4"
             >
-              <Text mr="2" color="purple">
-                {daoAddress.slice(0, 20)}...{daoAddress.slice(-6)}
-              </Text>
+              <Tooltip hasArrow label={daoAddress}>
+                <Text mr="2" color="purple">
+                  {daoAddress.slice(0, 20)}...{daoAddress.slice(-6)}
+                </Text>
+              </Tooltip>
 
               <Tooltip
                 ref={tooltipRef}
@@ -176,19 +189,21 @@ export default function DaoProposal({
                 }
                 placement="top"
               >
-                <Image
-                  mr="4"
-                  cursor="pointer"
-                  display="inline-block"
-                  src="/copy.svg"
-                  width="18px"
-                  height="18px"
-                  marginLeft="2px"
-                  alt="DAO Address"
-                  onClick={() => {
-                    copyToClipboard(daoAddress);
-                  }}
-                />
+                <Flex paddingX="4px" width="28px">
+                  {copied && (
+                    <CheckIcon width="16px" height="16px" color={green} />
+                  )}
+                  {!copied && (
+                    <CopyIcon
+                      color={purple}
+                      onClick={() => {
+                        copyToClipboard(daoAddress);
+                      }}
+                      width="18px"
+                      height="18px"
+                    />
+                  )}
+                </Flex>
               </Tooltip>
               <BalanceDisplay asCard={false} address={daoAddress} />
             </Flex>

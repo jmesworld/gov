@@ -362,6 +362,7 @@ export default function GovProposalDetail({
                 )}
               {(status === 'voting' || status === 'posted') &&
                 proposalExpired &&
+                yesPercentage < thresholdPercent &&
                 isPostingPeriod && (
                   <Box
                     backdropFilter="auto"
@@ -406,11 +407,13 @@ export default function GovProposalDetail({
                     </Text>
                   )}
 
-                  {(status === 'success' || status === 'success_concluded') && (
-                    <Text fontSize="xl" textAlign="center">
-                      Proposal passed
-                    </Text>
-                  )}
+                  {(proposalExpired && yesPercentage >= thresholdPercent) ||
+                    ((status === 'success' ||
+                      status === 'success_concluded') && (
+                      <Text fontSize="xl" textAlign="center">
+                        Proposal passed
+                      </Text>
+                    ))}
                 </Box>
               )}
             </GovProposalMyVote>

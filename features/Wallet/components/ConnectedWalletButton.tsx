@@ -13,6 +13,7 @@ import {
   MenuButton,
   useMenu,
   Box,
+  useToken,
 } from '@chakra-ui/react';
 
 import { ConnectedWalletType } from '../../types';
@@ -24,6 +25,8 @@ import { PromiseModal } from '../../components/genial/PromiseModal';
 import { useBalanceContext } from '../../../contexts/balanceContext';
 import { useClipboardTimeout } from '../../../hooks/useClipboard';
 import { CopiedText } from '../../components/genial/CopiedText';
+import CopyIcon from '../../../assets/icons/copy.svg';
+import CheckIcon from '../../../assets/icons/CheckFilled.svg';
 
 export const ConnectedWalletButton = ({
   identityName,
@@ -38,6 +41,7 @@ export const ConnectedWalletButton = ({
   const { isOpen, onToggle, buttonRef } = useMenu({
     defaultIsOpen: false,
   });
+  const [green, purple] = useToken('colors', ['green', 'purple']);
   const handleDisconnect = () => {
     if (preventNavigatingAway && check) {
       PromiseModal({
@@ -128,20 +132,31 @@ export const ConnectedWalletButton = ({
               }}
               placement="top"
             >
-              <Image
-                cursor="pointer"
-                display="inline-block"
-                src="/copy.svg"
-                width="16px"
-                height="16px"
-                marginLeft="4px"
-                alt="jmes"
-                onClick={e => {
-                  copyToClipbaord(address ?? '');
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-              />
+              <Flex>
+                {!copied && (
+                  <CopyIcon
+                    width={'16px'}
+                    height={'16px'}
+                    color={purple}
+                    onClick={() => {
+                      copyToClipbaord(address ?? '');
+                    }}
+                    style={{
+                      marginLeft: '4px',
+                    }}
+                  />
+                )}
+                {copied && (
+                  <CheckIcon
+                    width={'14px'}
+                    height={'14px'}
+                    color={green}
+                    style={{
+                      marginLeft: '4px',
+                    }}
+                  />
+                )}
+              </Flex>
             </Tooltip>
           ) : (
             <Flex width={'16px'} height={'16px'} marginLeft="4px" />

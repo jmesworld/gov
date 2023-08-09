@@ -1,4 +1,7 @@
-import { getGovProposalType } from '../../../../utils/proposalUti';
+import {
+  getDaoProposalType,
+  getGovProposalType,
+} from '../../../../utils/proposalUti';
 import { ProposalType } from '../../../components/Proposal/ProposalType';
 import { ProposalResponseForEmpty } from '../../../../client/DaoMultisig.types';
 import {
@@ -23,14 +26,14 @@ type Props = {
 export const GovProposalType = ({ proposal }: Props) => {
   if (!proposal) return null;
   const { proposalType } = getGovProposalType(proposal);
-
-  if (!proposalType) return null;
+  const daoProposalType = getDaoProposalType(proposal);
+  if (!proposalType && !daoProposalType) return null;
   return (
     <div>
       <ProposalType
         fullWidth
         mb="0px"
-        type={proposalType}
+        type={proposalType || daoProposalType || ''}
         proposalDetail
         isActive={false}
       />
