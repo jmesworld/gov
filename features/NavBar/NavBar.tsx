@@ -7,6 +7,7 @@ import {
   Image,
   Skeleton,
   Tooltip,
+  Divider,
 } from '@chakra-ui/react';
 import { Dispatch, SetStateAction } from 'react';
 import { WalletStatus } from '@cosmos-kit/core';
@@ -80,7 +81,7 @@ const NavBar = ({
           w="full"
           shouldWrapChildren
           hasArrow
-          label="All proposals"
+          label="Active proposals"
         >
           <Link.withStatus
             href="/"
@@ -99,12 +100,15 @@ const NavBar = ({
               if (query === 'core-slots') {
                 return false;
               }
+              if (query === 'archived') {
+                return false;
+              }
               return true;
             }}
           >
             {({ isActive }) => (
               <NavBarItem
-                text="Proposals"
+                text="Active"
                 isSelected={isActive}
                 onClick={() => {
                   setSelectedDao('');
@@ -177,6 +181,43 @@ const NavBar = ({
             {({ isActive }) => (
               <NavBarItem
                 text="Core Slots"
+                isSelected={isActive}
+                onClick={() => {
+                  setSelectedDao('');
+                  setSelectedDaoName('');
+                }}
+              />
+            )}
+          </Link.withStatus>
+        </Tooltip>
+        <Divider my="2" />
+        <Tooltip
+          openDelay={500}
+          w="full"
+          shouldWrapChildren
+          hasArrow
+          label="Archvied proposals"
+        >
+          <Link.withStatus
+            matchFunc={route => {
+              if (router.route === '/archived') {
+                return true;
+              }
+              if (router.route !== '/proposals/[id]') {
+                return false;
+              }
+
+              const query = route.query.tab;
+              if (query !== 'archived') {
+                return false;
+              }
+              return true;
+            }}
+            href="/archived"
+          >
+            {({ isActive }) => (
+              <NavBarItem
+                text="Archived"
                 isSelected={isActive}
                 onClick={() => {
                   setSelectedDao('');

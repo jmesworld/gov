@@ -7,6 +7,8 @@ import { ProposalResponse } from '../../client/Governance.types';
 import GovernanceProposalComponent from './GovernanceProposalComponent';
 import { useMemo } from 'react';
 import { useCoreSlotProposalsContext } from '../../contexts/CoreSlotProposalsContext';
+import { Flex } from '@chakra-ui/react';
+import GovHeader from './GovHeader';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -50,18 +52,23 @@ export default function GovernanceProposal({
     if (!data) return [];
     return data.proposals.sort(sortProposalsByType);
   }, [data]);
-
+console.log('sorted', sorted)
   return (
-    <GovernanceProposalComponent
-      tab="core-slots"
-      setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-      governanceQueryClient={governanceQueryClient}
-      setSelectedProposalId={setSelectedProposalId}
-      supply={supply as number}
-      proposalTitle={'CORE SLOT PROPOSALS'}
-      data={sorted}
-      isLoading={isLoading}
-      isFetching={isLoading}
-    />
+    <>
+      <Flex height={'35px'} />
+      <GovHeader />
+      <Flex height={'46px'} />
+      <GovernanceProposalComponent
+        tab="core-slots"
+        setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+        governanceQueryClient={governanceQueryClient}
+        setSelectedProposalId={setSelectedProposalId}
+        supply={supply as number}
+        proposalTitle={'CORE SLOT PROPOSALS'}
+        data={sorted}
+        isLoading={isLoading}
+        isFetching={isLoading}
+      />
+    </>
   );
 }

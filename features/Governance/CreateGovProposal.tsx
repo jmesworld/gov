@@ -43,7 +43,11 @@ import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 import { VoterDetail } from '../../client/DaoMultisig.types';
 import { useRouter } from 'next/router';
 import { ClosePageButton } from '../components/genial/ClosePageButton';
-import { numberWithDecimals } from '../../utils/numberValidators';
+import {
+  numberWithDecimals,
+  numberWithNoDecimals,
+  onNumberWithNoDecimalKeyDown,
+} from '../../utils/numberValidators';
 import { useCoreSlotProposalsContext } from '../../contexts/CoreSlotProposalsContext';
 import { ChevronRightIcon } from '@chakra-ui/icons';
 import { handleError } from '../../error/hanldeErrors';
@@ -308,7 +312,7 @@ export default function CreateGovProposal({
           amount: Number(fundingAmount),
           title: proposalTitle.value,
           description: proposalDescription.value,
-          duration: convertMonthToBlock(Number(fundingPeriod)), // months to seconds
+          duration: convertMonthToBlock(Math.floor(Number(fundingPeriod))), // months to seconds
           slot: getSlot(slotType) as Governance.CoreSlot,
           revoke_proposal_id: revokeProposalId,
           msgs: [
@@ -412,7 +416,7 @@ export default function CreateGovProposal({
 
   const onFundingAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (numberWithDecimals(6).safeParse(value).success) {
+    if (numberWithNoDecimals.safeParse(value).success) {
       setFundingAmount(Number(value));
     }
     if (value === '') {
@@ -420,7 +424,6 @@ export default function CreateGovProposal({
     }
     e.preventDefault();
   };
-console.log('Funding duration', fundingPeriod)
   return (
     <>
       <Flex height={'47px'} />
@@ -731,7 +734,7 @@ console.log('Funding duration', fundingPeriod)
 
             {isFundigRequired ? (
               <Box width={'full'}>
-                <Flex marginBottom={'17px'} height={'41px'} align={'flex-end'}>
+                <Flex   flexDir="column" marginBottom={'17px'} height={'41px'} align={'flex-start'}>
                   {selectedProposalType === 'text' && (
                     <Flex mr={'28px'}>
                       <Text
@@ -779,6 +782,7 @@ console.log('Funding duration', fundingPeriod)
                           background={'transparent'}
                           color={'purple'}
                           value={fundingAmount}
+                          onKeyDown={onNumberWithNoDecimalKeyDown}
                           onChange={onFundingAmountChange}
                           border="none"
                           borderBottom="1px solid"
