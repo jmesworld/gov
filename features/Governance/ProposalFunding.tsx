@@ -9,7 +9,7 @@ type ProposalFundingProps = {
   proposal?: ProposalResponse;
 };
 type Funding = {
-  amount: number;
+  amount: string;
   duration_in_blocks: number;
 };
 
@@ -26,7 +26,7 @@ export const ProposalFunding = ({ proposal }: ProposalFundingProps) => {
   const fundingPerMonth =
     (proposal?.funding as Funding)?.amount !== undefined
       ? Number(
-          ((proposal?.funding as Funding)?.amount ?? 0) /
+          Number((proposal?.funding as Funding)?.amount ?? 0) /
             (Number(duration) || 1),
         ) ?? 0
       : undefined;

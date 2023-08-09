@@ -220,6 +220,9 @@ export default function GovProposalDetail({
     if (tab === 'core-slots') {
       return 'Core Slot Proposal';
     }
+    if (tab === 'archived') {
+      return 'Archived Proposal';
+    }
     if (tab === 'funded') {
       return 'Funded Proposal';
     }
@@ -229,6 +232,9 @@ export default function GovProposalDetail({
   const tabLink = useMemo(() => {
     if (tab === 'core-slots') {
       return '/core-slots';
+    }
+    if (tab === 'archived') {
+      return '/archived';
     }
     if (tab === 'funded') {
       return '/funded';

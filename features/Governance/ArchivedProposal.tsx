@@ -25,7 +25,6 @@ type Props = {
   cosmWasmClient: CosmWasmClient;
   setSelectedProposalId: (id: number) => void;
 };
-
 // ORDER OF PROPOSAL TYPES
 const proposalTypeOrder = {
   improvement: 1,
@@ -43,49 +42,7 @@ const sortProposalsByType = (a: ProposalResponse, b: ProposalResponse) => {
   }
   return proposalTypeOrder[aType] - proposalTypeOrder[bType];
 };
-
-export default function GovernanceProposal({
-  setSelectedProposalId,
-  cosmWasmClient,
-}: Props) {
-  const { setSelectedDaoProposalTitle } = useAppState();
-  const { supply } = useCoinSupplyContext();
-  const governanceQueryClient = new GovernanceQueryClient(
-    cosmWasmClient as CosmWasmClient,
-    NEXT_PUBLIC_GOVERNANCE_CONTRACT,
-  );
-
-  const { data, isLoading, isFetching, pagination } = useGovernanceProposals({
-    governanceQueryClient,
-    status: 'active',
-  });
-
-  const sorted = useMemo(() => {
-    if (!data) return [];
-    return data.proposals.sort(sortProposalsByType);
-  }, [data]);
-
-  return (
-    <>
-      <Flex height={'35px'} />
-      <GovHeader />
-      <Flex height={'46px'} />
-      <GovernanceProposalComponent
-        setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-        governanceQueryClient={governanceQueryClient}
-        setSelectedProposalId={setSelectedProposalId}
-        supply={supply as number}
-        pagination={pagination}
-        proposalTitle={'ACTIVE PROPOSALS'}
-        data={sorted}
-        isLoading={isLoading}
-        isFetching={isFetching}
-      />
-    </>
-  );
-}
-
-export const ArchivedGovernanceProposal = ({
+const ArchivedGovernanceProposal = ({
   setSelectedProposalId,
   cosmWasmClient,
 }: Props) => {
@@ -139,20 +96,14 @@ export const ArchivedGovernanceProposal = ({
       <Flex height={'46px'} />
       <Tabs
         variant="unstyled"
-        marginTop="41px"
         padding="0 30px"
         index={tabIndex}
         onChange={setTabIndex}
       >
         <TabList>
           <Tab padding="0 0 10px" opacity={0.5} _selected={{ opacity: '1' }}>
-            <Text
-              color="lilac"
-              fontFamily={'DM Sans'}
-              fontWeight="500"
-              fontSize={16}
-            >
-              Success
+            <Text fontFamily={'DM Sans'} fontWeight="500" fontSize={16}>
+              Expired
             </Text>
           </Tab>
           <Tab
@@ -161,24 +112,19 @@ export const ArchivedGovernanceProposal = ({
             opacity={0.5}
             _selected={{ opacity: '1' }}
           >
-            <Text
-              color="lilac"
-              fontFamily={'DM Sans'}
-              fontWeight="500"
-              fontSize={16}
-            >
-              Expired
+            <Text fontFamily={'DM Sans'} fontWeight="500" fontSize={16}>
+              Failed
             </Text>
           </Tab>
         </TabList>
         <TabIndicator
-          mt="-1.5px"
           height="2px"
-          bg="white"
+          mb="20"
+          bg="purple"
           borderRadius="1px"
           width="80%"
         />
-        <TabPanels>
+        <TabPanels mt="4">
           <TabPanel padding={0}>
             <GovernanceProposalComponent
               setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
@@ -186,10 +132,11 @@ export const ArchivedGovernanceProposal = ({
               setSelectedProposalId={setSelectedProposalId}
               supply={supply as number}
               pagination={successPagination}
-              proposalTitle={'ACTIVE PROPOSALS'}
+              proposalTitle={'SUCCESS PROPOSALS'}
               data={successSorted}
               isLoading={successLoading}
               isFetching={successFetching}
+              tab="archived"
             />
           </TabPanel>
           <TabPanel padding={0}>
@@ -199,10 +146,11 @@ export const ArchivedGovernanceProposal = ({
               setSelectedProposalId={setSelectedProposalId}
               supply={supply as number}
               pagination={expiredConcludedPagination}
-              proposalTitle={'ACTIVE PROPOSALS'}
+              proposalTitle={'EXPIRED PROPOSALS'}
               data={expiredConcludedSorted}
               isLoading={expiredConcludedLoading}
               isFetching={expiredConcludedFetching}
+              tab="archived"
             />
           </TabPanel>
         </TabPanels>
@@ -210,3 +158,5 @@ export const ArchivedGovernanceProposal = ({
     </>
   );
 };
+
+export default ArchivedGovernanceProposal;

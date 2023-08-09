@@ -6,7 +6,10 @@ import {
   useGovernanceProposalsQuery,
   useGovernanceWinningGrantsQuery,
 } from '../../client/Governance.react-query';
-import { ProposalsResponse } from '../../client/Governance.types';
+import {
+  ProposalQueryStatus,
+  ProposalsResponse,
+} from '../../client/Governance.types';
 import { useQueries } from '@tanstack/react-query';
 import { assertNullOrUndefined } from '../../utils/ts';
 
@@ -16,7 +19,8 @@ type GovernanceProps = {
 
 export const useGovernanceProposals = ({
   governanceQueryClient,
-}: GovernanceProps): {
+  status,
+}: GovernanceProps & { status: ProposalQueryStatus }): {
   data: ProposalsResponse | undefined;
   isLoading: boolean;
   isFetching: boolean;
@@ -33,10 +37,12 @@ export const useGovernanceProposals = ({
   const { data, isLoading, isFetching } = useGovernanceProposalsQuery({
     client: governanceQueryClient,
     args: {
+      status: status,
       limit,
       start: offset,
     },
     options: {
+      enabled: !!status,
       refetchInterval: 10000,
     },
   });
@@ -137,7 +143,6 @@ export const useCoreSlotProposals = ({
     }
     return result.filter(assertNullOrUndefined);
   }, [data]);
-
   const result = useQueries({
     queries: listOfCoreSlotProposals.map(proposal => ({
       queryKey: ['core_slot', 'proposal', proposal],

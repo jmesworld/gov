@@ -1,12 +1,10 @@
-import { Button, Flex, Skeleton } from '@chakra-ui/react';
+import { Flex, Skeleton, Text } from '@chakra-ui/react';
 import { GovernanceQueryClient } from '../../client/Governance.client';
-import GovHeader from './GovHeader';
 import { ProposalHeader } from '../components/Proposal/ProposalList';
 import { ProposalList } from '../components/Proposal/ProposalList';
 
 import { ProposalResponse } from '../../client/Governance.types';
-import Pagination from 'rc-pagination';
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { SimplePagination } from '../components/genial/Pagination';
 
 type Props = {
   governanceQueryClient: GovernanceQueryClient;
@@ -41,24 +39,36 @@ export default function GovernanceProposalComponent({
 }: Props) {
   return (
     <Flex flexDir="column" pb="4">
-      <Flex height={'35px'} />
-      <GovHeader />
-      <Flex height={'46px'} />
       <ProposalHeader proposalTitle={proposalTitle} isGov={true} />
       <Flex height={'9px'} />
-      {!data.length && (isLoading || isFetching) && (
-        <Flex flexDir="column" justifyContent="center" alignItems="center">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton
-              startColor="skeleton.200"
-              endColor="lilac"
-              rounded="lg"
-              key={i}
-              height="89px"
-              width="100%"
-              mb="10px"
-            />
-          ))}
+      {!data.length &&
+        pagination &&
+        !pagination?.total &&
+        (isLoading || isFetching) && (
+          <Flex flexDir="column" justifyContent="center" alignItems="center">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton
+                startColor="skeleton.200"
+                endColor="lilac"
+                rounded="lg"
+                key={i}
+                height="89px"
+                width="100%"
+                mb="10px"
+              />
+            ))}
+          </Flex>
+        )}
+      {((!data.length && pagination?.page) ||
+        (!data.length && !pagination)) && (
+        <Flex
+          flexDir="column"
+          justifyContent="center"
+          alignItems="center"
+          height="100%"
+          py="10"
+        >
+          <Text color="lilac">No proposals found</Text>
         </Flex>
       )}
       {data.length > 0 && (
@@ -80,51 +90,12 @@ export default function GovernanceProposalComponent({
 
       {pagination && pagination.total > pagination.limit && (
         <Flex justifyContent="flex-end">
-          <Pagination
-            disabled={isLoading || isFetching}
-            style={{
-              listStyle: 'none',
-              display: 'flex',
-              gap: 5,
-              justifyContent: 'flex-end',
-            }}
-            onChange={page => {
-              pagination.setPage(page);
-            }}
-            total={pagination.total}
-            itemRender={(current, type, element) => {
-              if (type === 'prev' || type === 'next') {
-                return (
-                  <Button
-                    size="sm"
-                    listStyleType="none"
-                    ml={2}
-                    mr={2}
-                    display="inline-block"
-                  >
-                    {type === 'prev' && <ChevronLeftIcon />}
-                    {type === 'next' && <ChevronRightIcon />}
-                  </Button>
-                );
-              }
-
-              if (type === 'page') {
-                return (
-                  <Button
-                    size="sm"
-                    variant={
-                      current === pagination.page ? 'purple' : 'purpleText'
-                    }
-                    listStyleType="none"
-                    display="inline-block"
-                  >
-                    {current}
-                  </Button>
-                );
-              }
-              return element;
-            }}
-            pageSize={pagination.limit}
+          <SimplePagination
+            enabled={pagination.page !== 1 || data.length === pagination.limit}
+            page={pagination.page}
+            nextPage={data.length === pagination.limit}
+            prevPage={pagination.page > 1}
+            onPage={page => pagination.setPage(page)}
           />
         </Flex>
       )}

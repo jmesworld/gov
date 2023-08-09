@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 
 const GovernanceProposal = dynamic(() => import('./GovernanceProposal'));
+const ArchivedProposal = dynamic(() => import('./ArchivedProposal'));
 const WinningGrantProposals = dynamic(() => import('./WinningGrantsProposal'));
 const CoreSlotProposals = dynamic(() => import('./CoreSlotProposals'));
 const CreateGovProposal = dynamic(() => import('./CreateGovProposal'));
@@ -19,6 +20,7 @@ const Governance = {
   GovProposalMyVote,
   WinningGrantProposals,
   CoreSlotProposals,
+  ArchivedProposal,
 };
 
 export { Governance };

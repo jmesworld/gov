@@ -7,6 +7,8 @@ import { ProposalResponse } from '../../client/Governance.types';
 import { useGovernanceWinningGrants } from './useGovernance';
 import GovernanceProposalComponent from './GovernanceProposalComponent';
 import { useMemo } from 'react';
+import { Flex } from '@chakra-ui/react';
+import GovHeader from './GovHeader';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -54,16 +56,21 @@ export default function GovernanceProposal({
   }, [data]);
 
   return (
-    <GovernanceProposalComponent
-      tab="funded"
-      setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-      governanceQueryClient={governanceQueryClient}
-      setSelectedProposalId={setSelectedProposalId}
-      supply={supply as number}
-      proposalTitle={'FUNDED PROPOSALS'}
-      data={sorted}
-      isLoading={isLoading}
-      isFetching={isFetching}
-    />
+    <>
+      <Flex height={'35px'} />
+      <GovHeader />
+      <Flex height={'46px'} />
+      <GovernanceProposalComponent
+        tab="funded"
+        setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+        governanceQueryClient={governanceQueryClient}
+        setSelectedProposalId={setSelectedProposalId}
+        supply={supply as number}
+        proposalTitle={'FUNDED PROPOSALS'}
+        data={sorted}
+        isLoading={isLoading}
+        isFetching={isFetching}
+      />
+    </>
   );
 }

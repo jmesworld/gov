@@ -1,16 +1,17 @@
 import { Governance } from '../features';
 import { useCosmWasmClientContext } from '../contexts/CosmWasmClient';
+import { NextPageWithLayout } from './_app';
 import { CoinSupplyContextProvider } from '../contexts/CoinSupply';
 
-const { WinningGrantProposals } = Governance;
+const { ArchivedProposal } = Governance;
 
-const Funded = () => {
+const Home: NextPageWithLayout = () => {
   const { cosmWasmClient } = useCosmWasmClientContext();
 
   return (
     <CoinSupplyContextProvider>
       {cosmWasmClient && (
-        <WinningGrantProposals
+        <ArchivedProposal
           cosmWasmClient={cosmWasmClient}
           setSelectedProposalId={() => {
             // router.push(`/proposals/${id}`);
@@ -20,4 +21,4 @@ const Funded = () => {
     </CoinSupplyContextProvider>
   );
 };
-export default Funded;
+export default Home;
