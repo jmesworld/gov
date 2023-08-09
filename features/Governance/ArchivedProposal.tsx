@@ -57,9 +57,8 @@ const ArchivedGovernanceProposal = ({
 
   const {
     data: expiredConcludedData,
-    isLoading: expiredConcludedLoading,
-    isFetching: expiredConcludedFetching,
     pagination: expiredConcludedPagination,
+    isFetched: expiredConcludedFetched,
   } = useGovernanceProposals({
     governanceQueryClient,
     status: 'expired_concluded',
@@ -67,9 +66,8 @@ const ArchivedGovernanceProposal = ({
 
   const {
     data: successData,
-    isLoading: successLoading,
-    isFetching: successFetching,
     pagination: successPagination,
+    isFetched: successFetched,
   } = useGovernanceProposals({
     governanceQueryClient,
     status: 'success_concluded',
@@ -134,8 +132,7 @@ const ArchivedGovernanceProposal = ({
               pagination={successPagination}
               proposalTitle={'SUCCESS PROPOSALS'}
               data={successSorted}
-              isLoading={successLoading}
-              isFetching={successFetching}
+              fetched={!!successFetched}
               tab="archived"
             />
           </TabPanel>
@@ -148,8 +145,7 @@ const ArchivedGovernanceProposal = ({
               pagination={expiredConcludedPagination}
               proposalTitle={'EXPIRED PROPOSALS'}
               data={expiredConcludedSorted}
-              isLoading={expiredConcludedLoading}
-              isFetching={expiredConcludedFetching}
+              fetched={!!expiredConcludedFetched}
               tab="archived"
             />
           </TabPanel>

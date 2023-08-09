@@ -23,6 +23,7 @@ export const useGovernanceProposals = ({
 }: GovernanceProps & { status: ProposalQueryStatus }): {
   data: ProposalsResponse | undefined;
   isLoading: boolean;
+  isFetched: boolean;
   isFetching: boolean;
   pagination?: {
     limit: number;
@@ -34,18 +35,19 @@ export const useGovernanceProposals = ({
 } => {
   const { setTotal, total, limit, offset, page, setPage } = usePagination({});
 
-  const { data, isLoading, isFetching } = useGovernanceProposalsQuery({
-    client: governanceQueryClient,
-    args: {
-      status: status,
-      limit,
-      start: offset,
-    },
-    options: {
-      enabled: !!status,
-      refetchInterval: 10000,
-    },
-  });
+  const { data, isLoading, isFetching, isFetched } =
+    useGovernanceProposalsQuery({
+      client: governanceQueryClient,
+      args: {
+        status: status,
+        limit,
+        start: offset,
+      },
+      options: {
+        enabled: !!status,
+        refetchInterval: 10000,
+      },
+    });
 
   useEffect(() => {
     if (!data || !data?.proposal_count) return;
@@ -58,6 +60,7 @@ export const useGovernanceProposals = ({
     data,
     isLoading,
     isFetching,
+    isFetched,
     pagination: {
       limit,
       offset,
@@ -74,18 +77,21 @@ export const useGovernanceWinningGrants = ({
   data: ProposalsResponse | undefined;
   isLoading: boolean;
   isFetching: boolean;
+  isFetched: boolean;
+  error: Error | null;
 } => {
   const {
+    isFetched: isFetchedWinningGrants,
     data,
     isLoading: loadingWinningGrants,
     isFetching: fetchingWinningGrants,
+    error: winningGrantsError,
   } = useGovernanceWinningGrantsQuery({
     client: governanceQueryClient,
     options: {
       refetchInterval: 10000,
     },
   });
-
   const result = useQueries({
     queries: (data?.winning_grants || []).map(grant => ({
       queryKey: ['funded', 'proposal', grant.proposal_id],
@@ -98,6 +104,14 @@ export const useGovernanceWinningGrants = ({
   const isFetching =
     result.some(query => query.isFetching) || fetchingWinningGrants;
 
+  const isFetched =
+    isFetchedWinningGrants && result.every(query => query.isFetched);
+  const error =
+    winningGrantsError ||
+    result
+      .map(query => query.error as Error | null)
+      .filter(assertNullOrUndefined)?.[0];
+
   const governanceData = result
     .map(query => query.data)
     .filter(assertNullOrUndefined);
@@ -109,6 +123,8 @@ export const useGovernanceWinningGrants = ({
     },
     isLoading,
     isFetching,
+    isFetched,
+    error,
   };
 };
 
@@ -121,6 +137,7 @@ export const useCoreSlotProposals = ({
     isLoading: loadingCoreSlot,
     isFetching: fetchingCoreSlot,
     refetch: refetchCoreSlot,
+    isFetched: isFetchedCoreSlot,
   } = useGovernanceCoreSlotsQuery({
     client: governanceQueryClient,
 
@@ -166,6 +183,7 @@ export const useCoreSlotProposals = ({
     );
   };
 
+  const isFetched = isFetchedCoreSlot && result.every(query => query.isFetched);
   const error =
     coreSlotError ||
     result
@@ -179,5 +197,6 @@ export const useCoreSlotProposals = ({
     isLoading: isLoading || isFetching,
     refetch,
     error,
+    isFetched,
   };
 };

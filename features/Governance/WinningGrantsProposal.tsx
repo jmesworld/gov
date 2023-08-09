@@ -46,7 +46,7 @@ export default function GovernanceProposal({
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   );
 
-  const { data, isLoading, isFetching } = useGovernanceWinningGrants({
+  const { data, isFetched } = useGovernanceWinningGrants({
     governanceQueryClient,
   });
 
@@ -68,8 +68,7 @@ export default function GovernanceProposal({
         supply={supply as number}
         proposalTitle={'FUNDED PROPOSALS'}
         data={sorted}
-        isLoading={isLoading}
-        isFetching={isFetching}
+        fetched={isFetched}
       />
     </>
   );

@@ -15,6 +15,7 @@ type CoreSlotProposalContextType = {
   isLoading: boolean;
   error: Error | Error[];
   coreSlotDaoIds?: string[];
+  isFetched?: boolean;
 };
 
 const emptyFN = () => {
@@ -32,6 +33,7 @@ const initailState: CoreSlotProposalContextType = {
   refetch: emptyFN,
   coreSlotDaoIds: [],
   error: [],
+  isFetched: false,
 };
 
 export const CoreSlotProposalsContext =
@@ -50,7 +52,7 @@ export const CoreSlotProposalsContextProvider = ({ children }: Props) => {
       ),
     [cosmWasmClient],
   );
-  const { data, isLoading, refetch, error } = useCoreSlotProposals({
+  const { data, isLoading, refetch, error, isFetched } = useCoreSlotProposals({
     governanceQueryClient,
   });
   const coreSlotDaoIds = useMemo(
@@ -61,7 +63,7 @@ export const CoreSlotProposalsContextProvider = ({ children }: Props) => {
 
   return (
     <CoreSlotProposalsContext.Provider
-      value={{ error, data, isLoading, refetch, coreSlotDaoIds }}
+      value={{ error, data, isLoading, refetch, isFetched, coreSlotDaoIds }}
     >
       {children}
     </CoreSlotProposalsContext.Provider>
