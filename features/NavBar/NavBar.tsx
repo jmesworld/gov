@@ -191,7 +191,7 @@ const NavBar = ({
           w="full"
           shouldWrapChildren
           hasArrow
-          label="Passed and concluded proposals"
+          label="Passed proposals"
         >
           <Link.withStatus
             matchFunc={route => {
@@ -227,7 +227,7 @@ const NavBar = ({
           w="full"
           shouldWrapChildren
           hasArrow
-          label="Expired and concluded proposals"
+          label="Expired proposals"
         >
           <Link.withStatus
             matchFunc={route => {

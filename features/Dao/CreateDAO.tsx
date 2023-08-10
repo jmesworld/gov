@@ -662,8 +662,6 @@ const CreateDaoNewForm = ({
               })
               .catch(error => {
                 handleError(error, 'Unable to create DAO.', toast);
-              })
-              .finally(() => {
                 setIsCreatingDao(false);
               });
           }}
