@@ -21,11 +21,13 @@ type Props = {
   removeCopy?: boolean;
   client: IdentityserviceQueryClient;
   isReadOnly: boolean;
+  fetchName?: boolean;
   name?: string;
   id: string;
   address?: string | null;
   error?: string;
   votingPower?: number;
+  nonClosable?: boolean;
   onVotingPowerChange: (id: string, value: number | '') => void;
   onNameChange: (id: string, value: string) => void;
   onAddress: (id: string, value?: string | null) => void;
@@ -49,6 +51,8 @@ export const MemberUpdate = memo(
     onVotingPowerChange,
     onRemove,
     removeCopy,
+    fetchName,
+    nonClosable,
   }: Props) => {
     const [copied, onCopy] = useClipboardTimeout();
     const [value, setValue] = useState<string>(name ?? '');
@@ -57,16 +61,20 @@ export const MemberUpdate = memo(
       value,
       delay: 300,
     });
-
     const {
       data,
       isFetching,
       error: err,
     } = useQuery({
-      enabled: !isReadOnly && debouncedValue === value && debouncedValue !== '',
+      enabled:
+        (fetchName || !isReadOnly) &&
+        debouncedValue === value &&
+        debouncedValue !== '',
       queryKey: ['members', debouncedValue],
       queryFn: ({ queryKey }) =>
-        client.getIdentityByName({ name: queryKey[1] }),
+        queryKey[1].length < 20
+          ? client.getIdentityByName({ name: queryKey[1] })
+          : client.getIdentityByOwner({ owner: queryKey[1] }),
       retry: 1,
       refetchOnMount: true,
     });
@@ -79,6 +87,7 @@ export const MemberUpdate = memo(
       }
 
       onAddress(id, data.identity?.owner ?? null);
+      value.length > 20 && setValue(data.identity?.name ?? '');
     }, [data, debouncedValue, id, onAddress, value]);
 
     useEffect(() => {
@@ -117,6 +126,7 @@ export const MemberUpdate = memo(
             color={'purple'}
             height={'100%'}
             defaultValue={value}
+            value={value}
             fontWeight={'normal'}
             onChange={e => {
               setValue(e.target.value);
@@ -171,7 +181,11 @@ export const MemberUpdate = memo(
             </Flex>
           </InputRightElement>
         </InputGroup>
-        <InputGroup pl="10px" width={'13%'} height={'48px'}>
+        <InputGroup
+          pl="10px"
+          width={nonClosable ? '15%' : '13%'}
+          height={'48px'}
+        >
           <Input
             variant={'outline'}
             width={'100%'}
@@ -203,28 +217,30 @@ export const MemberUpdate = memo(
           </InputRightElement>
         </InputGroup>
 
-        <Button
-          p="0"
-          ml="5px"
-          width={'24px'}
-          size="24px"
-          bg="transparent"
-          _focus={{ backgroundColor: 'transparent' }}
-          _hover={{ backgroundColor: 'transparent' }}
-          color={'rgba(15,0,86,0.3)'}
-          onClick={() => {
-            onRemove(id);
-          }}
-        >
-          {!isReadOnly && (
-            <Image
-              src="/CloseFilled.svg"
-              width="24px"
-              height="24px"
-              alt="close"
-            />
-          )}
-        </Button>
+        {!nonClosable && (
+          <Button
+            p="0"
+            ml="5px"
+            width={'24px'}
+            size="24px"
+            bg="transparent"
+            _focus={{ backgroundColor: 'transparent' }}
+            _hover={{ backgroundColor: 'transparent' }}
+            color={'rgba(15,0,86,0.3)'}
+            onClick={() => {
+              onRemove(id);
+            }}
+          >
+            {!isReadOnly && (
+              <Image
+                src="/CloseFilled.svg"
+                width="24px"
+                height="24px"
+                alt="close"
+              />
+            )}
+          </Button>
+        )}
       </Flex>
     );
   },

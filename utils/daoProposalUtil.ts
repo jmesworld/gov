@@ -18,20 +18,19 @@ export const getLabel = ({ proposal, yesVotes, threshold }: Args) => {
   }
 
   if (proposal.status === 'executed' || proposal.status === 'passed') {
-    label = expired ? 'Executed' : 'Passed';
+    label = 'Passed';
     labelSuccess = true;
   }
-
-  if (proposal.status === 'rejected' && expired) {
-    label = 'Rejected';
+  if (proposal.status === 'rejected') {
+    label = 'Failed';
     labelSuccess = false;
   }
 
   if (proposal.status === 'pending' || proposal.status === 'open') {
-    label = yesVotes >= threshold ? 'Passing' : 'Failing';
-    labelSuccess = yesVotes >= threshold;
+    label = yesVotes >= threshold ? 'Passed' : 'Pending';
+    labelSuccess = yesVotes >= threshold ? true : null;
   }
-  if (label === null || labelSuccess === null) {
+  if (label === null) {
     return null;
   }
   return {

@@ -48,7 +48,7 @@ export const ProposalProgress = ({
             fontSize={14}
             fontFamily="DM Sans"
             textTransform="uppercase"
-            opacity={yesPercent > noPercent ? '1' : '0.5'}
+            opacity={yesPercent >= targetPercentage ? '1' : '0.5'}
             width={'69px'}
             textOverflow="ellipsis"
             textAlign={'left'}
@@ -87,7 +87,7 @@ export const ProposalProgress = ({
             fontFamily="DM Sans"
             textTransform="uppercase"
             textOverflow="ellipsis"
-            opacity={yesPercent > noPercent ? '0.5' : '1'}
+            opacity={yesPercent < targetPercentage ? '1' : '0.5'}
             width={'69px'}
             textAlign={'left'}
             whiteSpace="pre"
@@ -113,13 +113,13 @@ export const ProposalProgress = ({
         top={'0'}
         bottom={'0'}
         left={'76px'}
-        right={'20px'}
+        right={targetPercentage === 100 ? '25px' : '20px'}
       >
         <Box
           position={'absolute'}
           left={`calc( ${
             targetPercentage > 100 ? 100 : targetPercentage
-          }% - 13px)`}
+          }% - 8px)`}
           top={0}
           bottom={0}
           width={'26px'}

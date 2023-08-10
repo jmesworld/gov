@@ -17,6 +17,7 @@ import { formatString } from '../../../../lib/strings';
 import { getFormattedSlotType } from '../../../../utils/coreSlotType';
 import { DaoTransferFund } from './DaoTransferFund';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
+import { UpdateDirectoriesList } from './UpdateDirectorsComponent';
 
 type Props = {
   proposal?: ProposalResponseForEmpty;
@@ -54,9 +55,34 @@ export const getSlotType = ({ proposal }: Omit<Props, 'client'>) => {
   return getFormattedSlotType(slotType ?? undefined);
 };
 
+type UpdateMember = {
+  add: Array<{
+    weight: number;
+    addr: string;
+  }>;
+
+  remove: Array<string>;
+};
+
 export const GetProposalDetail = ({ proposal, client }: Props) => {
   if (!proposal) return null;
   const { excuteMsg, bankMsg } = getGovProposalType(proposal);
+
+  if (excuteMsg && 'update_members' in excuteMsg) {
+    if (
+      !('remove' in (excuteMsg.update_members as UpdateMember)) ||
+      !('add' in (excuteMsg.update_members as UpdateMember))
+    ) {
+      return null;
+    }
+    return (
+      <UpdateDirectoriesList
+        client={client}
+        add={(excuteMsg.update_members as UpdateMember)?.add}
+        remove={(excuteMsg.update_members as UpdateMember)?.remove}
+      />
+    );
+  }
 
   if (bankMsg) {
     let total = 0;
@@ -191,16 +217,26 @@ export const GetProposalDetail = ({ proposal, client }: Props) => {
         height={'48px'}
         color={'purple'}
       >
-        <Text color="purple" fontSize="12px" fontWeight="bold">
+        <Text
+          fontFamily={'DM Sans'}
+          color="purple"
+          fontSize="12px"
+          fontWeight="bold"
+        >
           Feature Type:
         </Text>
-        <Text ml="15px" color="midnight">
+        <Text fontFamily={'DM Sans'} ml="15px" color="purple">
           {formatString(featureType)}
         </Text>
-        <Text ml="15px" fontSize="12px" fontWeight="bold">
+        <Text
+          fontFamily={'DM Sans'}
+          ml="30px"
+          fontSize="12px"
+          fontWeight="bold"
+        >
           Number of NFT&apos;s to Mint:
         </Text>
-        <Text ml="5px" color="midnight">
+        <Text fontFamily={'DM Sans'} ml="5px" color="purple">
           {NFTTomMint}
         </Text>
       </Flex>

@@ -734,7 +734,12 @@ export default function CreateGovProposal({
 
             {isFundigRequired ? (
               <Box width={'full'}>
-                <Flex   flexDir="column" marginBottom={'17px'} height={'41px'} align={'flex-start'}>
+                <Flex
+                  flexDir="column"
+                  marginBottom={'17px'}
+                  height={'60px'}
+                  align={'flex-start'}
+                >
                   {selectedProposalType === 'text' && (
                     <Flex mr={'28px'}>
                       <Text
