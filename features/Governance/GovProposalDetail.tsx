@@ -40,6 +40,7 @@ import { useDao, useDaoMemberList } from '../../hooks/dao';
 import DirectoresList from '../Dao/Proposal/Components/DirectorsList';
 import { getAttribute } from '../../utils/tx';
 import { handleError } from '../../error/hanldeErrors';
+import { AutoResizeTextarea } from '../components/genial/ResizableInput';
 
 const GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -120,7 +121,7 @@ export default function GovProposalDetail({
     if (periodData.current_period === 'posting') {
       return (
         periodData.current_block >=
-        data?.start_block + periodData?.posting_period_length / 5
+        data?.start_block + periodData?.voting_period_length / 5
       );
     }
     return (
@@ -274,23 +275,24 @@ export default function GovProposalDetail({
               Description
             </Text>
 
-            <Box
-              background="rgba(112, 79, 247, 0.1)"
+            <AutoResizeTextarea
+              background="background.100"
               borderRadius="12px"
-              border="1px solid rgba(112, 79, 247, 0.5)"
               padding="14px 16px"
               marginTop="10px"
               height="300px"
+              fontSize="16px"
+              fontWeight="normal"
+              color="purple"
+              fontFamily="DM Sans"
+              borderWidth={1}
+              borderStyle="solid"
+              borderColor="background.500"
+              isReadOnly
             >
-              <Text
-                fontSize="16px"
-                fontWeight="normal"
-                color="purple"
-                fontFamily="DM Sans"
-              >
-                {proposalDescription}
-              </Text>
-            </Box>
+              {proposalDescription}
+            </AutoResizeTextarea>
+
             <ProposalExcuteRawData proposal={data} />
           </Box>
           <VStack
@@ -305,6 +307,31 @@ export default function GovProposalDetail({
               voted={!!voted}
               proposalId={proposalId}
             >
+              {isPostingPeriod &&
+                !proposalExpired &&
+                (status === 'voting' || status === 'posted') && (
+                  <Box
+                    backdropFilter="auto"
+                    backdropBlur="3px"
+                    p="4"
+                    width="full"
+                    h="full"
+                    m="auto"
+                    zIndex="3"
+                    bg="purple"
+                    pos="absolute"
+                    color="white"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    flexDir="column"
+                  >
+                    <Text fontSize="xl" textAlign="center">
+                      Please wait until the voting starts.
+                    </Text>
+                    <Text textAlign="center">{nextPeriodTimeLeft}</Text>
+                  </Box>
+                )}
               {voted &&
                 !proposalExpired &&
                 (status === 'voting' || status === 'posted') && (
@@ -341,31 +368,6 @@ export default function GovProposalDetail({
                   </Box>
                 )}
 
-              {isPostingPeriod &&
-                !proposalExpired &&
-                (status === 'voting' || status === 'posted') && (
-                  <Box
-                    backdropFilter="auto"
-                    backdropBlur="3px"
-                    p="4"
-                    width="full"
-                    h="full"
-                    m="auto"
-                    zIndex="3"
-                    bg="purple"
-                    pos="absolute"
-                    color="white"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    flexDir="column"
-                  >
-                    <Text fontSize="xl" textAlign="center">
-                      Please wait until the voting starts.
-                    </Text>
-                    <Text textAlign="center">{nextPeriodTimeLeft}</Text>
-                  </Box>
-                )}
               {(status === 'voting' || status === 'posted') &&
                 proposalExpired &&
                 yesPercentage < thresholdPercent &&
@@ -388,6 +390,30 @@ export default function GovProposalDetail({
                   >
                     <Text fontSize="xl" textAlign="center">
                       Proposal expired
+                    </Text>
+                  </Box>
+                )}
+              {(status === 'voting' || status === 'posted') &&
+                proposalExpired &&
+                yesPercentage > thresholdPercent && (
+                  <Box
+                    backdropFilter="auto"
+                    backdropBlur="3px"
+                    p="4"
+                    width="full"
+                    h="full"
+                    m="auto"
+                    zIndex="3"
+                    bg="purple"
+                    pos="absolute"
+                    color="white"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    flexDir="column"
+                  >
+                    <Text fontSize="xl" textAlign="center">
+                      Proposal passed
                     </Text>
                   </Box>
                 )}

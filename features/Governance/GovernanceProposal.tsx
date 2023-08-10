@@ -46,31 +46,65 @@ export default function GovernanceProposal({
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   );
 
-  const { data, pagination, isFetched } = useGovernanceProposals({
+  const { data, isFetched } = useGovernanceProposals({
     governanceQueryClient,
     status: 'active',
+    loadAll: 'load-all',
   });
 
-  const sorted = useMemo(() => {
-    if (!data) return [];
-    return data.proposals.sort(sortProposalsByType);
-  }, [data]);
+  const active = useMemo(() => {
+    return data?.proposals.filter(
+      proposal =>
+        proposal.status !== 'expired' && proposal.status !== 'success',
+    );
+  }, [data?.proposals]);
+
+  const notConcluded = useMemo(() => {
+    return data?.proposals.filter(
+      proposal =>
+        proposal.status === 'expired' || proposal.status === 'success',
+    );
+  }, [data?.proposals]);
+
+  const sortedActive = useMemo(() => {
+    if (!active) return [];
+    return active.sort(sortProposalsByType);
+  }, [active]);
+
+  const sortedNotConcluded = useMemo(() => {
+    if (!notConcluded) return [];
+    return notConcluded.sort(sortProposalsByType);
+  }, [notConcluded]);
 
   return (
     <>
       <Flex height={'35px'} />
       <GovHeader />
       <Flex height={'46px'} />
-      <GovernanceProposalComponent
-        setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-        governanceQueryClient={governanceQueryClient}
-        setSelectedProposalId={setSelectedProposalId}
-        supply={supply as number}
-        pagination={pagination}
-        proposalTitle={'ACTIVE PROPOSALS'}
-        data={sorted}
-        fetched={isFetched}
-      />
+      {sortedActive.length !== 0 && (
+        <GovernanceProposalComponent
+          setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+          governanceQueryClient={governanceQueryClient}
+          setSelectedProposalId={setSelectedProposalId}
+          supply={supply as number}
+          pagination={undefined}
+          proposalTitle={'ACTIVE PROPOSALS'}
+          data={sortedActive}
+          fetched={isFetched}
+        />
+      )}
+      {sortedNotConcluded.length !== 0 && (
+        <GovernanceProposalComponent
+          setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+          governanceQueryClient={governanceQueryClient}
+          setSelectedProposalId={setSelectedProposalId}
+          supply={supply as number}
+          pagination={undefined}
+          proposalTitle={'NOT CONCLUDED PROPOSALS'}
+          data={sortedNotConcluded}
+          fetched={isFetched}
+        />
+      )}
     </>
   );
 }

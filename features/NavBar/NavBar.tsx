@@ -196,7 +196,7 @@ const NavBar = ({
           w="full"
           shouldWrapChildren
           hasArrow
-          label="Archvied proposals"
+          label="Concluded proposals"
         >
           <Link.withStatus
             matchFunc={route => {
@@ -217,7 +217,7 @@ const NavBar = ({
           >
             {({ isActive }) => (
               <NavBarItem
-                text="Archived"
+                text="Concluded"
                 isSelected={isActive}
                 onClick={() => {
                   setSelectedDao('');
@@ -249,7 +249,7 @@ const NavBar = ({
         <Box w="full">
           <Skeleton
             startColor="darkPurple"
-            endColor="primary.500"
+            endColor="background.500"
             height="30px"
           />
         </Box>

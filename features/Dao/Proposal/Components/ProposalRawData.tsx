@@ -21,7 +21,7 @@ export const ProposalExcuteRawData = ({ proposal }: Props) => {
       <Flex
         flexDir="row"
         mt="10px"
-        background="rgba(112, 79, 247, 0.1)"
+        bg="background.100"
         borderRadius="12px"
         border="1px solid rgba(112, 79, 247, 0.5)"
         padding="14px 16px"
@@ -56,7 +56,7 @@ export const ProposalExcuteRawData = ({ proposal }: Props) => {
             readonly
             style={{
               backgroundColor: 'transparent',
-              height: '300px',
+              minHeight: '40px',
             }}
             setOptions={{
               highlightSelectedWord: false,
@@ -64,6 +64,7 @@ export const ProposalExcuteRawData = ({ proposal }: Props) => {
               showPrintMargin: false,
               showGutter: true,
               showLineNumbers: false,
+              maxLines: Infinity,
             }}
             editorProps={{
               $blockScrolling: true,

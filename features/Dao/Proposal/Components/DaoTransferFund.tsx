@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { TwoInputs } from '../../../components/genial/TwoInputs';
 import { numberWithDecimals } from '../../../../utils/numberValidators';
+import { isDirty } from 'zod';
 
 interface BaseProps {
   client: IdentityserviceQueryClient;
@@ -22,6 +23,7 @@ interface BaseProps {
   error?: string;
   amount?: number | '';
   notCancelable?: boolean;
+  isDirty?: boolean;
 }
 
 interface ReadOnlyProps extends BaseProps {
@@ -55,6 +57,7 @@ export const DaoTransferFund = memo(
     error,
     amount,
     readonly,
+    isDirty,
     ...rest
   }: Props) => {
     const [nameValue, setNameValue] = useState<string>(name ?? '');
@@ -249,7 +252,11 @@ export const DaoTransferFund = memo(
           <Flex mr={2} flexGrow={1}>
             <TwoInputs
               isLoading={isFetching || isFetchingAddress}
-              error={(error || notFoundError) ?? undefined}
+              error={
+                isDirty || nameMemo || addressMemo
+                  ? (error || notFoundError) ?? undefined
+                  : undefined
+              }
               value={[nameMemo, addressMemo]}
               onchange={[onNameValueChange, onChangeAddress]}
             />
@@ -263,8 +270,8 @@ export const DaoTransferFund = memo(
               variant={'outline'}
               width={'202px'}
               height={'100%'}
-              borderColor={'primary.500'}
-              background={'primary.100'}
+              borderColor={'background.500'}
+              background={'background.100'}
               focusBorderColor="darkPurple"
               borderRadius={12}
               color={'purple'}

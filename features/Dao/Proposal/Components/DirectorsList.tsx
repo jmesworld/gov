@@ -113,7 +113,7 @@ export const DaoMembersListItem = ({
   const [mouseEnter, setOnMouseEnter] = useState(false);
   const { cosmWasmClient } = useCosmWasmClientContext();
   const [copied, copyToClipbaord] = useClipboardTimeout();
-  const [green, purple] = useToken('colors', ['green', 'purple']);
+  const [green, purple] = useToken('colors', ['darkGreen', 'purple']);
 
   const identityserviceQueryClient = useMemo(
     () =>
@@ -174,11 +174,7 @@ export const DaoMembersListItem = ({
                 <Tooltip
                   isOpen={copied || undefined}
                   label={
-                    copied ? (
-                      <CopiedText text="Copied Wallet Address" />
-                    ) : (
-                      'Copy wallet address'
-                    )
+                    copied ? <CopiedText text="Copied!" /> : 'Copy address'
                   }
                   hasArrow
                   placement="top"

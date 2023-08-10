@@ -424,7 +424,7 @@ const CreateDaoNewForm = ({
                   width={'100%'}
                   height={'100%'}
                   textAlign="center"
-                  borderColor={'primary.500'}
+                  borderColor={'background.500'}
                   background={totalVotingPower === 100 ? 'purple' : 'red'}
                   focusBorderColor="darkPurple"
                   borderRadius={12}
@@ -503,8 +503,8 @@ const CreateDaoNewForm = ({
               <SliderTrack
                 height={'16px'}
                 borderRadius={'10px'}
-                backgroundColor={'primary.100'}
-                borderColor={'primary.500'}
+                backgroundColor={'background.100'}
+                borderColor={'background.500'}
                 borderWidth={'1px'}
               >
                 <SliderFilledTrack backgroundColor={'green'} />

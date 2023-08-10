@@ -14,11 +14,11 @@ export const defaultThemeObject = {
   },
   colors: {
     skeleton: {
-      100: '#e1dafe',
+      100: '#d6ccfd',
       200: '#afa9c6',
     },
-    primary: {
-      100: 'gba(112,79,247,0.1)',
+    background: {
+      100: '#d6ccfe',
       500: 'rgba(112,79,247,0.5)',
     },
     yellow: '#ffd100',
@@ -29,6 +29,7 @@ export const defaultThemeObject = {
     darkPurple: '#5136C2',
     midnight: '#0F0056',
     green: '#A1F0C4',
+    darkGreen: '#28C66A',
     lilac: '#C6B4FC',
     lightLilac: '#E7E2F8',
     red: '#FF5876',
@@ -69,6 +70,24 @@ export const defaultThemeObject = {
   },
   components: {
     Alert: alertTheme,
+    Radio: {
+      variants: {
+        purple: {
+          control: {
+            borderRadius: 'full',
+            borderWidth: '1px',
+            borderColor: 'purple',
+            backgroundColor: 'gray.100',
+            _checked: {
+              bg: 'purple',
+            },
+          },
+          icon: {
+            color: 'purple',
+          },
+        },
+      },
+    },
     Switch: {
       variants: {
         secondary: {
@@ -79,6 +98,9 @@ export const defaultThemeObject = {
           },
           track: {
             bg: 'gray.100',
+            borderRadius: 'full',
+            borderWidth: '1px',
+            borderColor: 'purple',
             _checked: {
               bg: 'green',
             },

@@ -79,7 +79,8 @@ export const ProposalHeader = ({
           fontWeight="medium"
           fontFamily="DM Sans"
         >
-          Voting ends {timestampToDateTime(proposalExpiry)}
+          Voting {new Date(proposalExpiry) < new Date() ? 'Ended' : 'Ends'}{' '}
+          {timestampToDateTime(proposalExpiry)}
         </Text>
       </HStack>
     </Flex>

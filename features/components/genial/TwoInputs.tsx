@@ -20,8 +20,8 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
   const [isFocused, setIsFocused] = useState<boolean>(false);
   return (
     <InputGroup
-      borderColor={error ? 'red' : 'primary.500'}
-      background={'primary.100'}
+      borderColor={error ? 'red' : 'background.500'}
+      background={'background.100'}
       color={'purple'}
       borderRadius={12}
       borderWidth={isFocused ? 2 : 1}
@@ -62,8 +62,8 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
           width="30%"
           outline="0"
           height={'100%'}
-          borderColor={'primary.500'}
-          background={'primary.100'}
+          borderColor={'background.500'}
+          background={'background.100'}
           borderRadius={0}
           focusBorderColor="darkPurple"
           color={'purple'}
@@ -85,7 +85,7 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
         <Flex
           h="full"
           w="full"
-          background={'primary.100'}
+          background={'background.100'}
           justifyContent="flex-start"
           alignItems="center"
         >
@@ -101,7 +101,7 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
             border={0}
             width="980%"
             height={'100%'}
-            background={'primary.100'}
+            background={'background.100'}
             borderRadius={0}
             color={error && !isLoading ? 'red' : 'purple'}
             fontWeight={'normal'}

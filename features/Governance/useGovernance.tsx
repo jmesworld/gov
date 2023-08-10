@@ -1,5 +1,5 @@
 import { GovernanceQueryClient } from '../../client/Governance.client';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { usePagination } from '../Delegate/hooks/usePagination';
 import {
   useGovernanceCoreSlotsQuery,
@@ -17,10 +17,12 @@ type GovernanceProps = {
   governanceQueryClient: GovernanceQueryClient;
 };
 
+type LoadAll = 'load-all';
 export const useGovernanceProposals = ({
   governanceQueryClient,
   status,
-}: GovernanceProps & { status: ProposalQueryStatus }): {
+  loadAll,
+}: GovernanceProps & { status: ProposalQueryStatus; loadAll?: LoadAll }): {
   data: ProposalsResponse | undefined;
   isLoading: boolean;
   isFetched: boolean;
@@ -34,7 +36,9 @@ export const useGovernanceProposals = ({
   };
 } => {
   const { setTotal, total, limit, offset, page, setPage } = usePagination({});
-
+  const [proposalsData, setProposalData] = useState<
+    ProposalsResponse['proposals']
+  >([]);
   const { data, isLoading, isFetching, isFetched } =
     useGovernanceProposalsQuery({
       client: governanceQueryClient,
@@ -50,6 +54,18 @@ export const useGovernanceProposals = ({
     });
 
   useEffect(() => {
+    if (!data) {
+      return;
+    }
+    if (loadAll === 'load-all') {
+      if (data?.proposals.length === limit) {
+        setProposalData(p => [...p, ...data.proposals]);
+        setPage(p => p + 1);
+      }
+    }
+  }, [data, limit, loadAll, setPage, setTotal, total]);
+
+  useEffect(() => {
     if (!data || !data?.proposal_count) return;
     if (data.proposal_count && total !== data.proposal_count) {
       setTotal(data?.proposal_count);
@@ -57,7 +73,13 @@ export const useGovernanceProposals = ({
   }, [data, setTotal, total]);
 
   return {
-    data,
+    data:
+      loadAll === 'load-all'
+        ? ({
+            proposals: proposalsData,
+            proposal_count: total,
+          } as ProposalsResponse)
+        : data,
     isLoading,
     isFetching,
     isFetched,
