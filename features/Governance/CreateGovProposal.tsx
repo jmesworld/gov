@@ -658,12 +658,14 @@ export default function CreateGovProposal({
                     Feature type:
                   </Text>
                   <RadioGroup
-                    minWidth="100px"
+                    minWidth="150px"
                     value="art-dealer"
                     textColor={'darkPurple'}
                   >
                     <Stack direction="row" spacing={'35px'}>
-                      <Radio value="art-dealer">Art Dealer</Radio>
+                      <Radio variant="purple" size="lg" value="art-dealer">
+                        Art Dealer
+                      </Radio>
                     </Stack>
                   </RadioGroup>
                   <Flex
@@ -723,13 +725,13 @@ export default function CreateGovProposal({
                     textColor={'darkPurple'}
                   >
                     <Stack direction="row" spacing={'35px'}>
-                      <Radio variant="purple" value="brand">
+                      <Radio size="lg" variant="purple" value="brand">
                         Brand
                       </Radio>
-                      <Radio variant="purple" value="core-tech">
+                      <Radio size="lg" variant="purple" value="core-tech">
                         Tech
                       </Radio>
-                      <Radio variant="purple" value="creative">
+                      <Radio size="lg" variant="purple" value="creative">
                         Creative
                       </Radio>
                     </Stack>
