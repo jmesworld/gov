@@ -77,13 +77,23 @@ export const defaultThemeObject = {
             borderRadius: 'full',
             borderWidth: '1px',
             borderColor: 'purple',
-            backgroundColor: 'gray.100',
-            _checked: {
-              bg: 'purple',
+            backgroundColor: 'background.100',
+            _hover: {
+              boxShadow: 'none',
+              backgroundColor: 'transparent',
             },
-          },
-          icon: {
-            color: 'purple',
+            _focus: {
+              boxShadow: 'none',
+              backgroundColor: 'green',
+            },
+
+            _checked: {
+              _hover: {
+                backgroundColor: 'green',
+              },
+              color: 'purple',
+              bg: 'green',
+            },
           },
         },
       },
