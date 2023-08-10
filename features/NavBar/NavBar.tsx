@@ -94,15 +94,10 @@ const NavBar = ({
               }
 
               const query = route.query.tab;
-              if (query === 'funded') {
+              if (query) {
                 return false;
               }
-              if (query === 'core-slots') {
-                return false;
-              }
-              if (query === 'archived') {
-                return false;
-              }
+
               return true;
             }}
           >
@@ -196,11 +191,11 @@ const NavBar = ({
           w="full"
           shouldWrapChildren
           hasArrow
-          label="Concluded proposals"
+          label="Passed and concluded proposals"
         >
           <Link.withStatus
             matchFunc={route => {
-              if (router.route === '/archived') {
+              if (router.route === '/passed') {
                 return true;
               }
               if (router.route !== '/proposals/[id]') {
@@ -208,16 +203,52 @@ const NavBar = ({
               }
 
               const query = route.query.tab;
-              if (query !== 'archived') {
+              if (query !== 'passed') {
                 return false;
               }
               return true;
             }}
-            href="/archived"
+            href="/passed"
           >
             {({ isActive }) => (
               <NavBarItem
-                text="Concluded"
+                text="Passed"
+                isSelected={isActive}
+                onClick={() => {
+                  setSelectedDao('');
+                  setSelectedDaoName('');
+                }}
+              />
+            )}
+          </Link.withStatus>
+        </Tooltip>
+        <Tooltip
+          openDelay={500}
+          w="full"
+          shouldWrapChildren
+          hasArrow
+          label="Expired and concluded proposals"
+        >
+          <Link.withStatus
+            matchFunc={route => {
+              if (router.route === '/expired') {
+                return true;
+              }
+              if (router.route !== '/proposals/[id]') {
+                return false;
+              }
+
+              const query = route.query.tab;
+              if (query !== 'expired') {
+                return false;
+              }
+              return true;
+            }}
+            href="/expired"
+          >
+            {({ isActive }) => (
+              <NavBarItem
+                text="Expired"
                 isSelected={isActive}
                 onClick={() => {
                   setSelectedDao('');

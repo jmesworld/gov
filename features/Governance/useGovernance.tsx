@@ -185,8 +185,15 @@ export const useCoreSlotProposals = ({
   const result = useQueries({
     queries: listOfCoreSlotProposals.map(proposal => ({
       queryKey: ['core_slot', 'proposal', proposal],
-      queryFn: () => governanceQueryClient.proposal({ id: proposal }),
-      enabled: !!proposal,
+      queryFn: async () => {
+        try {
+          return await governanceQueryClient.proposal({ id: proposal });
+        } catch (e) {
+          console.error('e', e);
+          return null;
+        }
+      },
+      enabled: proposal !== undefined,
     })),
   });
   const isLoading = result.some(query => query.isLoading) || loadingCoreSlot;
@@ -205,7 +212,9 @@ export const useCoreSlotProposals = ({
     );
   };
 
-  const isFetched = isFetchedCoreSlot && result.every(query => query.isFetched);
+  const isFetched =
+    isFetchedCoreSlot && result.every(query => query.error || query.isFetched);
+  console.log('isFetched', isFetched, result);
   const error =
     coreSlotError ||
     result
