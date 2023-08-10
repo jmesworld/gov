@@ -3,27 +3,24 @@ import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { useAppState } from '../../contexts/AppStateContext';
 import { useCoinSupplyContext } from '../../contexts/CoinSupply';
 import { getProposalTypeForGovPublicProposals } from '../../utils/proposalUti';
-import { ProposalResponse } from '../../client/Governance.types';
+import {
+  ProposalQueryStatus,
+  ProposalResponse,
+} from '../../client/Governance.types';
 import { useGovernanceProposals } from './useGovernance';
 import GovernanceProposalComponent from './GovernanceProposalComponent';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import GovHeader from './GovHeader';
-import {
-  Flex,
-  Tab,
-  TabIndicator,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-} from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
 type Props = {
   cosmWasmClient: CosmWasmClient;
   setSelectedProposalId: (id: number) => void;
+  status: ProposalQueryStatus;
+  title: string;
+  tab: string;
 };
 // ORDER OF PROPOSAL TYPES
 const proposalTypeOrder = {
@@ -45,9 +42,11 @@ const sortProposalsByType = (a: ProposalResponse, b: ProposalResponse) => {
 const ArchivedGovernanceProposal = ({
   setSelectedProposalId,
   cosmWasmClient,
+  status,
+  title,
+  tab
 }: Props) => {
   const { setSelectedDaoProposalTitle } = useAppState();
-  const [tabIndex, setTabIndex] = useState<number>(0);
 
   const { supply } = useCoinSupplyContext();
   const governanceQueryClient = new GovernanceQueryClient(
@@ -61,16 +60,7 @@ const ArchivedGovernanceProposal = ({
     isFetched: expiredConcludedFetched,
   } = useGovernanceProposals({
     governanceQueryClient,
-    status: 'expired_concluded',
-  });
-
-  const {
-    data: successData,
-    pagination: successPagination,
-    isFetched: successFetched,
-  } = useGovernanceProposals({
-    governanceQueryClient,
-    status: 'success_concluded',
+    status: status,
   });
 
   const expiredConcludedSorted = useMemo(() => {
@@ -80,77 +70,23 @@ const ArchivedGovernanceProposal = ({
     return expiredConcludedData.proposals.sort(sortProposalsByType);
   }, [expiredConcludedData]);
 
-  const successSorted = useMemo(() => {
-    if (!successData) {
-      return [];
-    }
-    return successData.proposals.sort(sortProposalsByType);
-  }, [successData]);
-
   return (
     <>
       <Flex height={'35px'} />
       <GovHeader />
       <Flex height={'46px'} />
-      <Tabs
-        variant="unstyled"
-        padding="0 30px"
-        index={tabIndex}
-        onChange={setTabIndex}
-      >
-        <TabList>
-          <Tab padding="0 0 10px" opacity={0.5} _selected={{ opacity: '1' }}>
-            <Text fontFamily={'DM Sans'} fontWeight="500" fontSize={16}>
-              Expired
-            </Text>
-          </Tab>
-          <Tab
-            padding="0 0 10px"
-            marginLeft="40px"
-            opacity={0.5}
-            _selected={{ opacity: '1' }}
-          >
-            <Text fontFamily={'DM Sans'} fontWeight="500" fontSize={16}>
-              Failed
-            </Text>
-          </Tab>
-        </TabList>
-        <TabIndicator
-          height="2px"
-          mb="20"
-          bg="purple"
-          borderRadius="1px"
-          width="80%"
-        />
-        <TabPanels mt="4">
-          <TabPanel padding={0}>
-            <GovernanceProposalComponent
-              setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-              governanceQueryClient={governanceQueryClient}
-              setSelectedProposalId={setSelectedProposalId}
-              supply={supply as number}
-              pagination={successPagination}
-              proposalTitle={'SUCCESS PROPOSALS'}
-              data={successSorted}
-              fetched={!!successFetched}
-              tab="archived"
-            />
-          </TabPanel>
-          <TabPanel padding={0}>
-            <GovernanceProposalComponent
-              setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-              governanceQueryClient={governanceQueryClient}
-              setSelectedProposalId={setSelectedProposalId}
-              supply={supply as number}
-              pagination={expiredConcludedPagination}
-              proposalTitle={'EXPIRED PROPOSALS'}
-              data={expiredConcludedSorted}
-              fetched={!!expiredConcludedFetched}
-              tab="archived"
-            />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+
+      <GovernanceProposalComponent
+        setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+        governanceQueryClient={governanceQueryClient}
+        setSelectedProposalId={setSelectedProposalId}
+        supply={supply as number}
+        pagination={expiredConcludedPagination}
+        proposalTitle={title}
+        data={expiredConcludedSorted}
+        fetched={!!expiredConcludedFetched}
+        tab={tab}
+      />
     </>
   );
 };

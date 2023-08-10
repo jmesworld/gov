@@ -12,7 +12,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { v4 as uuid } from 'uuid';
-import { AddIcon, QuestionOutlineIcon } from '@chakra-ui/icons';
+import { AddIcon } from '@chakra-ui/icons';
 import { MemberUpdate } from './DaoMembersEdit';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
 import { AutoDistributeAsInt } from '../../../../utils/autoDistribute';

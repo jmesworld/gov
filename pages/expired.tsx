@@ -12,6 +12,9 @@ const Home: NextPageWithLayout = () => {
     <CoinSupplyContextProvider>
       {cosmWasmClient && (
         <ArchivedProposal
+          title="EXPIRED PROPOSALS"
+          tab="expired"
+          status="expired_concluded"
           cosmWasmClient={cosmWasmClient}
           setSelectedProposalId={() => {
             // router.push(`/proposals/${id}`);

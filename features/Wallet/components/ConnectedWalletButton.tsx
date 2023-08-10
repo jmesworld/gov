@@ -57,7 +57,7 @@ export const ConnectedWalletButton = ({
   const { formattedBalance, formattedWithSuffix } = useBalanceContext();
 
   return (
-    <Menu isOpen={isOpen}>
+    <Menu isOpen={isOpen} matchWidth>
       <Flex
         id="id"
         ref={buttonRef as unknown as RefObject<HTMLDivElement>}
@@ -147,14 +147,21 @@ export const ConnectedWalletButton = ({
                   />
                 )}
                 {copied && (
-                  <CheckIcon
-                    width={'14px'}
-                    height={'14px'}
-                    color={green}
-                    style={{
-                      marginLeft: '4px',
-                    }}
-                  />
+                  <Flex
+                    ml="4px"
+                    width={'16px'}
+                    height={'16px'}
+                    justifyContent="center"
+                  >
+                    <CheckIcon
+                      width={'14px'}
+                      height={'14px'}
+                      color={green}
+                      style={{
+                        marginLeft: '4px',
+                      }}
+                    />
+                  </Flex>
                 )}
               </Flex>
             </Tooltip>
@@ -226,6 +233,7 @@ export const ConnectedWalletButton = ({
         display="block"
         pos="relative"
         top="0"
+        w="full"
       />
       <MenuList
         backgroundColor="white"

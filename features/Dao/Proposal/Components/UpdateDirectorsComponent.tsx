@@ -22,7 +22,9 @@ export const UpdateDirectoriesList = ({ client, add, remove }: Props) => {
   const totalVotingPower = useMemo(() => {
     return add.reduce((acc, curr) => acc + curr.weight, 0);
   }, [add]);
-  const emptyFn = useCallback(() => {}, []);
+  const emptyFn = useCallback(() => {
+    // do nothing
+  }, []);
   return (
     <Flex flexDir="column" mt="4">
       <Flex>
