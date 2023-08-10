@@ -10,7 +10,7 @@ export interface Props {
   childrenAtTheBottom?: ReactNode;
   label?: {
     label: string;
-    success: boolean;
+    success: boolean | null;
   };
 }
 
@@ -22,6 +22,16 @@ export const ProposalVoting = ({
   target,
   label,
 }: Props) => {
+  const getBG = (success: boolean | null) => {
+    if (success === null) {
+      return 'yellow';
+    }
+    if (success) {
+      return 'green';
+    }
+    return 'red';
+  };
+
   return (
     <Box borderRadius="12px" background="#7453FD" padding="18px 20px">
       <Flex flexDir="column" align="flex-start">
@@ -41,7 +51,7 @@ export const ProposalVoting = ({
             fontWeight="normal"
             mt="10px"
             ml="10px"
-            bg={label.success ? 'green' : 'red'}
+            bg={getBG(label.success)}
           >
             {label.label}
           </Badge>

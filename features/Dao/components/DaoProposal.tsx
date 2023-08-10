@@ -35,6 +35,8 @@ import { AddIcon } from '@chakra-ui/icons';
 import { CopiedText } from '../../components/genial/CopiedText';
 import CopyIcon from '../../../assets/icons/copy.svg';
 import CheckIcon from '../../../assets/icons/CheckFilled.svg';
+import { usePagination } from '../../Delegate/hooks/usePagination';
+import { SimplePagination } from '../../components/genial/Pagination';
 
 export default function DaoProposal({
   daoAddress,
@@ -79,9 +81,14 @@ export default function DaoProposal({
     [cosmWasmClient],
   );
 
+  const { offset, limit, setPage, page } = usePagination({
+    defaultPage: 1,
+    defaultLimit: 30,
+  });
+
   const { data, isFetching, isLoading } = useDaoMultisigListProposalsQuery({
     client: daoQueryClient,
-    args: { limit: 10000 },
+    args: { startAfter: offset, limit: limit },
     options: {
       queryKey: ['daoDetail', daoAddress],
       refetchInterval: 10000,
@@ -338,6 +345,13 @@ export default function DaoProposal({
               />
             </Flex>
           )}
+          <SimplePagination
+            enabled={page > 1 || (data?.proposals?.length || 0) >= limit}
+            page={page}
+            onPage={setPage}
+            nextPage={(data?.proposals.length || 0) >= limit}
+            prevPage={page !== 1}
+          />
 
           {executed?.length > 0 && (
             <Flex flexDir="column">
