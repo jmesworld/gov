@@ -146,7 +146,7 @@ export const GetProposalDetail = ({ proposal, client }: Props) => {
               variant={'outline'}
               width={'202px'}
               height={'100%'}
-              borderColor={'primary.500'}
+              borderColor={'background.500'}
               background={total / 1e6 > 0 ? 'purple' : 'red'}
               focusBorderColor="darkPurple"
               borderRadius={12}
@@ -220,7 +220,7 @@ export const GetProposalDetail = ({ proposal, client }: Props) => {
         <Text
           fontFamily={'DM Sans'}
           color="purple"
-          fontSize="12px"
+          fontSize="15px"
           fontWeight="bold"
         >
           Feature Type:
@@ -231,7 +231,7 @@ export const GetProposalDetail = ({ proposal, client }: Props) => {
         <Text
           fontFamily={'DM Sans'}
           ml="30px"
-          fontSize="12px"
+          fontSize="15px"
           fontWeight="bold"
         >
           Number of NFT&apos;s to Mint:

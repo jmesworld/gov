@@ -25,7 +25,6 @@ type Props = {
 
 export const SpendDaoFunds = ({ isDirty, client, state, dispatch }: Props) => {
   const spendArr = useMemo(() => Object.values(state.spends), [state.spends]);
-
   const totalAmount = useMemo(() => {
     let votingPowers = 0;
     spendArr.forEach(el => {
@@ -96,7 +95,6 @@ export const SpendDaoFunds = ({ isDirty, client, state, dispatch }: Props) => {
   );
 
   const jmesBalance = useMemo(() => Number(state.balance.jmes), [state]);
-
   return (
     <Flex flexDir="column">
       <Flex width={'798px'} marginTop={'10px'} marginBottom={'25px'}>
@@ -140,6 +138,7 @@ export const SpendDaoFunds = ({ isDirty, client, state, dispatch }: Props) => {
 
       {spendArr.map(spend => (
         <DaoTransferFund
+          isDirty={isDirty}
           notCancelable={spendArr.length === 1}
           key={spend.id}
           id={spend.id}
@@ -162,7 +161,7 @@ export const SpendDaoFunds = ({ isDirty, client, state, dispatch }: Props) => {
         width={'100%'}
         justifyContent="flex-end"
       >
-        <Box width={'202px'} height={'18px'}>
+        <Box width={'202px'} height={'18px'} marginRight={'33px'}>
           <Text fontSize={12}>TOTAL</Text>
         </Box>
       </Flex>
@@ -178,7 +177,7 @@ export const SpendDaoFunds = ({ isDirty, client, state, dispatch }: Props) => {
             variant={'outline'}
             width={'202px'}
             height={'100%'}
-            borderColor={'primary.500'}
+            borderColor={'background.500'}
             background={
               totalAmount <= jmesBalance || !isDirty ? 'purple' : 'red'
             }

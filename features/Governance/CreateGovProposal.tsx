@@ -300,7 +300,7 @@ export default function CreateGovProposal({
           throw new Error('Proposal id not found');
         }
         restForm();
-        navigate(`/dao/view/${selectedDaoName}`);
+        navigate(`/dao/view/${selectedDaoName}/proposals/${id}`);
         return;
       }
       const proposalMsg = {
@@ -373,7 +373,7 @@ export default function CreateGovProposal({
         isClosable: true,
       });
       restForm();
-      navigate(`/dao/view/${selectedDaoName}`);
+      navigate(`/dao/view/${selectedDaoName}/proposals/${id}`);
     } catch (err) {
       handleError(err, 'Proposal creation error', toast);
     }
@@ -522,8 +522,8 @@ export default function CreateGovProposal({
               variant={'outline'}
               width={'full'}
               height={'48px'}
-              borderColor={'primary.500'}
-              background={'primary.100'}
+              borderColor={'background.500'}
+              background={'background.100'}
               focusBorderColor={proposalTitle.error ? 'red' : 'darkPurple'}
               borderRadius={12}
               color={'purple'}
@@ -559,8 +559,8 @@ export default function CreateGovProposal({
               variant={'outline'}
               width={'full'}
               height={'320px'}
-              borderColor={'primary.500'}
-              background={'primary.100'}
+              borderColor={'background.500'}
+              background={'background.100'}
               isInvalid={proposalDescription.error !== ''}
               value={proposalDescription.value}
               errorBorderColor="red"
@@ -600,8 +600,8 @@ export default function CreateGovProposal({
                   width={'full'}
                   height={'50px'}
                   type={'number'}
-                  borderColor={'primary.500'}
-                  background={'primary.100'}
+                  borderColor={'background.500'}
+                  background={'background.100'}
                   focusBorderColor="darkPurple"
                   borderRadius={12}
                   marginTop={'12px'}
@@ -684,7 +684,7 @@ export default function CreateGovProposal({
                     <Input
                       width={'100px'}
                       height={'41px'}
-                      borderColor={'primary.500'}
+                      borderColor={'background.500'}
                       background={'transparent'}
                       type="number"
                       color={'purple'}
@@ -723,9 +723,15 @@ export default function CreateGovProposal({
                     textColor={'darkPurple'}
                   >
                     <Stack direction="row" spacing={'35px'}>
-                      <Radio value="brand">Brand</Radio>
-                      <Radio value="core-tech">Tech</Radio>
-                      <Radio value="creative">Creative</Radio>
+                      <Radio variant="purple" value="brand">
+                        Brand
+                      </Radio>
+                      <Radio variant="purple" value="core-tech">
+                        Tech
+                      </Radio>
+                      <Radio variant="purple" value="creative">
+                        Creative
+                      </Radio>
                     </Stack>
                   </RadioGroup>
                 </Flex>
@@ -753,7 +759,8 @@ export default function CreateGovProposal({
                       </Text>
 
                       <Switch
-                        id="funding-option"
+                        variant="secondary"
+                        color="primary"
                         isChecked={isFundingNeeded}
                         onChange={() => setFundingNeeded(!isFundingNeeded)}
                       />
@@ -783,7 +790,7 @@ export default function CreateGovProposal({
                         <Input
                           width={'100px'}
                           height={'41px'}
-                          borderColor={'primary.500'}
+                          borderColor={'background.500'}
                           background={'transparent'}
                           color={'purple'}
                           value={fundingAmount}
@@ -814,7 +821,7 @@ export default function CreateGovProposal({
                           width={'100px'}
                           height={'41px'}
                           value={fundingPeriod}
-                          borderColor={'primary.500'}
+                          borderColor={'background.500'}
                           background={'transparent'}
                           focusBorderColor="darkPurple"
                           color={'purple'}

@@ -148,12 +148,11 @@ export const DAOProposalPage = ({
     }
     if (
       Object.values(spends).length <= 1 &&
-      Object.values(spends).some(el => el.amount || el.address)
+      Object.values(spends).some(el => el.amount || el.address || el.name)
     ) {
       return true;
     }
   }, [state]);
-
   const [setRouteCheck, navigate] = useLeaveConfirm({
     preventNavigatingAway: !!isDirty,
   });

@@ -40,6 +40,7 @@ import { useVotingPeriodContext } from '../../../contexts/VotingPeriodContext';
 import { getLabel } from '../../../utils/daoProposalUtil';
 import { IdentityserviceQueryClient } from '../../../client/Identityservice.client';
 import { DaoProposalFunding } from '../../Governance/ProposalFunding';
+import { AutoResizeTextarea } from '../../components/genial/ResizableInput';
 
 type Props = {
   selectedDao: string;
@@ -127,6 +128,7 @@ export default function DaoProposalDetail({
 
     return timestamp;
   }, [proposalDetailQuery.data]);
+
   const threshold = useMemo(() => {
     /// @ts-ignore
     return proposalDetailQuery?.data?.threshold?.absolute_count;
@@ -260,24 +262,24 @@ export default function DaoProposalDetail({
             <Text color="purple" mt="4">
               Description
             </Text>
-            <Flex
-              background="rgba(112, 79, 247, 0.1)"
+            <AutoResizeTextarea
+              background="background.100"
               borderRadius="12px"
-              border="1px solid rgba(112, 79, 247, 0.5)"
               padding="14px 16px"
-              marginTop="2"
+              marginTop="10px"
               height="300px"
+              fontSize="16px"
+              fontWeight="normal"
+              color="purple"
+              fontFamily="DM Sans"
+              borderWidth={1}
+              borderStyle="solid"
+              borderColor="background.500"
+              isReadOnly
             >
-              <Text
-                color="purple"
-                ml="10px"
-                fontSize="16px"
-                fontWeight="normal"
-                fontFamily="DM Sans"
-              >
-                {proposalDescription}
-              </Text>
-            </Flex>
+              {proposalDescription}
+            </AutoResizeTextarea>
+
             <ProposalExcuteRawData proposal={proposalDetailQuery.data} />
           </Box>
           <VStack width="330px" spacing="30px" align="flex-start">

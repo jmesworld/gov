@@ -99,7 +99,7 @@ export const UpdateDirectoriesList = ({ client, add, remove }: Props) => {
               variant={'outline'}
               width={'100%'}
               height={'100%'}
-              borderColor={'primary.500'}
+              borderColor={'background.500'}
               background={totalVotingPower === 100 ? 'purple' : 'red'}
               focusBorderColor="darkPurple"
               borderRadius={12}
@@ -108,11 +108,17 @@ export const UpdateDirectoriesList = ({ client, add, remove }: Props) => {
               value={totalVotingPower}
             />
 
-            <InputRightElement height={'100%'}>
+            <InputRightElement
+              width="30%"
+              display="flex"
+              justifyContent="center"
+              height={'100%'}
+            >
               <Text
                 color={'white'}
                 fontFamily="DM Sans"
                 fontSize={16}
+                marginRight={'24px'}
                 fontWeight="normal"
               >
                 %
@@ -149,8 +155,8 @@ export const UpdateDirectoriesList = ({ client, add, remove }: Props) => {
         <SliderTrack
           height={'16px'}
           borderRadius={'10px'}
-          backgroundColor={'primary.100'}
-          borderColor={'primary.500'}
+          backgroundColor={'background.100'}
+          borderColor={'background.500'}
           borderWidth={'1px'}
         >
           <SliderFilledTrack backgroundColor={'green'} />

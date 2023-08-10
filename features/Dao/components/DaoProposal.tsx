@@ -56,7 +56,7 @@ export default function DaoProposal({
 }) {
   const { setSelectedDAOByAddress } = useDAOContext();
   const tooltipRef = useRef(null);
-  const [green, purple] = useToken('colors', ['green', 'purple']);
+  const [green, purple] = useToken('colors', ['darkGreen', 'purple']);
   useEffect(() => {
     setSelectedDAOByAddress(daoAddress);
   }, [daoAddress, setSelectedDAOByAddress]);
@@ -174,7 +174,7 @@ export default function DaoProposal({
               borderRadius={22}
               border={1}
               borderStyle="solid"
-              borderColor="primary.100"
+              borderColor="background.100"
               px="4"
             >
               <Tooltip hasArrow label={daoAddress}>
@@ -187,13 +187,7 @@ export default function DaoProposal({
                 ref={tooltipRef}
                 isOpen={copied || undefined}
                 hasArrow
-                label={
-                  copied ? (
-                    <CopiedText text="Copied DAO Address" />
-                  ) : (
-                    'Copy DAO address'
-                  )
-                }
+                label={copied ? <CopiedText text="Copied!" /> : 'Copy address'}
                 placement="top"
               >
                 <Flex paddingX="4px" width="28px">
@@ -263,7 +257,7 @@ export default function DaoProposal({
           {proposals?.gov?.length > 0 && (
             <Flex flexDir="column" mb="25px">
               <ProposalHeader
-                proposalTitle=" GOVERNANCE PROPOSAL/S"
+                proposalTitle=" GOVERNANCE PROPOSALS"
                 isGov={false}
                 funding
                 minWidth="800px"
@@ -294,7 +288,7 @@ export default function DaoProposal({
             <Flex flexDir="column" mb="25px">
               <ProposalHeader
                 minWidth="800px"
-                proposalTitle=" DAO PROPOSAL/S"
+                proposalTitle=" DAO PROPOSALS"
                 isGov={false}
               />
               <Flex height={'9px'} />
@@ -324,7 +318,7 @@ export default function DaoProposal({
                 my="4"
                 fontSize="xs"
                 autoCapitalize="all"
-                color="textPrimary.100"
+                color="textbackground.100"
                 mb="4"
               >
                 EXECUTED
@@ -359,7 +353,7 @@ export default function DaoProposal({
                 my="4"
                 fontSize="xs"
                 autoCapitalize="all"
-                color="textPrimary.100"
+                color="textbackground.100"
                 mb="4"
               >
                 EXPIRED

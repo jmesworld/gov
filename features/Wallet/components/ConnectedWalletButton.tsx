@@ -18,7 +18,7 @@ import {
 
 import { ConnectedWalletType } from '../../types';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
-import { RefObject, useState } from 'react';
+import React, { RefObject, useState } from 'react';
 import { useDelegateContext } from '../../../contexts/DelegateContext';
 import { useLeaveConfirmContext } from '../../../hooks/useLeaveConfirm';
 import { PromiseModal } from '../../components/genial/PromiseModal';
@@ -41,7 +41,7 @@ export const ConnectedWalletButton = ({
   const { isOpen, onToggle, buttonRef } = useMenu({
     defaultIsOpen: false,
   });
-  const [green, purple] = useToken('colors', ['green', 'purple']);
+  const [green, purple] = useToken('colors', ['darkGreen', 'purple']);
   const handleDisconnect = () => {
     if (preventNavigatingAway && check) {
       PromiseModal({
@@ -122,9 +122,7 @@ export const ConnectedWalletButton = ({
           {mouseEnter || copied ? (
             <Tooltip
               isOpen={copied || undefined}
-              label={
-                copied ? <CopiedText text="Copied address" /> : 'Copy  address'
-              }
+              label={copied ? <CopiedText text="Copied!" /> : 'Copy  address'}
               hasArrow
               onClick={e => {
                 e.preventDefault();
@@ -138,8 +136,10 @@ export const ConnectedWalletButton = ({
                     width={'16px'}
                     height={'16px'}
                     color={purple}
-                    onClick={() => {
+                    onClick={(e: React.MouseEvent) => {
                       copyToClipbaord(address ?? '');
+                      e.preventDefault();
+                      e.stopPropagation();
                     }}
                     style={{
                       marginLeft: '4px',
