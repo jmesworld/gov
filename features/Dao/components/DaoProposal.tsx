@@ -178,7 +178,7 @@ export default function DaoProposal({
               px="4"
             >
               <Tooltip hasArrow label={daoAddress}>
-                <Text mr="2" color="purple">
+                <Text width="250px" mr="2" color="purple">
                   {daoAddress.slice(0, 20)}...{daoAddress.slice(-6)}
                 </Text>
               </Tooltip>

@@ -26,19 +26,37 @@ export const BalanceDisplay = ({ address, asCard }: Props) => {
   return (
     <>
       {(fetchingBalance || loadingBalance) && !balance && (
-        <Flex>
-          <Skeleton h="30px" w="100px" />
-        </Flex>
-      )}
-      {balance && (
-        <Flex>
+        <Flex width={'70px'}>
           <Flex
             borderWidth={asCard ? 1 : 0}
             borderStyle="solid"
             borderColor="bg.100"
             bg={asCard ? 'white' : 'transparent'}
             rounded="full"
-            px={3}
+            pl={3}
+            py={asCard ? 2 : 0}
+            alignItems="center"
+          >
+            <Image
+              src="/Wallet.svg"
+              width={'16px'}
+              height={'16px'}
+              mr="2"
+              alt="Wallet Icon"
+            />
+            <Skeleton rounded="full" h="20px" w="60px" />
+          </Flex>
+        </Flex>
+      )}
+      {balance && (
+        <Flex minW={'70px'}>
+          <Flex
+            borderWidth={asCard ? 1 : 0}
+            borderStyle="solid"
+            borderColor="bg.100"
+            bg={asCard ? 'white' : 'transparent'}
+            rounded="full"
+            pl={3}
             py={asCard ? 2 : 0}
             alignItems="center"
           >
@@ -54,9 +72,11 @@ export const BalanceDisplay = ({ address, asCard }: Props) => {
               placement="top"
               label={formatBalanceWithComma(balanceInJmes)}
             >
-              <Flex alignItems="center" gap="1">
+              <Flex alignItems="center" minWidth="20px" gap="1">
                 <JMESIcon width={'13px'} height={'13px'} />
-                <Text>{formatBalance(balanceInJmes)}</Text>
+                <Text  noOfLines={1} textOverflow="ellipsis">
+                  {formatBalance(balanceInJmes)}
+                </Text>
               </Flex>
             </Tooltip>
           </Flex>

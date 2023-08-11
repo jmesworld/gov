@@ -35,7 +35,10 @@ export const useGovernanceProposals = ({
     total: number;
   };
 } => {
-  const { setTotal, total, limit, offset, page, setPage } = usePagination({});
+  const { setTotal, total, limit, offset, page, setPage } = usePagination({
+    reverse: true,
+  });
+
   const [proposalsData, setProposalData] = useState<
     ProposalsResponse['proposals']
   >([]);
@@ -45,38 +48,44 @@ export const useGovernanceProposals = ({
       args: {
         status: status,
         limit,
-        start: offset,
+        start: offset < 10 ? 10 : offset,
       },
       options: {
         enabled: !!status,
         refetchInterval: 10000,
       },
     });
-
   useEffect(() => {
     if (!data) {
       return;
     }
     if (loadAll === 'load-all') {
-      if (data?.proposals.length === limit) {
+      if (total) {
         setProposalData(p => [...p, ...data.proposals]);
         setPage(p => p + 1);
       }
     }
-  }, [data, limit, loadAll, setPage, setTotal, total]);
-
-  useEffect(() => {
-    if (!data || !data?.proposal_count) return;
     if (data.proposal_count && total !== data.proposal_count) {
       setTotal(data?.proposal_count);
     }
-  }, [data, setTotal, total]);
+  }, [data, limit, loadAll, setPage, setTotal, total]);
+
+  const uniqueProposals = useMemo(() => {
+    if (!proposalsData) return [];
+    const unique = new Map<number, ProposalsResponse['proposals'][0]>();
+    proposalsData.forEach(proposal => {
+      if (!unique.has(proposal.id)) {
+        unique.set(proposal.id, proposal);
+      }
+    });
+    return Array.from(unique.values());
+  }, [proposalsData]);
 
   return {
     data:
       loadAll === 'load-all'
         ? ({
-            proposals: proposalsData,
+            proposals: uniqueProposals,
             proposal_count: total,
           } as ProposalsResponse)
         : data,
@@ -214,7 +223,7 @@ export const useCoreSlotProposals = ({
 
   const isFetched =
     isFetchedCoreSlot && result.every(query => query.error || query.isFetched);
-   const error =
+  const error =
     coreSlotError ||
     result
       .map(query => query.error as Error | null)

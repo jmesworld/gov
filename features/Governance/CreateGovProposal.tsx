@@ -312,7 +312,7 @@ export default function CreateGovProposal({
           amount: Number(fundingAmount),
           title: proposalTitle.value,
           description: proposalDescription.value,
-          duration: convertMonthToBlock(Math.floor(Number(fundingPeriod))), // months to seconds
+          duration: Math.floor(convertMonthToBlock(Number(fundingPeriod))), // months to seconds
           slot: getSlot(slotType) as Governance.CoreSlot,
           revoke_proposal_id: revokeProposalId,
           msgs: [

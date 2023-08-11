@@ -195,7 +195,7 @@ export const ProposalList = ({
           }
           return undefined;
         };
-
+console.log('pROPOSAL',proposal)
         return (
           <ProposalListItem
             daoId={proposal?.dao}
@@ -352,7 +352,7 @@ export const ProposalHeader = ({
       </Flex>
       {(funding || isGov) && (
         <>
-          <Box width={funding ? '15%' : '15%'}>
+          <Box width={funding ? '12%' : '15%'}>
             <Text
               color="rgba(15,0,86,0.8)"
               fontFamily={'DM Sans'}
@@ -577,7 +577,7 @@ export const DaoProposalListItem = ({
         </Flex>
 
         <>
-          <Flex width="15%" alignItems="center" justifyContent="flex-start">
+          <Flex width="12%" alignItems="center" justifyContent="flex-start">
             {!largeSize && (
               <Text
                 color="white"
@@ -597,7 +597,7 @@ export const DaoProposalListItem = ({
                 isDisabled={fundingPerMonth === undefined}
                 hasArrow
               >
-                <Flex alignItems="center">
+                <Flex w="full" alignItems="center">
                   <Image
                     src="/JMES_Icon_white.svg"
                     alt="JMES Icon"
@@ -610,6 +610,8 @@ export const DaoProposalListItem = ({
                     fontWeight="normal"
                     fontSize={14}
                     fontFamily="DM Sans"
+                    noOfLines={1}
+                    textOverflow="ellipsis"
                   >
                     {formatBalanceWithComma(
                       Number(fundingPerMonth ?? 0) || 0,
@@ -620,35 +622,31 @@ export const DaoProposalListItem = ({
               </Tooltip>
             )}
           </Flex>
-          <Box width="15%" justifyContent={'center'}>
+          <Box width="18%" justifyContent={'center'}>
             <Flex pr="3" justifyContent="space-between">
               <Text
                 color="white"
                 fontWeight="normal"
                 fontSize={14}
                 fontFamily="DM Sans"
+                noOfLines={1}
               >
                 {votingDuration}
               </Text>
 
-              <Tooltip label={labelText} hasArrow>
-                <Flex
-                  mt="3px"
-                  py="2px"
-                  p="1"
-                  rounded="full"
-                  fontWeight="normal"
-                  bg={labelColor}
-                  fontSize="10px"
-                  color="black"
-                  textAlign="center"
-                >
-                  {passed === true && <CheckIcon />}
-                  {passed === false && <CloseIcon />}
-                  {passing === 'Passing' && <CheckIcon />}
-                  {passing === 'Failing' && <TimeIcon />}
-                </Flex>
-              </Tooltip>
+              <Badge
+                alignItems="center"
+                display="flex"
+                fontWeight="normal"
+                color="black"
+                rounded="full"
+                px="2"
+                bg={labelColor}
+                fontSize="10px"
+                textAlign="center"
+              >
+                {labelText}
+              </Badge>
             </Flex>
           </Box>
         </>
@@ -889,26 +887,19 @@ export const ProposalListItem = ({
                   {votingDuration}
                 </Text>
                 {(passed !== undefined || label !== undefined) && (
-                  <Tooltip label={labelText} hasArrow>
-                    <Flex
-                      mt="3px"
-                      py="2px"
-                      p="1"
-                      mr="2"
-                      rounded="full"
-                      ml="3"
-                      fontWeight="normal"
-                      bg={labelColor}
-                      fontSize="10px"
-                      color="black"
-                      textAlign="center"
-                    >
-                      {passed && <CheckIcon />}
-                      {passed === false && <CloseIcon />}
-                      {label === 'Passing' && <CheckIcon />}
-                      {label === 'Failing' && <TimeIcon />}
-                    </Flex>
-                  </Tooltip>
+                  <Badge
+                    alignItems="center"
+                    display="flex"
+                    fontWeight="normal"
+                    color="black"
+                    rounded="full"
+                    px="2"
+                    bg={labelColor}
+                    fontSize="10px"
+                    textAlign="center"
+                  >
+                    {labelText}
+                  </Badge>
                 )}
               </Flex>
             </Box>
