@@ -100,7 +100,7 @@ export default function GovernanceProposal({
           setSelectedProposalId={setSelectedProposalId}
           supply={supply as number}
           pagination={undefined}
-          proposalTitle={'NOT CONCLUDED PROPOSALS'}
+          proposalTitle={'EXPIRED PROPOSALS'}
           data={sortedNotConcluded}
           fetched={isFetched}
         />

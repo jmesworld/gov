@@ -76,188 +76,153 @@ const NavBar = ({
         </Text>
       </Flex>
       <Flex flexDir="column" w="full">
-        <Tooltip
-          openDelay={500}
-          w="full"
-          shouldWrapChildren
-          hasArrow
-          label="Active proposals"
-        >
-          <Link.withStatus
-            href="/"
-            matchFunc={route => {
-              if (router.route === '/') {
-                return true;
-              }
-              if (router.route !== '/proposals/[id]') {
-                return false;
-              }
-
-              const query = route.query.tab;
-              if (query) {
-                return false;
-              }
-
+        <Link.withStatus
+          href="/"
+          matchFunc={route => {
+            if (router.route === '/') {
               return true;
-            }}
-          >
-            {({ isActive }) => (
-              <NavBarItem
-                text="Active"
-                isSelected={isActive}
-                onClick={() => {
-                  setSelectedDao('');
-                  setSelectedDaoName('');
-                }}
-              />
-            )}
-          </Link.withStatus>
-        </Tooltip>
-        <Tooltip
-          openDelay={500}
-          w="full"
-          shouldWrapChildren
-          hasArrow
-          label="Funded proposals"
-        >
-          <Link.withStatus
-            matchFunc={route => {
-              if (router.route === '/funded') {
-                return true;
-              }
-              if (router.route !== '/proposals/[id]') {
-                return false;
-              }
+            }
+            if (router.route !== '/proposals/[id]') {
+              return false;
+            }
 
-              const query = route.query.tab;
-              if (query !== 'funded') {
-                return false;
-              }
-              return true;
-            }}
-            href="/funded"
-          >
-            {({ isActive }) => (
-              <NavBarItem
-                text="Funded"
-                isSelected={isActive}
-                onClick={() => {
-                  setSelectedDao('');
-                  setSelectedDaoName('');
-                }}
-              />
-            )}
-          </Link.withStatus>
-        </Tooltip>
-        <Tooltip
-          openDelay={500}
-          w="full"
-          shouldWrapChildren
-          hasArrow
-          label="Core Slot proposals"
-        >
-          <Link.withStatus
-            matchFunc={route => {
-              if (router.route === '/core-slots') {
-                return true;
-              }
-              if (router.route !== '/proposals/[id]') {
-                return false;
-              }
+            const query = route.query.tab;
+            if (query) {
+              return false;
+            }
 
-              const query = route.query.tab;
-              if (query !== 'core-slots') {
-                return false;
-              }
+            return true;
+          }}
+        >
+          {({ isActive }) => (
+            <NavBarItem
+              text="Active"
+              isSelected={isActive}
+              onClick={() => {
+                setSelectedDao('');
+                setSelectedDaoName('');
+              }}
+            />
+          )}
+        </Link.withStatus>
+
+        <Link.withStatus
+          matchFunc={route => {
+            if (router.route === '/funded') {
               return true;
-            }}
-            href="/core-slots"
-          >
-            {({ isActive }) => (
-              <NavBarItem
-                text="Core Slots"
-                isSelected={isActive}
-                onClick={() => {
-                  setSelectedDao('');
-                  setSelectedDaoName('');
-                }}
-              />
-            )}
-          </Link.withStatus>
-        </Tooltip>
+            }
+            if (router.route !== '/proposals/[id]') {
+              return false;
+            }
+
+            const query = route.query.tab;
+            if (query !== 'funded') {
+              return false;
+            }
+            return true;
+          }}
+          href="/funded"
+        >
+          {({ isActive }) => (
+            <NavBarItem
+              text="Funded"
+              isSelected={isActive}
+              onClick={() => {
+                setSelectedDao('');
+                setSelectedDaoName('');
+              }}
+            />
+          )}
+        </Link.withStatus>
+
+        <Link.withStatus
+          matchFunc={route => {
+            if (router.route === '/core-slots') {
+              return true;
+            }
+            if (router.route !== '/proposals/[id]') {
+              return false;
+            }
+
+            const query = route.query.tab;
+            if (query !== 'core-slots') {
+              return false;
+            }
+            return true;
+          }}
+          href="/core-slots"
+        >
+          {({ isActive }) => (
+            <NavBarItem
+              text="Core Slots"
+              isSelected={isActive}
+              onClick={() => {
+                setSelectedDao('');
+                setSelectedDaoName('');
+              }}
+            />
+          )}
+        </Link.withStatus>
+
         <Divider my="2" />
-        <Tooltip
-          openDelay={500}
-          w="full"
-          shouldWrapChildren
-          hasArrow
-          label="Passed proposals"
-        >
-          <Link.withStatus
-            matchFunc={route => {
-              if (router.route === '/passed') {
-                return true;
-              }
-              if (router.route !== '/proposals/[id]') {
-                return false;
-              }
 
-              const query = route.query.tab;
-              if (query !== 'passed') {
-                return false;
-              }
+        <Link.withStatus
+          matchFunc={route => {
+            if (router.route === '/passed') {
               return true;
-            }}
-            href="/passed"
-          >
-            {({ isActive }) => (
-              <NavBarItem
-                text="Passed"
-                isSelected={isActive}
-                onClick={() => {
-                  setSelectedDao('');
-                  setSelectedDaoName('');
-                }}
-              />
-            )}
-          </Link.withStatus>
-        </Tooltip>
-        <Tooltip
-          openDelay={500}
-          w="full"
-          shouldWrapChildren
-          hasArrow
-          label="Expired proposals"
-        >
-          <Link.withStatus
-            matchFunc={route => {
-              if (router.route === '/expired') {
-                return true;
-              }
-              if (router.route !== '/proposals/[id]') {
-                return false;
-              }
+            }
+            if (router.route !== '/proposals/[id]') {
+              return false;
+            }
 
-              const query = route.query.tab;
-              if (query !== 'expired') {
-                return false;
-              }
+            const query = route.query.tab;
+            if (query !== 'passed') {
+              return false;
+            }
+            return true;
+          }}
+          href="/passed"
+        >
+          {({ isActive }) => (
+            <NavBarItem
+              text="Passed"
+              isSelected={isActive}
+              onClick={() => {
+                setSelectedDao('');
+                setSelectedDaoName('');
+              }}
+            />
+          )}
+        </Link.withStatus>
+
+        <Link.withStatus
+          matchFunc={route => {
+            if (router.route === '/expired') {
               return true;
-            }}
-            href="/expired"
-          >
-            {({ isActive }) => (
-              <NavBarItem
-                text="Expired"
-                isSelected={isActive}
-                onClick={() => {
-                  setSelectedDao('');
-                  setSelectedDaoName('');
-                }}
-              />
-            )}
-          </Link.withStatus>
-        </Tooltip>
+            }
+            if (router.route !== '/proposals/[id]') {
+              return false;
+            }
+
+            const query = route.query.tab;
+            if (query !== 'expired') {
+              return false;
+            }
+            return true;
+          }}
+          href="/expired"
+        >
+          {({ isActive }) => (
+            <NavBarItem
+              text="Expired"
+              isSelected={isActive}
+              onClick={() => {
+                setSelectedDao('');
+                setSelectedDaoName('');
+              }}
+            />
+          )}
+        </Link.withStatus>
       </Flex>
       <Box height={'27px'} />
       <Flex
