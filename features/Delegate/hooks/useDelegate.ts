@@ -29,11 +29,11 @@ export const useDelegate = () => {
   const { balance, refresh } = useBalanceContext();
   const totalJmes = useMemo(
     () => parseInt((balance?.jmes ?? 0).toString() ?? 0),
-    [balance?.jmes],
+    [balance],
   );
   const totalBondedJmes = useMemo(
     () => parseInt((balance?.bJmes ?? 0).toString() ?? 0),
-    [balance?.bJmes],
+    [balance],
   );
 
   const { address } = useIdentityContext();
@@ -125,26 +125,29 @@ export const useDelegate = () => {
     });
   }, [bonding, totalBondedJmes, totalJmes]);
 
-  const onChangeSlider = (sliderValue: number) => {
-    setTransferForm(p => {
-      const jmesValue = bonding
-        ? (totalJmes / 100) * (100 - sliderValue)
-        : totalJmes + (totalBondedJmes / 100) * sliderValue;
-      const bJmesValue = bonding
-        ? (totalJmes / 100) * sliderValue + totalBondedJmes
-        : (totalBondedJmes / 100) * (100 - sliderValue);
-      const value = bonding
-        ? bJmesValue - totalBondedJmes
-        : jmesValue - totalJmes;
-      return {
-        ...p,
-        jmesValue: Number(jmesValue.toFixed(0)),
-        bJmesValue: Number(bJmesValue.toFixed(0)),
-        valueToMove: Number(value.toFixed(0)),
-        sliderValue,
-      };
-    });
-  };
+  const onChangeSlider = useCallback(
+    (sliderValue: number) => {
+      setTransferForm(p => {
+        const jmesValue = bonding
+          ? (totalJmes / 100) * (100 - sliderValue)
+          : totalJmes + (totalBondedJmes / 100) * sliderValue;
+        const bJmesValue = bonding
+          ? (totalJmes / 100) * sliderValue + totalBondedJmes
+          : (totalBondedJmes / 100) * (100 - sliderValue);
+        const value = bonding
+          ? bJmesValue - totalBondedJmes
+          : jmesValue - totalJmes;
+        return {
+          ...p,
+          jmesValue: Number(jmesValue.toFixed(0)),
+          bJmesValue: Number(bJmesValue.toFixed(0)),
+          valueToMove: Number(value.toFixed(0)),
+          sliderValue,
+        };
+      });
+    },
+    [bonding, totalBondedJmes, totalJmes],
+  );
 
   const onValueChange = useCallback(
     (val: string) => {
@@ -225,13 +228,6 @@ export const useDelegate = () => {
           /// @ts-ignore ( Issue with different type)
           'auto',
         );
-
-        toast({
-          title: 'Bonded Tokens',
-          status: 'success',
-          variant: 'custom',
-          isClosable: true,
-        });
       } else {
         if (!selectedUnBonding) {
           return;
@@ -244,18 +240,26 @@ export const useDelegate = () => {
           /// @ts-ignore ( Issue with different type)
           'auto',
         );
-        toast({
-          title: 'Unbonded Tokens',
-          status: 'success',
-          isClosable: true,
-          variant: 'custom',
-        });
       }
+      setTransferForm(p => ({
+        ...p,
+        valueToMove: 0,
+        sliderValue: sliderDefaultValue,
+      }));
+      setBondingState(p => ({
+        ...p,
+        delegatingToken: false,
+      }));
+      await refresh();
       await refetchUnBondValidators();
       await refetchBondValidators();
       await refetchMyUnBondingsValidators();
-      await refresh();
-      onChangeSlider(sliderDefaultValue);
+      toast({
+        title: `Tokens ${bonding ? 'Bonded' : 'Unbonded'}!`,
+        status: 'success',
+        isClosable: true,
+        variant: 'custom',
+      });
     } catch (err) {
       handleError(
         err,
@@ -263,17 +267,6 @@ export const useDelegate = () => {
         toast,
       );
     }
-    setTransferForm(p => ({
-      ...p,
-      jmesValue: Number(totalJmes.toFixed(0)),
-      bJmesValue: Number(totalBondedJmes.toFixed(0)),
-      valueToMove: 0,
-      sliderValue: sliderDefaultValue,
-    }));
-    setBondingState(p => ({
-      ...p,
-      delegatingToken: false,
-    }));
   }, [
     isMovingNotValid,
     bondingIsValid,
@@ -284,13 +277,10 @@ export const useDelegate = () => {
     refetchBondValidators,
     refetchMyUnBondingsValidators,
     refresh,
-    onChangeSlider,
     selectedValidator,
     signingCosmWasmClient,
     valueToMove,
     selectedUnBonding,
-    totalJmes,
-    totalBondedJmes,
   ]);
 
   return {

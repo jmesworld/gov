@@ -174,12 +174,8 @@ export const Delegate = ({ onClose }: Props) => {
                         color="white"
                         value={
                           bonding
-                            ? jmesValue > 0
-                              ? jmesValue
-                              : 0
-                            : totalJmes + totalBondedJmes < jmesValue
-                            ? 0
-                            : jmesValue
+                            ? totalJmes - (valueToMove || 0)
+                            : totalJmes + (valueToMove || 0)
                         }
                         fontFamily={'DM Sans'}
                         fontWeight="700"
@@ -306,18 +302,21 @@ export const Delegate = ({ onClose }: Props) => {
                       textAlign="center"
                       marginBottom="12px"
                     >
-                      {bonding && `Total JMES: ${totalJmes}`}
-                      {!bonding && `Total bJMES: ${totalBondedJmes}`}
+                      {bonding && `Total JMES: ${Math.max(0, totalJmes - 1)}`}
+                      {!bonding &&
+                        `Total bJMES: ${Math.max(0, totalBondedJmes - 1)}`}
                       <Button
                         size="xs"
                         ml="1"
                         color="purple"
                         onClick={e => {
                           if (bonding) {
-                            onValueChange(String(totalJmes));
+                            onValueChange(String(Math.max(0, totalJmes - 1)));
                             return;
                           }
-                          onValueChange(String(totalBondedJmes));
+                          onValueChange(
+                            String(Math.max(0, totalBondedJmes - 1)),
+                          );
                           e.preventDefault();
                           e.stopPropagation();
                         }}
@@ -472,7 +471,7 @@ export const Delegate = ({ onClose }: Props) => {
                 >
                   Bonding JMES carries the risk of slashing. This means you
                   could lose some or all of your tokens. Do your own research
-                  and only use bonding if you understand the consequences.
+                  before deciding to bond JMES.
                 </Text>
               </Box>
               <Box

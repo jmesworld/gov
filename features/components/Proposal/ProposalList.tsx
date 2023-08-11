@@ -195,7 +195,6 @@ export const ProposalList = ({
           }
           return undefined;
         };
-console.log('pROPOSAL',proposal)
         return (
           <ProposalListItem
             daoId={proposal?.dao}
