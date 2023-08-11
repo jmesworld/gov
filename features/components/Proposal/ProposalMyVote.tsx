@@ -185,8 +185,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                 .then(() => props.refetch())
                 .then(() => {
                   toast({
-                    title: 'Vote submitted.',
-                    description: "We've submitted your Vote.",
+                    title: 'Thank you for your vote!',
                     status: 'success',
                     variant: 'custom',
                     duration: 9000,
@@ -243,8 +242,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
                 .then(() => props.refetch())
                 .then(() => {
                   toast({
-                    title: 'Vote submitted.',
-                    description: "We've submitted your Vote.",
+                    title: 'Thank you for your vote!',
                     status: 'success',
                     variant: 'custom',
                     duration: 9000,

@@ -18,6 +18,7 @@ import { getFormattedSlotType } from '../../../../utils/coreSlotType';
 import { DaoTransferFund } from './DaoTransferFund';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
 import { UpdateDirectoriesList } from './UpdateDirectorsComponent';
+import { formatBalanceWithComma } from '../../../../hooks/useAccountBalance';
 
 type Props = {
   proposal?: ProposalResponseForEmpty;
@@ -237,7 +238,7 @@ export const GetProposalDetail = ({ proposal, client }: Props) => {
           Number of NFT&apos;s to Mint:
         </Text>
         <Text fontFamily={'DM Sans'} ml="5px" color="purple">
-          {NFTTomMint}
+          {formatBalanceWithComma(NFTTomMint, 0)}
         </Text>
       </Flex>
     );

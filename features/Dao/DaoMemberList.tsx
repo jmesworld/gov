@@ -39,7 +39,7 @@ export default function DaoMembersList({
     client: daoMultisigQueryClient,
     args: {},
   });
-
+  console.log('DATA', data);
   return (
     <Box width={'265px'} minWidth="185px" marginLeft={'41px'}>
       <Flex height={'20px'} />
@@ -87,8 +87,6 @@ export const MembersList = ({
   members: VoterDetail[];
   setSelectedDaoMembersList: Function;
 }) => {
-  const totalWeight = members?.reduce((acc, o) => acc + o.weight, 0);
-
   const membersList = members
     ?.sort((a, b) => b.weight - a.weight)
     .map(member => {
@@ -97,7 +95,7 @@ export const MembersList = ({
         <DaoMembersListItem
           key={member.addr}
           address={member.addr}
-          weightPercent={(weight / totalWeight) * 100}
+          weightPercent={weight}
           members={members}
           setSelectedDaoMembersList={setSelectedDaoMembersList}
         />

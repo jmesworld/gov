@@ -80,8 +80,6 @@ export const MembersList = ({
     weight: number;
   }[];
 }) => {
-  const totalWeight = members?.reduce((acc: number, o) => acc + o.weight, 0);
-
   return (
     <ul>
       {members?.map(member => {
@@ -93,7 +91,7 @@ export const MembersList = ({
             }
             key={member.voter}
             address={member.voter}
-            weightPercent={(weight / totalWeight) * 100}
+            weightPercent={weight}
           />
         );
       })}
