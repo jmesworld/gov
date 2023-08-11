@@ -214,8 +214,7 @@ export const useCoreSlotProposals = ({
 
   const isFetched =
     isFetchedCoreSlot && result.every(query => query.error || query.isFetched);
-  console.log('isFetched', isFetched, result);
-  const error =
+   const error =
     coreSlotError ||
     result
       .map(query => query.error as Error | null)
