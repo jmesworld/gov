@@ -90,10 +90,10 @@ const BalanceContextProvider = ({ children }: Props) => {
       return undefined;
     }
     const jmes = formatBalance(
-      data.jmes?.amount.dividedBy(1e6).toDecimalPlaces(1).toNumber() ?? 0,
+      data.jmes?.amount.dividedBy(1e6).toDecimalPlaces(6).toNumber() ?? 0,
     );
     const bJmes = formatBalance(
-      data.bJmes?.amount.dividedBy(1e6).toDecimalPlaces(1).toNumber() ?? 0,
+      data.bJmes?.amount.dividedBy(1e6).toDecimalPlaces(6).toNumber() ?? 0,
     );
     return {
       jmes: String(jmes),

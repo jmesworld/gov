@@ -93,7 +93,6 @@ const CreateDaoNewForm = ({
   });
 
   const membersArr = useMemo(() => Object.values(members), [members]);
-
   useEffect(() => {
     if (Object.keys(members).length !== 0) {
       return;
@@ -134,10 +133,14 @@ const CreateDaoNewForm = ({
     [cosmWasmClient],
   );
 
-  const idClient: IdentityserviceClient = new IdentityserviceClient(
-    signingClient as SigningCosmWasmClient,
-    address as string,
-    IDENTITY_SERVICE_CONTRACT,
+  const idClient: IdentityserviceClient = useMemo(
+    () =>
+      new IdentityserviceClient(
+        signingClient as SigningCosmWasmClient,
+        address as string,
+        IDENTITY_SERVICE_CONTRACT,
+      ),
+    [address, signingClient],
   );
 
   const registerDaoMutation = useIdentityserviceRegisterDaoMutation();
@@ -176,30 +179,15 @@ const CreateDaoNewForm = ({
     },
     [membersArr],
   );
-  const onAddress = useCallback(
-    (id: string, value?: string | null) => {
-      // TODO: move this to reducer
-      const member = membersArr.find(el => el.id === id);
-      const addressInArr = membersArr.find(
-        el => el.address === value && el.id !== id,
-      );
-
-      dispatch({
-        type: 'SET_VALUE',
-        payload: {
-          id,
-          address: value,
-          error:
-            addressInArr &&
-            member?.name === addressInArr.name &&
-            addressInArr.error === undefined
-              ? 'Address already exists'
-              : undefined,
-        },
-      });
-    },
-    [membersArr],
-  );
+  const onAddress = useCallback((id: string, value?: string | null) => {
+    dispatch({
+      type: 'SET_VALUE',
+      payload: {
+        id,
+        address: value,
+      },
+    });
+  }, []);
   const onErrorChange = useCallback(
     (id: string, error?: string) => {
       dispatch({
@@ -425,8 +413,7 @@ const CreateDaoNewForm = ({
                   height={'100%'}
                   textAlign="center"
                   borderColor={'background.500'}
-                  background={totalVotingPower === 100 ? 'purple' : 'red'}
-                  focusBorderColor="darkPurple"
+                  borderEndColor={totalVotingPower === 100 ? 'purple' : 'red'}
                   borderRadius={12}
                   color={'white'}
                   fontWeight={'normal'}

@@ -25,7 +25,7 @@ import {
 } from '../../client/DaoMultisig.client';
 import { useDaoMultisigProposeMutation } from '../../client/DaoMultisig.react-query';
 import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-
+import { NumericFormat } from 'react-number-format';
 import { ProposalType } from '../components/Proposal/ProposalType';
 import { toBase64 } from '../../utils/identity';
 import * as Governance from '../../client/Governance.types';
@@ -403,7 +403,7 @@ export default function CreateGovProposal({
   const onNumberOfNFTToMintChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const value = e.target.value;
+    const value = e.target.value.replace(/,/g, '');
     if (numberWithDecimals(6).safeParse(value).success) {
       setNumberOfNFTToMint(Number(value));
     }
@@ -415,7 +415,7 @@ export default function CreateGovProposal({
   };
 
   const onFundingAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    const value = e.target.value.replaceAll(/,/g, '');
     if (numberWithNoDecimals.safeParse(value).success) {
       setFundingAmount(Number(value));
     }
@@ -683,12 +683,15 @@ export default function CreateGovProposal({
                     >
                       Number of NFT’s to Mint
                     </Text>
-                    <Input
+                    <NumericFormat
+                      customInput={Input}
+                      thousandSeparator
+                      displayType="input"
+                      decimalScale={6}
                       width={'100px'}
                       height={'41px'}
                       borderColor={'background.500'}
                       background={'transparent'}
-                      type="number"
                       color={'purple'}
                       value={numberOfNFTToMint}
                       onChange={onNumberOfNFTToMintChange}
@@ -789,7 +792,8 @@ export default function CreateGovProposal({
                         >
                           Please pay me
                         </Text>
-                        <Input
+                        <NumericFormat
+                          customInput={Input}
                           width={'100px'}
                           height={'41px'}
                           borderColor={'background.500'}
@@ -801,10 +805,12 @@ export default function CreateGovProposal({
                           border="none"
                           borderBottom="1px solid"
                           borderRadius="0"
+                          thousandSeparator
                           px="0px"
                           mx="10px"
                           textAlign={'center'}
-                          type={'number'}
+                          inputMode="numeric"
+                          displayType="input"
                           _focus={{
                             boxShadow: 'none',
                             borderBottom: '1px solid',

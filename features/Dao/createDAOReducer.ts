@@ -62,6 +62,12 @@ export function Reducer(state: State, action: Actions): State {
       if (!member) {
         return state;
       }
+      const findMemberWithSameAddress = Object.values(state.members).find(
+        m => m.address === action.payload.address && m.id !== member.id,
+      );
+      const error = findMemberWithSameAddress
+        ? 'Address already exists'
+        : undefined;
       return {
         ...state,
         members: {
@@ -69,6 +75,7 @@ export function Reducer(state: State, action: Actions): State {
           [member.id]: {
             ...member,
             ...action.payload,
+            error,
           },
         },
       };

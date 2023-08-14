@@ -56,18 +56,40 @@ const formatWithSuffix = (value: number, decimalPlaces = 2) => {
   const suffixes = ['', 'k', 'm', 'b', 't'];
 
   const base = Math.floor(Math.log10(Math.abs(value)) / 3);
-  if (base < 0) return value.toFixed(decimalPlaces);
+  if (base < 0)
+    return value.toLocaleString(undefined, {
+      minimumFractionDigits: decimalPlaces,
+      maximumFractionDigits: decimalPlaces,
+      /// @ts-ignore
+      roundingMode: 'trunc',
+    });
   const suffix = suffixes[base > 0 ? base : 0];
-  if (!suffix) return value;
-  const scaledValue = value / 1e3;
+  if (!suffix) {
+    return value.toLocaleString(undefined, {
+      minimumFractionDigits: decimalPlaces,
+      maximumFractionDigits: decimalPlaces,
+      /// @ts-ignore
+      roundingMode: 'trunc',
+    });
+  }
+  const scaledValue = value / Math.pow(10, base * 3);
   const formattedValue =
     Math.floor(scaledValue * 10 ** decimalPlaces) / 10 ** decimalPlaces;
 
   return `${formattedValue}${suffix}`;
 };
 
-export function formatBalanceWithComma(balance: number, decimalPlaces = 6) {
+export function formatBalanceWithComma(
+  balance: number | string,
+  decimalPlaces = 6,
+  minDecimalPlaces: number | undefined = undefined,
+) {
+  minDecimalPlaces = minDecimalPlaces ?? decimalPlaces;
+  if (typeof balance === 'string') {
+    balance = parseFloat(balance);
+  }
   if (balance === 0) return '0';
+
   const coin = new Core.Coin(JMES_DENOM, balance);
   return (
     coin.amount
@@ -75,7 +97,9 @@ export function formatBalanceWithComma(balance: number, decimalPlaces = 6) {
       .toNumber()
       .toLocaleString(undefined, {
         maximumFractionDigits: decimalPlaces,
-        minimumFractionDigits: decimalPlaces,
+        minimumFractionDigits: minDecimalPlaces,
+        /// @ts-ignore
+        roundingMode: 'trunc',
       }) ?? '0'
   );
 }

@@ -246,10 +246,7 @@ export const useDelegate = () => {
         valueToMove: 0,
         sliderValue: sliderDefaultValue,
       }));
-      setBondingState(p => ({
-        ...p,
-        delegatingToken: false,
-      }));
+
       await refresh();
       await refetchUnBondValidators();
       await refetchBondValidators();
@@ -266,6 +263,11 @@ export const useDelegate = () => {
         `Error  ${bonding ? 'delegating' : 'undelegating'} Tokens.`,
         toast,
       );
+    } finally {
+      setBondingState(p => ({
+        ...p,
+        delegatingToken: false,
+      }));
     }
   }, [
     isMovingNotValid,

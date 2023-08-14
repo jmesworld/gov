@@ -14,6 +14,7 @@ import {
 import { TwoInputs } from '../../../components/genial/TwoInputs';
 import { numberWithDecimals } from '../../../../utils/numberValidators';
 import { isDirty } from 'zod';
+import { NumericFormat } from 'react-number-format';
 
 interface BaseProps {
   client: IdentityserviceQueryClient;
@@ -235,7 +236,7 @@ export const DaoTransferFund = memo(
     }, [readonly, name, nameValue, address, addressValue]);
 
     const onChangeAmount = (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
+      const value = e.target.value.replace(/,/g, '');
       if (numberWithDecimals(6).safeParse(value).success) {
         !readonly &&
           rest.onAmountChange &&
@@ -266,7 +267,11 @@ export const DaoTransferFund = memo(
             height={'48px'}
             marginRight={notCancelable ? '34px' : readonly ? '0px' : '16px'}
           >
-            <Input
+            <NumericFormat
+              customInput={Input}
+              paddingLeft={'32px'}
+              decimalScale={6}
+              thousandSeparator
               variant={'outline'}
               width={'202px'}
               height={'100%'}
@@ -277,7 +282,6 @@ export const DaoTransferFund = memo(
               color={'purple'}
               fontWeight={'normal'}
               value={amount}
-              type={'number'}
               onChange={onChangeAmount}
             />
 
@@ -285,9 +289,9 @@ export const DaoTransferFund = memo(
               <Image
                 src="/JMES_Icon.svg"
                 alt="JMES Icon"
-                width={4}
-                mr={1}
-                height={4}
+                width={'16px'}
+                mr={'4px'}
+                height={'16px'}
               />
             </InputLeftElement>
           </InputGroup>

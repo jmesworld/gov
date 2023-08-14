@@ -32,6 +32,8 @@ import { useDelegate } from './hooks/useDelegate';
 import { UnBondValidatorTable } from './unbond-validator-table';
 import { useIdentityContext } from '../../contexts/IdentityContext';
 import { numberWithDecimals } from '../../utils/numberValidators';
+import { formatBalanceWithComma } from '../../hooks/useAccountBalance';
+import { NumericFormat } from 'react-number-format';
 
 type Props = {
   onClose: () => void;
@@ -67,6 +69,15 @@ export const Delegate = ({ onClose }: Props) => {
     isLoadingUnBondings,
     onValueChange,
   } = useDelegate();
+  const balanceWhenMoved = useMemo(() => {
+    const balance = bonding
+      ? totalJmes - (valueToMove || 0)
+      : totalJmes + (valueToMove || 0);
+    if (balance > 0) {
+      return balance;
+    }
+    return 0;
+  }, [bonding, totalJmes, valueToMove]);
   const numberValueToMove = Number(valueToMove) || 0;
   const delegateButtonEnabled = useMemo(() => {
     const selected = bonding ? selectedValidator : selectedUnBonding;
@@ -85,11 +96,10 @@ export const Delegate = ({ onClose }: Props) => {
     onClose();
     return null;
   }
-
   const onValueToMoveChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    const value = e.target.value.replace(/,/g, '');
     if (numberWithDecimals(6).safeParse(value).success) {
-      onValueChange(e.target.value);
+      onValueChange(value);
     }
     if (value === '') {
       onValueChange('');
@@ -172,11 +182,7 @@ export const Delegate = ({ onClose }: Props) => {
                         readOnly
                         bg="transparent"
                         color="white"
-                        value={
-                          bonding
-                            ? totalJmes - (valueToMove || 0)
-                            : totalJmes + (valueToMove || 0)
-                        }
+                        value={formatBalanceWithComma(balanceWhenMoved, 0)}
                         fontFamily={'DM Sans'}
                         fontWeight="700"
                         fontSize={28}
@@ -269,15 +275,16 @@ export const Delegate = ({ onClose }: Props) => {
                       >
                         {bonding ? 'JMES to Bond' : 'bJMES to unbond'}
                       </Text>
-
-                      <Input
+                      <NumericFormat
+                        decimalScale={6}
+                        thousandSeparator
+                        customInput={Input}
                         isInvalid={
                           bonding
                             ? numberValueToMove > totalJmes
                             : numberValueToMove > totalBondedJmes
                         }
                         errorBorderColor="red"
-                        type="number"
                         onChange={onValueToMoveChange}
                         bg="transparent"
                         color="white"
@@ -452,8 +459,9 @@ export const Delegate = ({ onClose }: Props) => {
                       width={'9px'}
                       height={'10px'}
                       marginLeft="8px"
+                      marginRight={'4px'}
                     />
-                    {numberValueToMove}
+                    {formatBalanceWithComma(numberValueToMove, 6, 0)}
                   </Text>
                 </Button>
                 <Text

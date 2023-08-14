@@ -176,7 +176,7 @@ export interface GovernanceProposalsQuery<TData>
   extends GovernanceReactQuery<ProposalsResponse, TData> {
   args: {
     limit?: number;
-    start?: number;
+    startBefore?: number;
     status: ProposalQueryStatus;
   };
 }
@@ -191,7 +191,7 @@ export function useGovernanceProposalsQuery<TData = ProposalsResponse>({
       client
         ? client.proposals({
             limit: args.limit,
-            start: args.start,
+            startBefore: args.startBefore,
             status: args.status,
           })
         : Promise.reject(new Error('Invalid client')),

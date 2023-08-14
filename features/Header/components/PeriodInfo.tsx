@@ -218,7 +218,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                {timestampToDateTime(current_posting_start as number)}
+                {timestampToDateTime((current_posting_start as number) * 1e3)}
               </Text>
             </Flex>
             <Divider
@@ -270,7 +270,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                {timestampToDateTime(current_voting_start as number)}
+                {timestampToDateTime((current_voting_start as number) * 1e3)}
               </Text>
             </Flex>
             <Divider
@@ -296,7 +296,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                {timestampToDateTime(current_voting_end as number)}
+                {timestampToDateTime((current_voting_end as number) * 1e3)}
               </Text>
             </Flex>
             <Divider
@@ -348,7 +348,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                {timestampToDateTime(next_posting_start as number)}
+                {timestampToDateTime((next_posting_start as number) * 1e3)}
               </Text>
             </Flex>
             <Divider
@@ -374,7 +374,7 @@ export default function PeriodInfo() {
                 fontFamily="DM Sans"
                 fontSize={12}
               >
-                {timestampToDateTime(next_voting_start as number)}
+                {timestampToDateTime((next_voting_start as number) * 1e3)}
               </Text>
             </Flex>
             <Divider

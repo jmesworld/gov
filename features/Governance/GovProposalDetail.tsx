@@ -120,8 +120,8 @@ export default function GovProposalDetail({
     }
     if (periodData.current_period === 'posting') {
       return (
-        periodData.current_block >=
-        data?.start_block + periodData?.voting_period_length / 5
+        periodData.current_block - periodData.current_time_in_cycle / 5 >
+        data?.start_block
       );
     }
     return (

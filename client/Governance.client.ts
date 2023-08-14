@@ -56,11 +56,11 @@ export interface GovernanceReadOnlyInterface {
   proposal: ({ id }: { id: number }) => Promise<ProposalResponse>;
   proposals: ({
     limit,
-    start,
+    startBefore,
     status,
   }: {
     limit?: number;
-    start?: number;
+    startBefore?: number;
     status: ProposalQueryStatus;
   }) => Promise<ProposalsResponse>;
   coreSlots: () => Promise<CoreSlotsResponse>;
@@ -100,17 +100,17 @@ export class GovernanceQueryClient implements GovernanceReadOnlyInterface {
   };
   proposals = async ({
     limit,
-    start,
+    startBefore,
     status,
   }: {
     limit?: number;
-    start?: number;
+    startBefore?: number;
     status: ProposalQueryStatus;
   }): Promise<ProposalsResponse> => {
     return this.client.queryContractSmart(this.contractAddress, {
       proposals: {
         limit,
-        start,
+        start_before: startBefore,
         status,
       },
     });

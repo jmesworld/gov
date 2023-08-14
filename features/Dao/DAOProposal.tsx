@@ -42,6 +42,7 @@ import { useAccountBalance } from '../../hooks/useAccountBalance';
 import { ClosePageButton } from '../components/genial/ClosePageButton';
 import { ChevronRightIcon } from '@chakra-ui/icons';
 import { handleError } from '../../error/hanldeErrors';
+import { fee } from '../../utils/fee';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -187,7 +188,6 @@ export const DAOProposalPage = ({
     }
     fetchConfig();
   }, [daoClient]);
-
   const daoMembersAddress = daoMultisigConfig?.dao_members_addr;
 
   // useEffect(() => {
@@ -273,9 +273,9 @@ export const DAOProposalPage = ({
     return votingPowers;
   }, [membersArr]);
 
-  const error = () => {
+  const error = useMemo(() => {
     return validateForm(state, activeTab);
-  };
+  }, [state, activeTab]);
   return (
     <Box pb="2">
       <Flex height={'47px'} />
@@ -397,9 +397,7 @@ export const DAOProposalPage = ({
           </Button>
           <Box width={'12px'} />
           <Button
-            disabled={
-              creatingProposal || !!error().length || !daoMembersAddress
-            }
+            disabled={creatingProposal || !!error.length || !daoMembersAddress}
             onClick={async () => {
               let result = null;
               if (!daoMembersAddress) {
@@ -429,7 +427,7 @@ export const DAOProposalPage = ({
                   });
                 }
                 if (msg && 'propose' in msg) {
-                  result = await daoClient.propose(msg.propose);
+                  result = await daoClient.propose(msg.propose, fee);
                 }
 
                 if (!msg) {
