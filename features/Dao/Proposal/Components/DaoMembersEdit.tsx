@@ -117,11 +117,12 @@ export const MemberUpdate = memo(
           <Input
             spellCheck="false"
             isReadOnly={isReadOnly}
-            isInvalid={!!error}
+            isInvalid={!!error || address === null}
             variant={'outline'}
             borderColor={'background.500'}
             background={'background.100'}
-            focusBorderColor="darkPurple"
+            errorBorderColor="red"
+            focusBorderColor={error ? 'red' : 'darkPurple'}
             borderRadius={12}
             color={'purple'}
             height={'100%'}
@@ -152,12 +153,20 @@ export const MemberUpdate = memo(
               marginRight="-1px"
               marginY="auto"
             />
-            <Flex width="full" ml="4" justifyContent="space-between">
+            <Flex
+              flexWrap="wrap"
+              width="full"
+              ml="4"
+              justifyContent="space-between"
+            >
               <Text
                 color={'purple'}
                 fontFamily="DM Sans"
                 fontSize={16}
+                width={'90%'}
                 textAlign="left"
+                noOfLines={1}
+                wordBreak="break-all"
                 fontWeight="normal"
               >
                 {isFetching && address === undefined && 'loading...'}
@@ -189,10 +198,12 @@ export const MemberUpdate = memo(
           <Input
             variant={'outline'}
             width={'100%'}
+            isInvalid={(votingPower ?? 0) > 100}
+            errorBorderColor="red"
             height={'100%'}
             borderColor={'background.500'}
             background={'background.100'}
-            focusBorderColor="darkPurple"
+            focusBorderColor={(votingPower ?? 0) < 100 ? 'darkPurple' : 'red'}
             borderRadius={12}
             textAlign="center"
             color={'purple'}

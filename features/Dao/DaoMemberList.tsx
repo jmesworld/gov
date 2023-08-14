@@ -39,7 +39,6 @@ export default function DaoMembersList({
     client: daoMultisigQueryClient,
     args: {},
   });
-  console.log('DATA', data);
   return (
     <Box width={'265px'} minWidth="185px" marginLeft={'41px'}>
       <Flex height={'20px'} />

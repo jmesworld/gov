@@ -34,7 +34,7 @@ import {
 } from '../Proposal/Components/ProposalType';
 import { ProposalExcuteRawData } from '../Proposal/Components/ProposalRawData';
 import { useDAOContext } from '../../../contexts/DAOContext';
-import { isProposalGov } from '../../../utils/proposalUti';
+import { getGovProposalType, isProposalGov } from '../../../utils/proposalUti';
 import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { useVotingPeriodContext } from '../../../contexts/VotingPeriodContext';
 import { getLabel } from '../../../utils/daoProposalUtil';
@@ -57,7 +57,7 @@ export default function DaoProposalDetail({
   const { address } = useChain(chainName);
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { setSelectedDAOByAddress } = useDAOContext();
-  const { isPostingPeriod } = useVotingPeriodContext();
+  const { isPostingPeriod, data: periodData } = useVotingPeriodContext();
 
   useEffect(() => {
     setSelectedDAOByAddress(selectedDao);
@@ -94,6 +94,27 @@ export default function DaoProposalDetail({
       refetchInterval: 1000,
     },
   });
+
+  const disableExcute = useMemo(() => {
+    if (!isPostingPeriod) {
+      return 'Please wait until the posting period';
+    }
+    if (!proposalDetailQuery?.data) {
+      return 'Loading...';
+    }
+    const proposalType = getGovProposalType(proposalDetailQuery?.data);
+
+    if (proposalType.proposalType !== 'core-slot') {
+      return undefined;
+    }
+    const postingPeriodBlock = periodData?.posting_period_length ?? 0;
+    const currentBlockTime = periodData?.current_time_in_cycle ?? 0;
+
+    return currentBlockTime > postingPeriodBlock / 2
+      ? 'You can only excute Core slot proposals in the first half of the posting period'
+      : undefined;
+  }, [isPostingPeriod, periodData, proposalDetailQuery?.data]);
+
   const votesQuery = useDaoMultisigListVotesQuery({
     client: daoMultisigQueryClient,
     args: { proposalId: selectedDaoProposalId },
@@ -284,11 +305,11 @@ export default function DaoProposalDetail({
           </Box>
           <VStack width="330px" spacing="30px" align="flex-start">
             <ProposalMyVote
-              disableExcuteTooltip="Please wait until the posting period"
+              disableExcuteTooltip={disableExcute}
               refetch={refetchData}
               executed={status === 'executed'}
               hideExecute={!(status !== 'executed' && target <= yesPercentage)}
-              disableExecute={!!isGov && !isPostingPeriod}
+              disableExecute={!!isGov && !!disableExcute}
               myVotingPower={myVotingPower}
               passed={passed}
               voted={myVote}

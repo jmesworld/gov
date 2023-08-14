@@ -48,13 +48,14 @@ export const useGovernanceProposals = ({
       args: {
         status: status,
         limit,
-        start: offset < 10 ? 10 : offset,
+        startBefore: offset < 10 ? 10 : offset,
       },
       options: {
         enabled: !!status,
         refetchInterval: 10000,
       },
     });
+
   useEffect(() => {
     if (!data) {
       return;

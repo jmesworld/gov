@@ -413,7 +413,7 @@ export type QueryMsg =
   | {
       proposals: {
         limit?: number | null;
-        start?: number | null;
+        start_before?: number | null;
         status: ProposalQueryStatus;
         [k: string]: unknown;
       };

@@ -2,7 +2,7 @@ import { KeyboardEvent } from 'react';
 import { z } from 'zod';
 
 export const numberWithDecimals = (decimals: number) =>
-  z.string().regex(new RegExp(`^[0-9]+(\\.[0-9]{1,${decimals}})?$`));
+  z.string().regex(new RegExp(`^[0-9]+(\\.[0-9]{0,${decimals}})?$`));
 
 export const numberWithNoDecimals = z.string().regex(/^[0-9]+$/);
 

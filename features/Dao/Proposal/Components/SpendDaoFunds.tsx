@@ -15,6 +15,7 @@ import { v4 as uuid } from 'uuid';
 import { AddIcon } from '@chakra-ui/icons';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
 import { DaoTransferFund } from './DaoTransferFund';
+import { formatBalanceWithComma } from '../../../../hooks/useAccountBalance';
 
 type Props = {
   state: State;
@@ -35,7 +36,6 @@ export const SpendDaoFunds = ({ isDirty, client, state, dispatch }: Props) => {
     });
     return votingPowers;
   }, [spendArr]);
-
   const onAmountChange = useCallback(
     (id: string, value: number | '') => {
       dispatch({
@@ -185,7 +185,7 @@ export const SpendDaoFunds = ({ isDirty, client, state, dispatch }: Props) => {
             borderRadius={12}
             color={'white'}
             fontWeight={'normal'}
-            value={totalAmount}
+            value={formatBalanceWithComma(totalAmount, 6, 0)}
           />
 
           <InputLeftElement height={'100%'}>
