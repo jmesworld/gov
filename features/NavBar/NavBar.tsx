@@ -164,7 +164,7 @@ const NavBar = ({
           )}
         </Link.withStatus>
 
-        <Flex ml="25px">
+        <Flex ml="25px" mr="4">
           <Divider my="2" />
         </Flex>
 
