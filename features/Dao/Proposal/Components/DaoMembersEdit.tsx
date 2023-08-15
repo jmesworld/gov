@@ -6,16 +6,21 @@ import {
   Button,
   Flex,
   Image,
-  Input,
   InputGroup,
   InputRightElement,
   Text,
+  Tooltip,
+  useToken,
 } from '@chakra-ui/react';
 import { useClipboardTimeout } from '../../../../hooks/useClipboard';
 import {
   numberWithNoDecimals,
   onNumberWithNoDecimalKeyDown,
 } from '../../../../utils/numberValidators';
+import CopyIcon from '../../../../assets/icons/copy.svg';
+import CheckIcon from '../../../../assets/icons/CheckFilled.svg';
+import { truncateFromMiddle } from '../../../../utils/truncateString';
+import { InputStyled } from '../../../components/common/Input';
 
 type Props = {
   removeCopy?: boolean;
@@ -57,6 +62,8 @@ export const MemberUpdate = memo(
     const [copied, onCopy] = useClipboardTimeout();
     const [value, setValue] = useState<string>(name ?? '');
 
+    const [purple, green] = useToken('colors', ['purple', 'darkGreen']);
+
     const debouncedValue = useDebounce({
       value,
       delay: 300,
@@ -88,7 +95,8 @@ export const MemberUpdate = memo(
 
       onAddress(id, data.identity?.owner ?? null);
       value.length > 20 && setValue(data.identity?.name ?? '');
-    }, [data, debouncedValue, id, onAddress, value]);
+      value.length > 20 && onNameChange(id, data.identity?.name ?? '');
+    }, [data, debouncedValue, id, name, onAddress, onNameChange, value]);
 
     useEffect(() => {
       if (err instanceof Error) {
@@ -111,29 +119,25 @@ export const MemberUpdate = memo(
       e.preventDefault();
     };
 
+    const addressError = !!error || address === null;
+    const votingPowerError = (votingPower ?? 0) > 100;
+
     return (
       <Flex key={id} w="full" marginBottom={'16px'}>
         <InputGroup width={'85%'} height={'48px'}>
-          <Input
-            spellCheck="false"
+          <InputStyled
             isReadOnly={isReadOnly}
-            isInvalid={!!error || address === null}
-            variant={'outline'}
-            borderColor={'background.500'}
-            background={'background.100'}
-            errorBorderColor="red"
-            focusBorderColor={error ? 'red' : 'darkPurple'}
+            isInvalid={addressError}
             borderRadius={12}
-            color={'purple'}
-            height={'100%'}
             defaultValue={value}
             value={value}
-            fontWeight={'normal'}
             onChange={e => {
               setValue(e.target.value);
               onNameChange(id, e.target.value);
               onAddress(id, undefined);
             }}
+            paddingRight={'80%'}
+            placeholder="Enter name "
           />
           <InputRightElement
             width="77%"
@@ -171,20 +175,43 @@ export const MemberUpdate = memo(
               >
                 {isFetching && address === undefined && 'loading...'}
                 {error}
-                {!!address && !error && address}
+                {!!address && !error && truncateFromMiddle(address, 50)}
                 {address === null && 'Not Found'}
               </Text>
               {address && !removeCopy && (
-                <Flex>
-                  <Image
-                    onClick={() => {
-                      onCopy(address);
-                    }}
-                    src="/copy.svg"
-                    alt="copy"
-                  />
-                  <Text fontSize="sm">{copied && 'Copied'}</Text>
-                </Flex>
+                <Tooltip
+                  hasArrow
+                  isOpen={copied || undefined}
+                  label={copied ? 'Copied!' : 'Copy Address'}
+                  aria-label="A tooltip"
+                  placement="top"
+                >
+                  <Flex alignItems="center" justifyContent="center">
+                    {!copied && (
+                      <Flex
+                        onClick={() => {
+                          onCopy(address ?? '');
+                        }}
+                        alignItems="center"
+                        justify="center"
+                        width="24px"
+                        height="24px"
+                      >
+                        <CopyIcon color={purple} width="22px" height="22px" />
+                      </Flex>
+                    )}
+                    {copied && (
+                      <Flex
+                        alignItems="center"
+                        justify="center"
+                        width="24px"
+                        height="24px"
+                      >
+                        <CheckIcon color={green} width="18px" height="18px" />
+                      </Flex>
+                    )}
+                  </Flex>
+                </Tooltip>
               )}
               {!address && <span />}
             </Flex>
@@ -195,22 +222,12 @@ export const MemberUpdate = memo(
           width={nonClosable ? '15%' : '13%'}
           height={'48px'}
         >
-          <Input
-            variant={'outline'}
-            width={'100%'}
-            isInvalid={(votingPower ?? 0) > 100}
-            errorBorderColor="red"
-            height={'100%'}
-            borderColor={'background.500'}
-            background={'background.100'}
-            focusBorderColor={(votingPower ?? 0) < 100 ? 'darkPurple' : 'red'}
-            borderRadius={12}
-            textAlign="center"
-            color={'purple'}
-            fontWeight={'normal'}
+          <InputStyled
+            isInvalid={votingPowerError}
             value={votingPower}
             onKeyDown={onNumberWithNoDecimalKeyDown}
             type={'number'}
+            paddingRight={'40%'}
             onChange={onChangeVotingPower}
           />
 

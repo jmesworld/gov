@@ -769,15 +769,6 @@ export default function CreateGovProposal({
                         isChecked={isFundingNeeded}
                         onChange={() => setFundingNeeded(!isFundingNeeded)}
                       />
-                      <Text
-                        color={'darkPurple'}
-                        fontWeight="normal"
-                        fontSize={16}
-                        fontFamily="DM Sans"
-                        marginLeft={'8px'}
-                      >
-                        Yes
-                      </Text>
                     </Flex>
                   )}
                   {(isFundingNeeded || selectedProposalType !== 'text') && (
@@ -939,6 +930,7 @@ const getProposalExecuteMsg = ({
   amount,
   duration,
   featureApproved,
+  isFundingRequired,
 }: {
   type: ProposalTypes;
   title: string;
@@ -952,6 +944,7 @@ const getProposalExecuteMsg = ({
   featureApproved: number;
 }) => {
   // "text", "core-slot", "revoke-core-slot", "improvement"
+  console.log('IS FUNDING REQUIRED', isFundingRequired)
   let msg: Governance.ProposalMsg;
   switch (type) {
     case 'text':
@@ -959,10 +952,14 @@ const getProposalExecuteMsg = ({
         text_proposal: {
           description,
           title,
-          funding: {
-            amount: amount?.toString() as string,
-            duration_in_blocks: duration as number,
-          },
+          ...(isFundingRequired
+            ? {
+                funding: {
+                  amount: amount?.toString() as string,
+                  duration_in_blocks: duration as number,
+                },
+              }
+            : {}),
         },
       };
       return msg;

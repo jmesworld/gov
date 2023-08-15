@@ -197,11 +197,12 @@ export const UpdateDirectories = ({
               variant={'outline'}
               width={'100%'}
               height={'100%'}
-              borderColor={'background.500'}
-              background={totalVotingPower === 100 ? 'purple' : 'red'}
+              bg="purple"
+              background={totalVotingPower === 100 ? 'background.500' : 'red'}
               focusBorderColor="darkPurple"
               borderRadius={12}
               color={'white'}
+              textAlign="center"
               fontWeight={'normal'}
               value={totalVotingPower}
             />

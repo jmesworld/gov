@@ -1,5 +1,5 @@
 import React, { Dispatch, useEffect } from 'react';
-import { Flex, Input } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { Actions } from '../createDAOReducer';
@@ -7,6 +7,7 @@ import { useDebounce } from '../../../hooks/useDebounce';
 import { IdentityserviceQueryClient } from '../../../client/Identityservice.client';
 import { daoNameSchema } from '../../../utils/dao';
 import { allowedCharacters } from '../../../utils/numberValidators';
+import { InputStyled } from '../../components/common/Input';
 
 const nameSchemaForEachChar = z.string().regex(/^[a-z0-9]+$/);
 const capitalNameSchema = z.string().regex(/^[A-Z]+$/);
@@ -66,18 +67,10 @@ export const DaoName = ({
 
   return (
     <Flex width="84%">
-      <Input
-        spellCheck="false"
-        variant={'outline'}
-        width="100%"
+      <InputStyled
         height={'48px'}
-        borderColor={'background.500'}
-        background={'background.100'}
-        errorBorderColor="red"
-        focusBorderColor={daoNameError ? 'red' : 'darkPurple'}
         value={daoName}
-        borderRadius={12}
-        color={'purple'}
+        isInvalid={!!daoNameError}
         onKeyDown={e => {
           const { key } = e;
           if (allowedCharacters.includes(key)) {
@@ -88,11 +81,16 @@ export const DaoName = ({
           if (capitalName.success) {
             // fire with lowercase
             e.preventDefault();
+            const daoNameValidation = daoNameSchema.safeParse(
+              DaoName + key.toLowerCase(),
+            );
             dispatch({
               type: 'SET_DAO_NAME',
               payload: {
                 value: daoName + key.toLowerCase(),
-                error: null,
+                error: daoNameValidation.success
+                  ? undefined
+                  : (daoNameValidation.error.issues[0].message as string),
               },
             });
           }

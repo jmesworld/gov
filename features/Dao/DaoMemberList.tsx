@@ -156,7 +156,6 @@ export const DaoMembersListItem = ({
       alignItems={'center'}
       borderColor={'rgba(116,83,256,0.3)'}
       borderWidth={'1px'}
-      borderRadius="12px"
       pos="relative"
       onMouseEnter={() => {
         setOnMouseEnter(true);
@@ -164,6 +163,11 @@ export const DaoMembersListItem = ({
       onMouseLeave={() => {
         setOnMouseEnter(false);
       }}
+      borderBottomRightRadius={'30px'}
+      borderTopRightRadius={'30px'}
+      borderBottomLeftRadius={'12px'}
+      borderTopLeftRadius={'12px'}
+      borderRightWidth={0}
     >
       <Flex
         p="1px"
@@ -238,7 +242,7 @@ export const DaoMembersListItem = ({
         style={{
           zIndex: 99,
           position: 'absolute',
-          right: '-10px',
+          right: '0px',
         }}
       >
         <Flex
