@@ -7,7 +7,7 @@ import { useCosmWasmClientContext } from '../../contexts/CosmWasmClient';
 const Header = () => {
   const { cosmWasmClient } = useCosmWasmClientContext();
   return (
-    <Flex width={'100%'}>
+    <Flex width={'100%'} pb="1.5">
       {cosmWasmClient && <PeriodInfo />}
       <Spacer />
       <Wallet />

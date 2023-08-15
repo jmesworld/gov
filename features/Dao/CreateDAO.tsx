@@ -58,7 +58,7 @@ const initialState: State = {
 };
 
 const leaveModalTitle =
-  'Are you sure you want to leave the creation of this Proposal?';
+  'Are you sure you want to leave the creation of this DAO?';
 const leaveModalMessage = 'All data will be lost.';
 const CreateDaoNewForm = ({
   setCreateDaoSelected,
@@ -164,21 +164,16 @@ const CreateDaoNewForm = ({
     [dispatch],
   );
 
-  const onNameChange = useCallback(
-    (id: string, value: string) => {
-      // CHECK if error exist or same name exist
-      const nameInArr = membersArr.find(el => el.name === value);
-      dispatch({
-        type: 'SET_VALUE',
-        payload: {
-          id,
-          name: value,
-          error: nameInArr ? 'Name already exists' : undefined,
-        },
-      });
-    },
-    [membersArr],
-  );
+  const onNameChange = useCallback((id: string, value: string) => {
+    // CHECK if error exist or same name exist
+    dispatch({
+      type: 'SET_VALUE',
+      payload: {
+        id,
+        name: value,
+      },
+    });
+  }, []);
   const onAddress = useCallback((id: string, value?: string | null) => {
     dispatch({
       type: 'SET_VALUE',
@@ -391,7 +386,7 @@ const CreateDaoNewForm = ({
             marginTop={'16px'}
             height={'48px'}
             alignItems={'center'}
-            width={'100%%'}
+            width={'100%'}
             justifyContent="space-between"
           >
             <Flex
@@ -411,9 +406,8 @@ const CreateDaoNewForm = ({
                   variant={'outline'}
                   width={'100%'}
                   height={'100%'}
-                  textAlign="center"
-                  borderColor={'background.500'}
-                  borderEndColor={totalVotingPower === 100 ? 'purple' : 'red'}
+                  bg="purple"
+                  borderColor={totalVotingPower === 100 ? 'darkPurple' : 'red'}
                   borderRadius={12}
                   color={'white'}
                   fontWeight={'normal'}
@@ -616,21 +610,11 @@ const CreateDaoNewForm = ({
                 args: { fee },
               })
               .then(() => {
-                const ownerMember: State['members'] = {
-                  [ownerId]: {
-                    id: ownerId,
-                    name: daoOwner.name,
-                    address: daoOwner.address,
-                    votingPower: 0,
-                  },
-                };
                 setRouterCheck(false);
                 dispatch({
                   type: 'RESET',
                   payload: {
                     ...initialState,
-                    members: ownerMember,
-                    ownerId,
                   },
                 });
               })

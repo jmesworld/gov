@@ -118,7 +118,7 @@ export const ProposalList = ({
             maximumFractionDigits: 1,
           });
           votingDuration = `${votingDurationNum} month${
-            duration > 1 ? 's' : ''
+            duration !== 1 ? 's' : ''
           }`;
         }
         const {
@@ -242,7 +242,9 @@ export const ProposalList = ({
           minimumFractionDigits: 0,
           maximumFractionDigits: 1,
         });
-        votingDuration = `${votingDurationNum} month${duration > 1 ? 's' : ''}`;
+        votingDuration = `${votingDurationNum} month${
+          duration !== 1 ? 's' : ''
+        }`;
       }
 
       if (fund?.amount) {

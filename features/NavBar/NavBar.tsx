@@ -164,7 +164,9 @@ const NavBar = ({
           )}
         </Link.withStatus>
 
-        <Divider my="2" />
+        <Flex ml="25px">
+          <Divider my="2" />
+        </Flex>
 
         <Link.withStatus
           matchFunc={route => {

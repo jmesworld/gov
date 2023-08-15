@@ -41,6 +41,7 @@ import { getLabel } from '../../../utils/daoProposalUtil';
 import { IdentityserviceQueryClient } from '../../../client/Identityservice.client';
 import { DaoProposalFunding } from '../../Governance/ProposalFunding';
 import { AutoResizeTextarea } from '../../components/genial/ResizableInput';
+import { useCoreSlotProposalsContext } from '../../../contexts/CoreSlotProposalsContext';
 
 type Props = {
   selectedDao: string;
@@ -55,6 +56,7 @@ export default function DaoProposalDetail({
   selectedDaoProposalId,
 }: Props) {
   const { address } = useChain(chainName);
+  const { coreSlotDaoIds } = useCoreSlotProposalsContext();
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { setSelectedDAOByAddress } = useDAOContext();
   const { isPostingPeriod, data: periodData } = useVotingPeriodContext();
@@ -107,11 +109,14 @@ export default function DaoProposalDetail({
     if (proposalType.proposalType !== 'core-slot') {
       return undefined;
     }
+    if (coreSlotDaoIds?.includes(selectedDao)) {
+      return undefined;
+    }
     const postingPeriodBlock = periodData?.posting_period_length ?? 0;
     const currentBlockTime = periodData?.current_time_in_cycle ?? 0;
 
     return currentBlockTime > postingPeriodBlock / 2
-      ? 'You can only excute Core slot proposals in the first half of the posting period'
+      ? 'Please wait until Week 1 of the Posting window to execute this Proposal'
       : undefined;
   }, [isPostingPeriod, periodData, proposalDetailQuery?.data]);
 
