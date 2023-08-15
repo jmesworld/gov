@@ -15,6 +15,9 @@ export const AutoResizeTextarea = React.forwardRef<
       ref={ref}
       minRows={1}
       as={ResizeTextarea}
+      _hover={{
+        borderColor: 'purple',
+      }}
       {...props}
     />
   );

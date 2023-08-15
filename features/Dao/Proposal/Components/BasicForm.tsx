@@ -5,6 +5,8 @@ import {
   proposalDescriptionValidator,
   proposalTitleValidator,
 } from '../../../../utils/proposalValidate';
+import { InputStyled } from '../../../components/common/Input';
+import { TextareaStyled } from '../../../components/common/textarea';
 
 type Props = {
   title: string;
@@ -32,16 +34,10 @@ export const BasicForm = ({
       >
         DETAILS
       </Text>
-      <Input
-        variant={'outline'}
+      <InputStyled
         height={'48px'}
-        borderColor={'background.500'}
-        background={'background.100'}
-        errorBorderColor="red"
-        focusBorderColor={titleError ? 'red' : 'darkPurple'}
-        borderRadius={12}
+        isInvalid={!!titleError}
         value={title}
-        color={'purple'}
         onChange={e => {
           const nameValidation = proposalTitleValidator.safeParse(
             e.target.value,
@@ -64,17 +60,10 @@ export const BasicForm = ({
       </Text>
 
       <Box height={'12px'} />
-      <Textarea
-        variant={'outline'}
-        width={'full'}
+      <TextareaStyled
         height={'320px'}
         value={description}
-        borderColor={'background.500'}
-        background={'background.100'}
-        errorBorderColor="red"
-        focusBorderColor={descriptionError ? 'red' : 'darkPurple'}
-        borderRadius={12}
-        color={'purple'}
+        isInvalid={!!descriptionError}
         onChange={e => {
           const descriptionValidation = proposalDescriptionValidator.safeParse(
             e.target.value,

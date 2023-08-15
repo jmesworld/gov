@@ -138,6 +138,7 @@ export const SpendDaoFunds = ({ isDirty, client, state, dispatch }: Props) => {
 
       {spendArr.map(spend => (
         <DaoTransferFund
+          maxAmount={jmesBalance}
           isDirty={isDirty}
           notCancelable={spendArr.length === 1}
           key={spend.id}
@@ -177,10 +178,10 @@ export const SpendDaoFunds = ({ isDirty, client, state, dispatch }: Props) => {
             variant={'outline'}
             width={'202px'}
             height={'100%'}
-            borderColor={'background.500'}
-            background={
-              totalAmount <= jmesBalance || !isDirty ? 'purple' : 'red'
+            borderColor={
+              totalAmount <= jmesBalance || !isDirty ? 'background.500' : 'red'
             }
+            background={'purple'}
             focusBorderColor="darkPurple"
             borderRadius={12}
             color={'white'}
