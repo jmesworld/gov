@@ -62,7 +62,6 @@ export function Reducer(state: State, action: Actions): State {
       if (!member) {
         return state;
       }
-      console.log('Action payload', member , action.payload)
       const findMemberWithSameAddress = Object.values(state.members).find(
         m =>
           m.name === (action.payload.name || member.name) &&
