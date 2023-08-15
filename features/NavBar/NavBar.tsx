@@ -6,7 +6,6 @@ import {
   Spacer,
   Image,
   Skeleton,
-  Tooltip,
   Divider,
 } from '@chakra-ui/react';
 import { Dispatch, SetStateAction } from 'react';

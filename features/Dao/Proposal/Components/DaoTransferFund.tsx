@@ -13,7 +13,6 @@ import {
 } from '@chakra-ui/react';
 import { TwoInputs } from '../../../components/genial/TwoInputs';
 import { numberWithDecimals } from '../../../../utils/numberValidators';
-import { isDirty } from 'zod';
 import { NumericFormat } from 'react-number-format';
 
 interface BaseProps {
@@ -25,6 +24,7 @@ interface BaseProps {
   amount?: number | '';
   notCancelable?: boolean;
   isDirty?: boolean;
+  maxAmount?: number;
 }
 
 interface ReadOnlyProps extends BaseProps {
@@ -59,6 +59,7 @@ export const DaoTransferFund = memo(
     amount,
     readonly,
     isDirty,
+    maxAmount,
     ...rest
   }: Props) => {
     const [nameValue, setNameValue] = useState<string>(name ?? '');
@@ -247,6 +248,13 @@ export const DaoTransferFund = memo(
       }
     };
 
+    const amountinValid = useMemo(() => {
+      if (!maxAmount) {
+        return false;
+      }
+      return maxAmount && (amount || 0) > maxAmount;
+    }, [amount, maxAmount]);
+
     return (
       <Box>
         <Flex key={id} marginBottom={'3px'} mb={readonly ? '10px' : '10px'}>
@@ -272,17 +280,29 @@ export const DaoTransferFund = memo(
               paddingLeft={'32px'}
               decimalScale={6}
               thousandSeparator
-              variant={'outline'}
               width={'202px'}
-              height={'100%'}
-              borderColor={'background.500'}
+              value={amount}
+              isInvalid={amountinValid}
+              onChange={onChangeAmount}
+              variant={'outline'}
               background={'background.100'}
-              focusBorderColor="darkPurple"
+              boxShadow="none"
+              errorBorderColor="red"
+              borderColor={amountinValid ? 'red' : 'background.500'}
+              focusBorderColor={amountinValid ? 'red' : 'darkPurple'}
+              _invalid={{
+                boxShadow: 'none',
+              }}
+              _focus={{
+                boxShadow: 'none',
+              }}
+              _hover={{
+                borderColor: amountinValid ? 'red' : 'darkPurple',
+              }}
               borderRadius={12}
               color={'purple'}
+              height={'100%'}
               fontWeight={'normal'}
-              value={amount}
-              onChange={onChangeAmount}
             />
 
             <InputLeftElement height={'100%'}>

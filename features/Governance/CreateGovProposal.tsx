@@ -13,7 +13,6 @@ import {
   Stack,
   Switch,
   Text,
-  Textarea,
   useToast,
 } from '@chakra-ui/react';
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
@@ -51,6 +50,8 @@ import {
 import { useCoreSlotProposalsContext } from '../../contexts/CoreSlotProposalsContext';
 import { ChevronRightIcon } from '@chakra-ui/icons';
 import { handleError } from '../../error/hanldeErrors';
+import { InputStyled } from '../components/common/Input';
+import { TextareaStyled } from '../components/common/textarea';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -77,6 +78,10 @@ const allowedProposalTypes: ProposalTypes[] = [
   'improvement',
   'feature-request',
 ];
+
+//TODO: UPDATE FOR PROD. minimum duration in block
+const minimumDuration = 0.001;
+const decimalPointAllowedInDuration = 3;
 
 export default function CreateGovProposal({
   selectedDao,
@@ -390,7 +395,14 @@ export default function CreateGovProposal({
 
   const onFundingPeriodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (numberWithDecimals(1).safeParse(value).success) {
+    // TODO: change this on prod
+    if (
+      numberWithDecimals(decimalPointAllowedInDuration).safeParse(value).success
+    ) {
+      const numberValue = Number(value);
+      if (numberValue < minimumDuration) {
+        return;
+      }
       setFundingPeriod(Number(value));
     }
 
@@ -518,15 +530,8 @@ export default function CreateGovProposal({
             >
               DETAILS
             </Text>
-            <Input
-              variant={'outline'}
-              width={'full'}
+            <InputStyled
               height={'48px'}
-              borderColor={'background.500'}
-              background={'background.100'}
-              focusBorderColor={proposalTitle.error ? 'red' : 'darkPurple'}
-              borderRadius={12}
-              color={'purple'}
               isInvalid={proposalTitle.error !== ''}
               errorBorderColor="red"
               onChange={e => {
@@ -555,15 +560,10 @@ export default function CreateGovProposal({
               {proposalTitle.error}
             </Text>
             <Box height={'12px'} />
-            <Textarea
-              variant={'outline'}
-              width={'full'}
+            <TextareaStyled
               height={'320px'}
-              borderColor={'background.500'}
-              background={'background.100'}
               isInvalid={proposalDescription.error !== ''}
               value={proposalDescription.value}
-              errorBorderColor="red"
               focusBorderColor={
                 proposalDescription.error ? 'red' : 'darkPurple'
               }
@@ -701,9 +701,15 @@ export default function CreateGovProposal({
                       px="0px"
                       mx="10px"
                       textAlign={'center'}
+                      _invalid={{
+                        boxShadow: 'none',
+                      }}
                       _focus={{
                         boxShadow: 'none',
                         borderBottom: '1px solid',
+                      }}
+                      _hover={{
+                        borderColor: 'darkPurple',
                       }}
                     />
                   </Flex>
@@ -793,6 +799,16 @@ export default function CreateGovProposal({
                           value={fundingAmount}
                           onKeyDown={onNumberWithNoDecimalKeyDown}
                           onChange={onFundingAmountChange}
+                          _invalid={{
+                            boxShadow: 'none',
+                          }}
+                          _focus={{
+                            boxShadow: 'none',
+                            borderBottom: '1px solid',
+                          }}
+                          _hover={{
+                            borderColor: 'darkPurple',
+                          }}
                           border="none"
                           borderBottom="1px solid"
                           borderRadius="0"
@@ -802,10 +818,6 @@ export default function CreateGovProposal({
                           textAlign={'center'}
                           inputMode="numeric"
                           displayType="input"
-                          _focus={{
-                            boxShadow: 'none',
-                            borderBottom: '1px solid',
-                          }}
                         />
                         <Text
                           color={'darkPurple'}
@@ -832,9 +844,15 @@ export default function CreateGovProposal({
                           mx="10px"
                           textAlign={'center'}
                           type={'number'}
+                          _invalid={{
+                            boxShadow: 'none',
+                          }}
                           _focus={{
                             boxShadow: 'none',
                             borderBottom: '1px solid',
+                          }}
+                          _hover={{
+                            borderColor: 'darkPurple',
                           }}
                         />
                         <Text
@@ -944,7 +962,7 @@ const getProposalExecuteMsg = ({
   featureApproved: number;
 }) => {
   // "text", "core-slot", "revoke-core-slot", "improvement"
-  console.log('IS FUNDING REQUIRED', isFundingRequired)
+  console.log('IS FUNDING REQUIRED', isFundingRequired);
   let msg: Governance.ProposalMsg;
   switch (type) {
     case 'text':

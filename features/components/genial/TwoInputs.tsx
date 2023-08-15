@@ -9,6 +9,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useState } from 'react';
+import { InputStyled } from '../common/Input';
 
 type Props = {
   value: [string, string];
@@ -20,16 +21,16 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
   const [isFocused, setIsFocused] = useState<boolean>(false);
   return (
     <InputGroup
-      borderColor={error ? 'red' : 'background.500'}
       background={'background.100'}
       color={'purple'}
       borderRadius={12}
-      borderWidth={isFocused ? 2 : 1}
+      borderWidth={isFocused ? 1 : 1}
       borderStyle="solid"
       variant={'outline'}
       overflow="hidden"
       display="flex"
       alignItems="center"
+      borderColor={error ? 'red' : isFocused ? 'darkPurple' : 'background.500'}
     >
       {value[0] === value[1] && value.join('') !== '' && (
         <Tag
@@ -51,7 +52,13 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
         </Tag>
       )}
       {(value[0] !== value[1] || value.join('') === '') && (
-        <Input
+        <InputStyled
+          onMouseEnter={() => {
+            setIsFocused(true);
+          }}
+          onMouseLeave={() => {
+            setIsFocused(false);
+          }}
           onFocus={() => {
             setIsFocused(true);
           }}
@@ -62,13 +69,8 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
           width="30%"
           outline="0"
           height={'100%'}
-          borderColor={'background.500'}
-          background={'background.100'}
           borderRadius={0}
-          focusBorderColor="darkPurple"
-          color={'purple'}
           placeholder="Name or Address"
-          fontWeight={'normal'}
           value={value[0]}
           type="text"
           onChange={e => {
@@ -103,7 +105,7 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
             height={'100%'}
             background={'background.100'}
             borderRadius={0}
-            color={error && !isLoading ? 'red' : 'purple'}
+            color={'purple'}
             fontWeight={'normal'}
             display="flex"
             alignItems="center"

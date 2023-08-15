@@ -253,6 +253,15 @@ export const ChooseUsernameCardComponent = ({
                   fontSize={'16px'}
                   fontWeight="normal"
                   value={usernameInput}
+                  _invalid={{
+                    boxShadow: 'none',
+                  }}
+                  _focus={{
+                    boxShadow: 'none',
+                  }}
+                  _hover={{
+                    borderColor: 'darkPurple',
+                  }}
                   onKeyDown={e => {
                     const character = e.key;
                     if (allowedCharacters.includes('Backspace')) {
