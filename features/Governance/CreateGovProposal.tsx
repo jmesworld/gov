@@ -80,7 +80,7 @@ const allowedProposalTypes: ProposalTypes[] = [
 ];
 
 //TODO: UPDATE FOR PROD. minimum duration in block
-const minimumDuration = 0.041;
+const minimumDuration = 0.001;
 const decimalPointAllowedInDuration = 3;
 
 export default function CreateGovProposal({
