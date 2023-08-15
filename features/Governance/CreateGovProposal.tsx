@@ -80,7 +80,7 @@ const allowedProposalTypes: ProposalTypes[] = [
 ];
 
 //TODO: UPDATE FOR PROD. minimum duration in block
-const minimumDuration = 0.001;
+const minimumDuration = 0.041;
 const decimalPointAllowedInDuration = 3;
 
 export default function CreateGovProposal({
@@ -135,6 +135,8 @@ export default function CreateGovProposal({
   const [daoMembers, setDaoMembers] = useState<VoterDetail[] | null>(null);
   const [daoThreshold, setDaoThreshold] = useState<number | string>(0);
 
+  const fundingPeriodError = (Number(fundingPeriod) || 0) < minimumDuration;
+  console.log('Fudning period error', fundingPeriodError);
   useEffect(() => {
     const getMemberList = async () => {
       try {
@@ -391,7 +393,8 @@ export default function CreateGovProposal({
     proposalTitle.value.length > 1 &&
     proposalTitle.error === '' &&
     proposalDescription.value.length > 1 &&
-    proposalDescription.error === '';
+    proposalDescription.error === '' &&
+    !fundingPeriodError;
 
   const onFundingPeriodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -399,19 +402,16 @@ export default function CreateGovProposal({
     if (
       numberWithDecimals(decimalPointAllowedInDuration).safeParse(value).success
     ) {
-      const numberValue = Number(value);
-      if (numberValue < minimumDuration) {
-        return;
-      }
-      setFundingPeriod(Number(value));
-    }
+      const numberValue = parseFloat(value);
 
+      setFundingPeriod(numberValue);
+      return;
+    }
     if (value === '') {
       setFundingPeriod('');
     }
     e.preventDefault();
   };
-
   const onNumberOfNFTToMintChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -828,17 +828,23 @@ export default function CreateGovProposal({
                         >
                           tokens over
                         </Text>
+
                         <Input
+                          isInvalid={fundingPeriodError}
                           width={'100px'}
-                          height={'41px'}
                           value={fundingPeriod}
-                          borderColor={'background.500'}
+                          borderColor={
+                            fundingPeriodError ? 'red' : 'background.500'
+                          }
                           background={'transparent'}
-                          focusBorderColor="darkPurple"
+                          focusBorderColor={
+                            fundingPeriodError ? 'red' : 'darkPurple'
+                          }
                           color={'purple'}
                           onChange={onFundingPeriodChange}
-                          border="none"
-                          borderBottom="1px solid"
+                          borderTop={'none'}
+                          borderLeft={'none'}
+                          borderRight={'none'}
                           borderRadius="0"
                           px="0"
                           mx="10px"
@@ -849,12 +855,14 @@ export default function CreateGovProposal({
                           }}
                           _focus={{
                             boxShadow: 'none',
-                            borderBottom: '1px solid',
                           }}
                           _hover={{
-                            borderColor: 'darkPurple',
+                            borderColor: fundingPeriodError
+                              ? 'red'
+                              : 'darkPurple',
                           }}
                         />
+
                         <Text
                           color={'darkPurple'}
                           fontWeight="normal"
