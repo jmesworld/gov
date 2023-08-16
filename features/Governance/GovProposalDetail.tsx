@@ -363,7 +363,7 @@ export default function GovProposalDetail({
                       >
                         {votedYes ? 'Yes' : 'No'}
                       </Badge>
-                      Vote.
+                      vote!
                     </Text>
                   </Box>
                 )}

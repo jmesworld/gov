@@ -192,6 +192,9 @@ export const DaoTransferFund = memo(
     }, [err, addressErr, id, readonly, rest]);
 
     const notFoundError = useMemo(() => {
+      if (!name && !address && !nameValue && !addressValue) {
+        return null;
+      }
       if (
         !address &&
         nameValue &&
@@ -277,7 +280,7 @@ export const DaoTransferFund = memo(
           >
             <NumericFormat
               customInput={Input}
-              paddingLeft={'32px'}
+              paddingLeft={'42px'}
               decimalScale={6}
               thousandSeparator
               width={'202px'}
@@ -305,13 +308,12 @@ export const DaoTransferFund = memo(
               fontWeight={'normal'}
             />
 
-            <InputLeftElement height={'100%'}>
+            <InputLeftElement width="42px" height={'100%'}>
               <Image
                 src="/JMES_Icon.svg"
                 alt="JMES Icon"
-                width={'16px'}
-                mr={'4px'}
-                height={'16px'}
+                width={4}
+                height={4}
               />
             </InputLeftElement>
           </InputGroup>

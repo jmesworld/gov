@@ -1,14 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import {
-  Box,
-  Button,
-  Flex,
-  Image,
-  Text,
-  Tooltip,
-  useToken,
-} from '@chakra-ui/react';
-import { useRef } from 'react';
+import { Box, Button, Flex, Text, Tooltip, useToken } from '@chakra-ui/react';
+import { useCallback, useRef } from 'react';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import DaoMembersList from '../DaoMemberList';
 
@@ -94,27 +86,21 @@ export default function DaoProposal({
       refetchInterval: 10000,
     },
   });
-  const isInActive = useMemo(() => {
-    if (!data) {
-      return [];
+
+  const isExpired = useCallback((proposal: ProposalResponseForEmpty) => {
+    if (!proposal) {
+      return 0;
     }
-    return data.proposals.filter(proposal => {
-      let atTime: string | null = null;
-      if ('at_time' in proposal.expires) {
-        atTime = ((Number(proposal.expires.at_time) || 0) / 1e6).toFixed(0);
-      }
-      if (atTime === null) return false;
-      return Date.now() > Number(atTime);
-    });
-  }, [data]);
+    let timestamp = 0;
+    if ('at_time' in proposal.expires) {
+      timestamp = Number(proposal.expires.at_time) / 1e6;
+    }
+    if ('at_height' in proposal.expires) {
+      timestamp = Number(proposal.expires.at_height * 5);
+    }
 
-  const executed = useMemo(() => {
-    return isInActive?.filter(el => el.status === 'executed');
-  }, [isInActive]);
-
-  const expired = useMemo(() => {
-    return isInActive?.filter(el => el.status !== 'executed');
-  }, [isInActive]);
+    return Date.now() > new Date(timestamp).getTime();
+  }, []);
 
   const proposals = useMemo(() => {
     const gov: ProposalResponseForEmpty[] = [];
@@ -148,6 +134,87 @@ export default function DaoProposal({
     };
   }, [data, goverrnanceQueryClient]);
 
+  const activeDaoProposal = useMemo(() => {
+    return proposals.daoPropsal.filter(
+      el => el.status === 'pending' || el.status === 'open',
+    );
+  }, [proposals.daoPropsal]);
+
+  const activeGovProposal = useMemo(() => {
+    return proposals.gov.filter(
+      el => el.status === 'open' || el.status === 'passed',
+    );
+  }, [proposals.gov]);
+
+  const passedDaoProposal = useMemo(() => {
+    return proposals.daoPropsal.filter(el => el.status === 'passed');
+  }, [proposals.daoPropsal]);
+
+  const passedGovProposal = useMemo(() => {
+    return proposals.gov.filter(el => el.status === 'passed');
+  }, [proposals.gov]);
+
+  const executedDaoProposal = useMemo(() => {
+    return proposals.daoPropsal.filter(el => el.status === 'executed');
+  }, [proposals.daoPropsal]);
+
+  const executedGovProposal = useMemo(() => {
+    return proposals.gov.filter(el => el.status === 'executed');
+  }, [proposals.gov]);
+
+  const expiredDaoProposal = useMemo(() => {
+    return proposals.daoPropsal.filter(proposal => isExpired(proposal));
+  }, [isExpired, proposals.daoPropsal]);
+
+  const expiredGovProposal = useMemo(() => {
+    return proposals.gov.filter(proposal => isExpired(proposal));
+  }, [isExpired, proposals.gov]);
+
+  const getProposalList = useCallback(
+    (title: string, proposals: ProposalResponseForEmpty[]) => {
+      return (
+        <>
+          <Text
+            color="rgba(15,0,86,0.8)"
+            fontWeight="medium"
+            fontFamily="DM Sans"
+            fontSize={12}
+            mt="3"
+            mb="3"
+          >
+            {title}
+          </Text>
+          <ProposalList
+            showPassedOrFailed
+            showPassingOrFailing
+            daoClient={daoQueryClient}
+            client={goverrnanceQueryClient}
+            daoName={daoName}
+            totalSupply={supply as number}
+            proposals={proposals}
+            isGov={false}
+            isGovList={false}
+            daoAddress={daoAddress}
+            onClickListItem={() => {
+              setDaoProposalDetailOpen(true);
+            }}
+            setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
+            setSelectedProposalId={setSelectedProposalId}
+          />
+        </>
+      );
+    },
+    [
+      daoAddress,
+      daoName,
+      daoQueryClient,
+      goverrnanceQueryClient,
+      setDaoProposalDetailOpen,
+      setSelectedDaoProposalTitle,
+      setSelectedProposalId,
+      supply,
+    ],
+  );
   return (
     <Box pb="4">
       <Flex height={'47px'} />
@@ -263,24 +330,15 @@ export default function DaoProposal({
                 minWidth="800px"
               />
               <Flex height={'9px'} />
-              <ProposalList
-                showPassedOrFailed
-                showPassingOrFailing
-                daoClient={daoQueryClient}
-                client={goverrnanceQueryClient}
-                daoName={daoName}
-                totalSupply={supply as number}
-                proposals={proposals.gov}
-                isGov={false}
-                goToDaoDetail
-                isGovList={true}
-                daoAddress={daoAddress}
-                onClickListItem={() => {
-                  setDaoProposalDetailOpen(true);
-                }}
-                setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-                setSelectedProposalId={setSelectedProposalId}
-              />
+
+              {activeGovProposal.length > 0 &&
+                getProposalList('ACTIVE', activeGovProposal)}
+              {passedGovProposal.length > 0 &&
+                getProposalList('PASSED', passedGovProposal)}
+              {executedGovProposal.length > 0 &&
+                getProposalList('EXECUTED', executedGovProposal)}
+              {expiredGovProposal.length > 0 &&
+                getProposalList('EXPIRED', expiredGovProposal)}
             </Flex>
           )}
 
@@ -292,53 +350,17 @@ export default function DaoProposal({
                 isGov={false}
               />
               <Flex height={'9px'} />
-              <ProposalList
-                showPassedOrFailed
-                showPassingOrFailing
-                daoClient={daoQueryClient}
-                client={goverrnanceQueryClient}
-                daoName={daoName}
-                totalSupply={supply as number}
-                proposals={proposals.daoPropsal}
-                isGov={false}
-                isGovList={false}
-                daoAddress={daoAddress}
-                onClickListItem={() => {
-                  setDaoProposalDetailOpen(true);
-                }}
-                setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-                setSelectedProposalId={setSelectedProposalId}
-              />
+              {activeDaoProposal.length > 0 &&
+                getProposalList('ACTIVE', activeDaoProposal)}
+              {passedDaoProposal.length > 0 &&
+                getProposalList('PASSED', passedDaoProposal)}
+              {executedDaoProposal.length > 0 &&
+                getProposalList('EXECUTED', executedDaoProposal)}
+              {expiredDaoProposal.length > 0 &&
+                getProposalList('EXPIRED', expiredDaoProposal)}
             </Flex>
           )}
 
-          {executed?.length > 0 && (
-            <Flex flexDir="column">
-              <Text
-                my="4"
-                fontSize="xs"
-                autoCapitalize="all"
-                color="textbackground.100"
-                mb="4"
-              >
-                EXECUTED
-              </Text>
-              <ProposalList
-                showPassedOrFailed
-                client={goverrnanceQueryClient}
-                daoName={daoName}
-                totalSupply={supply as number}
-                proposals={executed}
-                isGov={false}
-                daoAddress={daoAddress}
-                onClickListItem={() => {
-                  setDaoProposalDetailOpen(true);
-                }}
-                setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-                setSelectedProposalId={setSelectedProposalId}
-              />
-            </Flex>
-          )}
           <SimplePagination
             enabled={page > 1 || (data?.proposals?.length || 0) >= limit}
             page={page}
@@ -346,35 +368,6 @@ export default function DaoProposal({
             nextPage={(data?.proposals.length || 0) >= limit}
             prevPage={page !== 1}
           />
-
-          {executed?.length > 0 && (
-            <Flex flexDir="column">
-              <Text
-                my="4"
-                fontSize="xs"
-                autoCapitalize="all"
-                color="textbackground.100"
-                mb="4"
-              >
-                EXPIRED
-              </Text>
-              <ProposalList
-                showPassedOrFailed
-                isAllInactive
-                client={goverrnanceQueryClient}
-                daoName={daoName}
-                totalSupply={supply as number}
-                proposals={expired}
-                isGov={false}
-                daoAddress={daoAddress}
-                onClickListItem={() => {
-                  setDaoProposalDetailOpen(true);
-                }}
-                setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-                setSelectedProposalId={setSelectedProposalId}
-              />
-            </Flex>
-          )}
 
           {isLoading ||
             (isFetching && !data && (

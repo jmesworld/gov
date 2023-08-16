@@ -1,3 +1,4 @@
+import { Coin } from '@cosmjs/amino';
 import { ProposalResponseForEmpty } from '../client/DaoMultisig.types';
 import { GovernanceQueryClient } from '../client/Governance.client';
 import {
@@ -16,10 +17,12 @@ export const getProposalExcuteMsg = (
   excuteMsgs: ProposalResponseForEmpty['msgs'];
   contractAddr: string | null;
   msgs: ProposalResponseForEmpty['msgs'];
+  funds: Coin | null;
 } => {
   const excuteMsgs: ProposalResponseForEmpty['msgs'] = [];
   let excuteMsg: { propose: ProposalMsg } | null = null;
   const bankMsg: BankMsg[] = [];
+  let funds: Coin | null = null;
   let contractAddr: null | string = null;
   proposal?.msgs?.forEach(msg => {
     if (!msg) {
@@ -33,8 +36,12 @@ export const getProposalExcuteMsg = (
       return;
     }
     const wasm = msg.wasm;
+
     if (!('execute' in wasm)) {
       return;
+    }
+    if ('funds' in wasm.execute) {
+      funds = wasm.execute.funds?.[0] ?? null;
     }
     const wasmMessage = wasm?.execute?.msg;
     if (!wasmMessage) {
@@ -70,6 +77,7 @@ export const getProposalExcuteMsg = (
     excuteMsgs,
     contractAddr,
     msgs: proposal.msgs as ProposalResponseForEmpty['msgs'],
+    funds,
   };
 };
 

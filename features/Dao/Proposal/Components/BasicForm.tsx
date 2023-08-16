@@ -61,7 +61,7 @@ export const BasicForm = ({
 
       <Box height={'12px'} />
       <TextareaStyled
-        height={'320px'}
+        height={'220px'}
         value={description}
         isInvalid={!!descriptionError}
         onChange={e => {

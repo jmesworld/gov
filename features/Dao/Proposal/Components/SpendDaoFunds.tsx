@@ -189,7 +189,7 @@ export const SpendDaoFunds = ({ isDirty, client, state, dispatch }: Props) => {
             value={formatBalanceWithComma(totalAmount, 6, 0)}
           />
 
-          <InputLeftElement height={'100%'}>
+          <InputLeftElement width="42px" height={'100%'}>
             <Image
               src="/JMES_Icon_white.svg"
               alt="JMES Icon"

@@ -19,6 +19,7 @@ import { DaoMultisigClient } from '../../../client/DaoMultisig.client';
 import {
   useDaoMultisigVoteMutation,
   useDaoMultisigExecuteMutation,
+  useDaoMultisigCloseMutation,
 } from '../../../client/DaoMultisig.react-query';
 import { chainName } from '../../../config/defaults';
 import { useSigningCosmWasmClientContext } from '../../../contexts/SigningCosmWasmClient';
@@ -39,15 +40,20 @@ export interface ProposalMyVoteType {
   hideExecute: boolean;
   disableExecute: boolean;
   disableExcuteTooltip?: string;
+  enableClose: boolean;
   refetch: () => Promise<unknown>;
 }
 
-export const ProposalMyVote = (props: ProposalMyVoteType) => {
+export const ProposalMyVote = ({
+  enableClose,
+  ...props
+}: ProposalMyVoteType) => {
   const toast = useToast();
   const { address } = useChain(chainName);
   const [isSubmittingYesVote, setSubmittingYesVote] = useState(false);
   const [isSubmittingNoVote, setSubmittingNoVote] = useState(false);
   const [isSubmittingExecuteVote, setSubmittingExecuteVote] = useState(false);
+  const [isSubmittingConcludeVote, setSubmittingConcludeVote] = useState(false);
   const { signingCosmWasmClient: signingClient } =
     useSigningCosmWasmClientContext();
 
@@ -59,6 +65,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
 
   const voteMutation = useDaoMultisigVoteMutation();
   const executeMutation = useDaoMultisigExecuteMutation();
+  const concludeMutation = useDaoMultisigCloseMutation();
 
   return (
     <Box w="full">
@@ -119,7 +126,7 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
               >
                 {props.voted ? 'Yes' : 'No'}
               </Badge>
-              Vote
+              vote!
             </Text>
           </Flex>
         )}
@@ -326,6 +333,52 @@ export const ProposalMyVote = (props: ProposalMyVoteType) => {
             Execute
           </Button>
         </Tooltip>
+      )}
+      {enableClose && (
+        <Button
+          mt="37px"
+          as="button"
+          height="48px"
+          width="100%"
+          lineHeight="16px"
+          border="1px"
+          borderRadius="90px"
+          fontSize="14px"
+          fontWeight="medium"
+          bg="#A1F0C4"
+          borderColor="#91D8B0"
+          isLoading={isSubmittingConcludeVote}
+          loadingText="Closing..."
+          color="#0F0056"
+          fontFamily="DM Sans"
+          onClick={() => {
+            setSubmittingConcludeVote(true);
+            concludeMutation
+              .mutateAsync({
+                client: daoMultisigClient,
+                msg: {
+                  proposalId: props.proposalId,
+                },
+                args: { fee },
+              })
+              .then(() => props.refetch())
+              .then(() => {
+                toast({
+                  title: 'Proposal closed!',
+                  status: 'success',
+                  variant: 'custom',
+                  duration: 9000,
+                  isClosable: true,
+                });
+              })
+              .catch(error => {
+                handleError(error, 'Proposal conclusion error.', toast);
+              })
+              .finally(() => setSubmittingConcludeVote(false));
+          }}
+        >
+          Close
+        </Button>
       )}
     </Box>
   );
