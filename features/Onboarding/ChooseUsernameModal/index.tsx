@@ -1,5 +1,4 @@
-import { useToast } from '@chakra-ui/react';
-
+ import { useToast } from '../../../hooks/useToast';
 import {
   CosmWasmClient,
   SigningCosmWasmClient,

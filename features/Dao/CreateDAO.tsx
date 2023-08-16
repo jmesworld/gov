@@ -12,8 +12,8 @@ import {
   SliderTrack,
   Spacer,
   Text,
-  useToast,
 } from '@chakra-ui/react';
+import { useToast } from '../../hooks/useToast';
 import { useEffect, useMemo, useState, useReducer, useCallback } from 'react';
 
 import { AddIcon } from '@chakra-ui/icons';

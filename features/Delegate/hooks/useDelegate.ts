@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { movingValidator } from '../lib/validateBonding';
-import { useToast } from '@chakra-ui/react';
+import { useToast } from '../../../hooks/useToast';
 import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { JMES_DENOM } from '../../../lib/constants';
 import { useBalanceContext } from '../../../contexts/balanceContext';
