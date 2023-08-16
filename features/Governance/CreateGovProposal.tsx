@@ -835,6 +835,7 @@ export default function CreateGovProposal({
                           borderColor={
                             fundingPeriodError ? 'red' : 'background.500'
                           }
+                          height={'41px'}
                           background={'transparent'}
                           focusBorderColor={
                             fundingPeriodError ? 'red' : 'darkPurple'
@@ -968,8 +969,6 @@ const getProposalExecuteMsg = ({
   duration?: number;
   featureApproved: number;
 }) => {
-  // "text", "core-slot", "revoke-core-slot", "improvement"
-  console.log('IS FUNDING REQUIRED', isFundingRequired);
   let msg: Governance.ProposalMsg;
   switch (type) {
     case 'text':

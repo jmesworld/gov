@@ -15,7 +15,7 @@ import { chainName } from '../config/defaults';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import OnboardingModal from '../features/Onboarding/OnboardingModal';
 import { WalletModal } from '../features/Wallet/components/WalletModal';
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { AppStateProvider } from '../contexts/AppStateContext';
 import { CosmWasmClientContextProvider } from '../contexts/CosmWasmClient';
 import { Container as ModalContainer } from 'react-modal-promise';
@@ -62,11 +62,21 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
 
     preferredSignType: () => 'direct',
   };
-
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const loader = document.getElementById('globalLoader');
+      if (loader) loader.remove();
+    }
+  }, []);
   const queryClient = new QueryClient();
 
   return (
-    <ChakraProvider theme={defaultTheme}>
+    <ChakraProvider
+      toastOptions={{
+        toastSpacing: 4,
+      }}
+      theme={defaultTheme}
+    >
       <QueryClientProvider client={queryClient}>
         <ChainProvider
           sessionOptions={{

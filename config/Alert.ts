@@ -1,5 +1,5 @@
 import { alertAnatomy as parts } from '@chakra-ui/anatomy';
-import { createMultiStyleConfigHelpers } from '@chakra-ui/styled-system';
+import { createMultiStyleConfigHelpers } from '@chakra-ui/react';
 
 const { definePartsStyle, defineMultiStyleConfig } =
   createMultiStyleConfigHelpers(parts.keys);
@@ -10,6 +10,7 @@ const custom = definePartsStyle(props => {
   return {
     container: {
       borderColor: status === 'error' ? 'red.100' : 'green',
+
       bg: status === 'error' ? 'red.100' : 'green',
     },
     icon: {

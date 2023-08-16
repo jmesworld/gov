@@ -90,16 +90,12 @@ export function formatBalanceWithComma(
   }
   if (balance === 0) return '0';
 
-  const coin = new Core.Coin(JMES_DENOM, balance);
   return (
-    coin.amount
-      .toDecimalPlaces(decimalPlaces)
-      .toNumber()
-      .toLocaleString(undefined, {
-        maximumFractionDigits: decimalPlaces,
-        minimumFractionDigits: minDecimalPlaces,
-        /// @ts-ignore
-        roundingMode: 'trunc',
-      }) ?? '0'
+    balance.toLocaleString(undefined, {
+      maximumFractionDigits: decimalPlaces,
+      minimumFractionDigits: minDecimalPlaces,
+      /// @ts-ignore
+      roundingMode: 'trunc',
+    }) ?? '0'
   );
 }
