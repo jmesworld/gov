@@ -136,7 +136,6 @@ export default function CreateGovProposal({
   const [daoThreshold, setDaoThreshold] = useState<number | string>(0);
 
   const fundingPeriodError = (Number(fundingPeriod) || 0) < minimumDuration;
-  console.log('Fudning period error', fundingPeriodError);
   useEffect(() => {
     const getMemberList = async () => {
       try {
@@ -561,7 +560,7 @@ export default function CreateGovProposal({
             </Text>
             <Box height={'12px'} />
             <TextareaStyled
-              height={'320px'}
+              height={'220px'}
               isInvalid={proposalDescription.error !== ''}
               value={proposalDescription.value}
               focusBorderColor={

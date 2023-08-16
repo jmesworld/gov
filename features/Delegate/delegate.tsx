@@ -587,8 +587,8 @@ export const Delegate = ({ onClose }: Props) => {
                         left="0"
                         width="100%"
                       >
-                        Once unbonding bJMES is requested, it takes 21 days for
-                        them to become available as JMES again.
+                        Once requested, it takes 21 days for unbonded JMES to
+                        become available.
                       </Text>
                     </TabPanel>
                   </TabPanels>

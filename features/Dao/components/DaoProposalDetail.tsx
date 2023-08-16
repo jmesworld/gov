@@ -34,7 +34,11 @@ import {
 } from '../Proposal/Components/ProposalType';
 import { ProposalExcuteRawData } from '../Proposal/Components/ProposalRawData';
 import { useDAOContext } from '../../../contexts/DAOContext';
-import { getGovProposalType, isProposalGov } from '../../../utils/proposalUti';
+import {
+  getGovProposalType,
+  getProposalExcuteMsg,
+  isProposalGov,
+} from '../../../utils/proposalUti';
 import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { useVotingPeriodContext } from '../../../contexts/VotingPeriodContext';
 import { getLabel } from '../../../utils/daoProposalUtil';
@@ -42,6 +46,8 @@ import { IdentityserviceQueryClient } from '../../../client/Identityservice.clie
 import { DaoProposalFunding } from '../../Governance/ProposalFunding';
 import { AutoResizeTextarea } from '../../components/genial/ResizableInput';
 import { useCoreSlotProposalsContext } from '../../../contexts/CoreSlotProposalsContext';
+import { useAccountBalance } from '../../../hooks/useAccountBalance';
+import { Core } from 'jmes';
 
 type Props = {
   selectedDao: string;
@@ -96,29 +102,6 @@ export default function DaoProposalDetail({
       refetchInterval: 1000,
     },
   });
-
-  const disableExcute = useMemo(() => {
-    if (!isPostingPeriod) {
-      return 'Please wait until the posting period';
-    }
-    if (!proposalDetailQuery?.data) {
-      return 'Loading...';
-    }
-    const proposalType = getGovProposalType(proposalDetailQuery?.data);
-
-    if (proposalType.proposalType !== 'core-slot') {
-      return undefined;
-    }
-    if (coreSlotDaoIds?.includes(selectedDao)) {
-      return undefined;
-    }
-    const postingPeriodBlock = periodData?.posting_period_length ?? 0;
-    const currentBlockTime = periodData?.current_time_in_cycle ?? 0;
-
-    return currentBlockTime > postingPeriodBlock / 2
-      ? 'Please wait until Week 1 of the Posting window to execute this Proposal'
-      : undefined;
-  }, [isPostingPeriod, periodData, proposalDetailQuery?.data]);
 
   const votesQuery = useDaoMultisigListVotesQuery({
     client: daoMultisigQueryClient,
@@ -191,6 +174,8 @@ export default function DaoProposalDetail({
     [proposalDetailQuery?.data, goverrnanceQueryClient],
   );
 
+  const { data: balance } = useAccountBalance(selectedDao, 1 * 1000, isGov);
+
   const myVotingInfo = votersQuery?.data?.voters.filter(
     voter => voter.addr === (address as string),
   ) ?? [{ weight: 0 }];
@@ -242,6 +227,70 @@ export default function DaoProposalDetail({
       threshold,
     });
   }, [proposalDetailQuery.data, yesPercentage, threshold]);
+
+  const canExecuteWithBalance = useMemo(() => {
+    if (!isGov) {
+      return false;
+    }
+    if (!balance || !balance.jmes) {
+      return false;
+    }
+    if (!proposalDetailQuery?.data) {
+      return false;
+    }
+    const { funds } = getProposalExcuteMsg(proposalDetailQuery?.data);
+    if (!funds) {
+      return false;
+    }
+    const fundNeeded = new Core.Coin(funds.denom, funds.amount).amount
+      .dividedBy(1e6)
+      .toNumber();
+    const daoBalance = balance.jmes.amount.dividedBy(1e6).toNumber();
+    return fundNeeded < daoBalance;
+  }, [isGov, balance, proposalDetailQuery?.data]);
+  const disableExcute = useMemo(() => {
+    if (!canExecuteWithBalance) {
+      return 'DAO balance insufficient to pay the Proposal fee.';
+    }
+    if (!isPostingPeriod) {
+      return 'Please wait until the posting period';
+    }
+    if (!proposalDetailQuery?.data) {
+      return 'Loading...';
+    }
+    const proposalType = getGovProposalType(proposalDetailQuery?.data);
+
+    if (proposalType.proposalType !== 'core-slot') {
+      return undefined;
+    }
+    if (coreSlotDaoIds?.includes(selectedDao)) {
+      return undefined;
+    }
+    const postingPeriodBlock = periodData?.posting_period_length ?? 0;
+    const currentBlockTime = periodData?.current_time_in_cycle ?? 0;
+
+    return currentBlockTime > postingPeriodBlock / 2
+      ? 'Please wait until Week 1 of the Posting window to execute this Proposal'
+      : undefined;
+  }, [
+    canExecuteWithBalance,
+    coreSlotDaoIds,
+    isPostingPeriod,
+    periodData?.current_time_in_cycle,
+    periodData?.posting_period_length,
+    proposalDetailQuery?.data,
+    selectedDao,
+  ]);
+
+  const enableClose = useMemo(() => {
+    if (!proposalDetailQuery.data) {
+      return false;
+    }
+    return (
+      proposalDetailQuery.data.status === 'open' &&
+      Date.now() > new Date(expiryDateTimestamp).getTime()
+    );
+  }, [expiryDateTimestamp, proposalDetailQuery.data]);
 
   return (
     <>
@@ -310,6 +359,7 @@ export default function DaoProposalDetail({
           </Box>
           <VStack width="330px" spacing="30px" align="flex-start">
             <ProposalMyVote
+              enableClose={enableClose}
               disableExcuteTooltip={disableExcute}
               refetch={refetchData}
               executed={status === 'executed'}

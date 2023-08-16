@@ -229,6 +229,7 @@ export const MemberUpdate = memo(
             type={'number'}
             paddingRight={'40%'}
             onChange={onChangeVotingPower}
+            textAlign="center"
           />
 
           <InputRightElement width="30%" height={'100%'}>
