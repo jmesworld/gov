@@ -7,8 +7,8 @@ import {
   Flex,
   Spacer,
   Text,
-  useToast,
 } from '@chakra-ui/react';
+import { useToast } from '../../hooks/useToast';
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import { IdentityserviceQueryClient } from '../../client/Identityservice.client';
 import {

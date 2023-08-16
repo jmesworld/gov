@@ -13,8 +13,8 @@ import {
   SliderTrack,
   Spacer,
   Text,
-  useToast,
 } from '@chakra-ui/react';
+import { useToast } from '../../hooks/useToast';
 import { useEffect, useMemo, useState } from 'react';
 import {
   countObjectsWithDuplicateNames,

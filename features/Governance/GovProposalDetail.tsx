@@ -9,8 +9,9 @@ import {
   Text,
   Tooltip,
   VStack,
-  useToast,
 } from '@chakra-ui/react';
+import { useToast } from '../../hooks/useToast';
+
 import { useEffect, useMemo, useState } from 'react';
 import { useChain } from '@cosmos-kit/react';
 

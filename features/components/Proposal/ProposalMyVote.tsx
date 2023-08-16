@@ -3,12 +3,12 @@ import {
   Text,
   ButtonGroup,
   Button,
-  useToast,
   CircularProgress,
   Flex,
   Tooltip,
   Badge,
 } from '@chakra-ui/react';
+import { useToast } from '../../../hooks/useToast';
 import { useChain } from '@cosmos-kit/react';
 
 import { useState } from 'react';

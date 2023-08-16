@@ -6,12 +6,13 @@ import {
   Image,
   Text,
   IconButton,
-  useToast,
   Button,
   Modal,
   ModalBody,
   ModalContent,
 } from '@chakra-ui/react';
+import { useToast } from '../../../hooks/useToast';
+
 import OnboardingProgressIndicator from './OnboardingProgressIndicator';
 import { useChain } from '@cosmos-kit/react';
 import { chainName } from '../../../config/defaults';

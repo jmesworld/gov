@@ -13,8 +13,9 @@ import {
   Stack,
   Switch,
   Text,
-  useToast,
 } from '@chakra-ui/react';
+import { useToast } from '../../hooks/useToast';
+
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import React, { useEffect, useMemo, useState } from 'react';
 import { StdFee } from '@cosmjs/amino';
