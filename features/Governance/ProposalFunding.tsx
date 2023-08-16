@@ -55,13 +55,12 @@ export const DaoProposalFunding = ({ proposal }: DaoProposalFundingProps) => {
   });
   const votingDuration = `${votingDurationNum} month${duration > 1 ? 's' : ''}`;
 
-  const fundingPerMonth = (
-    Number(fund?.amount || 0) / (Number(votingDurationNum) || 1)
-  ).toFixed(0);
+  const fundingPerMonth =
+    Number(fund?.amount || 0) / (Number(votingDurationNum) || 1);
 
   return (
     <ProposalFundingComponent
-      fundingPerMonth={Number(fundingPerMonth)}
+      fundingPerMonth={fundingPerMonth}
       durationFormatted={votingDuration}
     />
   );
@@ -98,7 +97,7 @@ const ProposalFundingComponent = ({
           >
             <Text fontFamily="DM Sans" fontSize={14} color="white">
               {fundingPerMonth
-                ? formatBalanceWithComma(fundingPerMonth, 0)
+                ? formatBalanceWithComma(fundingPerMonth, 1, 0)
                 : '0'}
             </Text>
           </Tooltip>

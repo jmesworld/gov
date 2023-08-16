@@ -248,9 +248,8 @@ export const ProposalList = ({
       }
 
       if (fund?.amount) {
-        fundingPerMonth = (
-          Number(fund?.amount || 0) / (Number(votingDurationNum) || 1)
-        ).toFixed(0);
+        fundingPerMonth =
+          Number(fund?.amount || 0) / (Number(votingDurationNum) || 1);
       }
 
       const threshold = proposal.threshold?.absolute_count;
@@ -598,7 +597,7 @@ export const DaoProposalListItem = ({
                 isDisabled={fundingPerMonth === undefined}
                 hasArrow
               >
-                <Flex w="full" alignItems="center">
+                <Flex alignItems="center">
                   <Image
                     src="/JMES_Icon_white.svg"
                     alt="JMES Icon"
@@ -616,6 +615,7 @@ export const DaoProposalListItem = ({
                   >
                     {formatBalanceWithComma(
                       Number(fundingPerMonth ?? 0) || 0,
+                      1,
                       0,
                     )}
                   </Text>
@@ -779,7 +779,7 @@ export const ProposalListItem = ({
                   </Text>
                 </Tooltip>
 
-                <Flex flexDir="column" w="100%">
+                <Flex alignItems="flex-start" flexDir="column" w="100%">
                   <Text
                     noOfLines={1}
                     color="white"
@@ -793,11 +793,7 @@ export const ProposalListItem = ({
                     {type}
                   </Text>
                   {daoInfo?.dao_name && (
-                    <Tooltip
-                      shouldWrapChildren
-                      hasArrow
-                      label={daoInfo?.dao_name}
-                    >
+                    <Tooltip hasArrow label={daoInfo?.dao_name}>
                       <Text
                         width="auto"
                         color="white"
@@ -870,6 +866,7 @@ export const ProposalListItem = ({
                     >
                       {formatBalanceWithComma(
                         Number(fundingPerMonth ?? 0) || 0,
+                        1,
                         0,
                       )}
                     </Text>

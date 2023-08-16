@@ -34,9 +34,10 @@ export const onNumberWithNoDecimalKeyDown = (
   e: KeyboardEvent<HTMLInputElement>,
 ) => {
   const { key } = e;
-
   if (
-    ['ArrowLeft', 'Backspace', 'ArrowRight', 'Delete', 'Enter'].includes(key)
+    ['ArrowLeft', 'Tab', 'Backspace', 'ArrowRight', 'Delete', 'Enter'].includes(
+      key,
+    )
   ) {
     return;
   }
