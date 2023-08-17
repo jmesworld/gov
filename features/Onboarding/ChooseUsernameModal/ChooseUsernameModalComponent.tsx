@@ -16,11 +16,19 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { z } from 'zod';
-import { Suspense, Dispatch, SetStateAction, ReactNode, memo } from 'react';
+import {
+  Suspense,
+  Dispatch,
+  SetStateAction,
+  ReactNode,
+  memo,
+  useEffect,
+} from 'react';
 import { IdentityserviceQueryClient } from '../../../client/Identityservice.client';
 import OnboardingProgressIndicator from '../components/OnboardingProgressIndicator';
 import { useIdentityserviceGetIdentityByNameQuery } from '../../../client/Identityservice.react-query';
 import { allowedCharacters } from '../../../utils/numberValidators';
+import { useIdentityFetch } from '../../../hooks/useIdentityFetch';
 
 const nameSchemaForEachChar = z.string().regex(/^[a-z0-9]+$/);
 const capitalNameSchema = z.string().regex(/^[A-Z]+$/);
@@ -40,27 +48,35 @@ export const SearchResults = memo(
     queryError: string;
     isIdentityNameAvailable: boolean;
   }) => {
-    const { data, isFetching, error } =
-      useIdentityserviceGetIdentityByNameQuery({
-        client,
-        args: { name: query },
-
-        options: {
-          enabled: !queryError && query !== '',
-          staleTime: 1000,
-          cacheTime: 1000,
-          retry: 3,
-          refetchOnReconnect: true,
-          onError() {
-            setIsIdentityNameAvailable(false);
-          },
-          onSuccess: data => {
-            if (!queryError)
-              setIsIdentityNameAvailable(!data?.identity?.name.toString());
-            else setIsIdentityNameAvailable(false);
-          },
+    const { data, isFetching, error } = useIdentityFetch({
+      client,
+      type: 'name',
+      value: query,
+      enabled: !queryError && query !== '',
+      moreOptions: {
+        onError() {
+          setIsIdentityNameAvailable(false);
         },
-      });
+        onSuccess: data => {
+          if (!queryError)
+            setIsIdentityNameAvailable(!data?.identity?.name.toString());
+          else setIsIdentityNameAvailable(false);
+        },
+      },
+    });
+
+    useEffect(() => {
+      if (error) {
+        setIsIdentityNameAvailable(false);
+        return;
+      }
+
+      if (!queryError && data?.identity?.name.toString()) {
+        setIsIdentityNameAvailable(!data?.identity?.name.toString());
+        return;
+      }
+      setIsIdentityNameAvailable(true);
+    }, [data, error, queryError, setIsIdentityNameAvailable]);
 
     const isLoadingOrFetching = isFetching;
 
@@ -93,7 +109,8 @@ export const SearchResults = memo(
           marginLeft={'18px'}
           marginTop={'8px'}
         >
-          <Text color="red"> {queryError || error?.message}</Text>
+          <Text color="red"> {queryError}</Text>
+          <Text color="red"> {error instanceof Error && error.message} </Text>
         </Text>
       );
     }

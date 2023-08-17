@@ -42,6 +42,7 @@ import { CoreSlotProposalsContextProvider } from '../contexts/CoreSlotProposalsC
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   Layout?: ({ children }: { children: ReactElement }) => ReactElement;
 };
+export const queryClient = new QueryClient();
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
@@ -68,7 +69,6 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
       if (loader) loader.remove();
     }
   }, []);
-  const queryClient = new QueryClient();
 
   return (
     <ChakraProvider

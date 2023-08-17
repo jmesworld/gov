@@ -14,6 +14,7 @@ import {
 import { TwoInputs } from '../../../components/genial/TwoInputs';
 import { numberWithDecimals } from '../../../../utils/numberValidators';
 import { NumericFormat } from 'react-number-format';
+import { useIdentityFetch } from '../../../../hooks/useIdentityFetch';
 
 interface BaseProps {
   client: IdentityserviceQueryClient;
@@ -119,13 +120,11 @@ export const DaoTransferFund = memo(
       data,
       isFetching,
       error: err,
-    } = useQuery({
+    } = useIdentityFetch({
+      client,
       enabled: debouncedValue === nameValue && debouncedValue !== '',
-      queryKey: ['members', debouncedValue],
-      queryFn: ({ queryKey }) =>
-        client.getIdentityByName({ name: queryKey[1] }),
-      retry: 1,
-      refetchOnMount: true,
+      value: debouncedValue,
+      type: 'name',
     });
 
     // fetch by Address
@@ -133,16 +132,14 @@ export const DaoTransferFund = memo(
       data: addressData,
       isFetching: isFetchingAddress,
       error: addressErr,
-    } = useQuery({
+    } = useIdentityFetch({
       enabled:
         debouncedAddressValue === addressValue && debouncedAddressValue !== '',
-      queryKey: ['address', debouncedAddressValue],
-      queryFn: ({ queryKey }) =>
-        client.getIdentityByOwner({ owner: queryKey[1] }),
-      retry: 1,
-      refetchOnMount: true,
-      refetchOnWindowFocus: false,
+      value: debouncedAddressValue,
+      client,
+      type: 'address',
     });
+
     useEffect(() => {
       if (!data) {
         return;
