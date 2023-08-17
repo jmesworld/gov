@@ -1,7 +1,6 @@
 import { useEffect, useState, ChangeEvent, memo, useMemo } from 'react';
 import { useDebounce } from '../../../../hooks/useDebounce';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
-import { useQuery } from '@tanstack/react-query';
 import {
   Box,
   CloseButton,

@@ -9,7 +9,6 @@ import {
   Text,
   Tooltip,
 } from '@chakra-ui/react';
-import { CloseIcon, CheckIcon, TimeIcon } from '@chakra-ui/icons';
 import { MouseEventHandler, useMemo } from 'react';
 import { ProposalProgress } from './ProposalProgress';
 import { useRouter } from 'next/router';

@@ -26,7 +26,6 @@ import {
 } from 'react';
 import { IdentityserviceQueryClient } from '../../../client/Identityservice.client';
 import OnboardingProgressIndicator from '../components/OnboardingProgressIndicator';
-import { useIdentityserviceGetIdentityByNameQuery } from '../../../client/Identityservice.react-query';
 import { allowedCharacters } from '../../../utils/numberValidators';
 import { useIdentityFetch } from '../../../hooks/useIdentityFetch';
 
