@@ -50,17 +50,26 @@ export const useIdentityFetch = ({
     retry,
     ...moreOptions,
   });
+
+  const getComplementaryQueryKey = useMemo(() => {
+    if (type === 'name') {
+      return ['identity by value', query.data?.identity?.owner, 'address'];
+    }
+    return ['identity by value', query.data?.identity?.name, 'name'];
+  }, [query.data?.identity?.name, query.data?.identity?.owner, type]);
+
   useEffect(() => {
     const { data } = query;
     if (!data) {
       return;
     }
 
-    if (data?.identity?.name) {
-      return;
+    if (data?.identity) {
+      queryClient.setQueryData(getComplementaryQueryKey, data);
     }
+
     queryClient.cancelQueries(queryKey);
-  }, [query, queryKey]);
+  }, [getComplementaryQueryKey, query, queryKey]);
 
   return query;
 };
