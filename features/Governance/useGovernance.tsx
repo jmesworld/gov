@@ -55,7 +55,6 @@ export const useGovernanceProposals = ({
         refetchInterval: 10000,
       },
     });
-
   useEffect(() => {
     if (!data) {
       return;
