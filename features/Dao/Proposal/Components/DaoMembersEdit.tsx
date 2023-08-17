@@ -21,6 +21,7 @@ import CopyIcon from '../../../../assets/icons/copy.svg';
 import CheckIcon from '../../../../assets/icons/CheckFilled.svg';
 import { truncateFromMiddle } from '../../../../utils/truncateString';
 import { InputStyled } from '../../../components/common/Input';
+import { useIdentityFetch } from '../../../../hooks/useIdentityFetch';
 
 type Props = {
   removeCopy?: boolean;
@@ -72,19 +73,16 @@ export const MemberUpdate = memo(
       data,
       isFetching,
       error: err,
-    } = useQuery({
+    } = useIdentityFetch({
+      client,
       enabled:
         (fetchName || !isReadOnly) &&
         debouncedValue === value &&
         debouncedValue !== '',
-      queryKey: ['members', debouncedValue],
-      queryFn: ({ queryKey }) =>
-        queryKey[1].length < 20
-          ? client.getIdentityByName({ name: queryKey[1] })
-          : client.getIdentityByOwner({ owner: queryKey[1] }),
-      retry: 1,
-      refetchOnMount: true,
+      value: debouncedValue,
+      type: debouncedValue.length < 20 ? 'name' : 'address',
     });
+
     useEffect(() => {
       if (!data) {
         return;

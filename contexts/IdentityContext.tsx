@@ -9,9 +9,9 @@ import { Identity } from '../client/Identityservice.types';
 import { useCosmWasmClientContext } from './CosmWasmClient';
 import { IdentityserviceQueryClient } from '../client/Identityservice.client';
 import { chainName, IDENTITY_SERVICE_CONTRACT } from '../config/defaults';
-import { useIdentityserviceGetIdentityByOwnerQuery } from '../client/Identityservice.react-query';
 import { useChain } from '@cosmos-kit/react';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import { useIdentityFetch } from '../hooks/useIdentityFetch';
 
 type Props = {
   children?: ReactNode;
@@ -56,13 +56,13 @@ const IdentityContextProvider = ({ children }: Props) => {
         : undefined,
     [cosmWasmClient],
   );
-  const identityOwnerQuery = useIdentityserviceGetIdentityByOwnerQuery({
+  const identityOwnerQuery = useIdentityFetch({
     client: identityserviceClient,
-    args: { owner: address as string },
-    options: {
+    value: address as string,
+    type: 'address',
+    enabled: !!address && !!identityserviceClient,
+    moreOptions: {
       refetchOnMount: true,
-      refetchOnWindowFocus: false,
-      enabled: !!address,
     },
   });
 
