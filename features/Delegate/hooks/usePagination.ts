@@ -12,11 +12,10 @@ export const usePagination = ({
   const offset = useMemo(() => {
     if (reverse) {
       if (!total) return 0;
-      return Math.max(0, total - (page - 1) * limit);
+      return Math.max(0, total + 1 - (page - 1) * limit);
     }
     return (page - 1) * limit;
   }, [reverse, total, page, limit]);
-
   const pagination = useMemo(
     () => ({
       page,
