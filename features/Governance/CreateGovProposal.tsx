@@ -5,6 +5,8 @@ import {
   Button,
   CircularProgress,
   Flex,
+  FormControl,
+  FormErrorMessage,
   Input,
   Radio,
   RadioGroup,
@@ -53,6 +55,8 @@ import { ChevronRightIcon } from '@chakra-ui/icons';
 import { handleError } from '../../error/hanldeErrors';
 import { InputStyled } from '../components/common/Input';
 import { TextareaStyled } from '../components/common/textarea';
+import { getMaxRewardPerBlock } from '../../utils/proposalFunding';
+import { useVotingPeriodContext } from '../../contexts/VotingPeriodContext';
 
 // TODO: DEEP- refactor needed for the whole page
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -94,6 +98,7 @@ export default function CreateGovProposal({
   // eslint-disable-next-line @typescript-eslint/ban-types
   setCreateGovProposalSelected: Function;
 }) {
+  const { data: periodData } = useVotingPeriodContext();
   const { cosmWasmClient } = useCosmWasmClientContext();
   const { coreSlotDaoIds } = useCoreSlotProposalsContext();
   const daoQueryClient = useMemo(
@@ -136,7 +141,13 @@ export default function CreateGovProposal({
   const [daoMembers, setDaoMembers] = useState<VoterDetail[] | null>(null);
   const [daoThreshold, setDaoThreshold] = useState<number | string>(0);
 
-  const fundingPeriodError = (Number(fundingPeriod) || 0) < minimumDuration;
+  const fundingPeriodError = useMemo(
+    () =>
+      (Number(fundingPeriod) || 0) < minimumDuration
+        ? `Funding period must be greater than ${minimumDuration}`
+        : '',
+    [fundingPeriod],
+  );
   useEffect(() => {
     const getMemberList = async () => {
       try {
@@ -253,6 +264,25 @@ export default function CreateGovProposal({
   const isImprovementRequired = selectedProposalType === 'improvement';
 
   const createGovProposalMutation = useDaoMultisigProposeMutation();
+
+  const fundingAmountError = useMemo(() => {
+    if (!fundingAmount || !fundingPeriod) return false;
+    const maxAmountPerBlock = getMaxRewardPerBlock(
+      periodData?.current_block ?? 0,
+      selectedProposalType,
+      slotType,
+    );
+    const periodInBlock = convertMonthToBlock(Number(fundingPeriod));
+    return Number(fundingAmount) / periodInBlock > maxAmountPerBlock
+      ? 'Amount exceeds the maximum amount per block'
+      : '';
+  }, [
+    fundingAmount,
+    fundingPeriod,
+    periodData?.current_block,
+    selectedProposalType,
+    slotType,
+  ]);
 
   const onSubmit = async () => {
     try {
@@ -754,7 +784,6 @@ export default function CreateGovProposal({
                 <Flex
                   flexDir="column"
                   marginBottom={'17px'}
-                  height={'60px'}
                   align={'flex-start'}
                 >
                   {selectedProposalType === 'text' && (
@@ -778,8 +807,8 @@ export default function CreateGovProposal({
                     </Flex>
                   )}
                   {(isFundingNeeded || selectedProposalType !== 'text') && (
-                    <Box w="full" mb="10px">
-                      <Flex height={'41px'} w="full" align={'flex-end'}>
+                    <Box height="60px" w="full" mb="10px">
+                      <Flex height={'61px'} w="full" align={'center'}>
                         <Text
                           color={'darkPurple'}
                           fontWeight="normal"
@@ -789,36 +818,53 @@ export default function CreateGovProposal({
                         >
                           Please pay me
                         </Text>
-                        <NumericFormat
-                          customInput={Input}
-                          width={'100px'}
-                          height={'41px'}
-                          borderColor={'background.500'}
-                          background={'transparent'}
-                          color={'purple'}
-                          value={fundingAmount}
-                          onKeyDown={onNumberWithNoDecimalKeyDown}
-                          onChange={onFundingAmountChange}
-                          _invalid={{
-                            boxShadow: 'none',
-                          }}
-                          _focus={{
-                            boxShadow: 'none',
-                            borderBottom: '1px solid',
-                          }}
-                          _hover={{
-                            borderColor: 'darkPurple',
-                          }}
-                          border="none"
-                          borderBottom="1px solid"
-                          borderRadius="0"
-                          thousandSeparator
-                          px="0px"
-                          mx="10px"
-                          textAlign={'center'}
-                          inputMode="numeric"
-                          displayType="input"
-                        />
+                        <FormControl
+                          width="200px"
+                          isInvalid={!!fundingAmountError}
+                        >
+                          <NumericFormat
+                            customInput={Input}
+                            width={'100px'}
+                            height={'41px'}
+                            isInvalid={!!fundingAmountError}
+                            borderColor={
+                              fundingAmountError ? 'red' : 'background.500'
+                            }
+                            focusBorderColor={
+                              fundingAmountError ? 'red' : 'darkPurple'
+                            }
+                            background={'transparent'}
+                            borderTop={'none'}
+                            borderLeft={'none'}
+                            borderRight={'none'}
+                            color={'purple'}
+                            value={fundingAmount}
+                            onKeyDown={onNumberWithNoDecimalKeyDown}
+                            onChange={onFundingAmountChange}
+                            _invalid={{
+                              boxShadow: 'none',
+                            }}
+                            _focus={{
+                              boxShadow: 'none',
+                            }}
+                            _hover={{
+                              borderColor: fundingAmountError
+                                ? 'red'
+                                : 'darkPurple',
+                            }}
+                            borderRadius="0"
+                            thousandSeparator
+                            px="0px"
+                            mx="10px"
+                            textAlign={'center'}
+                            inputMode="numeric"
+                            displayType="input"
+                          />
+
+                          <FormErrorMessage fontSize={12}>
+                            {fundingAmountError}
+                          </FormErrorMessage>
+                        </FormControl>
                         <Text
                           color={'darkPurple'}
                           fontWeight="normal"
@@ -828,41 +874,48 @@ export default function CreateGovProposal({
                         >
                           tokens over
                         </Text>
-
-                        <Input
-                          isInvalid={fundingPeriodError}
-                          width={'100px'}
-                          value={fundingPeriod}
-                          borderColor={
-                            fundingPeriodError ? 'red' : 'background.500'
-                          }
-                          height={'41px'}
-                          background={'transparent'}
-                          focusBorderColor={
-                            fundingPeriodError ? 'red' : 'darkPurple'
-                          }
-                          color={'purple'}
-                          onChange={onFundingPeriodChange}
-                          borderTop={'none'}
-                          borderLeft={'none'}
-                          borderRight={'none'}
-                          borderRadius="0"
-                          px="0"
-                          mx="10px"
-                          textAlign={'center'}
-                          type={'number'}
-                          _invalid={{
-                            boxShadow: 'none',
-                          }}
-                          _focus={{
-                            boxShadow: 'none',
-                          }}
-                          _hover={{
-                            borderColor: fundingPeriodError
-                              ? 'red'
-                              : 'darkPurple',
-                          }}
-                        />
+                        <FormControl
+                          width="200px"
+                          isInvalid={!!fundingPeriodError}
+                        >
+                          <Input
+                            isInvalid={!!fundingPeriodError}
+                            width={'100px'}
+                            value={fundingPeriod}
+                            borderColor={
+                              fundingPeriodError ? 'red' : 'background.500'
+                            }
+                            height={'41px'}
+                            background={'transparent'}
+                            focusBorderColor={
+                              fundingPeriodError ? 'red' : 'darkPurple'
+                            }
+                            color={'purple'}
+                            onChange={onFundingPeriodChange}
+                            borderTop={'none'}
+                            borderLeft={'none'}
+                            borderRight={'none'}
+                            borderRadius="0"
+                            px="0"
+                            mx="10px"
+                            textAlign={'center'}
+                            type={'number'}
+                            _invalid={{
+                              boxShadow: 'none',
+                            }}
+                            _focus={{
+                              boxShadow: 'none',
+                            }}
+                            _hover={{
+                              borderColor: fundingPeriodError
+                                ? 'red'
+                                : 'darkPurple',
+                            }}
+                          />
+                          <FormErrorMessage fontSize={12}>
+                            {fundingPeriodError}
+                          </FormErrorMessage>
+                        </FormControl>
 
                         <Text
                           color={'darkPurple'}
