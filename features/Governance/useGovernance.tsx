@@ -52,9 +52,10 @@ export const useGovernanceProposals = ({
       },
       options: {
         enabled: !!status,
-        refetchInterval: 10000,
+        refetchInterval: 5000,
       },
     });
+
   useEffect(() => {
     if (!data) {
       return;

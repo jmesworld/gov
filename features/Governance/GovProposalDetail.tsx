@@ -42,6 +42,7 @@ import DirectoresList from '../Dao/Proposal/Components/DirectorsList';
 import { getAttribute } from '../../utils/tx';
 import { handleError } from '../../error/hanldeErrors';
 import { AutoResizeTextarea } from '../components/genial/ResizableInput';
+import { getProposalLabelDetail } from '../../utils/govProposalUtil';
 
 const GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -150,38 +151,12 @@ export default function GovProposalDetail({
     [data?.coins_no, data?.coins_total, data?.coins_yes],
   );
 
-  const isPassing = useMemo(() => {
-    if (thresholdPercent === undefined || yesPercentage === undefined) {
-      return undefined;
+  const labelDetail = useMemo(() => {
+    if (!data) {
+      return null;
     }
-    return thresholdPercent <= yesPercentage ? 'Passing' : 'pending';
-  }, [thresholdPercent, yesPercentage]);
-
-  const passed = useMemo(() => {
-    if (data?.status === 'success' || data?.status === 'success_concluded') {
-      return true;
-    }
-    if (data?.status === 'expired' || data?.status === 'expired_concluded') {
-      return false;
-    }
-    return undefined;
-  }, [data?.status]);
-
-  const label = useMemo(() => {
-    if (passed !== undefined) {
-      return {
-        label: passed ? 'Passed' : 'Failed',
-        success: passed,
-      };
-    }
-    if (isPassing !== undefined) {
-      return {
-        label: isPassing,
-        success: isPassing === 'Passing',
-      };
-    }
-    return undefined;
-  }, [passed, isPassing]);
+    return getProposalLabelDetail(data, thresholdPercent, yesPercentage);
+  }, [data, thresholdPercent, yesPercentage]);
 
   const votedYes = useMemo(() => {
     return data?.yes_voters?.includes(address as string);
@@ -266,7 +241,7 @@ export default function GovProposalDetail({
                 target={Number(threshold) || 0}
                 yesVotesPercentage={yesPercentage}
                 noVotesPercentage={noPercentage}
-                label={label}
+                label={labelDetail ?? undefined}
               />
 
               <ProposalFunding proposal={data} />
