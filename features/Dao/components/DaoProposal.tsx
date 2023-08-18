@@ -29,6 +29,8 @@ import CopyIcon from '../../../assets/icons/copy.svg';
 import CheckIcon from '../../../assets/icons/CheckFilled.svg';
 import { usePagination } from '../../Delegate/hooks/usePagination';
 import { SimplePagination } from '../../components/genial/Pagination';
+import { DaoProposalList } from '../../components/common/ProposalList/DaoProposal';
+import { useRouter } from 'next/router';
 
 export default function DaoProposal({
   daoAddress,
@@ -46,6 +48,7 @@ export default function DaoProposal({
   setSelectedDaoMembersList: Function;
   setSelectedProposalId: Function;
 }) {
+  const router = useRouter();
   const { setSelectedDAOByAddress } = useDAOContext();
   const tooltipRef = useRef(null);
   const [green, purple] = useToken('colors', ['darkGreen', 'purple']);
@@ -184,22 +187,15 @@ export default function DaoProposal({
           >
             {title}
           </Text>
-          <ProposalList
-            showPassedOrFailed
-            showPassingOrFailing
+          <DaoProposalList
+            daoAddress={daoAddress}
             daoClient={daoQueryClient}
             client={goverrnanceQueryClient}
-            daoName={daoName}
-            totalSupply={supply as number}
             proposals={proposals}
-            isGov={false}
-            isGovList={false}
-            daoAddress={daoAddress}
-            onClickListItem={() => {
+            onClickListItem={id => {
               setDaoProposalDetailOpen(true);
+              router.push(`/dao/view/${daoName}/proposals/${id}`);
             }}
-            setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
-            setSelectedProposalId={setSelectedProposalId}
           />
         </>
       );
@@ -209,10 +205,8 @@ export default function DaoProposal({
       daoName,
       daoQueryClient,
       goverrnanceQueryClient,
+      router,
       setDaoProposalDetailOpen,
-      setSelectedDaoProposalTitle,
-      setSelectedProposalId,
-      supply,
     ],
   );
   return (

@@ -232,7 +232,7 @@ export default function DaoProposalDetail({
     if (!isGov) {
       return false;
     }
-    if (!balance || !balance.jmes) {
+    if (!balance || balance.jmes === undefined) {
       return false;
     }
     if (!proposalDetailQuery?.data) {
@@ -246,7 +246,7 @@ export default function DaoProposalDetail({
       .dividedBy(1e6)
       .toNumber();
     const daoBalance = balance.jmes.amount.dividedBy(1e6).toNumber();
-    return fundNeeded < daoBalance;
+    return daoBalance >= fundNeeded;
   }, [isGov, balance, proposalDetailQuery?.data]);
   const disableExcute = useMemo(() => {
     if (!canExecuteWithBalance) {

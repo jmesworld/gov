@@ -16,18 +16,13 @@ export const usePagination = ({
     }
     return (page - 1) * limit;
   }, [reverse, total, page, limit]);
-  const pagination = useMemo(
-    () => ({
-      page,
-      setPage,
-      limit,
-      setLimit,
-      offset,
-      total,
-      setTotal,
-    }),
-    [page, setPage, limit, setLimit, offset, total, setTotal],
-  );
-
-  return pagination;
+  return {
+    page,
+    setPage,
+    limit,
+    setLimit,
+    offset,
+    total,
+    setTotal,
+  };
 };
