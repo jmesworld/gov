@@ -1,10 +1,10 @@
 {
   "$schema": "../chain.schema.json",
-  "chain_name": "jmesprenet",
+  "chain_name": "jmespretestnet",
   "status": "live",
   "network_type": "testnet",
-  "pretty_name": "JMES Prenet",
-  "chain_id": "jmes-prenet",
+  "pretty_name": "JMES Pre-Testnet",
+  "chain_id": "jmes-pre-testnet",
   "bech32_prefix": "jmes",
   "daemon_name": "jmesd",
   "node_home": "$HOME/.jmesd",
