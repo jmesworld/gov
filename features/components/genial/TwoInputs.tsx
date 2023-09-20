@@ -1,6 +1,5 @@
 import {
   Flex,
-  Input,
   InputGroup,
   InputRightElement,
   Tag,
@@ -13,7 +12,7 @@ import { InputStyled } from '../common/Input';
 
 type Props = {
   value: [string, string];
-  onchange: [(value: string) => void, (value: string) => void];
+  onchange?: [(value: string) => void, (value: string) => void];
   error?: string;
   isLoading?: boolean;
 };
@@ -45,7 +44,7 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
           <TagLabel> Address </TagLabel>
           <TagCloseButton
             onClick={() => {
-              onchange[1]('');
+              onchange?.[1]('');
             }}
             color={'white'}
           />
@@ -53,6 +52,7 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
       )}
       {(value[0] !== value[1] || value.join('') === '') && (
         <InputStyled
+          isReadOnly={!onchange?.[0]}
           onMouseEnter={() => {
             setIsFocused(true);
           }}
@@ -76,10 +76,10 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
           onChange={e => {
             const value = e.target.value;
             if (value.length > 20) {
-              onchange[1](value);
+              onchange?.[1](value);
               return;
             }
-            onchange[0](value);
+            onchange?.[0](value);
           }}
         />
       )}
@@ -102,7 +102,6 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
           <Text
             border={0}
             width="980%"
-            height={'100%'}
             background={'background.100'}
             borderRadius={0}
             color={'purple'}
@@ -111,6 +110,9 @@ export const TwoInputs = ({ value, onchange, error, isLoading }: Props) => {
             alignItems="center"
             justifyContent="flex-start"
             fontSize="16px"
+            noOfLines={1}
+            whiteSpace="pre-wrap"
+            wordBreak="break-all"
           >
             {isLoading && 'Loading...'}
             {(!isLoading && error) || (!isLoading && value[1])}

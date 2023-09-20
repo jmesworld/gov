@@ -12,6 +12,7 @@ import GovernanceProposalComponent from './GovernanceProposalComponent';
 import { useMemo } from 'react';
 import GovHeader from './GovHeader';
 import { Flex } from '@chakra-ui/react';
+// import { SimplePagination } from '../components/genial/Pagination';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -44,7 +45,7 @@ const ArchivedGovernanceProposal = ({
   cosmWasmClient,
   status,
   title,
-  tab
+  tab,
 }: Props) => {
   const { setSelectedDaoProposalTitle } = useAppState();
 
@@ -61,6 +62,8 @@ const ArchivedGovernanceProposal = ({
   } = useGovernanceProposals({
     governanceQueryClient,
     status: status,
+    reverse: true,
+    loadAll: 'load-all',
   });
 
   const expiredConcludedSorted = useMemo(() => {
@@ -87,6 +90,18 @@ const ArchivedGovernanceProposal = ({
         fetched={!!expiredConcludedFetched}
         tab={tab}
       />
+      {/* <SimplePagination
+        enabled={
+          (expiredConcludedPagination?.offset ?? 1) > 10 ||
+          (expiredConcludedPagination?.page ?? 1) > 1
+        }
+        page={expiredConcludedPagination?.page ?? 1}
+        onPage={page => {
+          expiredConcludedPagination?.setPage(page);
+        }}
+        nextPage={(expiredConcludedPagination?.offset ?? 1) > 10}
+        prevPage={(expiredConcludedPagination?.page ?? 1) > 1}
+      /> */}
     </>
   );
 };

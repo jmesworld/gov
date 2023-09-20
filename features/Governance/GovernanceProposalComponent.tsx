@@ -80,18 +80,6 @@ export default function GovernanceProposalComponent({
           />
         </Flex>
       )}
-
-      {pagination && (
-        <Flex justifyContent="flex-end">
-          <SimplePagination
-            enabled={pagination.page !== 1 || data.length === pagination.limit}
-            page={pagination.page}
-            nextPage={data.length === pagination.limit}
-            prevPage={pagination.page > 1}
-            onPage={page => pagination.setPage(page)}
-          />
-        </Flex>
-      )}
     </Flex>
   );
 }
