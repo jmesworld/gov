@@ -351,9 +351,8 @@ export default function DaoProposalDetail({
               borderStyle="solid"
               borderColor="background.500"
               isReadOnly
-            >
-              {proposalDescription}
-            </AutoResizeTextarea>
+              defaultValue={proposalDescription}
+            />
 
             <ProposalExcuteRawData proposal={proposalDetailQuery.data} />
           </Box>

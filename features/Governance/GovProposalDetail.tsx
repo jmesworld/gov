@@ -97,11 +97,9 @@ export default function GovProposalDetail({
         setDaoProposalId(Number(daoProposalId));
       });
   }, [address, cosmWasmClient, proposalId]);
-
   const { data: daoInfo } = useDao(data?.dao);
   const { voters: memberListWithVote, isFetching: daoMemberListLoading } =
     useDaoMemberList(data?.dao, daoProposalId);
-
   const govMutationClient = useMemo(
     () =>
       signingCosmWasmClient && address

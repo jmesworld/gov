@@ -22,7 +22,12 @@ export const useGovernanceProposals = ({
   governanceQueryClient,
   status,
   loadAll,
-}: GovernanceProps & { status: ProposalQueryStatus; loadAll?: LoadAll }): {
+  reverse = true,
+}: GovernanceProps & {
+  status: ProposalQueryStatus;
+  loadAll?: LoadAll;
+  reverse?: boolean;
+}): {
   data: ProposalsResponse | undefined;
   isLoading: boolean;
   isFetched: boolean;
@@ -36,9 +41,8 @@ export const useGovernanceProposals = ({
   };
 } => {
   const { setTotal, total, limit, offset, page, setPage } = usePagination({
-    reverse: true,
+    reverse,
   });
-
   const [proposalsData, setProposalData] = useState<
     ProposalsResponse['proposals']
   >([]);
@@ -48,7 +52,7 @@ export const useGovernanceProposals = ({
       args: {
         status: status,
         limit,
-        startBefore: offset < 10 ? 10 : offset,
+        startBefore: offset <= 10 && offset !== 0 ? undefined : offset,
       },
       options: {
         enabled: !!status,
@@ -61,15 +65,23 @@ export const useGovernanceProposals = ({
       return;
     }
     if (loadAll === 'load-all') {
+      // offset 0 is the initial load to set the total.
+      if (reverse && offset <= 10 && offset !== 0) {
+        setProposalData(p => [...data.proposals, ...p]);
+        return;
+      } else {
+        setProposalData(p => [...data.proposals, ...p]);
+        setPage(p => p + 1);
+      }
       if (total) {
-        setProposalData(p => [...p, ...data.proposals]);
+        setProposalData(p => [...data.proposals, ...p]);
         setPage(p => p + 1);
       }
     }
     if (data.proposal_count && total !== data.proposal_count) {
       setTotal(data?.proposal_count);
     }
-  }, [data, limit, loadAll, setPage, setTotal, total]);
+  }, [data, limit, loadAll, offset, page, reverse, setPage, setTotal, total]);
 
   const uniqueProposals = useMemo(() => {
     if (!proposalsData) return [];

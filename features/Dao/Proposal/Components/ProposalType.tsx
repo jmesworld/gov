@@ -15,10 +15,10 @@ import {
 } from '@chakra-ui/react';
 import { formatString } from '../../../../lib/strings';
 import { getFormattedSlotType } from '../../../../utils/coreSlotType';
-import { DaoTransferFund } from './DaoTransferFund';
 import { IdentityserviceQueryClient } from '../../../../client/Identityservice.client';
 import { UpdateDirectoriesList } from './UpdateDirectorsComponent';
 import { formatBalanceWithComma } from '../../../../hooks/useAccountBalance';
+import { ShowDaoTransferFund } from './DaoTransferFundReadOnly';
 
 type Props = {
   proposal?: ProposalResponseForEmpty;
@@ -98,12 +98,10 @@ export const GetProposalDetail = ({ proposal, client }: Props) => {
       total += amountInUjmes;
       const address = msg.send.to_address;
       return (
-        <DaoTransferFund
+        <ShowDaoTransferFund
           client={client}
-          readonly
           id={String(i)}
           key={i}
-          name=""
           address={address}
           amount={amountInUjmes / 1e6}
         />
