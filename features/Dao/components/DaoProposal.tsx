@@ -7,14 +7,10 @@ import DaoMembersList from '../DaoMemberList';
 import { DaoMultisigQueryClient } from '../../../client/DaoMultisig.client';
 import { useDaoMultisigListProposalsQuery } from '../../../client/DaoMultisig.react-query';
 
-import {
-  ProposalHeader,
-  ProposalList,
-} from '../../components/Proposal/ProposalList';
+import { ProposalHeader } from '../../components/Proposal/ProposalList';
 import { useCosmWasmClientContext } from '../../../contexts/CosmWasmClient';
 
 import { BalanceDisplay } from './Balance';
-import { useCoinSupplyContext } from '../../../contexts/CoinSupply';
 import { useEffect, useMemo } from 'react';
 import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { NEXT_PUBLIC_GOVERNANCE_CONTRACT } from '../../../config/defaults';
@@ -36,9 +32,7 @@ export default function DaoProposal({
   daoAddress,
   daoName,
   setDaoProposalDetailOpen,
-  setSelectedDaoProposalTitle,
   setSelectedDaoMembersList,
-  setSelectedProposalId,
 }: {
   daoAddress: string;
   daoName: string;
@@ -57,7 +51,6 @@ export default function DaoProposal({
   }, [daoAddress, setSelectedDAOByAddress]);
 
   const { cosmWasmClient } = useCosmWasmClientContext();
-  const { supply } = useCoinSupplyContext();
   const [copied, copyToClipboard] = useClipboardTimeout();
   const daoQueryClient = useMemo(
     () =>
@@ -145,7 +138,7 @@ export default function DaoProposal({
 
   const activeGovProposal = useMemo(() => {
     return proposals.gov.filter(
-      el => el.status === 'open' || el.status === 'passed',
+      el => el.status === 'open' || el.status === 'pending',
     );
   }, [proposals.gov]);
 

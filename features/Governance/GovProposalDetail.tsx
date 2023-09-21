@@ -82,14 +82,12 @@ export default function GovProposalDetail({
   });
   useEffect(() => {
     cosmWasmClient
-      ?.searchTx({
-        tags: [
-          {
-            key: 'wasm.gov_proposal_id',
-            value: proposalId.toString(),
-          },
-        ],
-      })
+      ?.searchTx([
+        {
+          key: 'wasm.gov_proposal_id',
+          value: proposalId.toString(),
+        },
+      ])
       .then(res => {
         const daoProposalId = getAttribute(res[0], 'wasm', 'proposal_id');
 
