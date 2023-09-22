@@ -30,6 +30,7 @@ import { getLabelForProposalTypes } from './ProposalType';
 import { getFormattedSlotType } from '../../../utils/coreSlotType';
 import { getSlotType } from '../../Dao/Proposal/Components/ProposalType';
 import { useDao } from '../../../hooks/dao';
+import { timestampToDateTime } from '../../../utils/time';
 
 type BaseProps = {
   totalSupply: number;
@@ -120,6 +121,10 @@ export const ProposalList = ({
             duration !== 1 ? 's' : ''
           }`;
         }
+        const votingEndTime = proposal.voting_end
+          ? proposal.voting_end * 1e3
+          : undefined;
+
         const {
           coinYes,
           coinNo,
@@ -202,6 +207,7 @@ export const ProposalList = ({
                 ? String(fundingPerMonth)
                 : undefined
             }
+            votingEndTime={votingEndTime}
             inActive={isAllInactive}
             label={isPassing() || hasPassed()}
             labelSuccess={isPassing() === 'Passing' || hasPassed() === 'Passed'}
@@ -676,8 +682,8 @@ export const ProposalListItem = ({
   fundingPerMonth,
   passed,
   label,
-  labelSuccess,
   daoId,
+  votingEndTime,
 }: {
   title: string;
   threshold: number;
@@ -703,6 +709,7 @@ export const ProposalListItem = ({
   label?: string;
   labelSuccess?: boolean;
   daoId?: string;
+  votingEndTime?: number;
 }) => {
   const { data: daoInfo } = useDao(daoId);
   const labelColor = useMemo(() => {
@@ -733,6 +740,15 @@ export const ProposalListItem = ({
     }
     return 'Failed';
   }, [label, passed]);
+
+  const expiryDate = useMemo(() => {
+    if (!votingEndTime) {
+      return undefined;
+    }
+    return `Voting ${
+      new Date(votingEndTime) < new Date() ? 'ended' : 'ends'
+    } on ${timestampToDateTime(votingEndTime)}`;
+  }, [votingEndTime]);
 
   return (
     <>
@@ -875,14 +891,16 @@ export const ProposalListItem = ({
             </Flex>
             <Box width="15%" justifyContent={'center'}>
               <Flex pr="2" justifyContent="space-between">
-                <Text
-                  color="white"
-                  fontWeight="normal"
-                  fontSize={14}
-                  fontFamily="DM Sans"
-                >
-                  {votingDuration}
-                </Text>
+                <Tooltip hasArrow label={expiryDate} isDisabled={!expiryDate}>
+                  <Text
+                    color="white"
+                    fontWeight="normal"
+                    fontSize={14}
+                    fontFamily="DM Sans"
+                  >
+                    {votingDuration}
+                  </Text>
+                </Tooltip>
                 {(passed !== undefined || label !== undefined) && (
                   <Badge
                     alignItems="center"
