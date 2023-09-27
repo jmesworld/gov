@@ -11,3 +11,7 @@ export const convertBlockToMonth = (block: number): number => {
 export const convertTimestampToBlock = (timestamp: number): number => {
   return timestamp / 5;
 };
+
+export const convertBlockToTimestamp = (block: number): number => {
+  return block * 5;
+};

@@ -349,8 +349,8 @@ export default function DaoProposal({
           )}
 
           <SimplePagination
-            enabled={page > 1 || (data?.proposals?.length || 0) >= limit}
-            page={page}
+            enabled={(page ?? 1) > 1 || (data?.proposals?.length || 0) >= limit}
+            page={page ?? 1}
             onPage={setPage}
             nextPage={(data?.proposals.length || 0) >= limit}
             prevPage={page !== 1}
