@@ -12,7 +12,7 @@ import GovernanceProposalComponent from './GovernanceProposalComponent';
 import { useMemo } from 'react';
 import GovHeader from './GovHeader';
 import { Flex } from '@chakra-ui/react';
-// import { SimplePagination } from '../components/genial/Pagination';
+import { SimplePagination } from '../components/genial/Pagination';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -55,23 +55,22 @@ const ArchivedGovernanceProposal = ({
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   );
 
-  const {
-    data: expiredConcludedData,
-    pagination: expiredConcludedPagination,
-    isFetched: expiredConcludedFetched,
-  } = useGovernanceProposals({
+  const { data, pagination, isFetched } = useGovernanceProposals({
     governanceQueryClient,
     status: status,
     reverse: true,
-    loadAll: 'load-all',
   });
 
   const expiredConcludedSorted = useMemo(() => {
-    if (!expiredConcludedData) {
+    if (!data) {
       return [];
     }
-    return expiredConcludedData.proposals.sort(sortProposalsByType);
-  }, [expiredConcludedData]);
+    return data.proposals.sort(sortProposalsByType);
+  }, [data]);
+
+  const paginationEnabled = useMemo(() => {
+    return (pagination?.offset ?? 0) > 0;
+  }, [pagination?.offset]);
 
   return (
     <>
@@ -84,24 +83,21 @@ const ArchivedGovernanceProposal = ({
         governanceQueryClient={governanceQueryClient}
         setSelectedProposalId={setSelectedProposalId}
         supply={supply as number}
-        pagination={expiredConcludedPagination}
+        pagination={pagination}
         proposalTitle={title}
         data={expiredConcludedSorted}
-        fetched={!!expiredConcludedFetched}
+        fetched={!!isFetched}
         tab={tab}
       />
-      {/* <SimplePagination
-        enabled={
-          (expiredConcludedPagination?.offset ?? 1) > 10 ||
-          (expiredConcludedPagination?.page ?? 1) > 1
-        }
-        page={expiredConcludedPagination?.page ?? 1}
+      <SimplePagination
+        enabled={!!paginationEnabled}
+        page={pagination?.page ?? 1}
         onPage={page => {
-          expiredConcludedPagination?.setPage(page);
+          pagination?.setPage(page);
         }}
-        nextPage={(expiredConcludedPagination?.offset ?? 1) > 10}
-        prevPage={(expiredConcludedPagination?.page ?? 1) > 1}
-      /> */}
+        nextPage={(pagination?.offset ?? 1) > 10}
+        prevPage={(pagination?.page ?? 1) > 1}
+      />
     </>
   );
 };

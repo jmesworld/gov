@@ -105,7 +105,6 @@ export const ProposalList = ({
   } else {
     const proposalItems = proposals.map((proposal: any) => {
       const isGov = isProposalGov(proposal, client);
-
       if (isGovList && !goToDaoDetail) {
         let votingDuration = null;
         let votingDurationNum = null;
@@ -121,9 +120,9 @@ export const ProposalList = ({
             duration !== 1 ? 's' : ''
           }`;
         }
-        const votingEndTime = proposal.voting_end
-          ? proposal.voting_end * 1e3
-          : undefined;
+        const votingEndTime =
+          proposal.posting_start +
+          convertBlockToMonth(proposal?.funding?.duration_in_blocks ?? 0);
 
         const {
           coinYes,
@@ -207,7 +206,7 @@ export const ProposalList = ({
                 ? String(fundingPerMonth)
                 : undefined
             }
-            votingEndTime={votingEndTime}
+            votingEndTime={votingEndTime * 1e3}
             inActive={isAllInactive}
             label={isPassing() || hasPassed()}
             labelSuccess={isPassing() === 'Passing' || hasPassed() === 'Passed'}
@@ -411,8 +410,7 @@ export const DaoProposalListItem = ({
   passed,
   daoAddress,
   daoClient,
-  label,
-  labelSuccess,
+
   showIsPassing,
 }: {
   title: string;
@@ -476,10 +474,6 @@ export const DaoProposalListItem = ({
     }
     return undefined;
   }, [votesQuery.data, passed, showIsPassing, yesPercentage, threshold]);
-
-  const passingSuccess = useMemo(() => {
-    return passing === 'Passing';
-  }, [passing]);
 
   const labelColor = useMemo(() => {
     if (passed || passing === 'Passing') {
@@ -745,8 +739,8 @@ export const ProposalListItem = ({
     if (!votingEndTime) {
       return undefined;
     }
-    return `Voting ${
-      new Date(votingEndTime) < new Date() ? 'ended' : 'ends'
+    return `Proposal ${
+      new Date(votingEndTime) < new Date() ? 'expired' : 'expires'
     } on ${timestampToDateTime(votingEndTime)}`;
   }, [votingEndTime]);
 

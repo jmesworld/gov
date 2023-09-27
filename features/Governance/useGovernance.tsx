@@ -42,17 +42,32 @@ export const useGovernanceProposals = ({
 } => {
   const { setTotal, total, limit, offset, page, setPage } = usePagination({
     reverse,
+    defaultLimit: 10,
   });
   const [proposalsData, setProposalData] = useState<
     ProposalsResponse['proposals']
   >([]);
+
+  const startBefore = useMemo(() => {
+    if (page === null) {
+      return 0;
+    }
+    if (page && offset >= limit) {
+      return offset;
+    }
+    if (offset <= 10 && offset !== 0) {
+      return undefined;
+    }
+    return offset;
+  }, [limit, offset, page]);
+
   const { data, isLoading, isFetching, isFetched } =
     useGovernanceProposalsQuery({
       client: governanceQueryClient,
       args: {
         status: status,
         limit,
-        startBefore: offset <= 10 && offset !== 0 ? undefined : offset,
+        startBefore,
       },
       options: {
         enabled: !!status,
@@ -60,38 +75,55 @@ export const useGovernanceProposals = ({
       },
     });
 
+  const lastFetch = useMemo(() => {
+    return page && (startBefore == 0 || startBefore === undefined);
+  }, [page, startBefore]);
+
   useEffect(() => {
     if (!data) {
       return;
     }
+    if (data.proposal_count && total !== data.proposal_count) {
+      setTotal(data?.proposal_count);
+      setPage(1);
+      return;
+    }
     if (loadAll === 'load-all') {
       // offset 0 is the initial load to set the total.
-      if (reverse && offset <= 10 && offset !== 0) {
+      if (reverse && lastFetch) {
         setProposalData(p => [...data.proposals, ...p]);
         return;
-      } else {
-        setProposalData(p => [...data.proposals, ...p]);
-        setPage(p => p + 1);
       }
       if (total) {
         setProposalData(p => [...data.proposals, ...p]);
-        setPage(p => p + 1);
+        setPage(p => (p ?? 0) + 1);
       }
     }
-    if (data.proposal_count && total !== data.proposal_count) {
-      setTotal(data?.proposal_count);
-    }
-  }, [data, limit, loadAll, offset, page, reverse, setPage, setTotal, total]);
+  }, [
+    data,
+    lastFetch,
+    limit,
+    loadAll,
+    offset,
+    page,
+    reverse,
+    setPage,
+    setTotal,
+    total,
+  ]);
 
   const uniqueProposals = useMemo(() => {
     if (!proposalsData) return [];
-    const unique = new Map<number, ProposalsResponse['proposals'][0]>();
+    const proposalUniqueMap = new Map<
+      number,
+      ProposalsResponse['proposals'][0]
+    >();
     proposalsData.forEach(proposal => {
-      if (!unique.has(proposal.id)) {
-        unique.set(proposal.id, proposal);
+      if (!proposalUniqueMap.has(proposal.id)) {
+        proposalUniqueMap.set(proposal.id, proposal);
       }
     });
-    return Array.from(unique.values());
+    return Array.from(proposalUniqueMap.values());
   }, [proposalsData]);
 
   return {
@@ -108,9 +140,9 @@ export const useGovernanceProposals = ({
     pagination: {
       limit,
       offset,
-      page,
+      page: page ?? 0,
       setPage,
-      total,
+      total: total ?? 0,
     },
   };
 };
