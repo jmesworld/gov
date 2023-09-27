@@ -46,6 +46,8 @@ const Example = () => {
           value={startBefore}
           onChange={e =>
             setStartBefore(
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              /// @ts-ignore
               Number(e.target.value) ? Number(e.target.value) : undefined,
             )
           }
@@ -63,6 +65,8 @@ const Example = () => {
         <input
           type="number"
           value={limit}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          /// @ts-ignore
           onChange={e => setLimit(e.target.value)}
         />
         <Button onClick={() => refetch()}>refetch</Button>
