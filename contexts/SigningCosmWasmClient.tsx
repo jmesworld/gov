@@ -11,7 +11,7 @@ import { chainName } from '../config/defaults';
 import { Alert, Button } from '@chakra-ui/react';
 import { ErrorAlert } from '../features/components/genial/Alert';
 import LoadingComponent from '../features/components/genial/LoadingMessage';
-
+  
 type Props = {
   children?: ReactNode;
 };
