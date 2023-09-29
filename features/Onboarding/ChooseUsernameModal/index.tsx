@@ -24,6 +24,7 @@ import { useIdentityContext } from '../../../contexts/IdentityContext';
 import { daoNameSchema } from '../../../utils/dao';
 import { useSigningCosmWasmClientContext } from '../../../contexts/SigningCosmWasmClient';
 import { handleError } from '../../../error/hanldeErrors';
+import { queryClient } from '../../../pages/_app';
 
 const IDENTITY_SERVICE_CONTRACT = process.env
   .NEXT_PUBLIC_IDENTITY_SERVICE_CONTRACT as string;
@@ -93,7 +94,14 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
         },
         args: { fee },
       })
-      .then(() => refetchIdentity())
+      .then(async () => {
+        await queryClient.invalidateQueries([
+          'identity by value',
+          query,
+          'name',
+        ]);
+        refetchIdentity();
+      })
       .then(() => {
         toast({
           title: 'Identity created!',
@@ -130,6 +138,7 @@ const ChooseUsernameCard = ({ identityName }: ChooseUsernameCardProps) => {
       createIdentityDisabled={!isIdentityNameAvailable || usernameError !== ''}
       searchComponent={
         <SearchResults
+          isCreatingIdentity={isCreatingIdentity}
           isIdentityNameAvailable={isIdentityNameAvailable}
           queryError={usernameError}
           client={client}

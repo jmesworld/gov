@@ -311,7 +311,7 @@ export const Delegate = ({ onClose }: Props) => {
                     >
                       {bonding && `Total JMES: ${Math.max(0, totalJmes - 1)}`}
                       {!bonding &&
-                        `Total bJMES: ${Math.max(0, totalBondedJmes - 1)}`}
+                        `Total bJMES: ${Math.max(0, totalBondedJmes)}`}
                       <Button
                         size="xs"
                         ml="1"
@@ -321,9 +321,7 @@ export const Delegate = ({ onClose }: Props) => {
                             onValueChange(String(Math.max(0, totalJmes - 1)));
                             return;
                           }
-                          onValueChange(
-                            String(Math.max(0, totalBondedJmes - 1)),
-                          );
+                          onValueChange(String(Math.max(0, totalBondedJmes)));
                           e.preventDefault();
                           e.stopPropagation();
                         }}

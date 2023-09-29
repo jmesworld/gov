@@ -44,7 +44,7 @@ export const DaoName = ({
   });
 
   useEffect(() => {
-    if (!data) {
+    if (!data || disabled) {
       return;
     }
     if (daoNameDebounced !== daoName) {
@@ -57,7 +57,7 @@ export const DaoName = ({
         error: data?.identity?.owner ? 'Name already exists' : undefined,
       },
     });
-  }, [data, daoNameDebounced, daoName, dispatch]);
+  }, [data, daoNameDebounced, daoName, dispatch, disabled]);
 
   useEffect(() => {
     if (!daoNameError) {

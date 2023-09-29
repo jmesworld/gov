@@ -40,18 +40,21 @@ export const SearchResults = memo(
     setIsIdentityNameAvailable,
     isIdentityNameAvailable,
     queryError,
+    isCreatingIdentity,
   }: {
     query: string;
     client: IdentityserviceQueryClient;
     setIsIdentityNameAvailable: Dispatch<SetStateAction<boolean>>;
     queryError: string;
     isIdentityNameAvailable: boolean;
+    isCreatingIdentity: boolean;
   }) => {
+    const enabled = !queryError && query !== '' && !isCreatingIdentity;
     const { data, isFetching, error } = useIdentityFetch({
       client,
       type: 'name',
       value: query,
-      enabled: !queryError && query !== '',
+      enabled,
       moreOptions: {
         onError() {
           setIsIdentityNameAvailable(false);
@@ -78,7 +81,9 @@ export const SearchResults = memo(
     }, [data, error, queryError, setIsIdentityNameAvailable]);
 
     const isLoadingOrFetching = isFetching;
-
+    if (isCreatingIdentity) {
+      return null;
+    }
     if (isLoadingOrFetching) {
       return (
         <Text

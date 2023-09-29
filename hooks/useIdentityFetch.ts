@@ -64,11 +64,9 @@ export const useIdentityFetch = ({
       return;
     }
 
-    if (data?.identity) {
+    if (data?.identity?.name) {
       queryClient.setQueryData(getComplementaryQueryKey, data);
     }
-
-    queryClient.cancelQueries(queryKey);
   }, [getComplementaryQueryKey, query, queryKey]);
 
   return query;

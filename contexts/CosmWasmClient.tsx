@@ -7,6 +7,9 @@ import {
 } from 'react';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { rpc } from '../config/defaults';
+import LoadingComponent from '../features/components/genial/LoadingMessage';
+import { Button } from '@chakra-ui/react';
+import { ErrorAlert } from '../features/components/genial/Alert';
 
 type Props = {
   children?: ReactNode;
@@ -27,6 +30,8 @@ const CosmWasmClientContextProvider = ({ children }: Props) => {
   const [cosmWasmClient, setCosmWasmClient] = useState<CosmWasmClient | null>(
     null,
   );
+  const [error, setError] = useState<string | null>(null);
+  const [retry, setRetry] = useState<number>(0);
   const value = {
     cosmWasmClient,
   };
@@ -39,12 +44,30 @@ const CosmWasmClientContextProvider = ({ children }: Props) => {
         }
         setCosmWasmClient(cosmWasmClient);
       })
-      .catch(error => console.error(error));
-  }, []);
+      .catch(error => {
+        setError(error.message);
+        console.error(error);
+      });
+  }, [retry]);
 
   return (
     <CosmWasmClientContext.Provider value={value}>
-      {children}
+      {!cosmWasmClient && !error && <LoadingComponent />}
+      {cosmWasmClient && children}
+      {error && (
+        <ErrorAlert
+          description={error}
+          title={'Error connecting to WASM client!'}
+        >
+          <Button
+            onClick={() => {
+              setRetry(p => p + 1);
+            }}
+          >
+            Retry
+          </Button>
+        </ErrorAlert>
+      )}
     </CosmWasmClientContext.Provider>
   );
 };
