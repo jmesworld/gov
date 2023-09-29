@@ -17,6 +17,7 @@ type GovernanceProps = {
   governanceQueryClient: GovernanceQueryClient;
 };
 
+const defaultLimit = 10;
 type LoadAll = 'load-all';
 export const useGovernanceProposals = ({
   governanceQueryClient,
@@ -42,7 +43,9 @@ export const useGovernanceProposals = ({
 } => {
   const { setTotal, total, limit, offset, page, setPage } = usePagination({
     reverse,
-    defaultLimit: 10,
+    defaultPage: null,
+    defaultTotal: null,
+    defaultLimit,
   });
   const [proposalsData, setProposalData] = useState<
     ProposalsResponse['proposals']
@@ -50,7 +53,7 @@ export const useGovernanceProposals = ({
 
   const startBefore = useMemo(() => {
     if (page === null) {
-      return 0;
+      return undefined;
     }
     if (page && offset >= limit) {
       return offset;
@@ -70,10 +73,29 @@ export const useGovernanceProposals = ({
         startBefore,
       },
       options: {
+        refetchOnMount: true,
+        refetchOnWindowFocus: false,
         enabled: !!status,
-        refetchInterval: 5000,
+        retry: 3,
+        refetchInterval: loadAll === 'load-all' ? 0 : 5000,
+        cacheTime: 5000,
+        staleTime: 5000,
       },
     });
+
+  useEffect(() => {
+    if (loadAll !== 'load-all') {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setPage(1);
+    }, 5500);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [loadAll, setPage]);
 
   const lastFetch = useMemo(() => {
     return page && (startBefore == 0 || startBefore === undefined);
@@ -119,9 +141,7 @@ export const useGovernanceProposals = ({
       ProposalsResponse['proposals'][0]
     >();
     proposalsData.forEach(proposal => {
-      if (!proposalUniqueMap.has(proposal.id)) {
-        proposalUniqueMap.set(proposal.id, proposal);
-      }
+      proposalUniqueMap.set(proposal.id, proposal);
     });
     return Array.from(proposalUniqueMap.values());
   }, [proposalsData]);
