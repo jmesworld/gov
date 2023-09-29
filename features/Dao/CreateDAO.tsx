@@ -610,6 +610,7 @@ const CreateDaoNewForm = ({
                 args: { fee },
               })
               .then(() => {
+                refresh();
                 setRouterCheck(false);
                 dispatch({
                   type: 'RESET',
@@ -619,7 +620,6 @@ const CreateDaoNewForm = ({
                 });
               })
               .then(() => {
-                refresh();
                 toast({
                   title: 'DAO created!',
                   status: 'success',

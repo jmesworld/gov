@@ -63,9 +63,9 @@ const IdentityContextProvider = ({ children }: Props) => {
     enabled: !!address && !!identityserviceClient,
     moreOptions: {
       refetchOnMount: true,
+      refetchOnWindowFocus: false,
     },
   });
-
   const getIdentityName = useCallback(() => {
     const loading = identityOwnerQuery?.isLoading;
     const name = identityOwnerQuery?.data?.identity?.name;

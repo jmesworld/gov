@@ -103,13 +103,12 @@ export const defaultThemeObject = {
         secondary: {
           container: {
             borderRadius: 'full',
-            borderWidth: '1px',
-            borderColor: 'purple',
+            borderWidth: '0px',
           },
           track: {
             bg: 'gray.100',
             borderRadius: 'full',
-            borderWidth: '1px',
+            borderWidth: '2px',
             borderColor: 'purple',
             _checked: {
               bg: 'green',
