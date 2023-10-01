@@ -61,7 +61,7 @@ function CreateCosmosApp({ Component, pageProps }: AppPropsWithLayout) {
       };
     },
 
-    preferredSignType: () => 'direct',
+    preferredSignType: () => 'amino',
   };
   useEffect(() => {
     if (typeof window !== 'undefined') {
