@@ -82,7 +82,6 @@ export const useGovernanceProposals = ({
         staleTime: 5000,
       },
     });
-
   useEffect(() => {
     if (loadAll !== 'load-all') {
       return;
@@ -153,7 +152,9 @@ export const useGovernanceProposals = ({
             proposals: uniqueProposals,
             proposal_count: total,
           } as ProposalsResponse)
-        : data,
+        : (page ?? 0) >= 1
+        ? data
+        : undefined,
     isLoading,
     isFetching,
     isFetched,

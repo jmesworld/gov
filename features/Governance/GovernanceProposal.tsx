@@ -87,7 +87,6 @@ export default function GovernanceProposal({
           governanceQueryClient={governanceQueryClient}
           setSelectedProposalId={setSelectedProposalId}
           supply={supply as number}
-          pagination={undefined}
           proposalTitle={'ACTIVE PROPOSALS'}
           data={sortedActive}
           fetched={isFetched}
@@ -99,7 +98,6 @@ export default function GovernanceProposal({
           governanceQueryClient={governanceQueryClient}
           setSelectedProposalId={setSelectedProposalId}
           supply={supply as number}
-          pagination={undefined}
           proposalTitle={'EXPIRED PROPOSALS'}
           data={sortedNotConcluded}
           fetched={isFetched}
