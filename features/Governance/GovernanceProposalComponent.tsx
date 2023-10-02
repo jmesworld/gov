@@ -4,7 +4,6 @@ import { ProposalHeader } from '../components/Proposal/ProposalList';
 import { ProposalList } from '../components/Proposal/ProposalList';
 
 import { ProposalResponse } from '../../client/Governance.types';
-import { SimplePagination } from '../components/genial/Pagination';
 
 type Props = {
   governanceQueryClient: GovernanceQueryClient;
@@ -13,13 +12,10 @@ type Props = {
   fetched: boolean;
   setSelectedDaoProposalTitle: (title: string) => void;
   supply: number;
-  pagination?: {
-    limit: number;
-    page: number;
-    setPage: (page: number) => void;
-  };
+
   proposalTitle?: string;
   tab?: string;
+  isLoading?: boolean;
 };
 // TODO: fix passing/passed
 export default function GovernanceProposalComponent({
@@ -27,17 +23,16 @@ export default function GovernanceProposalComponent({
   governanceQueryClient,
   setSelectedDaoProposalTitle,
   supply,
-  pagination,
   proposalTitle,
-  fetched,
   data,
   tab,
+  isLoading,
 }: Props) {
   return (
     <Flex flexDir="column" pb="4">
       <ProposalHeader proposalTitle={proposalTitle} isGov={true} />
       <Flex height={'9px'} />
-      {!fetched && !data.length && (
+      {isLoading && data.length === 0 && (
         <Flex flexDir="column" justifyContent="center" alignItems="center">
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton
@@ -52,7 +47,7 @@ export default function GovernanceProposalComponent({
           ))}
         </Flex>
       )}
-      {fetched && !data.length && (
+      {!isLoading && !data.length && (
         <Flex
           flexDir="column"
           justifyContent="center"

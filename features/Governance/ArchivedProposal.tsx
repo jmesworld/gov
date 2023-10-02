@@ -83,7 +83,6 @@ const ArchivedGovernanceProposal = ({
         governanceQueryClient={governanceQueryClient}
         setSelectedProposalId={setSelectedProposalId}
         supply={supply as number}
-        pagination={pagination}
         proposalTitle={title}
         data={expiredConcludedSorted}
         fetched={!!isFetched}

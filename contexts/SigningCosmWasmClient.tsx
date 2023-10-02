@@ -10,8 +10,7 @@ import { useChain } from '@cosmos-kit/react';
 import { chainName } from '../config/defaults';
 import { Alert, Button } from '@chakra-ui/react';
 import { ErrorAlert } from '../features/components/genial/Alert';
-import LoadingComponent from '../features/components/genial/LoadingMessage';
-  
+
 type Props = {
   children?: ReactNode;
 };
@@ -51,7 +50,6 @@ const SigningCosmWasmClientContextProvider = ({ children }: Props) => {
   const value = {
     signingCosmWasmClient,
   };
-
   return (
     <SigningCosmWasmClientContext.Provider value={value}>
       {error && <Alert status="error">{error}</Alert>}
@@ -69,8 +67,7 @@ const SigningCosmWasmClientContextProvider = ({ children }: Props) => {
           </Button>
         </ErrorAlert>
       )}
-      {!signingCosmWasmClient && !error && <LoadingComponent />}
-      {signingCosmWasmClient && children}
+      {children}
     </SigningCosmWasmClientContext.Provider>
   );
 };

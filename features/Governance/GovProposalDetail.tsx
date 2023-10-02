@@ -199,6 +199,12 @@ export default function GovProposalDetail({
     if (tab === 'funded') {
       return 'Funded Proposal';
     }
+    if (tab === 'passed') {
+      return 'Passed Proposal';
+    }
+    if (tab === 'expired') {
+      return 'Expired Proposal';
+    }
     return 'Governance Proposal';
   }, [tab]);
 
@@ -211,6 +217,12 @@ export default function GovProposalDetail({
     }
     if (tab === 'funded') {
       return '/funded';
+    }
+    if (tab === 'passed') {
+      return '/passed';
+    }
+    if (tab === 'expired') {
+      return '/expired';
     }
     return undefined;
   }, [tab]);
