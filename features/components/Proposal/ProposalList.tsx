@@ -212,7 +212,7 @@ export const ProposalList = ({
             labelSuccess={isPassing() === 'Passing' || hasPassed() === 'Passed'}
             votingDuration={votingDuration ?? '-'}
             key={proposal.id + proposal.description}
-            title={proposal.title}
+            title={`${proposal.title}-id-${proposal.id}`}
             yesCount={coinYes}
             passed={statusSuccess()}
             isGov={isGov}

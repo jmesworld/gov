@@ -322,6 +322,10 @@ export default function CreateGovProposal({
             description: proposalDescription.value,
             msgs: [{ wasm: wasmMsg }],
           },
+          args: {
+            fee,
+            funds: [{ amount: '10000000', denom: 'ujmes' }],
+          },
         });
         toast({
           title: 'Proposal created!',
