@@ -28,7 +28,7 @@ const Example = () => {
     client: governanceQueryClient,
     args: {
       status,
-      limit,
+      limit: Number(limit) ? Number(limit) : 10,
       startBefore: startBefore ?? undefined,
     },
     options: {
