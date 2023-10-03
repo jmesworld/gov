@@ -81,7 +81,7 @@ const Example = () => {
         <pre>{JSON.stringify(data, null, 2)}</pre>
 
         <p>error</p>
-        <pre>{JSON.stringify(error, null, 2)}</pre>
+        <pre>{String(error)}</pre>
       </div>
     </>
   );
