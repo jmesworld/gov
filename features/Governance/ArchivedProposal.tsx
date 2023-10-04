@@ -12,7 +12,7 @@ import GovernanceProposalComponent from './GovernanceProposalComponent';
 import { useMemo } from 'react';
 import GovHeader from './GovHeader';
 import { Flex } from '@chakra-ui/react';
-import { SimplePagination } from '../components/genial/Pagination';
+import { LoadMore } from '../components/genial/LoadMore';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -55,11 +55,12 @@ const ArchivedGovernanceProposal = ({
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   );
 
-  const { data, pagination, isFetched } = useGovernanceProposals({
-    governanceQueryClient,
-    status: status,
-    reverse: true,
-  });
+  const { data, pagination, isFetched, isFetching, isLoading } =
+    useGovernanceProposals({
+      governanceQueryClient,
+      status: status,
+      reverse: true,
+    });
 
   const expiredConcludedSorted = useMemo(() => {
     if (!data) {
@@ -67,10 +68,6 @@ const ArchivedGovernanceProposal = ({
     }
     return data.proposals.sort(sortProposalsByType);
   }, [data]);
-
-  const paginationEnabled = useMemo(() => {
-    return (pagination?.offset ?? 0) > 0;
-  }, [pagination?.offset]);
 
   return (
     <>
@@ -86,16 +83,15 @@ const ArchivedGovernanceProposal = ({
         proposalTitle={title}
         data={expiredConcludedSorted}
         fetched={!!isFetched}
+        isLoading={isFetching || isLoading}
         tab={tab}
       />
-      <SimplePagination
-        enabled={!!paginationEnabled}
-        page={pagination?.page ?? 1}
-        onPage={page => {
-          pagination?.setPage(page);
+      <LoadMore
+        loading={!!pagination?.loading}
+        enabled={!!pagination?.loadMore}
+        nextPage={() => {
+          pagination?.fetchNext();
         }}
-        nextPage={(pagination?.offset ?? 1) > 10}
-        prevPage={(pagination?.page ?? 1) > 1}
       />
     </>
   );

@@ -8,7 +8,7 @@ import { useGovernanceProposals } from './useGovernance';
 import GovernanceProposalComponent from './GovernanceProposalComponent';
 import { useMemo } from 'react';
 import GovHeader from './GovHeader';
-import { Flex } from '@chakra-ui/react';
+import { Flex, Skeleton } from '@chakra-ui/react';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
   .NEXT_PUBLIC_GOVERNANCE_CONTRACT as string;
@@ -46,10 +46,10 @@ export default function GovernanceProposal({
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   );
 
-  const { data, isFetched } = useGovernanceProposals({
+  const { data, isFetched, isFetching, isLoading } = useGovernanceProposals({
     governanceQueryClient,
     status: 'active',
-    loadAll: 'load-all',
+    loadAll: true,
   });
 
   const active = useMemo(() => {
@@ -81,6 +81,21 @@ export default function GovernanceProposal({
       <Flex height={'35px'} />
       <GovHeader />
       <Flex height={'46px'} />
+      {data?.proposals.length === 0 && isLoading && isFetching && (
+        <Flex flexDir="column" justifyContent="center" alignItems="center">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton
+              startColor="skeleton.200"
+              endColor="lilac"
+              rounded="lg"
+              key={i}
+              height="89px"
+              width="100%"
+              mb="10px"
+            />
+          ))}
+        </Flex>
+      )}
       {sortedActive.length !== 0 && (
         <GovernanceProposalComponent
           setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}

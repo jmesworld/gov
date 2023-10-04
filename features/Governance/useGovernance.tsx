@@ -12,63 +12,52 @@ import {
 } from '../../client/Governance.types';
 import { useQueries } from '@tanstack/react-query';
 import { assertNullOrUndefined } from '../../utils/ts';
+import { useCallbackRef, useToast } from '@chakra-ui/react';
 
 type GovernanceProps = {
   governanceQueryClient: GovernanceQueryClient;
 };
 
 const defaultLimit = 10;
-type LoadAll = 'load-all';
 export const useGovernanceProposals = ({
   governanceQueryClient,
   status,
   loadAll,
-  reverse = true,
+  concatResult = true,
 }: GovernanceProps & {
   status: ProposalQueryStatus;
-  loadAll?: LoadAll;
+  loadAll?: boolean;
   reverse?: boolean;
+  concatResult?: boolean;
 }): {
   data: ProposalsResponse | undefined;
   isLoading: boolean;
   isFetched: boolean;
   isFetching: boolean;
   pagination?: {
-    limit: number;
-    offset: number;
-    page: number;
-    setPage: (page: number) => void;
-    total: number;
+    fetchNext: () => void;
+    loadMore: boolean;
+    loading: boolean;
   };
 } => {
+  const toast = useToast();
+  const [isFetchingOnDemand, setIsFetchingOnDemand] = useState(false);
   const { setTotal, total, limit, offset, page, setPage } = usePagination({
-    reverse,
-    defaultPage: null,
+    reverse: true,
+    defaultPage: 1,
     defaultTotal: null,
     defaultLimit,
   });
+  const [startBefore, setStartBefore] = useState<number | undefined>(undefined);
   const [proposalsData, setProposalData] = useState<
     ProposalsResponse['proposals']
   >([]);
-
-  const startBefore = useMemo(() => {
-    if (page === null) {
-      return undefined;
-    }
-    if (page && offset >= limit) {
-      return offset;
-    }
-    if (offset <= 10 && offset !== 0) {
-      return undefined;
-    }
-    return offset;
-  }, [limit, offset, page]);
 
   const { data, isLoading, isFetching, isFetched } =
     useGovernanceProposalsQuery({
       client: governanceQueryClient,
       args: {
-        status: status,
+        status,
         limit,
         startBefore,
       },
@@ -77,18 +66,20 @@ export const useGovernanceProposals = ({
         refetchOnWindowFocus: false,
         enabled: !!status,
         retry: 3,
-        refetchInterval: loadAll === 'load-all' ? 0 : 5000,
+        refetchInterval: loadAll ? false : 5000,
         cacheTime: 5000,
         staleTime: 5000,
       },
     });
+
   useEffect(() => {
-    if (loadAll !== 'load-all') {
+    if (!loadAll) {
       return;
     }
 
     const interval = setInterval(() => {
       setPage(1);
+      setStartBefore(undefined);
     }, 5500);
 
     return () => {
@@ -96,41 +87,88 @@ export const useGovernanceProposals = ({
     };
   }, [loadAll, setPage]);
 
-  const lastFetch = useMemo(() => {
-    return page && (startBefore == 0 || startBefore === undefined);
-  }, [page, startBefore]);
+  const updateStartBefore = useCallbackRef(() => {
+    setIsFetchingOnDemand(true);
+    if (!data) {
+      setPage(1);
+      return;
+    }
+
+    const { proposals } = data;
+    if (!proposals.length) {
+      setStartBefore(Math.max((startBefore ?? 10) - limit, 0));
+      return;
+    }
+    const lastProposal = proposals[proposals.length - 1];
+    if (!lastProposal) {
+      return;
+    }
+    setStartBefore(lastProposal.id);
+  }, [offset]);
+
+  const isPaginationActive = useMemo(() => {
+    if (startBefore === 0 || offset == 0) {
+      return false;
+    }
+    return true;
+  }, [offset, startBefore]);
 
   useEffect(() => {
-    if (!data) {
+    if (!loadAll || !data) {
       return;
     }
     if (data.proposal_count && total !== data.proposal_count) {
       setTotal(data?.proposal_count);
-      setPage(1);
-      return;
     }
-    if (loadAll === 'load-all') {
-      // offset 0 is the initial load to set the total.
-      if (reverse && lastFetch) {
-        setProposalData(p => [...data.proposals, ...p]);
-        return;
-      }
-      if (total) {
-        setProposalData(p => [...data.proposals, ...p]);
-        setPage(p => (p ?? 0) + 1);
-      }
-    }
+    const { proposals } = data;
+
+    setProposalData(p => [...p, ...proposals]);
+    updateStartBefore();
   }, [
     data,
-    lastFetch,
+    isPaginationActive,
+    loadAll,
+    setTotal,
+    toast,
+    total,
+    updateStartBefore,
+  ]);
+
+  useEffect(() => {
+    if (!data || loadAll) {
+      return;
+    }
+    if (data.proposal_count && total !== data.proposal_count) {
+      setTotal(data?.proposal_count);
+    }
+    setIsFetchingOnDemand(false);
+    const { proposals } = data;
+    if (proposals.length === 0) {
+      toast({
+        title: `The last query didn't return proposals, ${
+          isPaginationActive
+            ? 'Please try again to fetch more.'
+            : 'No more proposals to fetch.'
+        } `,
+        status: 'info',
+        position: 'bottom',
+        duration: 1000,
+      });
+    }
+    setProposalData(p => [...p, ...proposals]);
+  }, [
+    concatResult,
+    data,
+    isPaginationActive,
     limit,
     loadAll,
     offset,
     page,
-    reverse,
     setPage,
     setTotal,
+    toast,
     total,
+    updateStartBefore,
   ]);
 
   const uniqueProposals = useMemo(() => {
@@ -147,7 +185,7 @@ export const useGovernanceProposals = ({
 
   return {
     data:
-      loadAll === 'load-all'
+      loadAll || concatResult
         ? ({
             proposals: uniqueProposals,
             proposal_count: total,
@@ -159,11 +197,9 @@ export const useGovernanceProposals = ({
     isFetching,
     isFetched,
     pagination: {
-      limit,
-      offset,
-      page: page ?? 0,
-      setPage,
-      total: total ?? 0,
+      loadMore: isPaginationActive,
+      fetchNext: updateStartBefore,
+      loading: isFetchingOnDemand,
     },
   };
 };

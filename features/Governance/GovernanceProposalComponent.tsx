@@ -60,7 +60,7 @@ export default function GovernanceProposalComponent({
       )}
 
       {data.length > 0 && (
-        <Flex flexDir="column" mb="25px">
+        <Flex flexDir="column" mb="4">
           <ProposalList
             tab={tab}
             showPassedOrFailed
