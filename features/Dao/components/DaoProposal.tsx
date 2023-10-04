@@ -305,7 +305,7 @@ export default function DaoProposal({
         </Flex>
       </Flex>
       <Flex>
-        <Box flexGrow={1} minWidth="700px" overflow="auto">
+        <Box flexGrow={1} mb="2" minWidth="700px" overflow="auto">
           <Flex height={'20px'} />
 
           {proposals?.gov?.length > 0 && (
