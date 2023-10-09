@@ -1,7 +1,6 @@
 import { GovernanceQueryClient } from '../../client/Governance.client';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { useAppState } from '../../contexts/AppStateContext';
-import { useCoinSupplyContext } from '../../contexts/CoinSupply';
 import { getProposalTypeForGovPublicProposals } from '../../utils/proposalUti';
 import { ProposalResponse } from '../../client/Governance.types';
 import { useGovernanceWinningGrants } from './useGovernance';
@@ -40,7 +39,6 @@ export default function GovernanceProposal({
   cosmWasmClient,
 }: Props) {
   const { setSelectedDaoProposalTitle } = useAppState();
-  const { supply } = useCoinSupplyContext();
   const governanceQueryClient = new GovernanceQueryClient(
     cosmWasmClient as CosmWasmClient,
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
@@ -65,7 +63,6 @@ export default function GovernanceProposal({
         setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
         governanceQueryClient={governanceQueryClient}
         setSelectedProposalId={setSelectedProposalId}
-        supply={supply as number}
         proposalTitle={'FUNDED PROPOSALS'}
         data={sorted}
         fetched={isFetched}

@@ -25,6 +25,6 @@ export const proposalDescriptionValidator = z
   .max(maxDescriptionLength, {
     message: `Description must not exceed ${maxDescriptionLength} characters`,
   })
-  .regex(/^[a-zA-Z0-9\s!&?#:()*+'-./"']+$/, {
+  .regex(/^[a-zA-Z0-9\s!&?#:"'()*+,'\-./]+$/, {
     message: 'Description must only contain alphanumeric characters',
   });
