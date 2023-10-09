@@ -118,11 +118,12 @@ export const ProposalList = ({
             duration !== 1 ? 's' : ''
           }`;
         }
-        const votingEndTime =
-          proposal.posting_start +
-          convertMonthToSec(
-            convertBlockToMonth(proposal?.funding?.duration_in_blocks ?? 0),
-          );
+        const votingEndTime = votingDuration
+          ? proposal.posting_start +
+            convertMonthToSec(
+              convertBlockToMonth(proposal?.funding?.duration_in_blocks ?? 0),
+            )
+          : undefined;
 
         const {
           coinYes,
