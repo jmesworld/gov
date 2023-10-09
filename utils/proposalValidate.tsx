@@ -13,7 +13,7 @@ export const proposalTitleValidator = z
   .max(maxTitleLength, {
     message: `Title must not exceed ${maxTitleLength} characters`,
   })
-  .regex(/^[a-zA-Z0-9\s!&?#()*+'-./"']+$/, {
+  .regex(/^[a-zA-Z0-9\s!&?#:"'()*+,'\-./]+$/, {
     message: 'Title must only contain alphanumeric characters',
   });
 
