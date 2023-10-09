@@ -11,8 +11,6 @@ type Props = {
   data: ProposalResponse[];
   fetched: boolean;
   setSelectedDaoProposalTitle: (title: string) => void;
-  supply: number;
-
   proposalTitle?: string;
   tab?: string;
   isLoading?: boolean;
@@ -22,17 +20,17 @@ export default function GovernanceProposalComponent({
   setSelectedProposalId,
   governanceQueryClient,
   setSelectedDaoProposalTitle,
-  supply,
   proposalTitle,
   data,
   tab,
   isLoading,
+  fetched,
 }: Props) {
   return (
     <Flex flexDir="column" pb="4">
       <ProposalHeader proposalTitle={proposalTitle} isGov={true} />
       <Flex height={'9px'} />
-      {isLoading && data.length === 0 && (
+      {isLoading && !fetched && data.length === 0 && (
         <Flex flexDir="column" justifyContent="center" alignItems="center">
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton
@@ -58,7 +56,6 @@ export default function GovernanceProposalComponent({
           <Text color="lilac">No proposals found</Text>
         </Flex>
       )}
-
       {data.length > 0 && (
         <Flex flexDir="column" mb="4">
           <ProposalList
@@ -67,7 +64,6 @@ export default function GovernanceProposalComponent({
             showPassingOrFailing
             isGovList
             client={governanceQueryClient}
-            totalSupply={supply as number}
             proposals={data}
             isGov={true}
             setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}

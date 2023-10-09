@@ -1,7 +1,6 @@
 import { GovernanceQueryClient } from '../../client/Governance.client';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { useAppState } from '../../contexts/AppStateContext';
-import { useCoinSupplyContext } from '../../contexts/CoinSupply';
 import { getProposalTypeForGovPublicProposals } from '../../utils/proposalUti';
 import { ProposalResponse } from '../../client/Governance.types';
 import { useGovernanceProposals } from './useGovernance';
@@ -40,19 +39,19 @@ export default function GovernanceProposal({
   cosmWasmClient,
 }: Props) {
   const { setSelectedDaoProposalTitle } = useAppState();
-  const { supply } = useCoinSupplyContext();
   const governanceQueryClient = new GovernanceQueryClient(
     cosmWasmClient as CosmWasmClient,
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   );
 
-  const { data, isFetched, isFetching, isLoading } = useGovernanceProposals({
+  const { data, isFetching, isLoading } = useGovernanceProposals({
     governanceQueryClient,
     status: 'active',
     loadAll: true,
   });
 
   const active = useMemo(() => {
+    if (!data?.proposals) return [];
     return data?.proposals.filter(
       proposal =>
         proposal.status !== 'expired' && proposal.status !== 'success',
@@ -60,6 +59,7 @@ export default function GovernanceProposal({
   }, [data?.proposals]);
 
   const notConcluded = useMemo(() => {
+    if (!data?.proposals) return [];
     return data?.proposals.filter(
       proposal =>
         proposal.status === 'expired' || proposal.status === 'success',
@@ -81,7 +81,7 @@ export default function GovernanceProposal({
       <Flex height={'35px'} />
       <GovHeader />
       <Flex height={'46px'} />
-      {data?.proposals.length === 0 && isLoading && isFetching && (
+      {data === null && isLoading && isFetching && (
         <Flex flexDir="column" justifyContent="center" alignItems="center">
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton
@@ -101,10 +101,9 @@ export default function GovernanceProposal({
           setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
           governanceQueryClient={governanceQueryClient}
           setSelectedProposalId={setSelectedProposalId}
-          supply={supply as number}
           proposalTitle={'ACTIVE PROPOSALS'}
           data={sortedActive}
-          fetched={isFetched}
+          fetched={data !== null}
         />
       )}
       {sortedNotConcluded.length !== 0 && (
@@ -112,10 +111,9 @@ export default function GovernanceProposal({
           setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
           governanceQueryClient={governanceQueryClient}
           setSelectedProposalId={setSelectedProposalId}
-          supply={supply as number}
           proposalTitle={'EXPIRED PROPOSALS'}
           data={sortedNotConcluded}
-          fetched={isFetched}
+          fetched={data !== null}
         />
       )}
     </>

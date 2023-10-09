@@ -23,7 +23,7 @@ import { GovernanceQueryClient } from '../../../client/Governance.client';
 import { ProposalResponse } from '../../../client/Governance.types';
 import { ProposalResponseForEmpty } from '../../../client/DaoMultisig.types';
 import { formatBalanceWithComma } from '../../../hooks/useAccountBalance';
-import { convertBlockToMonth } from '../../../utils/block';
+import { convertBlockToMonth, convertMonthToSec } from '../../../utils/block';
 import { useDaoMultisigListVotesQuery } from '../../../client/DaoMultisig.react-query';
 import { DaoMultisigQueryClient } from '../../../client/DaoMultisig.client';
 import { getLabelForProposalTypes } from './ProposalType';
@@ -33,7 +33,6 @@ import { useDao } from '../../../hooks/dao';
 import { timestampToDateTime } from '../../../utils/time';
 
 type BaseProps = {
-  totalSupply: number;
   proposals: ProposalResponse[] | ProposalResponseForEmpty[];
   onClickListItem?: MouseEventHandler<HTMLDivElement>;
   setSelectedDaoProposalTitle: Function;
@@ -66,7 +65,6 @@ export const ProposalList = ({
   onClickListItem,
   setSelectedDaoProposalTitle,
   setSelectedProposalId,
-  totalSupply,
   client,
   isGovList,
   daoAddress,
@@ -122,7 +120,9 @@ export const ProposalList = ({
         }
         const votingEndTime =
           proposal.posting_start +
-          convertBlockToMonth(proposal?.funding?.duration_in_blocks ?? 0);
+          convertMonthToSec(
+            convertBlockToMonth(proposal?.funding?.duration_in_blocks ?? 0),
+          );
 
         const {
           coinYes,
@@ -220,7 +220,6 @@ export const ProposalList = ({
             noCount={coinNo}
             yesPercent={yesPercentage}
             noPercent={noPercentage}
-            totalCount={totalSupply}
             threshold={Number(threshold)}
             type={`${getLabelForProposalTypes(type)}${
               coreSlotType ? ` - ${getFormattedSlotType(coreSlotType)}` : ''
@@ -282,7 +281,6 @@ export const ProposalList = ({
           key={proposal.id + proposal.description}
           title={proposal.title}
           daoClient={daoClient}
-          totalCount={totalSupply}
           threshold={target}
           isGov={isGov}
           inActive={isAllInactive}
@@ -410,13 +408,11 @@ export const DaoProposalListItem = ({
   passed,
   daoAddress,
   daoClient,
-
   showIsPassing,
 }: {
   title: string;
   threshold: number;
   type: string;
-  totalCount: number;
   largeSize: boolean;
   proposalId?: string;
   onClickListItem?: MouseEventHandler<HTMLDivElement>;
@@ -587,7 +583,7 @@ export const DaoProposalListItem = ({
                 -
               </Text>
             )}
-            {largeSize && fundingPerMonth !== undefined && (
+            {largeSize && (
               <Tooltip
                 zIndex={333}
                 label={formatBalanceWithComma(
@@ -687,7 +683,6 @@ export const ProposalListItem = ({
   thresholdPercent: number;
   noCount: number;
   noPercent: number;
-  totalCount: number;
   largeSize: boolean;
   daoAddress?: string;
   proposalId?: string;

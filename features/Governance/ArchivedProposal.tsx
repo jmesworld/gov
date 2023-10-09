@@ -1,7 +1,6 @@
 import { GovernanceQueryClient } from '../../client/Governance.client';
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { useAppState } from '../../contexts/AppStateContext';
-import { useCoinSupplyContext } from '../../contexts/CoinSupply';
 import { getProposalTypeForGovPublicProposals } from '../../utils/proposalUti';
 import {
   ProposalQueryStatus,
@@ -9,9 +8,9 @@ import {
 } from '../../client/Governance.types';
 import { useGovernanceProposals } from './useGovernance';
 import GovernanceProposalComponent from './GovernanceProposalComponent';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import GovHeader from './GovHeader';
-import { Flex } from '@chakra-ui/react';
+import { Flex, Text } from '@chakra-ui/react';
 import { LoadMore } from '../components/genial/LoadMore';
 
 const NEXT_PUBLIC_GOVERNANCE_CONTRACT = process.env
@@ -48,14 +47,14 @@ const ArchivedGovernanceProposal = ({
   tab,
 }: Props) => {
   const { setSelectedDaoProposalTitle } = useAppState();
-
-  const { supply } = useCoinSupplyContext();
+  const [showProposalMessage, setShowProposalMessage] = useState(false);
+  console.log('refreshing ...');
   const governanceQueryClient = new GovernanceQueryClient(
     cosmWasmClient as CosmWasmClient,
     NEXT_PUBLIC_GOVERNANCE_CONTRACT,
   );
 
-  const { data, pagination, isFetched, isFetching, isLoading } =
+  const { pagination, data, isFetched, isFetching, isLoading } =
     useGovernanceProposals({
       governanceQueryClient,
       status: status,
@@ -66,8 +65,24 @@ const ArchivedGovernanceProposal = ({
     if (!data) {
       return [];
     }
-    return data.proposals.sort(sortProposalsByType);
+    return (data.proposals ?? []).sort(sortProposalsByType);
   }, [data]);
+
+  useEffect(() => {
+    if (!isFetched) {
+      return;
+    }
+    if (pagination?.loading) {
+      return;
+    }
+    if (!pagination?.data) {
+      return;
+    }
+    if (pagination.data.proposals.length !== 0) {
+      return;
+    }
+    setShowProposalMessage(true);
+  }, [pagination, isFetched]);
 
   return (
     <>
@@ -79,17 +94,34 @@ const ArchivedGovernanceProposal = ({
         setSelectedDaoProposalTitle={setSelectedDaoProposalTitle}
         governanceQueryClient={governanceQueryClient}
         setSelectedProposalId={setSelectedProposalId}
-        supply={supply as number}
         proposalTitle={title}
         data={expiredConcludedSorted}
-        fetched={!!isFetched}
-        isLoading={isFetching || isLoading}
+        fetched={data !== null}
+        isLoading={(isFetching || isLoading) && data === null}
         tab={tab}
       />
+
+      {showProposalMessage && pagination?.loadMore && (
+        <Flex mb="2">
+          <Text size="sm" color="lilac">
+            No proposals with status{' '}
+            <span
+              style={{
+                fontWeight: 700,
+                textTransform: 'capitalize',
+              }}
+            >
+              {tab}
+            </span>{' '}
+            returned, click again to load more
+          </Text>
+        </Flex>
+      )}
       <LoadMore
         loading={!!pagination?.loading}
         enabled={!!pagination?.loadMore}
         nextPage={() => {
+          setShowProposalMessage(false);
           pagination?.fetchNext();
         }}
       />
