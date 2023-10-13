@@ -92,6 +92,23 @@ export const Delegate = ({ onClose }: Props) => {
   const handleTabsChange = (index: number) => {
     setTabIndex(index);
   };
+  const selectedUnboundingValidator = useMemo(() => {
+    if (!selectedUnBonding) {
+      return null;
+    }
+    const validator = bondedValidators.find(
+      el => el.validator_address === selectedUnBonding,
+    );
+    if (!validator) {
+      return null;
+    }
+
+    return formatBalanceWithComma(
+      validator.balance.amount.dividedBy(1e6).toDecimalPlaces(6).toNumber(),
+      0,
+    );
+  }, [bondedValidators, selectedUnBonding]);
+
   if (!address) {
     onClose();
     return null;
@@ -311,7 +328,11 @@ export const Delegate = ({ onClose }: Props) => {
                     >
                       {bonding && `Total JMES: ${Math.max(0, totalJmes - 1)}`}
                       {!bonding &&
-                        `Total bJMES: ${Math.max(0, totalBondedJmes)}`}
+                        `Total bJMES: ${
+                          selectedUnboundingValidator ??
+                          (totalBondedJmes < 0 ? 0 : totalBondedJmes)
+                        }
+                        `}
                       <Button
                         size="xs"
                         ml="1"
