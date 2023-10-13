@@ -10,7 +10,9 @@ import { SignerOptions } from '@cosmos-kit/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Chain } from '@chain-registry/types';
 import jmesTestnet from '../config/chains/jmes-testnet/chain.json';
+import jmesNamito from '../config/chains/jmes-namito/chain.json';
 import jmesAssets from '../config/chains/jmes-testnet/assetlist.json';
+import jmesNamitoAssets from '../config/chains/jmes-namito/assetlist.json';
 import { chainName } from '../config/defaults';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import OnboardingModal from '../features/Onboarding/OnboardingModal';
@@ -21,8 +23,8 @@ import { CosmWasmClientContextProvider } from '../contexts/CosmWasmClient';
 import { Container as ModalContainer } from 'react-modal-promise';
 
 const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL as string;
-const chains: Chain[] = [jmesTestnet];
-const assets = [jmesAssets];
+const chains: Chain[] = [jmesTestnet, jmesNamito];
+const assets = [jmesAssets, jmesNamitoAssets];
 
 import type { NextPage } from 'next';
 import { Layout } from '../layouts/main';

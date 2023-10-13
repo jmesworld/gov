@@ -1,0 +1,24 @@
+{
+  "$schema": "../assetlist.schema.json",
+  "chain_name": "jmesnamito",
+  "assets": [
+    {
+      "description": "The native token of the JMES testnet.",
+      "denom_units": [
+        {
+          "denom": "ujmes",
+          "exponent": 0
+        },
+        {
+          "denom": "jmes",
+          "exponent": 6
+        }
+      ],
+      "base": "ujmes",
+      "name": "JMES",
+      "display": "jmes",
+      "symbol": "JMES",
+      "logo_URIs": {}
+    }
+  ]
+}
