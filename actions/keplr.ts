@@ -18,7 +18,7 @@ export const addJMEStoKeplr = async () => {
         chainName: chainName,
         stakeCurrency: {
             coinDenom: 'JMES',
-            coinMinimalDenom: 'ujmese',
+            coinMinimalDenom: 'ujmes',
             coinDecimals: 6,
         },
         bech32Config: {

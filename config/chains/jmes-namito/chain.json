@@ -1,0 +1,68 @@
+{
+  "$schema": "../chain.schema.json",
+  "chain_name": "jmesnamito",
+  "status": "live",
+  "network_type": "testnet",
+  "pretty_name": "JMES Namito",
+  "chain_id": "jmes-namito",
+  "bech32_prefix": "jmes",
+  "daemon_name": "jmesd",
+  "node_home": "$HOME/.jmesd",
+  "key_algos": ["secp256k1"],
+  "slip44": 6280,
+  "fees": {
+    "fee_tokens": [
+      {
+        "denom": "ujmes",
+        "fixed_min_gas_price": 0.1,
+        "low_gas_price": 0.1,
+        "average_gas_price": 0.15,
+        "high_gas_price": 1
+      }
+    ]
+  },
+  "codebase": {
+    "git_repo": "https://github.com/jmesworld/core/",
+    "recommended_version": "v0.47.1",
+    "compatible_versions": ["v0.47.1"],
+    "genesis": {
+      "genesis_url": "https://raw.githubusercontent.com/jmesworld/testnet/main/jmes-namito/genesis.json"
+    }
+  },
+  "peers": {
+    "seeds": [],
+    "persistent_peers": [
+      {
+        "id": "70bf22e2a103e3a00065a540b3963663a34dec25",
+        "address": "51.38.52.37:26656"
+      }
+    ]
+  },
+  "apis": {
+    "rpc": [
+      {
+        "address": "https://rpc-testnet.jmes-proxy.art",
+        "provider": "genesisdao"
+      }
+    ],
+    "rest": [
+      {
+        "address": "https://lcd-testnet.jmes-proxy.art",
+        "provider": "genesisdao"
+      }
+    ],
+    "grpc": [
+      {
+        "address": "http://51.38.52.37:9090",
+        "provider": "genesisdao"
+      }
+    ]
+  },
+  "explorers": [
+    {
+      "kind": "pingpub",
+      "url": "https://jmes-explorer.art/",
+      "tx_page": "https://jmes-explorer.art/jmes-namito/tx/${txHash}"
+    }
+  ]
+}
